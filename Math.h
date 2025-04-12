@@ -8,6 +8,15 @@ struct Transform {
 	Vector3 translate;
 };
 
+// ベクトルの長さを求める
+float Length(const Vector3& v);
+// ベクトルの正規化
+Vector3 Normalize(const Vector3& v);
+// 内積
+float Dot(const Vector3& v1, const Vector3& v2);
+// 外積
+Vector3 Cross(const Vector3& v1, const Vector3& v2);
+
 // 単位行列を生成する関数
 Matrix4x4 MakeIdentity4x4();
 
