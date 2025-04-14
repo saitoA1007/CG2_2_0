@@ -107,6 +107,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="CompileShader.h" />
     <ClInclude Include="ConvertString.h" />
+    <ClInclude Include="CrashHandler.h" />
     <ClInclude Include="CreateBufferResource.h" />
     <ClInclude Include="DepthStencilTexture.h" />
     <ClInclude Include="DescriptorHandle.h" />
@@ -129,6 +130,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />
     <ClInclude Include="VertexData.h" />
+    <ClInclude Include="WindowProc.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Object3d.PS.hlsl">

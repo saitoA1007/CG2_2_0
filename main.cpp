@@ -18,6 +18,8 @@
 #include"DescriptorHandle.h"
 #include"Material.h"
 #include"DirectionalLight.h"
+#include"CrashHandler.h"
+#include"WindowProc.h"
 #include<dxgidebug.h>
 #include<dxcapi.h>
 #include <string>
@@ -33,31 +35,12 @@
 
 static const double M_PI = 3.14159265358979323846;
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-// ウィンドウプロシージャ
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
-		return true;
-	}
-
-	// メッセージに応じてゲーム固有の処理を行う
-	switch (msg) {
-		// ウィンドウが破棄された
-	case WM_DESTROY:
-		// OSに対して、アプリの終了を伝える
-		PostQuitMessage(0);
-		return 0;
-	}
-
-	// 標準のメッセージ処理を行う
-	return DefWindowProc(hwnd, msg, wparam, lparam);
-}
-
 // windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
+	// 誰も補足しなかった場合に(Unhandled)、補足する関数を登録
+	SetUnhandledExceptionFilter(ExportDump);
+
 	// COMの初期化
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
