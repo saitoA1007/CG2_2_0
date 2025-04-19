@@ -3,6 +3,12 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+WindowsApp* WindowsApp::GetInstance()
+{
+	static WindowsApp instance;
+	return &instance;
+}
+
 LRESULT CALLBACK WindowsApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
@@ -28,7 +34,7 @@ void WindowsApp::CreateGameWindow(const std::wstring& title, int32_t kClientWidt
 	// ウィンドウプロシージャ
 	wc_.lpfnWndProc = &WindowProc;
 	// ウィンドウクラス名
-	wc_.lpszClassName = title.c_str();
+	wc_.lpszClassName = L"CG2WindowClass";
 	// インスタンスハンドル
 	wc_.hInstance = GetModuleHandle(nullptr);
 	// カーソル
@@ -45,7 +51,7 @@ void WindowsApp::CreateGameWindow(const std::wstring& title, int32_t kClientWidt
 
 	hwnd_ = CreateWindow(
 		wc_.lpszClassName,       // 利用するクラス名
-		L"CG2",                 // タイトルバーの文字
+		title.c_str(),                 // タイトルバーの文字
 		WS_OVERLAPPEDWINDOW,    // よく見るウィンドウスタイル
 		CW_USEDEFAULT,          // 表示X座標(Windowに任せる)
 		CW_USEDEFAULT,          // 表示Y座標(WindowOSに任せる)
@@ -58,6 +64,19 @@ void WindowsApp::CreateGameWindow(const std::wstring& title, int32_t kClientWidt
 
 	// ウィンドウを表示する
 	ShowWindow(hwnd_, SW_SHOW);
+}
+
+bool WindowsApp::ProcessMessage() {
+
+	// falseならそのまま処理、trueなら終了
+	while (PeekMessage(&msg_, nullptr, 0, 0, PM_REMOVE)) {
+		if (msg_.message == WM_QUIT) {
+			return true; 
+		}
+		TranslateMessage(&msg_);
+		DispatchMessage(&msg_);
+	}
+	return false; 
 }
 
 void WindowsApp::BreakGameWindow() {

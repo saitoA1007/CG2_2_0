@@ -1,11 +1,7 @@
-#pragma once
-#include<d3d12.h>
-#include<iostream>
-#include<wrl.h>
+#include"DepthStencilTexture.h"
 #include<cassert>
 
-
-inline Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
+Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height) {
 	// 生成するResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = width; // Textureの幅

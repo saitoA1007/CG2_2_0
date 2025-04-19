@@ -2,6 +2,8 @@
 #include"Vector3.h"
 #include "Matrix4x4.h"
 
+static const double M_PI = 3.14159265358979323846;
+
 struct Transform {
 	Vector3 scale;
 	Vector3 rotate;

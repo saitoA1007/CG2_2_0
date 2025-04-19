@@ -6,8 +6,7 @@
 class WindowsApp {
 public:
 
-	WindowsApp() = default;
-	~WindowsApp() = default;
+	static WindowsApp* GetInstance();
 
 	// ウィンドウサイズ
 	static const int32_t kWindowWidth = 1280;
@@ -36,6 +35,11 @@ public:
 	void CreateGameWindow(const std::wstring& title, int32_t clientWidth = kWindowWidth, int32_t clientHeight = kWindowHeight);
 
 	/// <summary>
+	/// メッセージ処理
+	/// </summary>
+	bool ProcessMessage();
+
+	/// <summary>
 	/// ウィンドウの破棄
 	/// </summary>
 	void BreakGameWindow();
@@ -48,10 +52,16 @@ public:
 
 	HINSTANCE GetHInstance() const { return wc_.hInstance; }
 private:
+	WindowsApp() = default;
+	~WindowsApp() = default;
+	WindowsApp(const WindowsApp&) = delete;
+	WindowsApp& operator=(const WindowsApp&) = delete;
 
 	// ウィンドウクラス
 	WNDCLASS wc_{};
 	// ウィンドウハンドル
 	HWND hwnd_ = nullptr;
 	RECT wrc_;
+
+	MSG msg_{};
 };
