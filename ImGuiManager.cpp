@@ -1,14 +1,12 @@
 #include"ImGuiManager.h"
 
-ImGuiManager* ImGuiManager::GetInstance() {
-	static ImGuiManager instance;
-	return &instance;
-}
+ImGuiManager::ImGuiManager() {}
+ImGuiManager::~ImGuiManager() {}
 
 void ImGuiManager::Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon) {
 
-	windowsApp_ = windowsApp->GetInstance();
-	dxCommon_ = dxCommon->GetInstance();
+	windowsApp_ = windowsApp;
+	dxCommon_ = dxCommon;
 
 	// クライアント領域のサイズと一緒にして画面全体に表示
 	viewport_.Width = windowsApp_->kWindowWidth;

@@ -1,6 +1,6 @@
 #include"Sphere.h"
 #include <cmath>
-#include "Math.h"
+#include "Math/Math.h"
 #include<cassert>
 #include"CreateBufferResource.h"
 

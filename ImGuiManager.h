@@ -9,7 +9,8 @@
 class ImGuiManager {
 public:
 
-	static ImGuiManager* GetInstance();
+	ImGuiManager();
+	~ImGuiManager();
 
 	void Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon);
 
@@ -22,8 +23,8 @@ public:
 	void Finalize();
 
 private:
-	ImGuiManager() = default;
-	~ImGuiManager() = default;
+	//ImGuiManager() = default;
+	//~ImGuiManager() = default;
 	ImGuiManager(const ImGuiManager&) = delete;
 	const ImGuiManager& operator=(const ImGuiManager&) = delete;
 

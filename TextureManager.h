@@ -8,14 +8,10 @@
 #include"DirectXCommon.h"
 #include<format>
 
-/// <summary>
-/// テクスチャマネージャ
-/// </summary>
 class TextureManager {
 public:
-
-	// シングルインスタンス
-	static TextureManager* GetInstance();
+	TextureManager();
+	~TextureManager();
 
 	// テクスチャ
 	struct Texture {
@@ -35,7 +31,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="dxCommon"></param>
-	void Initialize();
+	void Initialize(DirectXCommon* dxCommon);
 
 	// 解放処理
 	void Finalize();
@@ -46,19 +42,19 @@ public:
 	/// <param name="fileName">ファイル名</param>
 	/// <param name="logStream">ログファイル</param>
 	/// <returns></returns>
-	static uint32_t Load(const std::string& fileName, std::ofstream& logStream);
+	uint32_t Load(const std::string& fileName, std::ofstream& logStream);
 
 
-	static D3D12_GPU_DESCRIPTOR_HANDLE& GetTextureSrvHandlesGPU(const uint32_t& textureHandle);
+	D3D12_GPU_DESCRIPTOR_HANDLE& GetTextureSrvHandlesGPU(const uint32_t& textureHandle);
 
 private:
-	TextureManager() = default;
-	~TextureManager() = default;
+	//TextureManager() = default;
+	//~TextureManager() = default;
 	TextureManager(const TextureManager&) = delete;
 	TextureManager& operator=(const TextureManager&) = delete;
 
 	// テクスチャの数
-	static const int kTextureNum_ = 2;
+	static const int kTextureNum_ = 128;
 
 	// DirectXCommon
 	DirectXCommon* dxCommon_ = nullptr;

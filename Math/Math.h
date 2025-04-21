@@ -1,6 +1,6 @@
 #pragma once
-#include"Vector3.h"
-#include "Matrix4x4.h"
+#include"Math/Vector3.h"
+#include"Math/Matrix4x4.h"
 
 static const double M_PI = 3.14159265358979323846;
 

@@ -11,11 +11,9 @@
 
 using namespace Microsoft::WRL;
 
-DirectXCommon* DirectXCommon::GetInstance()
-{
-    static DirectXCommon instance;
-    return &instance;
-}
+DirectXCommon::DirectXCommon() {}
+
+DirectXCommon::~DirectXCommon() {}
 
 void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, std::ofstream& logStream)
 {
@@ -34,7 +32,7 @@ void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, std::
     CreateFence();
 }
 
-void DirectXCommon::PreDraw(ID3D12RootSignature* rootSignature, ID3D12PipelineState* graphicsPipelineState)
+void DirectXCommon::PreDraw(ID3D12RootSignature* rootSignature,ID3D12PipelineState* graphicsPipelineState)
 {
     // これから書き込むバックバッファのインデックスを取得
     backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
@@ -78,11 +76,6 @@ void DirectXCommon::PostDraw()
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
     // バリアを張る対象のリソース。現在のバックバッファに対して行う
     barrier.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
-    // 遷移前(現在)のResourceState
-    //barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-    // 遷移後のResourceState
-    //barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;

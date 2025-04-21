@@ -7,12 +7,13 @@
 
 class DirectXCommon {
 public:
-    static DirectXCommon* GetInstance();
+    DirectXCommon();
+    ~DirectXCommon();
 
     // 初期化
     void Initialize(HWND hwnd, uint32_t width, uint32_t height, std::ofstream& logStream);
     // 描画前処理
-    void PreDraw(ID3D12RootSignature* rootSignature, ID3D12PipelineState* graphicsPipelineState);
+    void PreDraw(ID3D12RootSignature* rootSignature,ID3D12PipelineState* graphicsPipelineState);
     // 描画後処理
     void PostDraw();
     // 解放処理
@@ -38,8 +39,8 @@ public:
     D3D12_RENDER_TARGET_VIEW_DESC GetRTVDesc() const { return rtvDesc; }
 
 private:
-    DirectXCommon() = default;
-    ~DirectXCommon() = default;
+    //DirectXCommon() = default;
+    //~DirectXCommon() = default;
     DirectXCommon(const DirectXCommon&) = delete;
     DirectXCommon& operator=(const DirectXCommon&) = delete;
 

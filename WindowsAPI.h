@@ -5,15 +5,13 @@
 
 class WindowsApp {
 public:
-
-	static WindowsApp* GetInstance();
+	WindowsApp();
+	~WindowsApp();
 
 	// ウィンドウサイズ
 	static const int32_t kWindowWidth = 1280;
 	static const int32_t kWindowHeight = 720;
-	// ウィンドウ名
-	//static const wchar_t kWindowClassName[];
-
+	
 public:
 
 	/// <summary>
@@ -52,8 +50,8 @@ public:
 
 	HINSTANCE GetHInstance() const { return wc_.hInstance; }
 private:
-	WindowsApp() = default;
-	~WindowsApp() = default;
+	//WindowsApp() = default;
+	//~WindowsApp() = default;
 	WindowsApp(const WindowsApp&) = delete;
 	WindowsApp& operator=(const WindowsApp&) = delete;
 
@@ -61,7 +59,7 @@ private:
 	WNDCLASS wc_{};
 	// ウィンドウハンドル
 	HWND hwnd_ = nullptr;
-	RECT wrc_;
+	RECT wrc_{};
 
 	MSG msg_{};
 };

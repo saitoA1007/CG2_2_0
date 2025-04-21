@@ -3,11 +3,8 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-WindowsApp* WindowsApp::GetInstance()
-{
-	static WindowsApp instance;
-	return &instance;
-}
+WindowsApp::WindowsApp() {}
+WindowsApp::~WindowsApp() {}
 
 LRESULT CALLBACK WindowsApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
