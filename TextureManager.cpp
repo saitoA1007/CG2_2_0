@@ -2,13 +2,13 @@
 #include"ConvertString.h"
 #include"CreateBufferResource.h"
 #include"DescriptorHandle.h"
-#include"Log.h"
 
 TextureManager::TextureManager(){}
 TextureManager::~TextureManager() {}
 
-void TextureManager::Initialize(DirectXCommon* dxCommon) {
+void TextureManager::Initialize(DirectXCommon* dxCommon, LogManager* logManager) {
 	dxCommon_ = dxCommon;
+	logManager_ = logManager;
 }
 
 void TextureManager::Finalize() {
@@ -24,7 +24,7 @@ void TextureManager::Finalize() {
 	intermediateResources_.clear();	
 }
 
-uint32_t TextureManager::Load(const std::string& fileName, std::ofstream& logStream) {
+uint32_t TextureManager::Load(const std::string& fileName) {
 
 	// もし同じテクスチャを読み込んだのであれば、すでに格納されている配列番号を返す。
 	for (int i = 0; i < textures_.size(); ++i) {
@@ -45,20 +45,20 @@ uint32_t TextureManager::Load(const std::string& fileName, std::ofstream& logStr
 		// テクスチャを読み込む
 	textures_.at(index_).mipImage = LoadTexture(fileName);
 	if (!textures_.at(index_).mipImage.GetImages()) {
-		Log(logStream, "Failed to load texture: " + fileName);
+		logManager_->Log("Failed to load texture: " + fileName);
 		assert(false);
 	}
 	metadata_ = &textures_.at(index_).mipImage.GetMetadata();
 	// テクスチャリソースを作成
 	textures_.at(index_).textureResource = CreateTextureResource(dxCommon_->GetDevice(), *metadata_);
 	if (!textures_.at(index_).textureResource) {
-		Log(logStream, "Failed to create texture resource for: " + fileName);
+		logManager_->Log("Failed to create texture resource for: " + fileName);
 		assert(false);
 	}
 	// テクスチャデータをアップロード
 	intermediateResources_.push_back(UploadTextureData(textures_.at(index_).textureResource.Get(), textures_.at(index_).mipImage, dxCommon_->GetDevice(), dxCommon_->GetCommandList()));
 	if (!intermediateResources_.at(index_)) {
-		Log(logStream, "Failed to upload texture data for: " + fileName);
+		logManager_->Log("Failed to upload texture data for: " + fileName);
 		assert(false);
 	}
 
@@ -71,7 +71,7 @@ uint32_t TextureManager::Load(const std::string& fileName, std::ofstream& logStr
 	// SRVを作成するDescriptorHeapの場所を決める。先頭はImGuiが使っているのでその次を使う
 	textures_.at(index_).textureSrvHandleCPU = GetCPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), index_ + 1);
 	textures_.at(index_).textureSrvHandleGPU = GetGPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), index_ + 1);
-	Log(logStream, std::format("CPU Handle: {}, GPU Handle: {}", textures_.at(index_).textureSrvHandleCPU.ptr, textures_.at(index_).textureSrvHandleGPU.ptr));
+	logManager_->Log(std::format("CPU Handle: {}, GPU Handle: {}", textures_.at(index_).textureSrvHandleCPU.ptr, textures_.at(index_).textureSrvHandleGPU.ptr));
 	// SRVを作成
 	dxCommon_->GetDevice()->CreateShaderResourceView(textures_.at(index_).textureResource.Get(), &srvDesc_, textures_.at(index_).textureSrvHandleCPU);
 

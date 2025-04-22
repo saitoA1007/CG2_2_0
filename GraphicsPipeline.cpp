@@ -1,6 +1,5 @@
 #include"GraphicsPipeline.h"
 #include"ConvertString.h"
-#include"Log.h"
 #include<format>
 #include <cassert>
 
@@ -9,7 +8,10 @@ GraphicsPipeline* GraphicsPipeline::GetInstance() {
 	return &instance;
 }
 
-void GraphicsPipeline::Initialize(ID3D12Device* device, std::ofstream& logStream) {
+void GraphicsPipeline::Initialize(ID3D12Device* device, LogManager* logManager) {
+
+	// ログを取得
+	logManager_ = logManager;
 
 	// dxcCompilerを初期化
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
@@ -66,7 +68,7 @@ void GraphicsPipeline::Initialize(ID3D12Device* device, std::ofstream& logStream
 	hr = D3D12SerializeRootSignature(&descriptionRootSignature,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
 	if (FAILED(hr)) {
-		Log(logStream, reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
+		logManager_->Log(reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
 		assert(false);
 	}
 	// バイナリを元に生成
@@ -108,11 +110,11 @@ void GraphicsPipeline::Initialize(ID3D12Device* device, std::ofstream& logStream
 
 	// Shaderをコンパイルする
 	vertexShaderBlob_ = CompileShader(L"Object3d.VS.hlsl",
-		L"vs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get(), logStream);
+		L"vs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(vertexShaderBlob_ != nullptr);
 
 	pixelShaderBlob_ = CompileShader(L"Object3d.PS.hlsl",
-		L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get(), logStream);
+		L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(pixelShaderBlob_ != nullptr);
 
 	// DepthStencilStateの設定
@@ -166,12 +168,10 @@ Microsoft::WRL::ComPtr<IDxcBlob> GraphicsPipeline::CompileShader(
 	// 初期化で生成したものを3つ
 	IDxcUtils* dxcUtils,
 	IDxcCompiler3* dxcCompiler,
-	IDxcIncludeHandler* includeHandler,
-	// ログ出力用のストリーム
-	std::ofstream& logStream)
+	IDxcIncludeHandler* includeHandler)
 {
 	// これからシェーダーをコンパイルする旨をログに出す
-	Log(logStream, ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
+	logManager_->Log(ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
 	// hlslファイルを読む
 	IDxcBlobEncoding* shaderSource = nullptr;
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
@@ -207,7 +207,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> GraphicsPipeline::CompileShader(
 	IDxcBlobUtf8* shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		Log(logStream, shaderError->GetStringPointer());
+		logManager_->Log(shaderError->GetStringPointer());
 		// 警告・エラーダメゼッタイ
 		assert(false);
 	}
@@ -217,7 +217,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> GraphicsPipeline::CompileShader(
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
 	// 成功したログを出す
-	Log(logStream, ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+	logManager_->Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
 	// もう使わないリソースを解放
 	shaderSource->Release();
 	shaderResult->Release();

@@ -15,7 +15,6 @@ public:
 
 	Matrix4x4 GetViewMatrix() { return viewMatrix_; }
 	Matrix4x4 GetProjectionMatrix() { return projectionMatrix_; }
-	Matrix4x4 GetOrthographicMatrix() { return orthographicMatrix_; }
 
 private:
 

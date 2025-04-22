@@ -3,7 +3,7 @@
 #include <string>
 #include <format>
 
-#include"Log.h"
+
 #include"ConvertString.h"
 #include"DescriptorHeap.h"
 #include"DescriptorHandle.h"
@@ -15,10 +15,13 @@ DirectXCommon::DirectXCommon() {}
 
 DirectXCommon::~DirectXCommon() {}
 
-void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, std::ofstream& logStream)
+void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, LogManager* logManager)
 {
+    // ログを所得
+    logManager_ = logManager;
+
     // デバイスとコマンドオブジェクトの生成
-    CreateDevice(logStream);
+    CreateDevice();
 #ifdef _DEBUG
     DebugLayer();
 #endif
@@ -132,7 +135,7 @@ void DirectXCommon::Finalize() {
 #endif 
 }
 
-void DirectXCommon::CreateDevice(std::ofstream& logStream)
+void DirectXCommon::CreateDevice()
 {
 #ifdef _DEBUG
     ComPtr<ID3D12Debug1> debugController;
@@ -162,7 +165,7 @@ void DirectXCommon::CreateDevice(std::ofstream& logStream)
         // ソフトウェアアダプタでなければ採用
         if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
             // 採用したアダプタの情報をログに出力。wstringの方なので注意
-            Log(logStream, ConvertString(std::format(L"Use Adapater:{}\n", adapterDesc.Description)));
+            logManager_->Log(ConvertString(std::format(L"Use Adapater:{}\n", adapterDesc.Description)));
             break;
         }
         useAdapter = nullptr; // ソフトウェアアダプタの場合は見なかったことにする
@@ -181,13 +184,13 @@ void DirectXCommon::CreateDevice(std::ofstream& logStream)
         // 指定した機能レベルでデバイスが生成できたかを確認
         if (SUCCEEDED(hr)) {
             // 生成できたログを出力を行ってループを抜ける
-            Log(logStream, std::format("FeatureLevel : {}\n", featureLevelString[i]));
+            logManager_->Log(std::format("FeatureLevel : {}\n", featureLevelString[i]));
             break;
         }
     }
     // デバイスの生成がうまくいかなかったので軌道できない
     assert(device_ != nullptr);
-    Log(logStream, "Complete create D3D12Device!!!\n"); // 初期化完了のログを出す
+    logManager_->Log("Complete create D3D12Device!!!\n");
 }
 
 void DirectXCommon::CreateCommandObjects()

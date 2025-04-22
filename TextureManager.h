@@ -7,6 +7,7 @@
 #include <wrl.h>
 #include"DirectXCommon.h"
 #include<format>
+#include"Log.h"
 
 class TextureManager {
 public:
@@ -31,7 +32,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="dxCommon"></param>
-	void Initialize(DirectXCommon* dxCommon);
+	void Initialize(DirectXCommon* dxCommon, LogManager* logManager);
 
 	// 解放処理
 	void Finalize();
@@ -42,7 +43,7 @@ public:
 	/// <param name="fileName">ファイル名</param>
 	/// <param name="logStream">ログファイル</param>
 	/// <returns></returns>
-	uint32_t Load(const std::string& fileName, std::ofstream& logStream);
+	uint32_t Load(const std::string& fileName);
 
 
 	D3D12_GPU_DESCRIPTOR_HANDLE& GetTextureSrvHandlesGPU(const uint32_t& textureHandle);
@@ -75,6 +76,9 @@ private:
 
 	// 配列の管理
 	int32_t index_ = -1;
+
+	// ログ
+	LogManager* logManager_;
 
 private:
 

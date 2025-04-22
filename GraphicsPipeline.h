@@ -3,6 +3,7 @@
 #include<dxcapi.h>
 #include<iostream>
 #include <wrl.h>
+#include"Log.h"
 
 #pragma comment(lib,"dxcompiler.lib")
 
@@ -13,7 +14,7 @@ public:
     static GraphicsPipeline* GetInstance();
 
     // 初期化
-    void Initialize(ID3D12Device* device, std::ofstream& logStream);
+    void Initialize(ID3D12Device* device, LogManager* logManager);
 
     // 解放処理
     void Finalize();
@@ -44,6 +45,9 @@ private:
     Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
     Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
 
+    // ログ
+    LogManager* logManager_;
+
 private:
 
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
@@ -54,7 +58,5 @@ private:
         // 初期化で生成したものを3つ
         IDxcUtils* dxcUtils,
         IDxcCompiler3* dxcCompiler,
-        IDxcIncludeHandler* includeHandler,
-        // ログ出力用のストリーム
-        std::ofstream& logStream);
+        IDxcIncludeHandler* includeHandler);
 };

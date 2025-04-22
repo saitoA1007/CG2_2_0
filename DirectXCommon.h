@@ -4,6 +4,7 @@
 #include <wrl.h>
 #include <array>
 #include <fstream>
+#include"Log.h"
 
 class DirectXCommon {
 public:
@@ -11,7 +12,7 @@ public:
     ~DirectXCommon();
 
     // 初期化
-    void Initialize(HWND hwnd, uint32_t width, uint32_t height, std::ofstream& logStream);
+    void Initialize(HWND hwnd, uint32_t width, uint32_t height, LogManager* logManager);
     // 描画前処理
     void PreDraw(ID3D12RootSignature* rootSignature,ID3D12PipelineState* graphicsPipelineState);
     // 描画後処理
@@ -45,7 +46,7 @@ private:
     DirectXCommon& operator=(const DirectXCommon&) = delete;
 
     // DirectXデバイスの生成
-    void CreateDevice(std::ofstream& logStream);
+    void CreateDevice();
     // 描画命令を記録・実行するためのオブジェクト群を生成
     void CreateCommandObjects();
     // 画面表示のための「表裏バッファ」セット（スワップチェーン）を作成
@@ -92,4 +93,7 @@ private:
 
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+
+    // ログ
+    LogManager* logManager_;
 };

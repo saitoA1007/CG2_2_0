@@ -5,8 +5,22 @@
 #include<filesystem>
 #include<chrono>
 
-// Log関数
-inline void Log(std::ostream& os, const std::string& message) {
-	os << message << std::endl;
-	OutputDebugStringA(message.c_str());
-}
+class LogManager {
+public:
+
+	/// <summary>
+	/// ログを書き込むため準備
+	/// </summary>
+	static void Create();
+
+	/// <summary>
+	/// ログを出力
+	/// </summary>
+	/// <param name="message">出力するメッセージ</param>
+	void Log(const std::string& message);
+
+	std::ofstream GetLogStream(){}
+
+private:
+	static std::ofstream logStream_;
+};
