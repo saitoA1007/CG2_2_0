@@ -24,17 +24,18 @@
 #include"TextureManager.h"
 #include"Sprite.h"
 #include"Model.h"
+#include"InPut.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 
 // windowsアプリでのエントリーポイント(main関数)
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	
 	// 誰も補足しなかった場合に(Unhandled)、補足する関数を登録
 	SetUnhandledExceptionFilter(ExportDump);
-
+	
 	// COMの初期化
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
@@ -45,6 +46,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// ウィンドウの作成
 	std::shared_ptr<WindowsApp> windowsApp = std::make_shared<WindowsApp>();
 	windowsApp->CreateGameWindow(L"CG2", 1280, 720);
+
+	std::shared_ptr<Input> input = std::make_shared<Input>();
+	input->Initialize(hInstance, windowsApp->GetHwnd());
 
 	// リソースチェックのデバック
 	D3DResourceLeakChecker leakCheck;
@@ -128,6 +132,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//=====================================================
 		// 更新処理
 		//=====================================================
+
+		// キー入力の更新処理
+		input->Update();
 
 		// ImGuiにフレームが始まる旨を伝える
 		imGuiManager->BeginFrame();

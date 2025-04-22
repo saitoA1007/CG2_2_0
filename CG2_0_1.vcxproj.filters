@@ -88,6 +88,7 @@
     <ClCompile Include="Log.cpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="InPut.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConvertString.h">
@@ -182,6 +183,7 @@
     <ClInclude Include="Model.h">
       <Filter>ヘッダー ファイル\Object</Filter>
     </ClInclude>
+    <ClInclude Include="InPut.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Object3d.PS.hlsl">
