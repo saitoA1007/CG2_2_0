@@ -10,6 +10,8 @@
 #include<vector>
 #include <wrl.h>
 
+#include"Camera.h"
+
 class Model {
 public:
 
@@ -52,7 +54,7 @@ public:
 	static Model* CreateSphere(uint32_t subdivision);
 
 	// 描画
-	void Draw(ID3D12Resource* directionalLightResource, D3D12_GPU_DESCRIPTOR_HANDLE* textureSrvHandlesGPU);
+	void Draw(const Matrix4x4& worldMatrix,ID3D12Resource* directionalLightResource, D3D12_GPU_DESCRIPTOR_HANDLE* textureSrvHandlesGPU,const Matrix4x4& VPMatrix);
 
 	/// <summary>
 	/// 移動処理

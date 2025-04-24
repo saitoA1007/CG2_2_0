@@ -10,6 +10,9 @@ struct Transform {
 	Vector3 translate;
 };
 
+// 減算
+Vector3 Subtract(const Vector3& v1, const Vector3& v2);
+
 // ベクトルの長さを求める
 float Length(const Vector3& v);
 // ベクトルの正規化
@@ -51,3 +54,6 @@ Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip
 
 // 平行投射行列の作成
 Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip);
+
+// (3+1)次元座標系をデカルト座標系に変換
+Vector3 Transforms(const Vector3& vector, const Matrix4x4& matrix);

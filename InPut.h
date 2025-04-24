@@ -59,6 +59,12 @@ public:
 	const Vector2& GetMousePosition() const;
 
 	/// <summary>
+	/// マウスの移動量を取得（ウィンドウ座標系）
+	/// </summary>
+	/// <returns></returns>
+	const Vector2& GetMouseDelta();
+
+	/// <summary>
 	/// ホイールスクロール量を取得する
 	/// </summary>
 	/// <returns>ホイールスクロール量。奥側に回したら+。Windowsの設定で逆にしてたら逆</returns>
@@ -80,4 +86,6 @@ private:
 	HWND hwnd_;
 	POINT point_;
 	Vector2 mousePosition_;
+	Vector2 preMousePosition_;
+	Vector2 mouseDelta_;
 };

@@ -53,6 +53,8 @@ void Input::Update() {
 	GetCursorPos(&point_);
 	// 自分のwindow基準の座標に変換
 	ScreenToClient(hwnd_, &point_);
+	// 前フレームの位置を取得する
+	preMousePosition_ = mousePosition_;
 	// Vector2に格納
 	mousePosition_.x = static_cast<float>(point_.x);
 	mousePosition_.y = static_cast<float>(point_.y);
@@ -92,6 +94,13 @@ bool Input::IsTriggerMouse(int32_t buttonNumber) const {
 
 const Vector2& Input::GetMousePosition() const {
 	return mousePosition_;
+}
+
+const Vector2& Input::GetMouseDelta() {
+	// マウス位置の差分を取得
+	mouseDelta_.x = mousePosition_.x - preMousePosition_.x;
+	mouseDelta_.y = mousePosition_.y - preMousePosition_.y;
+	return mouseDelta_;
 }
 
 int32_t Input::GetWheel() const {

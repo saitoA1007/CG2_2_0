@@ -188,7 +188,11 @@ Model* Model::CreateFromOBJ(const std::string& objFilename, const std::string& f
 }
 
 // 描画
-void Model::Draw(ID3D12Resource* directionalLightResource, D3D12_GPU_DESCRIPTOR_HANDLE* textureSrvHandlesGPU) {
+void Model::Draw(const Matrix4x4& worldMatrix, ID3D12Resource* directionalLightResource, D3D12_GPU_DESCRIPTOR_HANDLE* textureSrvHandlesGPU, const Matrix4x4& VPMatrix) {
+
+	// 変更した内容を適応
+	transformationMatrixData_->WVP = Multiply(worldMatrix,VPMatrix);
+
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	commandList_->IASetIndexBuffer(&indexBufferView_);
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -201,7 +205,6 @@ void Model::Draw(ID3D12Resource* directionalLightResource, D3D12_GPU_DESCRIPTOR_
 	} else if (modelname_ == obj) {
 		commandList_->DrawInstanced(totalIndices_, 1, 0, 0);
 	}
-	
 }
 
 Model::ModelData Model::LoadObjeFile(const std::string& directoryPath, const std::string& objFilename,const std::string& filename) {

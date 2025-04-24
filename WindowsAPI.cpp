@@ -27,6 +27,9 @@ LRESULT CALLBACK WindowsApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPAR
 
 void WindowsApp::CreateGameWindow(const std::wstring& title, int32_t kClientWidth, int32_t kClientHeight) {
 
+	// COMの初期化
+	CoInitializeEx(0, COINIT_MULTITHREADED);
+
 	/// ウィンドウクラスの作成
 	// ウィンドウプロシージャ
 	wc_.lpfnWndProc = &WindowProc;
@@ -77,5 +80,8 @@ bool WindowsApp::ProcessMessage() {
 }
 
 void WindowsApp::BreakGameWindow() {
+	// COMの終了処理
+	CoUninitialize();
+
 	CloseWindow(hwnd_);
 }

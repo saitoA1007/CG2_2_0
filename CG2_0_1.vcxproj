@@ -93,8 +93,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConvertString.cpp" />
+    <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="DirectXCommo.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
@@ -116,10 +118,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="WindowsAPI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Audio.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConvertString.h" />
     <ClInclude Include="CrashHandler.h" />
     <ClInclude Include="CreateBufferResource.h" />
+    <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="DepthStencilTexture.h" />
     <ClInclude Include="DescriptorHandle.h" />
     <ClInclude Include="DescriptorHeap.h" />

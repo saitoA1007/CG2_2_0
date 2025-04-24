@@ -13,9 +13,10 @@
 #include"Material.h"
 #include"DirectionalLight.h"
 #include"CrashHandler.h"
-#include"Camera.h"
 #include <string>
 
+#include"Camera.h"
+#include"DebugCamera.h"
 #include"ResorceLeakChecker.h"
 #include"WindowsAPI.h"
 #include"DirectXCommon.h"
@@ -25,6 +26,7 @@
 #include"Sprite.h"
 #include"Model.h"
 #include"InPut.h"
+#include"Audio.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -35,9 +37,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	
 	// 誰も補足しなかった場合に(Unhandled)、補足する関数を登録
 	SetUnhandledExceptionFilter(ExportDump);
-	
-	// COMの初期化
-	CoInitializeEx(0, COINIT_MULTITHREADED);
 
 	// ログの初期化
 	LogManager::Create();
@@ -75,6 +74,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	std::shared_ptr<TextureManager> textureManager = std::make_shared<TextureManager>();
 	textureManager->Initialize(dxCommon.get(),logManager.get());
 
+	// 音声の初期化
+	std::shared_ptr<AudioManager> audioManager = std::make_shared<AudioManager>();
+	audioManager->Initialize();
+
 	//=========================================================================
 	// 宣言と初期化
 	//=========================================================================
@@ -83,9 +86,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	uint32_t uvCheckerGH = textureManager->Load("Resources/uvChecker.png");
 	uint32_t monsterBallGH = textureManager->Load("Resources/monsterBall.png");
 
+	// 音声データをロード
+	//uint32_t fanfareSH = audioManager->Load("Resources/fanfare.wav");
+	//// 音声を再生
+	//audioManager->Play(fanfareSH);
+
 	// カメラ
 	Camera camera;
 	camera.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, windowsApp->kWindowWidth, windowsApp->kWindowHeight);
+
+	// デバックカメラ
+	DebugCamera debugCamera;
+	debugCamera.Initialize(windowsApp->kWindowWidth, windowsApp->kWindowHeight);
 
 	// 球
 	//Sphere sphere;
@@ -139,6 +151,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		// ImGuiにフレームが始まる旨を伝える
 		imGuiManager->BeginFrame();
 
+		// デバックカメラの更新処理
+		debugCamera.Update(input.get());
+
 		// 画像を動かすimGui
 		ImGui::Begin("DebugWindow");
 		// モデル
@@ -146,7 +161,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("UVrotate", &transform.rotate.x, 0.01f, -10.0f, 10.0f);
 		ImGui::DragFloat3("UVScale", &transform.scale.x, 0.01f, -10.0f, 10.0f);
 		worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-		plane->SetTransformationMatrix(camera.MakeWVPMatrix(worldMatrix));
 
 		// 光の色を変更
 		ImGui::ColorEdit3("Light_Color", &lightColor.x); 
@@ -182,9 +196,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
 		// 描画前処理
 		dxCommon->PreDraw(graphicsPipeline->GetRootSignature(), graphicsPipeline->GetPipelineState());
-
 		
-		plane->Draw(directionalLight.GetResource(), &textureManager->GetTextureSrvHandlesGPU(uvCheckerGH));
+		plane->Draw(worldMatrix,directionalLight.GetResource(), &textureManager->GetTextureSrvHandlesGPU(uvCheckerGH),debugCamera.GetVPMatrix());
 
 		// Spriteの描画
 		//sprite->Draw(&textureManager->GetTextureSrvHandlesGPU(uvCheckerGH));
@@ -195,15 +208,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		dxCommon->PostDraw();
 	}
 
-	// COMの終了処理
-	CoUninitialize();
-
 	/// 解放処理
 
 	// スプライトのインスタンスを解放
 	//delete sprite;
 
 	delete plane;
+
+	audioManager->Finalize();
 
 	// テクスチャの解放
 	textureManager->Finalize();
