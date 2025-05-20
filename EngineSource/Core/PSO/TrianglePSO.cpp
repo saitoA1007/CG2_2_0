@@ -87,18 +87,18 @@ void TrianglePSO::Initialize(const std::wstring& vsPath, const std::wstring& psP
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
 	// Blendstateの設定
-	D3D12_BLEND_DESC blendDesc{};
-	// すべての色要素を書き込む
-	blendDesc.RenderTarget[0].RenderTargetWriteMask =
-		D3D12_COLOR_WRITE_ENABLE_ALL;
-	// 透明度(アルファ値)を適応されるようにする
-	blendDesc.RenderTarget[0].BlendEnable = TRUE; // ブレンドを有効化
-	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // ソースのアルファ値を使用
-	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD; // 加算ブレンド
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA; // 1 - ソースアルファ値を使用
-	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE; // アルファ値のソース
-	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD; // アルファ値の加算ブレンド
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO; // アルファ値のデスティネーション
+	//D3D12_BLEND_DESC blendDesc{};
+	//// すべての色要素を書き込む
+	//blendDesc.RenderTarget[0].RenderTargetWriteMask =
+	//	D3D12_COLOR_WRITE_ENABLE_ALL;
+	//// 透明度(アルファ値)を適応されるようにする
+	//blendDesc.RenderTarget[0].BlendEnable = TRUE; // ブレンドを有効化
+	//blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // SrcA
+	//blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD; // 加算ブレンド
+	//blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA; // (1-SrcA)
+	//blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE; // アルファ値のソース
+	//blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD; // アルファ値の加算ブレンド
+	//blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO; // アルファ値のデスティネーション
 
 	// RasiterzerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
@@ -126,10 +126,74 @@ void TrianglePSO::Initialize(const std::wstring& vsPath, const std::wstring& psP
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	// PSO設定
+	//D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
+	//graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();// RootSignature
+	//graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;// InputLayout
+	//graphicsPipelineStateDesc.BlendState = blendDesc; // BlendState
+	//graphicsPipelineStateDesc.RasterizerState = rasterizerDesc; // RasterizerState
+	//graphicsPipelineStateDesc.VS = { vertexShaderBlob_->GetBufferPointer(),
+	//vertexShaderBlob_->GetBufferSize() };// VertexShader
+	//graphicsPipelineStateDesc.PS = { pixelShaderBlob_->GetBufferPointer(),
+	//pixelShaderBlob_->GetBufferSize() };// PixelShader
+	//// DepthStencilの設定
+	//graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+	//graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	//
+	//// 書き込むRTVの情報
+	//graphicsPipelineStateDesc.NumRenderTargets = 1;
+	//graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	//// 利用するトポロジ（形状）のタイプ。三角形
+	//graphicsPipelineStateDesc.PrimitiveTopologyType =
+	//	D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	//// どのように画面に色を打ち込んむかの設定（気にしなくて良い）
+	//graphicsPipelineStateDesc.SampleDesc.Count = 1;
+	//graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	//// 実際に生成
+	//hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
+	//	IID_PPV_ARGS(&graphicsPipelineState_[0]));
+	//assert(SUCCEEDED(hr));
+
+	//=====================================================================================
+
+	for (uint32_t i = 0; i < BlendMode::kCountOfBlendMode; ++i) {
+		// すべての色要素を書き込む
+		blendDesc_[i].RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+		// ブレンドモードの有効化
+		if (i != kBlendModeNone) {
+			blendDesc_[i].RenderTarget[0].BlendEnable = TRUE; // ブレンドを有効化
+			blendDesc_[i].RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE; // アルファ値のソース
+			blendDesc_[i].RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD; // アルファ値の加算ブレンド
+			blendDesc_[i].RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO; // アルファ値のデスティネーション
+		}
+
+		if (i == kBlendModeNormal) {
+			blendDesc_[i].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // SrcA
+			blendDesc_[i].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD; // 加算ブレンド
+			blendDesc_[i].RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA; // (1-SrcA)
+		} else if (i == kBlendModeAdd) {
+			blendDesc_[i].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // SrcA
+			blendDesc_[i].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD; // 加算ブレンド
+			blendDesc_[i].RenderTarget[0].DestBlend = D3D12_BLEND_ONE; // (1-SrcA)
+		} else if (i == kBlendModeSubtract) {
+			blendDesc_[i].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // SrcA
+			blendDesc_[i].RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT; // 加算ブレンド
+			blendDesc_[i].RenderTarget[0].DestBlend = D3D12_BLEND_ONE; // (1-SrcA)
+		} else if (i == kBlendModeMultily) {
+			blendDesc_[i].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // SrcA
+			blendDesc_[i].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD; // 加算ブレンド
+			blendDesc_[i].RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR; // (1-SrcA)
+		}else if (i == kBlendModeScreen) {
+			blendDesc_[i].RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR; // SrcA
+			blendDesc_[i].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD; // 加算ブレンド
+			blendDesc_[i].RenderTarget[0].DestBlend = D3D12_BLEND_ONE; // (1-SrcA)
+		}
+	}
+
+	// PSO設定
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();// RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;// InputLayout
-	graphicsPipelineStateDesc.BlendState = blendDesc; // BlendState
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc; // RasterizerState
 	graphicsPipelineStateDesc.VS = { vertexShaderBlob_->GetBufferPointer(),
 	vertexShaderBlob_->GetBufferSize() };// VertexShader
@@ -148,10 +212,17 @@ void TrianglePSO::Initialize(const std::wstring& vsPath, const std::wstring& psP
 	// どのように画面に色を打ち込んむかの設定（気にしなくて良い）
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-	// 実際に生成
-	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-		IID_PPV_ARGS(&graphicsPipelineState_));
-	assert(SUCCEEDED(hr));
+
+	for (uint32_t i = 0; i < BlendMode::kCountOfBlendMode; ++i) {
+
+		// 各ブレンドモードを設定
+		graphicsPipelineStateDesc.BlendState = blendDesc_[i];
+
+		// 実際に生成
+		hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
+			IID_PPV_ARGS(&graphicsPipelineState_[i]));
+		assert(SUCCEEDED(hr));
+	}
 
 	// 初期化を終了するログ
 	if (logManager_) {
