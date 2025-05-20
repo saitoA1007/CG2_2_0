@@ -59,4 +59,9 @@ private:
 	uint32_t uvTextureHandle_=0u;
 	// 平面色
 	Vector4 planeColor_{ 1.0f,1.0f,1.0f,1.0f };
+
+	// ブレンドモード
+	const char* blendModeName_[6] = { "kBlendModeNone","kBlendModeNormal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen"};
+	int selectBlendNum_ = 0;
+	GameEngine::BlendMode blendMode_ = GameEngine::BlendMode::kBlendModeNormal;
 };

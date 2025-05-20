@@ -22,10 +22,10 @@ void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* co
 	trianglePSO_ = trianglePSO;
 }
 
-void Model::PreDraw() {
+void Model::PreDraw(BlendMode blendMode) {
 	// 三角形用のRootSignatureを設定。
 	commandList_->SetGraphicsRootSignature(trianglePSO_->GetRootSignature());
-	commandList_->SetPipelineState(trianglePSO_->GetPipelineState()); // PSOを設定
+	commandList_->SetPipelineState(trianglePSO_->GetPipelineState(blendMode)); // PSOを設定
 }
 
 Model* Model::CreateSphere(uint32_t subdivision) {

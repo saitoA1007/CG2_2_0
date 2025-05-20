@@ -48,7 +48,7 @@ namespace GameEngine {
 		/// <summary>
 		/// 描画前処理
 		/// </summary>
-		static void PreDraw();
+		static void PreDraw(BlendMode blendMode);
 
 		/// <summary>
 		/// OBJファイルからメッシュ生成

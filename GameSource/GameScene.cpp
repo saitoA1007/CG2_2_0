@@ -74,6 +74,22 @@ void GameScene::Update(GameEngine::Input* input) {
 	// 光の強度を変更
 	ImGui::SliderFloat("LightIntensity", &intensity_, 0.0f, 10.0f);
 	directionalLight_->SetLightIntensity(intensity_);
+
+	if (ImGui::Combo("BlendMode", &selectBlendNum_, blendModeName_, IM_ARRAYSIZE(blendModeName_))) {
+		if (selectBlendNum_ == BlendMode::kBlendModeNone) {
+			blendMode_ = BlendMode::kBlendModeNone;
+		} else if (selectBlendNum_ == BlendMode::kBlendModeNormal) {
+			blendMode_ = BlendMode::kBlendModeNormal;
+		} else if (selectBlendNum_ == BlendMode::kBlendModeAdd) {
+			blendMode_ = BlendMode::kBlendModeAdd;
+		} else if (selectBlendNum_ == BlendMode::kBlendModeSubtract) {
+			blendMode_ = BlendMode::kBlendModeSubtract;
+		} else if (selectBlendNum_ == BlendMode::kBlendModeMultily) {
+			blendMode_ = BlendMode::kBlendModeMultily;
+		} else if (selectBlendNum_ == BlendMode::kBlendModeScreen) {
+			blendMode_ = BlendMode::kBlendModeScreen;
+		}
+	}
 	ImGui::End();
 
 	// カメラの切り替え処理
@@ -90,7 +106,7 @@ void GameScene::Update(GameEngine::Input* input) {
 void GameScene::Draw() {
 
 	// モデルの描画前処理
-	Model::PreDraw();
+	Model::PreDraw(blendMode_);
 
 	// 平面モデルを描画
 	planeModel_->Draw(planeWorldTransform_, uvTextureHandle_, camera_->GetVPMatrix());
