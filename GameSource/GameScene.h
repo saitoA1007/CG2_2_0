@@ -3,19 +3,10 @@
 #include"EngineSource/Core/TextureManager.h"
 #include"EngineSource/3D/Camera.h"
 #include"EngineSource/3D/DebugCamera.h"
-#include"EngineSource/3D/PrimitiveRenderer.h"
 #include"EngineSource/3D/AxisIndicator.h"
 #include"EngineSource/3D/DirectionalLight.h"
-#include"EngineSource/2D/Sprite.h"
-
-#include"Particles.h"
-#include"Triangle.h"
-#include"SkyDome.h"
-
-enum class Scene {
-	kTriangle,
-	kParticle,
-};
+#include"EngineSource/3D/Model.h"
+#include"EngineSource/3D/WorldTransform.h"
 
 class GameScene {
 public:
@@ -55,42 +46,17 @@ private:
 	// デバックカメラの有効の判定
 	bool isDebugCameraActive_ = false;
 
-	// 天球のクラス
-	std::unique_ptr<SkyDome> skyDome_;
-	// 天球のモデル
-	GameEngine::Model* skyDomeModel_ = nullptr;
-	// 天球のテクスチャ
-	uint32_t skyDomeTextureHandle_ = 0u;
-
-	// パーティクルのクラス
-	Particles* particles_ = nullptr;
-	// パーティクルのモデル
-	GameEngine::Model* paritcleModel_ = nullptr;
-	// パーティクルテクスチャ
-	uint32_t particleTextureHandle_[2] = {};
-
-	// 三角形のクラス
-	Triangle* triangle_ = nullptr;
-	// 三角形のモデル
-	GameEngine::Model* triangleModel_ = nullptr;
-	// 三角形のテクスチャ
-	uint32_t triangleTextureHandle_[2] = { 0u,0u };
-
-	// 線を描画するためのクラス
-	GameEngine::PrimitiveRenderer* primitiveRenderer_ = nullptr;
-	GameEngine::LineMesh lineMesh;
-
 	// 平行光源
 	std::unique_ptr<GameEngine::DirectionalLight> directionalLight_;
 	Vector4 lightColor_;
 	Vector3 lightDir_;
 	float intensity_;
 
-	// 画像
-	GameEngine::Sprite* sprite_ = nullptr;
-	// 画像テクスチャ
-	uint32_t spriteTextureHandle_ = 0u;
-
-	// 描画の切り替え
-	Scene scene_;
+	// 平面モデル
+	GameEngine::Model* planeModel_;
+	GameEngine::WorldTransform planeWorldTransform_;
+	// uvCheckerのテクスチャ
+	uint32_t uvTextureHandle_=0u;
+	// 平面色
+	Vector4 planeColor_{ 1.0f,1.0f,1.0f,1.0f };
 };

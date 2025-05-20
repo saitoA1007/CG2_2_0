@@ -132,18 +132,6 @@
     <ClCompile Include="GameSource\main.cpp">
       <Filter>GameSource</Filter>
     </ClCompile>
-    <ClCompile Include="GameSource\Particles.cpp">
-      <Filter>GameSource</Filter>
-    </ClCompile>
-    <ClCompile Include="GameSource\RandomGenerator.cpp">
-      <Filter>GameSource</Filter>
-    </ClCompile>
-    <ClCompile Include="GameSource\SkyDome.cpp">
-      <Filter>GameSource</Filter>
-    </ClCompile>
-    <ClCompile Include="GameSource\Triangle.cpp">
-      <Filter>GameSource</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -282,18 +270,6 @@
       <Filter>GameSource</Filter>
     </ClInclude>
     <ClInclude Include="GameSource\GameScene.h">
-      <Filter>GameSource</Filter>
-    </ClInclude>
-    <ClInclude Include="GameSource\Particles.h">
-      <Filter>GameSource</Filter>
-    </ClInclude>
-    <ClInclude Include="GameSource\RandomGenerator.h">
-      <Filter>GameSource</Filter>
-    </ClInclude>
-    <ClInclude Include="GameSource\SkyDome.h">
-      <Filter>GameSource</Filter>
-    </ClInclude>
-    <ClInclude Include="GameSource\Triangle.h">
       <Filter>GameSource</Filter>
     </ClInclude>
   </ItemGroup>
