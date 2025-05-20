@@ -55,6 +55,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -80,6 +81,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -93,6 +95,28 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
+    <ClCompile Include="EngineSource\2D\Sprite.cpp" />
+    <ClCompile Include="EngineSource\3D\AxisIndicator.cpp" />
+    <ClCompile Include="EngineSource\3D\Camera.cpp" />
+    <ClCompile Include="EngineSource\3D\DebugCamera.cpp" />
+    <ClCompile Include="EngineSource\3D\DirectionalLight.cpp" />
+    <ClCompile Include="EngineSource\3D\LineMesh.cpp" />
+    <ClCompile Include="EngineSource\3D\Material.cpp" />
+    <ClCompile Include="EngineSource\3D\Model.cpp" />
+    <ClCompile Include="EngineSource\3D\PrimitiveRenderer.cpp" />
+    <ClCompile Include="EngineSource\3D\WorldTransform.cpp" />
+    <ClCompile Include="EngineSource\Audio\AudioManager.cpp" />
+    <ClCompile Include="EngineSource\Common\LogManager.cpp" />
+    <ClCompile Include="EngineSource\Core\DirectXCommon.cpp" />
+    <ClCompile Include="EngineSource\Core\DXC.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\LinePSO.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\TrianglePSO.cpp" />
+    <ClCompile Include="EngineSource\Core\TextureManager.cpp" />
+    <ClCompile Include="EngineSource\Core\WindowsApp.cpp" />
+    <ClCompile Include="EngineSource\Input\InPut.cpp" />
+    <ClCompile Include="EngineSource\Math\EasingManager.cpp" />
+    <ClCompile Include="EngineSource\Math\MyMath.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -100,8 +124,50 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="GameSource\GameScene.cpp" />
+    <ClCompile Include="GameSource\main.cpp" />
+    <ClCompile Include="GameSource\Particles.cpp" />
+    <ClCompile Include="GameSource\RandomGenerator.cpp" />
+    <ClCompile Include="GameSource\SkyDome.cpp" />
+    <ClCompile Include="GameSource\Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
+    <ClInclude Include="EngineSource\2D\Sprite.h" />
+    <ClInclude Include="EngineSource\3D\AxisIndicator.h" />
+    <ClInclude Include="EngineSource\3D\Camera.h" />
+    <ClInclude Include="EngineSource\3D\DebugCamera.h" />
+    <ClInclude Include="EngineSource\3D\DirectionalLight.h" />
+    <ClInclude Include="EngineSource\3D\LineMesh.h" />
+    <ClInclude Include="EngineSource\3D\Material.h" />
+    <ClInclude Include="EngineSource\3D\Model.h" />
+    <ClInclude Include="EngineSource\3D\PrimitiveRenderer.h" />
+    <ClInclude Include="EngineSource\3D\VertexData.h" />
+    <ClInclude Include="EngineSource\3D\WorldTransform.h" />
+    <ClInclude Include="EngineSource\Audio\AudioManager.h" />
+    <ClInclude Include="EngineSource\Common\ConvertString.h" />
+    <ClInclude Include="EngineSource\Common\CrashHandle.h" />
+    <ClInclude Include="EngineSource\Common\CreateBufferResource.h" />
+    <ClInclude Include="EngineSource\Common\DepthStencilTexture.h" />
+    <ClInclude Include="EngineSource\Common\DescriptorHandle.h" />
+    <ClInclude Include="EngineSource\Common\DescriptorHeap.h" />
+    <ClInclude Include="EngineSource\Common\LogManager.h" />
+    <ClInclude Include="EngineSource\Common\ResourceLeakChecker.h" />
+    <ClInclude Include="EngineSource\Core\DirectXCommon.h" />
+    <ClInclude Include="EngineSource\Core\DXC.h" />
+    <ClInclude Include="EngineSource\Core\PSO\LinePSO.h" />
+    <ClInclude Include="EngineSource\Core\PSO\TrianglePSO.h" />
+    <ClInclude Include="EngineSource\Core\TextureManager.h" />
+    <ClInclude Include="EngineSource\Core\WindowsApp.h" />
+    <ClInclude Include="EngineSource\Input\InPut.h" />
+    <ClInclude Include="EngineSource\Math\EasingManager.h" />
+    <ClInclude Include="EngineSource\Math\Matrix4x4.h" />
+    <ClInclude Include="EngineSource\Math\MyMath.h" />
+    <ClInclude Include="EngineSource\Math\Transform.h" />
+    <ClInclude Include="EngineSource\Math\TransformationMatrix.h" />
+    <ClInclude Include="EngineSource\Math\Vector2.h" />
+    <ClInclude Include="EngineSource\Math\Vector3.h" />
+    <ClInclude Include="EngineSource\Math\Vector4.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -110,6 +176,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
+    <ClInclude Include="GameSource\GameEngine.h" />
+    <ClInclude Include="GameSource\GameScene.h" />
+    <ClInclude Include="GameSource\Particles.h" />
+    <ClInclude Include="GameSource\RandomGenerator.h" />
+    <ClInclude Include="GameSource\SkyDome.h" />
+    <ClInclude Include="GameSource\Triangle.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -118,6 +190,28 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Shaders\Object3d.hlsli" />
+    <None Include="Resources\Shaders\Primitive.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Resources\Shaders\Object3d.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Object3d.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Primitive.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Primitive.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
