@@ -21,6 +21,7 @@ namespace GameEngine {
 		struct TransformData {
 			Matrix4x4 worldMatrix;
 			Transform transform;
+			Vector4 color;
 		};
 
 	public:
@@ -37,12 +38,12 @@ namespace GameEngine {
 		/// 初期化
 		/// </summary>
 		/// <param name="transform"></param>
-		void Initialize(const std::vector<Transform>& transforms);
+		void Initialize(const uint32_t& kNumInstance);
 
 		/// <summary>
 		/// SRTを適応
 		/// </summary>
-		void UpdateTransformMatrix();
+		void UpdateTransformMatrix(const uint32_t& numInstance);
 
 		const CD3DX12_GPU_DESCRIPTOR_HANDLE* GetInstancingSrvGPU() const { return &instancingSrvHandleGPU_; }
 
@@ -59,7 +60,7 @@ namespace GameEngine {
 		/// WVP行列を作成
 		/// </summary>
 		/// <param name="VPMatrix"></param>
-		void SetWVPMatrix(const Matrix4x4& VPMatrix);
+		void SetWVPMatrix(const uint32_t& numInstance,const Matrix4x4& VPMatrix);
 
 	private:
 		// コピー禁止
@@ -74,7 +75,7 @@ namespace GameEngine {
 		uint32_t numInstance = 0;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
-		TransformationMatrix* instancingData_ = nullptr;
+		ParticleForGPU* instancingData_ = nullptr;
 
 		// シェーダリソースビューのハンドル(CPU)
 		CD3DX12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU_;

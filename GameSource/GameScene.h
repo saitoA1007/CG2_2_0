@@ -1,13 +1,15 @@
 #pragma once
 #include"EngineSource/Input/InPut.h"
 #include"EngineSource/Core/TextureManager.h"
-#include"EngineSource/3D/Camera.h"
-#include"EngineSource/3D/DebugCamera.h"
+#include"EngineSource/3D/Camera/Camera.h"
+#include"EngineSource/3D/Camera/DebugCamera.h"
 #include"EngineSource/3D/AxisIndicator.h"
-#include"EngineSource/3D/DirectionalLight.h"
+#include"EngineSource/3D/Light/DirectionalLight.h"
 #include"EngineSource/3D/Model.h"
 #include"EngineSource/3D/WorldTransform.h"
 #include"EngineSource/3D/WorldTransforms.h"
+
+#include"Particle.h"
 
 class GameScene {
 public:
@@ -40,6 +42,8 @@ private:
 	// 軸方向表示
 	std::unique_ptr<GameEngine::AxisIndicator> axisIndicator_;
 
+
+	Transform cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 	// カメラ
 	std::unique_ptr<GameEngine::Camera> camera_;
 	// デバックカメラ
@@ -55,13 +59,10 @@ private:
 
 	// 平面モデル
 	GameEngine::Model* planeModel_;
-	// ワールド行列
-	std::vector<Transform> planeTransform_;
-	GameEngine::WorldTransforms planeWorldTransforms_;
 	// uvCheckerのテクスチャ
-	uint32_t uvTextureHandle_=0u;
-	// 平面色
-	Vector4 planeColor_{ 1.0f,1.0f,1.0f,1.0f };
+	uint32_t circleTextureHandle_ = 0u;
+	// パーティクルクラス
+	std::unique_ptr<Particle> particle_;
 
 	// ブレンドモード
 	const char* blendModeName_[6] = { "kBlendModeNone","kBlendModeNormal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen"};

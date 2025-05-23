@@ -14,7 +14,7 @@ void Camera::Update() {
 	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 }
 
-void Camera::SetCameraPosition(Transform transform) {
+void Camera::SetCameraPosition(const Transform& transform) {
 	cameraMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	viewMatrix_ = InverseMatrix(cameraMatrix_);
 	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);

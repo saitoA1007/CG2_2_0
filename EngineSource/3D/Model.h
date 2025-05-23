@@ -13,7 +13,7 @@
 #include<vector>
 #include <wrl.h>
 
-#include"Camera.h"
+#include"EngineSource/3D/Camera/Camera.h"
 #include"Material.h"
 #include"WorldTransforms.h"
 
@@ -93,7 +93,7 @@ namespace GameEngine {
 		/// <param name="textureHandle"></param>
 		/// <param name="VPMatrix"></param>
 		/// <param name="material"></param>
-		void Draw(WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material = nullptr);
+		void Draw(const uint32_t& numInstance,WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material = nullptr);
 
 		/// <summary>
 		/// モデルに光源を適応させる

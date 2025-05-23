@@ -98,9 +98,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
     <ClCompile Include="EngineSource\3D\AxisIndicator.cpp" />
-    <ClCompile Include="EngineSource\3D\Camera.cpp" />
-    <ClCompile Include="EngineSource\3D\DebugCamera.cpp" />
-    <ClCompile Include="EngineSource\3D\DirectionalLight.cpp" />
+    <ClCompile Include="EngineSource\3D\Camera\Camera.cpp" />
+    <ClCompile Include="EngineSource\3D\Camera\DebugCamera.cpp" />
+    <ClCompile Include="EngineSource\3D\Light\DirectionalLight.cpp" />
     <ClCompile Include="EngineSource\3D\LineMesh.cpp" />
     <ClCompile Include="EngineSource\3D\Material.cpp" />
     <ClCompile Include="EngineSource\3D\Model.cpp" />
@@ -128,14 +128,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="GameSource\GameScene.cpp" />
     <ClCompile Include="GameSource\main.cpp" />
+    <ClCompile Include="GameSource\Particle.cpp" />
+    <ClCompile Include="GameSource\RandomGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
     <ClInclude Include="EngineSource\3D\AxisIndicator.h" />
-    <ClInclude Include="EngineSource\3D\Camera.h" />
-    <ClInclude Include="EngineSource\3D\DebugCamera.h" />
-    <ClInclude Include="EngineSource\3D\DirectionalLight.h" />
+    <ClInclude Include="EngineSource\3D\Camera\Camera.h" />
+    <ClInclude Include="EngineSource\3D\Camera\DebugCamera.h" />
+    <ClInclude Include="EngineSource\3D\Light\DirectionalLight.h" />
     <ClInclude Include="EngineSource\3D\LineMesh.h" />
     <ClInclude Include="EngineSource\3D\Material.h" />
     <ClInclude Include="EngineSource\3D\Model.h" />
@@ -179,6 +181,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="GameSource\GameEngine.h" />
     <ClInclude Include="GameSource\GameScene.h" />
+    <ClInclude Include="GameSource\Particle.h" />
+    <ClInclude Include="GameSource\RandomGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

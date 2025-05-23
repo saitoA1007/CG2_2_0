@@ -27,6 +27,8 @@ namespace GameEngine {
 
 		Matrix4x4 GetRotateMatrix();
 
+		Matrix4x4 GetWorldMatrix() const { return worldMatrix_; }
+
 	private:
 		// 拡縮
 		Vector3 scale_ = { 1.0f,1.0f,1.0f };
@@ -34,6 +36,8 @@ namespace GameEngine {
 		Vector3 rotate_ = { 0.0f,0.0f,0.0f };
 		// ローカル座標
 		Vector3 translate_ = { 0.0f,0.0f,-10.0f };
+		// ワールド行列
+		Matrix4x4 worldMatrix_;
 		// ビュー行列
 		Matrix4x4 viewMatrix_;
 		// 射影行列
