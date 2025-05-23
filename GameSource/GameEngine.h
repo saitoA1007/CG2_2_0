@@ -10,10 +10,10 @@
 #include"EngineSource/Common/ResourceLeakChecker.h"
 #include"EngineSource/Common/CrashHandle.h"
 
-#include"EngineSource/3D/Camera.h"
-#include"EngineSource/3D/DebugCamera.h"
+#include"EngineSource/3D/Camera/Camera.h"
+#include"EngineSource/3D/Camera/DebugCamera.h"
+#include"EngineSource/3D/Light/DirectionalLight.h"
 #include"EngineSource/3D/Model.h"
-#include"EngineSource/3D/DirectionalLight.h"
 #include"EngineSource/3D/WorldTransform.h"
 #include"EngineSource/3D/WorldTransforms.h"
 #include"EngineSource/3D/AxisIndicator.h"

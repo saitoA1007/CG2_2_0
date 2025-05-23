@@ -61,10 +61,10 @@ void DebugCamera::Update(Input* input) {
 	}
 
 	// ワールド行列
-	Matrix4x4 worldMatrix = Multiply(MakeTranslateMatrix(translate_),rotateMatrix_);
+	worldMatrix_ = Multiply(MakeTranslateMatrix(translate_),rotateMatrix_);
 
 	// カメラの変更した内容を適用する処理
-	viewMatrix_ = InverseMatrix(worldMatrix);
+	viewMatrix_ = InverseMatrix(worldMatrix_);
 }
 
 Matrix4x4 DebugCamera::GetVPMatrix() {

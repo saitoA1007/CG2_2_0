@@ -16,7 +16,7 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 
 	// カメラの初期化
 	camera_ = std::make_unique<Camera>();
-	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
+	camera_->Initialize(cameraTransform_, 1280, 720);
 	// デバックカメラの初期化
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize({ 0.0f,0.0f,-10.0f }, 1280, 720);
@@ -30,34 +30,23 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// 平行光源の生成
 	lightColor_ = { 1.0f, 1.0f, 1.0f, 1.0f };
 	lightDir_ = { 0.1f,-0.9f,0.1f };
-	intensity_ = 6.2f;
+	intensity_ = 1.0f;
 	directionalLight_ = std::make_unique<DirectionalLight>();
 	directionalLight_->Initialize(dxCommon->GetDevice(), lightColor_, lightDir_, intensity_);
 
 	// テクスチャを生成
-	uvTextureHandle_ = textureManager->Load("Resources/uvChecker.png");
+	circleTextureHandle_ = textureManager->Load("Resources/circle.png");
 	// 平面モデルを生成
 	planeModel_ = Model::CreateFromOBJ("plane.obj", "Plane");
-	// ワールド行列を更新
-	
-	Transform transform;
-	for (uint32_t i = 0; i < 10; ++i) {
-	
-		transform.scale = { 1.0f,1.0f,1.0f };
-		transform.rotate = { 0.0f,0.0f,0.0f };
-		transform.translate = { 0.0f,0.1f * static_cast<float>(i),0.0f };
-
-		planeTransform_.push_back(transform);
-	}
-
-	planeWorldTransforms_.Initialize(planeTransform_);
-	planeWorldTransforms_.UpdateTransformMatrix();
+	// パーティクルクラスを生成
+	particle_ = std::make_unique<Particle>();
+	particle_->Initialize(planeModel_, circleTextureHandle_);
 }
 
 void GameScene::Update(GameEngine::Input* input){
 
-	// 平面の色を設定
-	planeModel_->SetDefaultColor(planeColor_);
+	// パーティクルの更新処理
+	particle_->Update(debugCamera_->GetWorldMatrix());
 
 	// カメラ処理
 	if (isDebugCameraActive_) {
@@ -69,13 +58,17 @@ void GameScene::Update(GameEngine::Input* input){
 		axisIndicator_->Update(debugCamera_->GetRotateMatrix());
 	} else {
 		// カメラの更新処理
-		camera_->Update();
+		//camera_->Update();
+		camera_->SetCameraPosition(cameraTransform_);
 	}
 
 #ifdef _DEBUG
 	// 光源をデバック
 	ImGui::Begin("DebugWindow");
-	ImGui::ColorEdit4("planeColor", &planeColor_.x);
+	// カメラのトラスフォーム
+	ImGui::DragFloat3("CameraPos", &cameraTransform_.translate.x, 0.01f);
+	ImGui::DragFloat3("CameraRotate", &cameraTransform_.rotate.x, 0.01f);
+	ImGui::DragFloat3("CameraScale", &cameraTransform_.scale.x, 0.01f);
 	// 光の色を変更
 	ImGui::ColorEdit3("LightColor", &lightColor_.x);
 	directionalLight_->SetLightColor(lightColor_);
@@ -86,7 +79,7 @@ void GameScene::Update(GameEngine::Input* input){
 	// 光の強度を変更
 	ImGui::SliderFloat("LightIntensity", &intensity_, 0.0f, 10.0f);
 	directionalLight_->SetLightIntensity(intensity_);
-
+	// ブレンドモードの切り替え
 	if (ImGui::Combo("BlendMode", &selectBlendNum_, blendModeName_, IM_ARRAYSIZE(blendModeName_))) {
 		if (selectBlendNum_ == BlendMode::kBlendModeNone) {
 			blendMode_ = BlendMode::kBlendModeNone;
@@ -120,8 +113,8 @@ void GameScene::Draw() {
 	// モデルの複数描画前処理
 	Model::PreDraw(PSOMode::partilce, blendMode_);
 
-	// 平面モデルを描画
-	planeModel_->Draw(planeWorldTransforms_, uvTextureHandle_, camera_->GetVPMatrix());
+	// パーティクルの描画処理
+	particle_->Draw(camera_->GetVPMatrix());
 
 	// モデルの単体描画前処理
 	Model::PreDraw(PSOMode::triangle, blendMode_);

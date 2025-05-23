@@ -241,9 +241,9 @@ void Model::Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, 
 	}
 }
 
-void Model::Draw(WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material) {
+void Model::Draw(const uint32_t& numInstance,WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material) {
 	// カメラ座標に変換
-	worldTransforms.SetWVPMatrix(VPMatrix);
+	worldTransforms.SetWVPMatrix(numInstance,VPMatrix);
 
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	commandList_->IASetIndexBuffer(&indexBufferView_);
@@ -257,9 +257,9 @@ void Model::Draw(WorldTransforms& worldTransforms, const uint32_t& textureHandle
 	commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
 	commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
 	if (totalIndices_ != 0) {
-		commandList_->DrawIndexedInstanced(totalIndices_, worldTransforms.GetNumInstance(), 0, 0, 0);
+		commandList_->DrawIndexedInstanced(totalIndices_, numInstance, 0, 0, 0);
 	} else {
-		commandList_->DrawInstanced(totalVertices_, worldTransforms.GetNumInstance(), 0, 0);
+		commandList_->DrawInstanced(totalVertices_, numInstance, 0, 0);
 	}
 }
 

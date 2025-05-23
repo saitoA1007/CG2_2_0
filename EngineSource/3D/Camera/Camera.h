@@ -25,7 +25,7 @@ namespace GameEngine {
 		/// カメラの位置を変更
 		/// </summary>
 		/// <param name="transform"></param>
-		void SetCameraPosition(Transform transform);
+		void SetCameraPosition(const Transform& transform);
 
 	public:
 
@@ -44,6 +44,8 @@ namespace GameEngine {
 
 		Matrix4x4 GetVPMatrix() const { return VPMatrix_; }
 		void SetVPMatrix(Matrix4x4 VPMatrix) { VPMatrix_ = VPMatrix; }
+
+		Matrix4x4 GetWorldMatrix() const { return cameraMatrix_; }
 		
 	private:
 
