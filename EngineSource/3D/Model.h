@@ -8,12 +8,14 @@
 #include"EngineSource/Math/TransformationMatrix.h"
 #include"EngineSource/Common/LogManager.h"
 #include"EngineSource/Core/PSO/TrianglePSO.h"
+#include"EngineSource/Core/PSO/ParticlePSO.h"
 #include<iostream>
 #include<vector>
 #include <wrl.h>
 
 #include"Camera.h"
 #include"Material.h"
+#include"WorldTransforms.h"
 
 namespace GameEngine {
 
@@ -21,6 +23,11 @@ namespace GameEngine {
 	class TextureManager;
 	class WorldTransform;
 
+	enum PSOMode {
+		triangle, // 単体描画用
+		partilce, // 複数描画用
+	};
+	
 	class Model {
 	public:
 
@@ -43,12 +50,12 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="device"></param>
 		/// <param name="commandList"></param>
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,TrianglePSO* trianglePSO, LogManager* logManager);
+		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,TrianglePSO* trianglePSO, ParticlePSO* particlePSO, LogManager* logManager);
 		
 		/// <summary>
 		/// 描画前処理
 		/// </summary>
-		static void PreDraw(BlendMode blendMode);
+		static void PreDraw(PSOMode psoMode,BlendMode blendMode);
 
 		/// <summary>
 		/// OBJファイルからメッシュ生成
@@ -78,6 +85,15 @@ namespace GameEngine {
 		/// <param name="textureHandle">テクスチャハンドル</param>
 		/// <param name="material">マテリアル : 何の書かなければデフォルトのマテリアルを適応</param>
 		void Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix,const Material* material = nullptr);
+
+		/// <summary>
+		/// 生成したモデルを複数描画
+		/// </summary>
+		/// <param name="worldTransforms"></param>
+		/// <param name="textureHandle"></param>
+		/// <param name="VPMatrix"></param>
+		/// <param name="material"></param>
+		void Draw(WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material = nullptr);
 
 		/// <summary>
 		/// モデルに光源を適応させる
@@ -131,6 +147,7 @@ namespace GameEngine {
 
 		// PSO設定
 		static TrianglePSO* trianglePSO_;
+		static ParticlePSO* particlePSO_;
 
 		// ログ
 		static LogManager* logManager_;

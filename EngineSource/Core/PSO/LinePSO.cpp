@@ -74,10 +74,9 @@ void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath,
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	// 線には不要なのでNone
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-	//rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
 	// Zクリップを有効
-	//rasterizerDesc.DepthClipEnable = TRUE;
+	rasterizerDesc.DepthClipEnable = TRUE;
 
 	// Shaderをコンパイルする
 	vertexShaderBlob_ = dxc->CompileShader(vsPath,
@@ -91,11 +90,9 @@ void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath,
 	// DepthStencilStateの設定
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	// Depthの機能を有効化する
-	//depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthEnable = false;
+	depthStencilDesc.DepthEnable = true;
 	// 書き込みします
-	//depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	// 比較関数はLessEqual。つまり、近ければ描画される
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 

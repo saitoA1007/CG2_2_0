@@ -11,11 +11,11 @@
 
 namespace GameEngine {
 
-    class TrianglePSO {
+    class ParticlePSO {
     public:
 
-        TrianglePSO() = default;
-        ~TrianglePSO() = default;
+        ParticlePSO() = default;
+        ~ParticlePSO() = default;
 
         // 初期化
         void Initialize(const std::wstring& vsPath, const std::wstring& psPath, ID3D12Device* device, DXC* dxc, LogManager* logManager);
@@ -25,8 +25,8 @@ namespace GameEngine {
         ID3D12PipelineState* GetPipelineState(BlendMode blendMode) { return graphicsPipelineState_[blendMode].Get(); }
 
     private:
-        TrianglePSO(const TrianglePSO&) = delete;
-        TrianglePSO& operator=(const TrianglePSO&) = delete;
+        ParticlePSO(const ParticlePSO&) = delete;
+        ParticlePSO& operator=(const ParticlePSO&) = delete;
 
         ID3D12Device* device_ = nullptr;
 

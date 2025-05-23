@@ -132,6 +132,12 @@
     <ClCompile Include="GameSource\main.cpp">
       <Filter>GameSource</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\ParticlePSO.cpp">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\WorldTransforms.cpp">
+      <Filter>EngineSource\3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -189,9 +195,6 @@
       <Filter>EngineSource\3D</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\VertexData.h">
-      <Filter>EngineSource\3D</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\3D\WorldTransform.h">
       <Filter>EngineSource\3D</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Audio\AudioManager.h">
@@ -272,6 +275,18 @@
     <ClInclude Include="GameSource\GameScene.h">
       <Filter>GameSource</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\ParticlePSO.h">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\WorldTransform.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\BlendMode.h">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\WorldTransforms.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -283,6 +298,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Resources\Shaders\Primitive.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\Particle.hlsli">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
@@ -297,6 +315,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\Primitive.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Particle.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Particle.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

@@ -7,6 +7,9 @@
 
 namespace GameEngine {
 
+	/// <summary>
+	/// 単体描画用のワールド行列
+	/// </summary>
 	class WorldTransform {
 	public:
 		WorldTransform() = default;
@@ -69,4 +72,3 @@ namespace GameEngine {
 		TransformationMatrix* transformationMatrixData_ = nullptr;
 	};
 }
-

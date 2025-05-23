@@ -11,21 +11,28 @@ using namespace GameEngine;
 ID3D12Device* Model::device_ = nullptr;
 ID3D12GraphicsCommandList* Model::commandList_ = nullptr;
 TrianglePSO* Model::trianglePSO_ = nullptr;
+ParticlePSO* Model::particlePSO_ = nullptr;
 LogManager* Model::logManager_ = nullptr;
 TextureManager* Model::textureManager_ = nullptr;
 
-void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, TrianglePSO* trianglePSO,LogManager* logManager) {
+void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, TrianglePSO* trianglePSO, ParticlePSO* particlePSO, LogManager* logManager) {
 	device_ = device;
 	commandList_ = commandList;
 	logManager_ = logManager;
 	textureManager_ = textureManager;
 	trianglePSO_ = trianglePSO;
+	particlePSO_ = particlePSO;
 }
 
-void Model::PreDraw(BlendMode blendMode) {
-	// 三角形用のRootSignatureを設定。
-	commandList_->SetGraphicsRootSignature(trianglePSO_->GetRootSignature());
-	commandList_->SetPipelineState(trianglePSO_->GetPipelineState(blendMode)); // PSOを設定
+void Model::PreDraw(PSOMode psoMode, BlendMode blendMode) {
+	// 単体描画と複数描画の設定
+	if (psoMode == PSOMode::triangle) {
+		commandList_->SetGraphicsRootSignature(trianglePSO_->GetRootSignature());  // RootSignatureを設定。
+		commandList_->SetPipelineState(trianglePSO_->GetPipelineState(blendMode)); // trianglePSOを設定
+	} else if(psoMode == PSOMode::partilce) {
+		commandList_->SetGraphicsRootSignature(particlePSO_->GetRootSignature());  // RootSignatureを設定。
+		commandList_->SetPipelineState(particlePSO_->GetPipelineState(blendMode)); // particlePSOを設定
+	}
 }
 
 Model* Model::CreateSphere(uint32_t subdivision) {
@@ -231,6 +238,28 @@ void Model::Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, 
 		commandList_->DrawIndexedInstanced(totalIndices_, 1, 0, 0, 0);
 	} else {
 		commandList_->DrawInstanced(totalVertices_, 1, 0, 0);
+	}
+}
+
+void Model::Draw(WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material) {
+	// カメラ座標に変換
+	worldTransforms.SetWVPMatrix(VPMatrix);
+
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	commandList_->IASetIndexBuffer(&indexBufferView_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	// マテリアルが設定されていなければデフォルトのマテリアルを使う
+	if (material == nullptr) {
+		commandList_->SetGraphicsRootConstantBufferView(0, defaultMaterial_->GetMaterialResource()->GetGPUVirtualAddress());
+	} else {
+		commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+	}
+	commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
+	commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
+	if (totalIndices_ != 0) {
+		commandList_->DrawIndexedInstanced(totalIndices_, worldTransforms.GetNumInstance(), 0, 0, 0);
+	} else {
+		commandList_->DrawInstanced(totalVertices_, worldTransforms.GetNumInstance(), 0, 0);
 	}
 }
 
