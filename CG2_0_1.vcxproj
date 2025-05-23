@@ -106,11 +106,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Model.cpp" />
     <ClCompile Include="EngineSource\3D\PrimitiveRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\WorldTransform.cpp" />
+    <ClCompile Include="EngineSource\3D\WorldTransforms.cpp" />
     <ClCompile Include="EngineSource\Audio\AudioManager.cpp" />
     <ClCompile Include="EngineSource\Common\LogManager.cpp" />
     <ClCompile Include="EngineSource\Core\DirectXCommon.cpp" />
     <ClCompile Include="EngineSource\Core\DXC.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\LinePSO.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\ParticlePSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\TrianglePSO.cpp" />
     <ClCompile Include="EngineSource\Core\TextureManager.cpp" />
     <ClCompile Include="EngineSource\Core\WindowsApp.cpp" />
@@ -140,6 +142,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\PrimitiveRenderer.h" />
     <ClInclude Include="EngineSource\3D\VertexData.h" />
     <ClInclude Include="EngineSource\3D\WorldTransform.h" />
+    <ClInclude Include="EngineSource\3D\WorldTransforms.h" />
     <ClInclude Include="EngineSource\Audio\AudioManager.h" />
     <ClInclude Include="EngineSource\Common\ConvertString.h" />
     <ClInclude Include="EngineSource\Common\CrashHandle.h" />
@@ -151,7 +154,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Common\ResourceLeakChecker.h" />
     <ClInclude Include="EngineSource\Core\DirectXCommon.h" />
     <ClInclude Include="EngineSource\Core\DXC.h" />
+    <ClInclude Include="EngineSource\Core\PSO\BlendMode.h" />
     <ClInclude Include="EngineSource\Core\PSO\LinePSO.h" />
+    <ClInclude Include="EngineSource\Core\PSO\ParticlePSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\TrianglePSO.h" />
     <ClInclude Include="EngineSource\Core\TextureManager.h" />
     <ClInclude Include="EngineSource\Core\WindowsApp.h" />
@@ -185,6 +190,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli" />
+    <None Include="Resources\Shaders\Particle.hlsli" />
     <None Include="Resources\Shaders\Primitive.hlsli" />
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +199,18 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\Object3d.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Particle.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Particle.VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

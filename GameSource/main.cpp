@@ -38,6 +38,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	std::unique_ptr<TrianglePSO> trianglePSO = std::make_unique<TrianglePSO>();
 	trianglePSO->Initialize(L"Resources/Shaders/Object3d.VS.hlsl", L"Resources/Shaders/Object3d.PS.hlsl",dxCommon->GetDevice(),dxc.get(), logManager.get());
 
+	// パーティクル(複数描画用)のPSO設定を初期化
+	std::unique_ptr<ParticlePSO> particlePSO = std::make_unique<ParticlePSO>();
+	particlePSO->Initialize(L"Resources/Shaders/Particle.VS.hlsl", L"Resources/Shaders/particle.PS.hlsl", dxCommon->GetDevice(), dxc.get(), logManager.get());
+
 	// 線のPSO設定の初期化
 	std::unique_ptr<LinePSO> linePSO = std::make_unique<LinePSO>();
 	linePSO->Initialize(L"Resources/Shaders/Primitive.VS.hlsl", L"Resources/Shaders/Primitive.PS.hlsl", dxCommon->GetDevice(), dxc.get(), logManager.get());
@@ -57,21 +61,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	// テクスチャの初期化
 	std::shared_ptr<TextureManager> textureManager = std::make_shared<TextureManager>();
 	textureManager->Initialize(dxCommon.get(), logManager.get());
-
+	
 	// 画像の初期化
 	Sprite::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), textureManager.get(), windowsApp->kWindowWidth, windowsApp->kWindowHeight);
 	// 3dを描画する処理の初期化
-	Model::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), textureManager.get(), trianglePSO.get(), logManager.get());
+	Model::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), textureManager.get(), trianglePSO.get(), particlePSO.get(), logManager.get());
 	// 線を描画する処理の初期化
 	PrimitiveRenderer::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), linePSO.get(), logManager.get());
-	// 軸方向表示の初期化
-	AxisIndicator::StaticInitialize(dxCommon->GetCommandList());
 	// ワールドトランスフォームの初期化
 	WorldTransform::StaticInitialize(dxCommon->GetDevice());
+	WorldTransforms::StaticInitialize(dxCommon.get());
 	// マテリアルの初期化
 	Material::StaticInitialize(dxCommon->GetDevice());
 	// 線を描画する為のメッシュの初期化
 	LineMesh::StaticInitialize(dxCommon->GetDevice());
+
+	// 軸方向表示の初期化
+	AxisIndicator::StaticInitialize(dxCommon->GetCommandList());
 #pragma endregion
 
 	//=================================================================

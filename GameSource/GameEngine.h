@@ -4,6 +4,7 @@
 #include"EngineSource/Core/TextureManager.h"
 #include"EngineSource/Core/PSO/LinePSO.h"
 #include"EngineSource/Core/PSO/TrianglePSO.h"
+#include"EngineSource/Core/PSO/ParticlePSO.h"
 
 #include"EngineSource/Common/LogManager.h"
 #include"EngineSource/Common/ResourceLeakChecker.h"
@@ -14,6 +15,7 @@
 #include"EngineSource/3D/Model.h"
 #include"EngineSource/3D/DirectionalLight.h"
 #include"EngineSource/3D/WorldTransform.h"
+#include"EngineSource/3D/WorldTransforms.h"
 #include"EngineSource/3D/AxisIndicator.h"
 #include"EngineSource/3D/PrimitiveRenderer.h"
 #include"EngineSource/3D/LineMesh.h"

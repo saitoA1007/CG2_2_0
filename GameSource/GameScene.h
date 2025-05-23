@@ -7,6 +7,7 @@
 #include"EngineSource/3D/DirectionalLight.h"
 #include"EngineSource/3D/Model.h"
 #include"EngineSource/3D/WorldTransform.h"
+#include"EngineSource/3D/WorldTransforms.h"
 
 class GameScene {
 public:
@@ -54,7 +55,9 @@ private:
 
 	// 平面モデル
 	GameEngine::Model* planeModel_;
-	GameEngine::WorldTransform planeWorldTransform_;
+	// ワールド行列
+	std::vector<Transform> planeTransform_;
+	GameEngine::WorldTransforms planeWorldTransforms_;
 	// uvCheckerのテクスチャ
 	uint32_t uvTextureHandle_=0u;
 	// 平面色

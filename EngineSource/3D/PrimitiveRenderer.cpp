@@ -30,7 +30,7 @@ PrimitiveRenderer* PrimitiveRenderer::Create() {
 
 	PrimitiveRenderer* Renderer = new PrimitiveRenderer();
 
-	Renderer->totalVertices_ = 4;
+	Renderer->totalVertices_ = 2;
 
 	// トランスフォーメーション行列リソースを作成
 	// TransformationMatrix用のリソースを作る。TransformationMatrix 1つ分のサイズを用意する

@@ -6,8 +6,7 @@
 
 // 頂点データ
 struct VertexPosColor {
-	Vector3 pos;   // xyz座標
-	float pad;
+	Vector4 pos;   // xyz座標
 	Vector4 color; // RGBA
 };
 

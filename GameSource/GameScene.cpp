@@ -39,10 +39,22 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// 平面モデルを生成
 	planeModel_ = Model::CreateFromOBJ("plane.obj", "Plane");
 	// ワールド行列を更新
-	planeWorldTransform_.Initialize({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f } });
+	
+	Transform transform;
+	for (uint32_t i = 0; i < 10; ++i) {
+	
+		transform.scale = { 1.0f,1.0f,1.0f };
+		transform.rotate = { 0.0f,0.0f,0.0f };
+		transform.translate = { 0.0f,0.1f * static_cast<float>(i),0.0f };
+
+		planeTransform_.push_back(transform);
+	}
+
+	planeWorldTransforms_.Initialize(planeTransform_);
+	planeWorldTransforms_.UpdateTransformMatrix();
 }
 
-void GameScene::Update(GameEngine::Input* input) {
+void GameScene::Update(GameEngine::Input* input){
 
 	// 平面の色を設定
 	planeModel_->SetDefaultColor(planeColor_);
@@ -105,11 +117,14 @@ void GameScene::Update(GameEngine::Input* input) {
 
 void GameScene::Draw() {
 
-	// モデルの描画前処理
-	Model::PreDraw(blendMode_);
+	// モデルの複数描画前処理
+	Model::PreDraw(PSOMode::partilce, blendMode_);
 
 	// 平面モデルを描画
-	planeModel_->Draw(planeWorldTransform_, uvTextureHandle_, camera_->GetVPMatrix());
+	planeModel_->Draw(planeWorldTransforms_, uvTextureHandle_, camera_->GetVPMatrix());
+
+	// モデルの単体描画前処理
+	Model::PreDraw(PSOMode::triangle, blendMode_);
 
 	// 軸を描画
 	axisIndicator_->Draw(axisTextureHandle_);

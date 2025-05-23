@@ -16,6 +16,7 @@ void AxisIndicator::Initialize(const std::string& modelName) {
 	transform_.rotate = { 0.0f,0.0f,0.0f };
 	transform_.translate = { 0.0f,0.0f,0.0f };
 	worldTransform_.Initialize(transform_);
+	worldTransform_.UpdateTransformMatrix();
 
 	camera_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 160, 90);
 	camera_.SetProjectionMatrix(0.45f, 160, 90, 0.1f, 20.0f);

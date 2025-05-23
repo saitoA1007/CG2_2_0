@@ -54,7 +54,7 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 		// 即座に終了
 		std::abort();
 	}
-
+	// テクスチャ名を記録
 	textures_.at(index_).fileName = fileName;
 
 		// テクスチャを読み込む
