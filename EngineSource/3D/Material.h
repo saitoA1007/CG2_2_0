@@ -1,5 +1,6 @@
 #pragma once
 #include"EngineSource/Math/Vector4.h"
+#include"EngineSource/Math/Vector3.h"
 #include"EngineSource/Math/Matrix4x4.h"
 #include<iostream>
 #include <d3d12.h>
@@ -14,6 +15,8 @@ namespace GameEngine {
 			int32_t enableLighting;
 			float padding[3];
 			Matrix4x4 uvTransform;
+			Vector3 specularColor;
+			float shininess;
 		};
 
 	public:

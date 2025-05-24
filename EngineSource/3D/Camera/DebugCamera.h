@@ -3,6 +3,11 @@
 #include"EngineSource/Math/Matrix4x4.h"
 #include"EngineSource/Input/InPut.h"
 
+#include"EngineSource/Math/TransformationMatrix.h"
+
+#include <d3d12.h>
+#include <wrl.h>
+
 namespace GameEngine {
 
 	class DebugCamera {
@@ -14,7 +19,7 @@ namespace GameEngine {
 		/// <param name="translate">カメラ座標</param>
 		/// <param name="width">画面横幅</param>
 		/// <param name="height">画面縦幅</param>
-		void Initialize(const Vector3& translate, int width, int height);
+		void Initialize(const Vector3& translate, int width, int height, ID3D12Device* device);
 
 		/// <summary>
 		/// 更新処理
@@ -28,6 +33,10 @@ namespace GameEngine {
 		Matrix4x4 GetRotateMatrix();
 
 		Matrix4x4 GetWorldMatrix() const { return worldMatrix_; }
+
+		inline ID3D12Resource* GetCameraResource() const { return cameraResource_.Get(); }
+
+		Vector3 GetWorldPosition();
 
 	private:
 		// 拡縮
@@ -45,5 +54,8 @@ namespace GameEngine {
 
 		// 累積回転行列
 		Matrix4x4 rotateMatrix_;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
+		CameraForGPU* cameraForGPU_ = nullptr;
 	};
 }

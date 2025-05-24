@@ -21,4 +21,7 @@ void Material::Initialize(const Vector4& color,const bool& isEnableLighting) {
 	materialData_->enableLighting = isEnableLighting;
 	// UVTransform行列を初期化
 	materialData_->uvTransform = MakeIdentity4x4();
+
+	materialData_->specularColor = { 1.0f,1.0f,1.0f };
+	materialData_->shininess = 20.0f;
 }

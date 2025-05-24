@@ -101,7 +101,7 @@ namespace GameEngine {
 		/// モデルに光源を適応させる
 		/// </summary>
 		/// <param name="directionalLightResource"></param>
-		void DrawLight(ID3D12Resource* directionalLightResource);
+		void DrawLight(ID3D12Resource* directionalLightResource, ID3D12Resource* cameraResource);
 
 		/// <summary>
 		/// デフォルトの色を設定
