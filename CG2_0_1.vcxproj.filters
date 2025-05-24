@@ -144,18 +144,6 @@
     <ClCompile Include="EngineSource\3D\Light\DirectionalLight.cpp">
       <Filter>EngineSource\3D\Light</Filter>
     </ClCompile>
-    <ClCompile Include="GameSource\Particle.cpp">
-      <Filter>GameSource</Filter>
-    </ClCompile>
-    <ClCompile Include="GameSource\RandomGenerator.cpp">
-      <Filter>GameSource</Filter>
-    </ClCompile>
-    <ClCompile Include="GameSource\Emitter.cpp">
-      <Filter>GameSource</Filter>
-    </ClCompile>
-    <ClCompile Include="GameSource\CollisionUtils.cpp">
-      <Filter>GameSource</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -305,20 +293,8 @@
     <ClInclude Include="EngineSource\3D\Light\DirectionalLight.h">
       <Filter>EngineSource\3D\Light</Filter>
     </ClInclude>
-    <ClInclude Include="GameSource\Particle.h">
-      <Filter>GameSource</Filter>
-    </ClInclude>
-    <ClInclude Include="GameSource\RandomGenerator.h">
-      <Filter>GameSource</Filter>
-    </ClInclude>
-    <ClInclude Include="GameSource\Emitter.h">
-      <Filter>GameSource</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Math\Geometry.h">
       <Filter>EngineSource\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="GameSource\CollisionUtils.h">
-      <Filter>GameSource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

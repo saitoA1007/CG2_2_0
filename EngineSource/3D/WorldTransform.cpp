@@ -26,6 +26,7 @@ void WorldTransform::Initialize(const Transform& transform) {
 
 void WorldTransform::UpdateTransformMatrix() {
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	transformationMatrixData_->World = worldMatrix_;
 }
 
 void WorldTransform::SetWVPMatrix(const Matrix4x4& VPMatrix) {

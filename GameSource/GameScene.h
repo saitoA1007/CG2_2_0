@@ -9,9 +9,6 @@
 #include"EngineSource/3D/WorldTransform.h"
 #include"EngineSource/3D/WorldTransforms.h"
 
-#include"Particle.h"
-#include"Emitter.h"
-
 class GameScene {
 public:
 
@@ -58,19 +55,12 @@ private:
 	Vector3 lightDir_;
 	float intensity_;
 
-	// 平面モデル
-	GameEngine::Model* planeModel_;
-	// uvCheckerのテクスチャ
-	uint32_t circleTextureHandle_ = 0u;
-	// パーティクルクラス
-	std::unique_ptr<Particle> particle_;
 
-	// 四角形モデル
-	GameEngine::Model* cubeModel_;
-	// whiteテクスチャ
-	uint32_t whiteTextureHandle_ = 0u;
-	// エミッタクラス
-	std::unique_ptr<ParticleEmitter> particleEmitter_;
+	GameEngine::Model* shereModel_;
+
+	uint32_t monsterBallGH_ = 0u;
+
+	GameEngine::WorldTransform shereWorldTransform_;
 
 	// ブレンドモード
 	const char* blendModeName_[6] = { "kBlendModeNone","kBlendModeNormal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen"};
