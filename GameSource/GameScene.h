@@ -10,6 +10,7 @@
 #include"EngineSource/3D/WorldTransforms.h"
 
 #include"Particle.h"
+#include"Emitter.h"
 
 class GameScene {
 public:
@@ -42,7 +43,7 @@ private:
 	// 軸方向表示
 	std::unique_ptr<GameEngine::AxisIndicator> axisIndicator_;
 
-
+	// カメラトラスフォーム
 	Transform cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 	// カメラ
 	std::unique_ptr<GameEngine::Camera> camera_;
@@ -63,6 +64,13 @@ private:
 	uint32_t circleTextureHandle_ = 0u;
 	// パーティクルクラス
 	std::unique_ptr<Particle> particle_;
+
+	// 四角形モデル
+	GameEngine::Model* cubeModel_;
+	// whiteテクスチャ
+	uint32_t whiteTextureHandle_ = 0u;
+	// エミッタクラス
+	std::unique_ptr<ParticleEmitter> particleEmitter_;
 
 	// ブレンドモード
 	const char* blendModeName_[6] = { "kBlendModeNone","kBlendModeNormal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen"};

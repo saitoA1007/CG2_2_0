@@ -7,6 +7,9 @@ using namespace GameEngine;
 GameScene::~GameScene() {
 	// 平面モデルを解放
 	delete planeModel_;
+
+	// 四角形モデル
+	delete cubeModel_;
 }
 
 void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngine::DirectXCommon* dxCommon) {
@@ -34,6 +37,14 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	directionalLight_ = std::make_unique<DirectionalLight>();
 	directionalLight_->Initialize(dxCommon->GetDevice(), lightColor_, lightDir_, intensity_);
 
+	// whiteテクスチャを生成
+	whiteTextureHandle_ = textureManager->Load("Resources/white4x4.png");
+	// 四角形モデルを生成
+	cubeModel_ = Model::CreateFromOBJ("cube.obj", "cube");
+	// エミッタクラス
+	particleEmitter_ = std::make_unique<ParticleEmitter>();
+	particleEmitter_->Initialize(cubeModel_, whiteTextureHandle_);
+
 	// テクスチャを生成
 	circleTextureHandle_ = textureManager->Load("Resources/circle.png");
 	// 平面モデルを生成
@@ -41,9 +52,13 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// パーティクルクラスを生成
 	particle_ = std::make_unique<Particle>();
 	particle_->Initialize(planeModel_, circleTextureHandle_);
+	particle_->SetEmitter(particleEmitter_.get());
 }
 
 void GameScene::Update(GameEngine::Input* input){
+
+	// エミッタの更新処理
+	particleEmitter_->Update();
 
 	// パーティクルの更新処理
 	particle_->Update(debugCamera_->GetWorldMatrix());
@@ -110,14 +125,27 @@ void GameScene::Update(GameEngine::Input* input){
 
 void GameScene::Draw() {
 
+	// モデルの単体描画前処理
+	Model::PreDraw(DrawModel::Frame);
+
+	// エミッタの描画
+	particleEmitter_->Draw(camera_->GetVPMatrix());
+
+	// 裏面のモデルの単体描画前処理
+	Model::PreDraw(DrawModel::FrameBack);
+
+	// エミッタの描画
+	particleEmitter_->Draw(camera_->GetVPMatrix());
+
 	// モデルの複数描画前処理
 	Model::PreDraw(PSOMode::partilce, blendMode_);
 
 	// パーティクルの描画処理
 	particle_->Draw(camera_->GetVPMatrix());
 
+
 	// モデルの単体描画前処理
-	Model::PreDraw(PSOMode::triangle, blendMode_);
+	Model::PreDraw(PSOMode::triangle, BlendMode::kBlendModeNone);
 
 	// 軸を描画
 	axisIndicator_->Draw(axisTextureHandle_);

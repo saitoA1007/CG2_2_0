@@ -87,11 +87,26 @@ void TrianglePSO::Initialize(const std::wstring& vsPath, const std::wstring& psP
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
 	// RasiterzerStateの設定
-	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	// 裏面(時計回り)を表示しない
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-	// 三角形の中を塗りつぶす
-	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+	D3D12_RASTERIZER_DESC rasterizerDesc[DrawModel::kCountOfDrawMode]{};
+	for (uint32_t i = 0; i < DrawModel::kCountOfDrawMode; ++i) {
+
+		if (i == DrawModel::Fill) {
+			// 裏面(時計回り)を表示しない
+			rasterizerDesc[i].CullMode = D3D12_CULL_MODE_BACK;
+			// 三角形の中を塗りつぶす
+			rasterizerDesc[i].FillMode = D3D12_FILL_MODE_SOLID;
+		} else if (i == DrawModel::Frame) {
+			// 裏面(時計回り)を表示しない
+			rasterizerDesc[i].CullMode = D3D12_CULL_MODE_BACK;
+			// 三角形の中を塗りつぶす
+			rasterizerDesc[i].FillMode = D3D12_FILL_MODE_WIREFRAME;
+		} else if (i == DrawModel::FrameBack) {
+			// 表(反時計回り)を表示しない
+			rasterizerDesc[i].CullMode = D3D12_CULL_MODE_FRONT;
+			// 三角形の中を塗りつぶす
+			rasterizerDesc[i].FillMode = D3D12_FILL_MODE_WIREFRAME;
+		}
+	}
 
 	// Shaderをコンパイルする
 	vertexShaderBlob_ = dxc->CompileShader(vsPath,
@@ -150,7 +165,7 @@ void TrianglePSO::Initialize(const std::wstring& vsPath, const std::wstring& psP
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();// RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;// InputLayout
-	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc; // RasterizerState
+	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc[DrawModel::Fill]; // RasterizerState
 	graphicsPipelineStateDesc.VS = { vertexShaderBlob_->GetBufferPointer(),
 	vertexShaderBlob_->GetBufferSize() };// VertexShader
 	graphicsPipelineStateDesc.PS = { pixelShaderBlob_->GetBufferPointer(),
@@ -177,6 +192,20 @@ void TrianglePSO::Initialize(const std::wstring& vsPath, const std::wstring& psP
 		// 実際に生成
 		hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
 			IID_PPV_ARGS(&graphicsPipelineState_[i]));
+		assert(SUCCEEDED(hr));
+	}
+
+	//=============================================================================
+
+	// PSO設定
+	// ブレンドモードを設定
+	graphicsPipelineStateDesc.BlendState = blendDesc_[kBlendModeNormal];
+	
+	for (uint32_t i = 0; i < DrawModel::kCountOfDrawMode; ++i) {
+		graphicsPipelineStateDesc.RasterizerState = rasterizerDesc[i]; // RasterizerState
+		// 実際に生成
+		hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
+			IID_PPV_ARGS(&frameGraphicsPipelineState_[i]));
 		assert(SUCCEEDED(hr));
 	}
 

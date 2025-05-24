@@ -19,4 +19,13 @@ namespace GameEngine {
         // 利用禁止
         kCountOfBlendMode,
     };
+
+    enum DrawModel {
+        Fill, // 中身を描画
+        Frame, // フレームを描画
+        FrameBack, // 後ろ側を描画
+
+        kCountOfDrawMode,
+    };
+
 }
