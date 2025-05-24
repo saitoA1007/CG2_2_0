@@ -1,11 +1,21 @@
 #pragma once
+#include<list>
 #include"EngineSource/3D/WorldTransforms.h"
 #include"EngineSource/3D/Model.h"
+#include"EngineSource/Math/Geometry.h"
 
 #include"RandomGenerator.h"
 
+#include"Emitter.h"
+
 class Particle {
 public:
+
+	struct AccelerationField {
+		Vector3 acceleration; // 加速度
+		AABB area; // 範囲
+
+	};
 
 	struct ParticleData {
 		Transform transform;
@@ -38,7 +48,16 @@ public:
 	/// <param name="VPMatrix"></param>
 	void Draw(const Matrix4x4 VPMatrix);
 
+	/// <summary>
+	/// エミッタの設定
+	/// </summary>
+	/// <param name="emitter"></param>
+	void SetEmitter(ParticleEmitter* emitter) { particleEmitter_ = emitter; }
+
 private:
+
+	// エミッタのクラス
+	ParticleEmitter* particleEmitter_;
 
 	// ランダム生成器
 	RandomGenerator randomGenerator_;
@@ -47,9 +66,9 @@ private:
 	GameEngine::Model* planeModel_;
 
 	// モデルを描画する数
-	const uint32_t kNumMaxInstance = 10;
+	const uint32_t kNumMaxInstance = 100;
 	// パーティクルデータ
-	std::vector<ParticleData> particleDatas_;
+	std::list<ParticleData> particleDatas_;
 	// ワールド行列
 	GameEngine::WorldTransforms planeWorldTransforms_;
 	// テクスチャ
@@ -64,10 +83,18 @@ private:
 	// ビルボードを有効にするかのフラグ
 	bool useBillboard_ = false;
 
+	// 場を有効にするかのフラグ
+	bool enableField_ = false;
+
+	// 場の設定
+	AccelerationField accelerationField_;
+
 private:
 
 	/// <summary>
 	/// パーティクル生成関数
 	/// </summary>
-	ParticleData MakeNewParticle();
+	ParticleData MakeNewParticle(const Vector3& translate);
+
+	std::list<ParticleData> Emit(const ParticleEmitter::Emitter& emitter);
 };

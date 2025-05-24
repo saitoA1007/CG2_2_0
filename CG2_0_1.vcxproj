@@ -126,6 +126,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="GameSource\CollisionUtils.cpp" />
+    <ClCompile Include="GameSource\Emitter.cpp" />
     <ClCompile Include="GameSource\GameScene.cpp" />
     <ClCompile Include="GameSource\main.cpp" />
     <ClCompile Include="GameSource\Particle.cpp" />
@@ -164,6 +166,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\WindowsApp.h" />
     <ClInclude Include="EngineSource\Input\InPut.h" />
     <ClInclude Include="EngineSource\Math\EasingManager.h" />
+    <ClInclude Include="EngineSource\Math\Geometry.h" />
     <ClInclude Include="EngineSource\Math\Matrix4x4.h" />
     <ClInclude Include="EngineSource\Math\MyMath.h" />
     <ClInclude Include="EngineSource\Math\Transform.h" />
@@ -179,6 +182,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
+    <ClInclude Include="GameSource\CollisionUtils.h" />
+    <ClInclude Include="GameSource\Emitter.h" />
     <ClInclude Include="GameSource\GameEngine.h" />
     <ClInclude Include="GameSource\GameScene.h" />
     <ClInclude Include="GameSource\Particle.h" />

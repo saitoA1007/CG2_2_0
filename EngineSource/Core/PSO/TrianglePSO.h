@@ -24,6 +24,8 @@ namespace GameEngine {
 
         ID3D12PipelineState* GetPipelineState(BlendMode blendMode) { return graphicsPipelineState_[blendMode].Get(); }
 
+        ID3D12PipelineState* GetFramePipelineState(DrawModel drawMode) { return frameGraphicsPipelineState_[drawMode].Get(); }
+
     private:
         TrianglePSO(const TrianglePSO&) = delete;
         TrianglePSO& operator=(const TrianglePSO&) = delete;
@@ -31,6 +33,9 @@ namespace GameEngine {
         ID3D12Device* device_ = nullptr;
 
         std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, BlendMode::kCountOfBlendMode> graphicsPipelineState_;
+
+        std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, DrawModel::kCountOfDrawMode> frameGraphicsPipelineState_;
+
         Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
 
         Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob_;

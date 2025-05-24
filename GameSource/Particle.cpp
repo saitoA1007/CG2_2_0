@@ -5,6 +5,8 @@
 #include"EngineSource/2D/ImGuiManager.h"
 #include"EngineSource/Math/MyMath.h"
 
+#include"CollisionUtils.h"
+
 using namespace GameEngine;
 
 Particle::~Particle() {
@@ -25,41 +27,52 @@ void Particle::Initialize(GameEngine::Model* model, const uint32_t& textureHandl
 	randomGenerator_.Initialize();
 
 	// ワールド行列の初期化
-	for (uint32_t i = 0; i < kNumMaxInstance; ++i) {
-		particleDatas_.push_back(MakeNewParticle());
-	}
 	planeWorldTransforms_.Initialize(kNumMaxInstance);
+
+	accelerationField_.acceleration = { 15.0f,0.0f,0.0f };
+	accelerationField_.area.min = { -1.0f,-1.0f,-1.0f };
+	accelerationField_.area.max = { 1.0f,1.0f,1.0f };
 }
 
 void Particle::Update(const Matrix4x4& cameraMatrix) {
 
-	// 生存期間を過ぎていたら初期化する
-	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-		// 生存期間していれば飛ばす
-		if (particleDatas_[index].lifeTime >= particleDatas_[index].currentTime) { 
-			continue;
-		}
-		// 新しく生成する
-		particleDatas_[index] = MakeNewParticle();
+	// 発生処理
+	if (particleEmitter_->IsCall()) {
+		particleDatas_.splice(particleDatas_.end(), Emit(particleEmitter_->GetEmitter()));
 	}
 
 	// 移動処理
 	numInstance_ = 0;
-	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-		if (particleDatas_[index].lifeTime <= particleDatas_[index].currentTime) { // 生存期間を過ぎていたら更新せず描画対象にしない
+	for (std::list<ParticleData>::iterator particleIterator = particleDatas_.begin(); particleIterator != particleDatas_.end();) {
+		if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
+			particleIterator = particleDatas_.erase(particleIterator);  // 生存期間が過ぎたParticleはlistから消す。戻り値が次のイテレータとなる
 			continue;
 		}
 
-		// 移動
-		particleDatas_[index].transform.translate += particleDatas_[index].velocity * kDeltaTime;
-		particleDatas_[index].currentTime += kDeltaTime;  // 経過時間を足す
-		// トラスフォームの適応
-		planeWorldTransforms_.transformDatas_[numInstance_].transform = particleDatas_[index].transform;
-		// 色を適応
-		float alpha = 1.0f - (particleDatas_[index].currentTime / particleDatas_[index].lifeTime);
-		particleDatas_[index].color.w = alpha;
-		planeWorldTransforms_.transformDatas_[numInstance_].color = particleDatas_[index].color;
-		numInstance_++; // 生きているParticleの数を1つカウントする
+		// Fieldの範囲内のParticleには加速度を適用する
+		if (enableField_) {
+			if (IsAABBPosintCollision(accelerationField_.area, particleIterator->transform.translate)) {
+				particleIterator->velocity += accelerationField_.acceleration * kDeltaTime;
+			}
+		}
+
+		// 移動  
+		particleIterator->transform.translate += particleIterator->velocity * kDeltaTime;
+		particleIterator->currentTime += kDeltaTime;  // 経過時間を足す  
+
+		// トラスフォームの適応  
+		planeWorldTransforms_.transformDatas_[numInstance_].transform = particleIterator->transform;
+
+		// 色を適応  
+		float alpha = 1.0f - (particleIterator->currentTime / particleIterator->lifeTime);
+		particleIterator->color.w = alpha;
+		planeWorldTransforms_.transformDatas_[numInstance_].color = particleIterator->color;
+
+		if (numInstance_ < kNumMaxInstance) {
+			++numInstance_;
+		}
+
+		++particleIterator; // 次のイテレータに進める  
 	}
 
 	// ビルボードの適応の有無で行列の更新処理を変える
@@ -86,6 +99,11 @@ void Particle::Update(const Matrix4x4& cameraMatrix) {
 
 	ImGui::Begin("DebugParticle");
 	ImGui::Checkbox("useBillboard", &useBillboard_);
+	ImGui::Checkbox("enableField", &enableField_);
+
+	if (ImGui::Button("Add Particle")) {
+		particleDatas_.splice(particleDatas_.end(), Emit(particleEmitter_->GetEmitter()));
+	}
 	ImGui::End();
 #endif
 }
@@ -96,12 +114,12 @@ void Particle::Draw(const Matrix4x4 VPMatrix) {
 	planeModel_->Draw(numInstance_,planeWorldTransforms_, textureHandle_, VPMatrix);
 }
 
-Particle::ParticleData Particle::MakeNewParticle() {
+Particle::ParticleData Particle::MakeNewParticle(const Vector3& translate) {
 	ParticleData particleData;
 	// SRTを設定
 	particleData.transform.scale = { 1.0f,1.0f,1.0f };
 	particleData.transform.rotate = { 0.0f,0.0f,0.0f };
-	particleData.transform.translate = randomGenerator_.GetVector3(-1.0f, 1.0f);
+	particleData.transform.translate = translate + randomGenerator_.GetVector3(-1.0f, 1.0f);
 	// 速度
 	particleData.velocity = randomGenerator_.GetVector3(-1.0f, 1.0f);
 	// 色
@@ -110,4 +128,14 @@ Particle::ParticleData Particle::MakeNewParticle() {
 	particleData.lifeTime = randomGenerator_.GetFloat(1.0f, 3.0f);
 	particleData.currentTime = 0.0f;
 	return particleData;
+}
+
+std::list<Particle::ParticleData> Particle::Emit(const ParticleEmitter::Emitter& emitter) {
+
+	std::list<ParticleData> particles;
+
+	for (uint32_t count = 0; count < emitter.count; ++count) {
+		particles.push_back(MakeNewParticle(emitter.transform.translate));
+	}
+	return particles;
 }

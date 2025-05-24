@@ -35,6 +35,11 @@ void Model::PreDraw(PSOMode psoMode, BlendMode blendMode) {
 	}
 }
 
+void Model::PreDraw(DrawModel drawMode) {
+	commandList_->SetGraphicsRootSignature(trianglePSO_->GetRootSignature());  // RootSignatureを設定。
+	commandList_->SetPipelineState(trianglePSO_->GetFramePipelineState(drawMode)); // trianglePSOを設定
+}
+
 Model* Model::CreateSphere(uint32_t subdivision) {
 
 	Model* model = new Model();
