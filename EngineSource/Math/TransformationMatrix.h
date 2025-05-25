@@ -17,4 +17,5 @@ struct ParticleForGPU {
 
 struct CameraForGPU {
 	Vector3 worldPosition;
+	float pad;
 };

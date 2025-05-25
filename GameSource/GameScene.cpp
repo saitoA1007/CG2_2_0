@@ -6,6 +6,7 @@ using namespace GameEngine;
 
 GameScene::~GameScene() {
 	delete shereModel_;
+	delete terrainModel_;
 }
 
 void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngine::DirectXCommon* dxCommon) {
@@ -33,18 +34,33 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	directionalLight_ = std::make_unique<DirectionalLight>();
 	directionalLight_->Initialize(dxCommon->GetDevice(), lightColor_, lightDir_, intensity_);
 
+	// 点光源ライト
+	pointLightColor_ = {1.0f,1.0f,1.0f,1.0f};
+	pointLightPos_ = { 0.0f,0.0f,-5.0f };
+	pointLightIntensity_ = 1.0f;
+	pointLight_ = std::make_unique<PointLight>();
+	pointLight_->Initialize(dxCommon->GetDevice(), pointLightColor_, pointLightPos_, pointLightIntensity_);
+
 	// 球モデルを生成
 	shereModel_ = Model::CreateSphere(16);
 	shereModel_->SetDefaultIsEnableLight(true);
 	// モンスターボールのテクスチャを生成
 	monsterBallGH_ = textureManager->Load("Resources/monsterBall.png");
 	// 球のトランスフォームを生成
-	shereWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	shereWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
+
+	// 地面モデルを生成
+	terrainModel_ = Model::CreateFromOBJ("terrain.obj","terrain");
+	terrainModel_->SetDefaultIsEnableLight(true);
+	grassGH_ = textureManager->Load("Resources/terrain/grass.png");
+	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 }
 
 void GameScene::Update(GameEngine::Input* input){
 
 	shereWorldTransform_.UpdateTransformMatrix();
+
+	terrainWorldTransform_.UpdateTransformMatrix();
 
 	// カメラ処理
 	if (isDebugCameraActive_) {
@@ -93,6 +109,21 @@ void GameScene::Update(GameEngine::Input* input){
 			blendMode_ = BlendMode::kBlendModeScreen;
 		}
 	}
+	// 光の色を変更
+	ImGui::ColorEdit3("PointColor", &pointLightColor_.x);
+	pointLight_->SetLightColor(pointLightColor_);
+	// 光の位置を変更
+	ImGui::SliderFloat3("PointLightPos", &pointLightPos_.x, -10.0f, 10.0f);
+	pointLight_->SetLightPosition(pointLightPos_);
+	// 光の強度を変更
+	ImGui::SliderFloat("PointLightIntensity", &pointLightIntensity_, 0.0f, 10.0f);
+	pointLight_->SetLightIntensity(pointLightIntensity_);
+	// 光の範囲
+	ImGui::SliderFloat("PointLightRadiuse", &radius_, 0.0f, 10.0f);
+	pointLight_->SetRadius(radius_);
+	// 光の減衰率
+	ImGui::SliderFloat("PointLightDecay", &decay_, 0.0f, 10.0f);
+	pointLight_->SetDecay(decay_);
 	ImGui::End();
 
 	// カメラの切り替え処理
@@ -111,8 +142,12 @@ void GameScene::Draw() {
 	// モデルの単体描画前処理
 	Model::PreDraw(PSOMode::triangle, BlendMode::kBlendModeNone);
 
+	// 地面を描画
+	terrainModel_->DrawLight(directionalLight_->GetResource(), camera_->GetCameraResource(), pointLight_->GetResource());
+	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
+
 	// 球を描画
-	shereModel_->DrawLight(directionalLight_->GetResource(),camera_->GetCameraResource());
+	shereModel_->DrawLight(directionalLight_->GetResource(), camera_->GetCameraResource(), pointLight_->GetResource());
 	shereModel_->Draw(shereWorldTransform_, monsterBallGH_, camera_->GetVPMatrix());
 
 	// 軸を描画
