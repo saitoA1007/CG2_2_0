@@ -268,9 +268,13 @@ void Model::Draw(const uint32_t& numInstance,WorldTransforms& worldTransforms, c
 	}
 }
 
-void Model::DrawLight(ID3D12Resource* directionalLightResource, ID3D12Resource* cameraResource) {
+void Model::DrawLight(ID3D12Resource* directionalLightResource, ID3D12Resource* cameraResource, ID3D12Resource* pointLightResource) {
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+
+	if (pointLightResource) {
+		commandList_->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
+	}
 }
 
 Model::ModelData Model::LoadObjeFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename) {
