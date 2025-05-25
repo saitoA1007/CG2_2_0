@@ -5,6 +5,7 @@
 #include"EngineSource/3D/Camera/DebugCamera.h"
 #include"EngineSource/3D/AxisIndicator.h"
 #include"EngineSource/3D/Light/DirectionalLight.h"
+#include"EngineSource/3D/Light/PointLight.h"
 #include"EngineSource/3D/Model.h"
 #include"EngineSource/3D/WorldTransform.h"
 #include"EngineSource/3D/WorldTransforms.h"
@@ -55,12 +56,23 @@ private:
 	Vector3 lightDir_;
 	float intensity_;
 
+	// 点光源
+	std::unique_ptr<GameEngine::PointLight> pointLight_;
+	Vector4 pointLightColor_;
+	Vector3 pointLightPos_;
+	float pointLightIntensity_;
+	float radius_ = 4.0f;
+	float decay_ = 2.0f;
 
+	// 球モデル
 	GameEngine::Model* shereModel_;
-
 	uint32_t monsterBallGH_ = 0u;
-
 	GameEngine::WorldTransform shereWorldTransform_;
+
+	// 地面モデル
+	GameEngine::Model* terrainModel_;
+	uint32_t grassGH_ = 0u;
+	GameEngine::WorldTransform terrainWorldTransform_;
 
 	// ブレンドモード
 	const char* blendModeName_[6] = { "kBlendModeNone","kBlendModeNormal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen"};
