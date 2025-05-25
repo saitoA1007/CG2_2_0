@@ -2,11 +2,11 @@
 #include"Matrix4x4.h"
 #include"Vector4.h"
 #include"Vector3.h"
-#include<cstdint>
 
 struct TransformationMatrix {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
+	Matrix4x4 worldInverseTranspose;
 };
 
 struct ParticleForGPU {

@@ -156,6 +156,21 @@ Matrix4x4 InverseMatrix(const Matrix4x4& matrix) {
 	return result;
 }
 
+Matrix4x4 Transpose(const Matrix4x4& matrix) {
+	Matrix4x4 result;
+	for (int y = 0; y < 4; ++y) {
+		for (int x = 0; x < 4; ++x) {
+			result.m[y][x] = matrix.m[x][y];
+		}
+	}
+	return result;
+}
+
+Matrix4x4 InverseTranspose(const Matrix4x4& matrix) {
+	Matrix4x4 result = InverseMatrix(matrix);
+	return Transpose(result);
+}
+
 Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
 	float h = 1 / tanf(fovY / 2);
 	float w = h / aspectRatio;

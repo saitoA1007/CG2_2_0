@@ -43,6 +43,12 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& theta, const Vec
 // 4x4逆行列の計算
 Matrix4x4 InverseMatrix(const Matrix4x4& matrix);
 
+// 4x4行列の転置
+Matrix4x4 Transpose(const Matrix4x4& matrix);
+
+// 4x4行列の逆転置行列
+Matrix4x4 InverseTranspose(const Matrix4x4& matrix);
+
 // 透視投影行列の作成
 Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
 
