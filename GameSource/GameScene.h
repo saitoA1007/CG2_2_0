@@ -4,9 +4,10 @@
 #include"EngineSource/3D/Camera/Camera.h"
 #include"EngineSource/3D/Camera/DebugCamera.h"
 #include"EngineSource/3D/AxisIndicator.h"
-#include"EngineSource/3D/Light/DirectionalLight.h"
-#include"EngineSource/3D/Light/PointLight.h"
-#include"EngineSource/3D/Light/SpotLight.h"
+//#include"EngineSource/3D/Light/DirectionalLight.h"
+//#include"EngineSource/3D/Light/PointLight.h"
+//#include"EngineSource/3D/Light/SpotLight.h"
+#include"EngineSource/3D/Light/LightManager.h"
 #include"EngineSource/3D/Model.h"
 #include"EngineSource/3D/WorldTransform.h"
 #include"EngineSource/3D/WorldTransforms.h"
@@ -51,23 +52,8 @@ private:
 	// デバックカメラの有効の判定
 	bool isDebugCameraActive_ = false;
 
-	// 平行光源
-	std::unique_ptr<GameEngine::DirectionalLight> directionalLight_;
-	Vector4 lightColor_;
-	Vector3 lightDir_;
-	float intensity_;
-
-	// 点光源
-	std::unique_ptr<GameEngine::PointLight> pointLight_;
-	Vector4 pointLightColor_;
-	Vector3 pointLightPos_;
-	float pointLightIntensity_;
-	float radius_ = 4.0f;
-	float decay_ = 2.0f;
-
-	// スポットライト光源
-	std::unique_ptr<GameEngine::SpotLight> spotLight_;
-	GameEngine::SpotLight::SpotLightData spotLightData_;
+	// 光源
+	std::unique_ptr<GameEngine::LightManager> lightManager_;
 
 	// 球モデル
 	GameEngine::Model* shereModel_;

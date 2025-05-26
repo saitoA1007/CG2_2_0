@@ -28,32 +28,12 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// 軸方向表示の画像
 	axisTextureHandle_ = textureManager->Load("Resources/axis/axis.jpg");
 
-	// 平行光源の生成
-	lightColor_ = { 1.0f, 1.0f, 1.0f, 1.0f };
-	lightDir_ = { 0.1f,-0.9f,0.1f };
-	intensity_ = 1.0f;
-	directionalLight_ = std::make_unique<DirectionalLight>();
-	directionalLight_->Initialize(dxCommon->GetDevice(), lightColor_, lightDir_, intensity_);
-
-	// 点光源ライト
-	pointLightColor_ = { 1.0f,1.0f,1.0f,1.0f };
-	pointLightPos_ = { 0.0f,0.0f,-5.0f };
-	pointLightIntensity_ = 1.0f;
-	pointLight_ = std::make_unique<PointLight>();
-	pointLight_->Initialize(dxCommon->GetDevice(), pointLightColor_, pointLightPos_, pointLightIntensity_);
-
-	// スポットライト
-	spotLightData_.color = {1.0f,1.0f,1.0f,1.0f};
-	spotLightData_.position = { 2.0f,1.25f,0.0f };
-	spotLightData_.intensity = 4.0f;
-	spotLightData_.direction = { -1.0f,-1.0f,0.0f };
-	spotLightData_.distance = 7.0f;
-	spotLightData_.decay = 2.0f;
-	spotLightData_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-	spotLightData_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 6.0f);
-	spotLightData_.active = true;
-	spotLight_ = std::make_unique<SpotLight>();
-	spotLight_->Initialize(dxCommon->GetDevice(), spotLightData_.color, spotLightData_.position, spotLightData_.intensity);
+	// 光源の生成
+	lightManager_ = std::make_unique<LightManager>();
+	lightManager_->Initialize(dxCommon_->GetDevice());
+	lightManager_->directionalLight_->SetActive(true);
+	lightManager_->pointLight_->SetLightActive(true);
+	lightManager_->spotLight_->SetLightActive(true);
 
 	// 球モデルを生成
 	shereModel_ = Model::CreateSphere(16);
@@ -76,6 +56,9 @@ void GameScene::Update(GameEngine::Input* input){
 
 	terrainWorldTransform_.UpdateTransformMatrix();
 
+	// 光源の更新処理
+	lightManager_->Update();
+
 	// カメラ処理
 	if (isDebugCameraActive_) {
 		// デバックカメラの更新
@@ -97,16 +80,6 @@ void GameScene::Update(GameEngine::Input* input){
 	ImGui::DragFloat3("CameraPos", &cameraTransform_.translate.x, 0.01f);
 	ImGui::DragFloat3("CameraRotate", &cameraTransform_.rotate.x, 0.01f);
 	ImGui::DragFloat3("CameraScale", &cameraTransform_.scale.x, 0.01f);
-	// 光の色を変更
-	ImGui::ColorEdit3("LightColor", &lightColor_.x);
-	directionalLight_->SetLightColor(lightColor_);
-	// 光の方向を変更
-	ImGui::SliderFloat3("LightDirection", &lightDir_.x, -1.0f, 1.0f);
-	lightDir_ = Normalize(lightDir_);
-	directionalLight_->SetLightDir(lightDir_);
-	// 光の強度を変更
-	ImGui::SliderFloat("LightIntensity", &intensity_, 0.0f, 10.0f);
-	directionalLight_->SetLightIntensity(intensity_);
 	// ブレンドモードの切り替え
 	if (ImGui::Combo("BlendMode", &selectBlendNum_, blendModeName_, IM_ARRAYSIZE(blendModeName_))) {
 		if (selectBlendNum_ == BlendMode::kBlendModeNone) {
@@ -122,37 +95,6 @@ void GameScene::Update(GameEngine::Input* input){
 		} else if (selectBlendNum_ == BlendMode::kBlendModeScreen) {
 			blendMode_ = BlendMode::kBlendModeScreen;
 		}
-	}
-
-	if (ImGui::TreeNode("SpotLight")) {
-		ImGui::DragFloat3("SpotLightPos", &spotLightData_.position.x, 0.01f);
-		ImGui::DragFloat("SpotLightIntensity", &spotLightData_.intensity, 0.01f);
-		ImGui::DragFloat3("SpotLightDirection", &spotLightData_.direction.x, 0.01f);
-		ImGui::DragFloat("SpotLightDistance", &spotLightData_.distance, 0.01f);
-		ImGui::DragFloat("SpotLightDecay", &spotLightData_.decay, 0.01f);
-		ImGui::DragFloat("SpotLightCosFalloffStart", &spotLightData_.cosFalloffStart, 0.01f);
-		spotLightData_.direction = Normalize(spotLightData_.direction);
-		spotLight_->SetSpotLightData(spotLightData_);
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("PointLitht")) {
-		// 光の色を変更
-		ImGui::ColorEdit3("PointColor", &pointLightColor_.x);
-		pointLight_->SetLightColor(pointLightColor_);
-		// 光の位置を変更
-		ImGui::SliderFloat3("PointLightPos", &pointLightPos_.x, -10.0f, 10.0f);
-		pointLight_->SetLightPosition(pointLightPos_);
-		// 光の強度を変更
-		ImGui::SliderFloat("PointLightIntensity", &pointLightIntensity_, 0.0f, 10.0f);
-		pointLight_->SetLightIntensity(pointLightIntensity_);
-		// 光の範囲
-		ImGui::SliderFloat("PointLightRadiuse", &radius_, 0.0f, 10.0f);
-		pointLight_->SetRadius(radius_);
-		// 光の減衰率
-		ImGui::SliderFloat("PointLightDecay", &decay_, 0.0f, 10.0f);
-		pointLight_->SetDecay(decay_);
-		ImGui::TreePop();
 	}
 	ImGui::End();
 
@@ -173,13 +115,11 @@ void GameScene::Draw() {
 	Model::PreDraw(PSOMode::triangle, BlendMode::kBlendModeNone);
 
 	// 地面を描画
-	terrainModel_->DrawLight(directionalLight_->GetResource(), camera_->GetCameraResource(), pointLight_->GetResource());
-	terrainModel_->DrawSpotLight(spotLight_->GetResource());
+	terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
 	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
 
 	// 球を描画
-	shereModel_->DrawLight(directionalLight_->GetResource(), camera_->GetCameraResource(), pointLight_->GetResource());
-	shereModel_->DrawSpotLight(spotLight_->GetResource());
+	shereModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
 	shereModel_->Draw(shereWorldTransform_, monsterBallGH_, camera_->GetVPMatrix());
 
 	// 軸を描画
