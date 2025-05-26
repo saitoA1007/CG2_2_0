@@ -102,6 +102,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Camera\DebugCamera.cpp" />
     <ClCompile Include="EngineSource\3D\Light\DirectionalLight.cpp" />
     <ClCompile Include="EngineSource\3D\Light\PointLight.cpp" />
+    <ClCompile Include="EngineSource\3D\Light\SpotLight.cpp" />
     <ClCompile Include="EngineSource\3D\LineMesh.cpp" />
     <ClCompile Include="EngineSource\3D\Material.cpp" />
     <ClCompile Include="EngineSource\3D\Model.cpp" />
@@ -138,6 +139,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Camera\DebugCamera.h" />
     <ClInclude Include="EngineSource\3D\Light\DirectionalLight.h" />
     <ClInclude Include="EngineSource\3D\Light\PointLight.h" />
+    <ClInclude Include="EngineSource\3D\Light\SpotLight.h" />
     <ClInclude Include="EngineSource\3D\LineMesh.h" />
     <ClInclude Include="EngineSource\3D\Material.h" />
     <ClInclude Include="EngineSource\3D\Model.h" />

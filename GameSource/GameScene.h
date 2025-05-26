@@ -6,6 +6,7 @@
 #include"EngineSource/3D/AxisIndicator.h"
 #include"EngineSource/3D/Light/DirectionalLight.h"
 #include"EngineSource/3D/Light/PointLight.h"
+#include"EngineSource/3D/Light/SpotLight.h"
 #include"EngineSource/3D/Model.h"
 #include"EngineSource/3D/WorldTransform.h"
 #include"EngineSource/3D/WorldTransforms.h"
@@ -42,7 +43,7 @@ private:
 	std::unique_ptr<GameEngine::AxisIndicator> axisIndicator_;
 
 	// カメラトラスフォーム
-	Transform cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+	Transform cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,-20.0f} };
 	// カメラ
 	std::unique_ptr<GameEngine::Camera> camera_;
 	// デバックカメラ
@@ -63,6 +64,10 @@ private:
 	float pointLightIntensity_;
 	float radius_ = 4.0f;
 	float decay_ = 2.0f;
+
+	// スポットライト光源
+	std::unique_ptr<GameEngine::SpotLight> spotLight_;
+	GameEngine::SpotLight::SpotLightData spotLightData_;
 
 	// 球モデル
 	GameEngine::Model* shereModel_;

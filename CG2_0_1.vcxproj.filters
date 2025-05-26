@@ -147,6 +147,9 @@
     <ClCompile Include="EngineSource\3D\Light\PointLight.cpp">
       <Filter>EngineSource\3D\Light</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\3D\Light\SpotLight.cpp">
+      <Filter>EngineSource\3D\Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -300,6 +303,9 @@
       <Filter>EngineSource\Math</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Light\PointLight.h">
+      <Filter>EngineSource\3D\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Light\SpotLight.h">
       <Filter>EngineSource\3D\Light</Filter>
     </ClInclude>
   </ItemGroup>
