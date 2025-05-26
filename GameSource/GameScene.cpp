@@ -28,16 +28,8 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// 軸方向表示の画像
 	axisTextureHandle_ = textureManager->Load("Resources/axis/axis.jpg");
 
-	// 光源の生成
-	lightManager_ = std::make_unique<LightManager>();
-	lightManager_->Initialize(dxCommon_->GetDevice());
-	lightManager_->directionalLight_->SetActive(true);
-	lightManager_->pointLight_->SetLightActive(true);
-	lightManager_->spotLight_->SetLightActive(true);
-
 	// 球モデルを生成
 	shereModel_ = Model::CreateSphere(16);
-	shereModel_->SetDefaultIsEnableLight(true);
 	// モンスターボールのテクスチャを生成
 	monsterBallGH_ = textureManager->Load("Resources/monsterBall.png");
 	// 球のトランスフォームを生成
@@ -45,7 +37,6 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 
 	// 地面モデルを生成
 	terrainModel_ = Model::CreateFromOBJ("terrain.obj","terrain");
-	terrainModel_->SetDefaultIsEnableLight(true);
 	grassGH_ = textureManager->Load("Resources/terrain/grass.png");
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 }
@@ -55,9 +46,6 @@ void GameScene::Update(GameEngine::Input* input){
 	shereWorldTransform_.UpdateTransformMatrix();
 
 	terrainWorldTransform_.UpdateTransformMatrix();
-
-	// 光源の更新処理
-	lightManager_->Update();
 
 	// カメラ処理
 	if (isDebugCameraActive_) {
@@ -115,11 +103,9 @@ void GameScene::Draw() {
 	Model::PreDraw(PSOMode::triangle, BlendMode::kBlendModeNone);
 
 	// 地面を描画
-	terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
 	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
 
 	// 球を描画
-	shereModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
 	shereModel_->Draw(shereWorldTransform_, monsterBallGH_, camera_->GetVPMatrix());
 
 	// 軸を描画
