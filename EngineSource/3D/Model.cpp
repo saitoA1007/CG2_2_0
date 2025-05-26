@@ -7,9 +7,9 @@
 #include"EngineSource/Math/MyMath.h"
 #include"WorldTransform.h"
 
-//#include<assimp/Importer.hpp>
-//#include<assimp/scene.h>
-//#include<assimp/postprocess.h>
+#include<assimp/Importer.hpp>
+#include<assimp/scene.h>
+#include<assimp/postprocess.h>
 
 using namespace GameEngine;
 
@@ -281,129 +281,59 @@ void Model::DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* camera
 Model::ModelData Model::LoadObjeFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename) {
 
 	ModelData modelData; // 構築するModelData
-	std::vector<Vector4> positions; // 位置
-	std::vector<Vector3> normals; // 法線
-	std::vector<Vector2> texcoords; // テクスチャ座標
-	std::string line; // ファイルから読んだ1行を格納するもの
-	std::ifstream file(directoryPath + "/" + filename + "/" + objFilename);
-	assert(file.is_open());
+	
+	// objファイルを読み込み
+	Assimp::Importer importer;
+	std::string filePath = directoryPath + "/" + filename + "/" + objFilename;
+	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	assert(scene->HasMeshes()); // メッシュがないのは対応しない
+		
+	// Mesh解析
+	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
+		aiMesh* mesh = scene->mMeshes[meshIndex];
+		assert(mesh->HasNormals()); // 法線がないMeshは今回は非対応
+		assert(mesh->HasTextureCoords(0)); // TexcoordがないMeshは今回は非対応
 
-	// 頂点情報を取得
-	while (std::getline(file, line)) {
-		std::string identifier;
-		std::istringstream s(line);
-		s >> identifier;// 先頭の識別子を読む
+		// Face解析
+		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
+			aiFace& face = mesh->mFaces[faceIndex];
 
-		if (identifier == "v") {
-			Vector4 position;
-			s >> position.x >> position.y >> position.z;
-			position.w = 1.0f;
-			// 位置Xを反転
-			position.x *= -1.0f;
-			positions.push_back(position);
-		} else if (identifier == "vt") {
-			Vector2 texcoord;
-			s >> texcoord.x >> texcoord.y;
-			// Texture座標系を左下から左上へ
-			texcoord.y = 1.0f - texcoord.y;
-			texcoords.push_back(texcoord);
-		} else if (identifier == "vn") {
-			Vector3 normal;
-			s >> normal.x >> normal.y >> normal.z;
-			// 法線Xを反転
-			normal.x *= -1.0f;
-			normals.push_back(normal);
-		} else if (identifier == "f") {
-
-			VertexData triangle[3];
-
-			std::vector<std::string> vertexDefinitions;
-			std::string vertexDef;
-			// 面データを挿入
-			while (s >> vertexDef) {
-				vertexDefinitions.push_back(vertexDef);
+			// Vertex解析
+			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
+				uint32_t vertexIndex = face.mIndices[element];
+				aiVector3D& position = mesh->mVertices[vertexIndex];
+				aiVector3D& normal = mesh->mNormals[vertexIndex];
+				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+				VertexData vertex;
+				vertex.position = { position.x,position.y,position.z,1.0f };
+				vertex.normal = { normal.x,normal.y,normal.z };
+				vertex.texcoord = { texcoord.x,texcoord.y};
+				// 右手->左手に変換する
+				vertex.position.x *= -1.0f;
+				vertex.normal.x *= -1.0f;
+				modelData.vertices.push_back(vertex);
 			}
-
-			// 各面に対応
-			if (vertexDefinitions.size() >= 3) {
-				for (uint32_t i = 1; i < vertexDefinitions.size() - 1; ++i) {
-					triangle[0] = ParseVertex(vertexDefinitions[0], positions, texcoords, normals);
-					triangle[1] = ParseVertex(vertexDefinitions[i], positions, texcoords, normals);
-					triangle[2] = ParseVertex(vertexDefinitions[i + 1], positions, texcoords, normals);
-
-					// 頂点を逆順で登録
-					modelData.vertices.push_back(triangle[2]);
-					modelData.vertices.push_back(triangle[1]);
-					modelData.vertices.push_back(triangle[0]);
-				}	
-			}
-		} else if (identifier == "mtllib") {
-			// materialTemplateLibraryファイルの名前を取得する
-			std::string materialFilename;
-			s >> materialFilename;
-			// 基本的にobjファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
-			modelData.material = LoadMaterialTemplateFile(directoryPath, filename + "/" + materialFilename);
 		}
 	}
+
+	// Material解析
+	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
+		aiMaterial* material = scene->mMaterials[materialIndex];
+		// テクスチャを取得
+		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
+			aiString textureFilePath;
+			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
+			modelData.material.textureFilePath = directoryPath + "/" + filename + "/" + textureFilePath.C_Str();
+		}
+
+		// 色を取得
+		aiColor3D diffuseColor(1.0f, 1.0f, 1.0f);   // デフォルト値（白）
+		if (AI_SUCCESS == material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor)) {
+			modelData.material.color = { diffuseColor.r, diffuseColor.g, diffuseColor.b,1.0f };
+		}
+	}
+
 	return modelData;
-}
-
-Model::MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
-
-	MaterialData materialData; // 構築するMaterialData
-	std::string line; // ファイルを読んだ1行を格納する
-	std::ifstream file(directoryPath + "/" + filename); // ファイルを開く
-	assert(file.is_open()); // 開けなかったら止める
-
-	while (std::getline(file, line)) {
-		std::string identifier;
-		std::istringstream s(line);
-		s >> identifier;
-
-		// identifierに応じた処理
-		if (identifier == "map_Kd") {
-			std::string textureFilename;
-			s >> textureFilename;
-			// 連結してファイルパスにする
-			materialData.textureFilePath = directoryPath + "/" + textureFilename;
-		} else if (identifier == "Kd") {
-			// 色のデータを取得
-			s >> materialData.color.x >> materialData.color.y >> materialData.color.z;
-			// アルファ値は1にしておく
-			materialData.color.w = 1.0f;
-		}
-	}
-	return materialData;
-}
-
-VertexData Model::ParseVertex(
-	const std::string& vertexDefinition,
-	const std::vector<Vector4>& positions,
-	const std::vector<Vector2>& texcoords,
-	const std::vector<Vector3>& normals
-) {
-	std::istringstream v(vertexDefinition);
-	std::string indexStr;   // 読み込んだデータを格納する
-	uint32_t indices[3] = { 0 };
-
-	for (uint32_t i = 0; i < 3; ++i) {
-
-		if (!std::getline(v, indexStr, '/')) {
-			break;
-		}
-
-		// 空文字列でなければ代入
-		if (!indexStr.empty()) {
-			// 文字型をint型に変換して代入
-			indices[i] = std::stoi(indexStr);
-		}
-	}
-
-	// 配列データの先頭がobjでは0ではなく1なのでこちらの配列に合わせるために-1をする
-	Vector4 position = positions[indices[0] - 1];
-	Vector2 texcoord = texcoords[indices[1] - 1];
-	Vector3 normal = normals[indices[2] - 1];
-	return { position, texcoord, normal };
 }
 
 void  Model::SetDefaultColor(const Vector4& color) {

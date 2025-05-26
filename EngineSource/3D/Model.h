@@ -127,17 +127,6 @@ namespace GameEngine {
 		// OBJファイル読み込み
 		ModelData LoadObjeFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename);
 
-		// mtlファイルを読み込み
-		MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
-
-		// OBJファイルの面の成分を作成
-		VertexData ParseVertex(
-			const std::string& vertexDefinition,
-			const std::vector<Vector4>& positions,
-			const std::vector<Vector2>& texcoords,
-			const std::vector<Vector3>& normals
-		);
-
 	private:
 		//Model() = default;
 		Model(Model&) = delete;
