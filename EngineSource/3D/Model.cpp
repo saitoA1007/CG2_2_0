@@ -277,6 +277,12 @@ void Model::DrawLight(ID3D12Resource* directionalLightResource, ID3D12Resource* 
 	}
 }
 
+void Model::DrawSpotLight(ID3D12Resource* spotLightResource) {
+	if (spotLightResource) {
+		commandList_->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
+	}
+}
+
 Model::ModelData Model::LoadObjeFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename) {
 
 	ModelData modelData; // 構築するModelData

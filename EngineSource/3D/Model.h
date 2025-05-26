@@ -104,6 +104,12 @@ namespace GameEngine {
 		void DrawLight(ID3D12Resource* directionalLightResource, ID3D12Resource* cameraResource,ID3D12Resource* pointLightResource = nullptr);
 
 		/// <summary>
+		/// モデルにスポットライトの適応
+		/// </summary>
+		/// <param name="spotLightResource"></param>
+		void DrawSpotLight(ID3D12Resource* spotLightResource);
+
+		/// <summary>
 		/// デフォルトの色を設定
 		/// </summary>
 		/// <param name="color"></param>
