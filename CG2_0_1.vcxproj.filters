@@ -150,6 +150,9 @@
     <ClCompile Include="EngineSource\3D\Light\SpotLight.cpp">
       <Filter>EngineSource\3D\Light</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\3D\Light\LightManager.cpp">
+      <Filter>EngineSource\3D\Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -306,6 +309,9 @@
       <Filter>EngineSource\3D\Light</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Light\SpotLight.h">
+      <Filter>EngineSource\3D\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Light\LightManager.h">
       <Filter>EngineSource\3D\Light</Filter>
     </ClInclude>
   </ItemGroup>

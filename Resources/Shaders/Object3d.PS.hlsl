@@ -10,44 +10,18 @@ struct Material
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 
-struct DirectionalLight
+cbuffer LightGroup : register(b1)
 {
-    float32_t4 color; // ライトの色
-    float32_t3 direction; // ライトの向き
-    float intensity; // 輝度
+    DirectionalLight gDirectionalLight;
+    PointLight gPointLight;
+    SpotLight gSpotLight;
 };
-ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 
 struct Camera
 {
     float32_t3 worldPosition;
 };
 ConstantBuffer<Camera> gCamera : register(b2);
-
-struct PointLight
-{
-    float32_t4 color; // ライトの色
-    float32_t3 position; // ライトの位置
-    float intensity; // 輝度
-    int32_t acitce; // 有効化
-    float radius; // ライトの届く最大距離
-    float decay; // 減衰率
-};
-ConstantBuffer<PointLight> gPointLight : register(b3);
-
-struct SpotLight
-{
-    float32_t4 color; // ライトの色
-    float32_t3 position; // ライトの位置
-    float32_t intensity; // 輝度
-    float32_t3 direction; // ライトの方向
-    float32_t distance; // ライトの最大距離
-    float32_t decay; // 減衰率
-    float32_t cosAngle; // 減衰率
-    float32_t cosFalloffStart; // 
-    int32_t acitce; // 有効化
-};
-ConstantBuffer<SpotLight> gSpotLight : register(b4);
 
 Texture2D<float32_t4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
@@ -72,24 +46,29 @@ PixelShaderOutput main(VertexShaderOutput input)
     { // Lightingする場合
         
         float32_t3 tmpColor = { 0.0f, 0.0f, 0.0f };
-        
-        // half lambert
-        float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
-        float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-        // 拡散反射
-        float32_t3 diffuseDirectionalLight = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
-           
         // cameraDirection
         float32_t3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
-        float32_t3 halfVector = normalize(-gDirectionalLight.direction + toEye);
-        float NDotH = dot(normalize(input.normal), halfVector);
-        float specularPow = pow(saturate(NDotH), gMaterial.shininess); // 反射強度
-        // 鏡面反射
-        float32_t3 specularDirectionalLight = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * gMaterial.specularColor;
         
-        tmpColor += diffuseDirectionalLight + specularDirectionalLight;
+        if (gDirectionalLight.active)
+        {
+            // half lambert
+            float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
+            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+            // 拡散反射
+            float32_t3 diffuseDirectionalLight = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+              
+            // cameraDirection
+            float32_t3 halfVector = normalize(-gDirectionalLight.direction + toEye);
+            float NDotH = dot(normalize(input.normal), halfVector);
+            float specularPow = pow(saturate(NDotH), gMaterial.shininess); // 反射強度
+            // 鏡面反射
+            float32_t3 specularDirectionalLight = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * gMaterial.specularColor;
         
-        if (gPointLight.acitce)
+            // diffuse+specular
+            tmpColor += diffuseDirectionalLight + specularDirectionalLight;
+        }
+        
+        if (gPointLight.active)
         {
             
             float32_t distance = length(gPointLight.position - input.worldPosition); // pointLightへの距離
@@ -110,11 +89,11 @@ PixelShaderOutput main(VertexShaderOutput input)
             // specular
             float32_t3 specularPointLight = gPointLight.color.rgb * gPointLight.intensity * specularPow * gMaterial.specularColor * factor;
             
-             // diffuse+specular
+            // diffuse+specular
             tmpColor += diffusePointLight + specularPointLight;
         }         
         
-        if (gSpotLight.acitce)
+        if (gSpotLight.active)
         {
             // 入射光を求める
             float32_t3 spotLightDirectionOnSurface = normalize(input.worldPosition - gSpotLight.position);

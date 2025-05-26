@@ -12,9 +12,7 @@
 
 #include"EngineSource/3D/Camera/Camera.h"
 #include"EngineSource/3D/Camera/DebugCamera.h"
-#include"EngineSource/3D/Light/DirectionalLight.h"
-#include"EngineSource/3D/Light/PointLight.h"
-#include"EngineSource/3D/Light/SpotLight.h"
+#include"EngineSource/3D/Light/LightManager.h"
 #include"EngineSource/3D/Model.h"
 #include"EngineSource/3D/WorldTransform.h"
 #include"EngineSource/3D/WorldTransforms.h"

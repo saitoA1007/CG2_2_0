@@ -13,6 +13,7 @@
 #include<vector>
 #include <wrl.h>
 
+#include"EngineSource/3D/Light/LightManager.h"
 #include"EngineSource/3D/Camera/Camera.h"
 #include"Material.h"
 #include"WorldTransforms.h"
@@ -101,13 +102,7 @@ namespace GameEngine {
 		/// モデルに光源を適応させる
 		/// </summary>
 		/// <param name="directionalLightResource"></param>
-		void DrawLight(ID3D12Resource* directionalLightResource, ID3D12Resource* cameraResource,ID3D12Resource* pointLightResource = nullptr);
-
-		/// <summary>
-		/// モデルにスポットライトの適応
-		/// </summary>
-		/// <param name="spotLightResource"></param>
-		void DrawSpotLight(ID3D12Resource* spotLightResource);
+		void DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource);
 
 		/// <summary>
 		/// デフォルトの色を設定
