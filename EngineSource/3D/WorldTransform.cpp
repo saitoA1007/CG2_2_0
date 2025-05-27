@@ -31,6 +31,8 @@ void WorldTransform::UpdateTransformMatrix() {
 	transformationMatrixData_->worldInverseTranspose = InverseTranspose(worldMatrix_);
 }
 
-void WorldTransform::SetWVPMatrix(const Matrix4x4& VPMatrix) {
-	transformationMatrixData_->WVP = Multiply(worldMatrix_, VPMatrix);
+void WorldTransform::SetWVPMatrix(const Matrix4x4& localMatrix,const Matrix4x4& VPMatrix) {
+	transformationMatrixData_->WVP = Multiply(localMatrix ,Multiply(worldMatrix_, VPMatrix));
+	transformationMatrixData_->World = Multiply(localMatrix,worldMatrix_);
+	transformationMatrixData_->worldInverseTranspose = InverseTranspose(worldMatrix_);
 }

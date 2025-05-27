@@ -18,6 +18,11 @@
 #include"Material.h"
 #include"WorldTransforms.h"
 
+#include<assimp/Importer.hpp>
+#include<assimp/scene.h>
+#include<assimp/postprocess.h>
+
+
 namespace GameEngine {
 
 	// テクスチャの前方宣言
@@ -37,9 +42,16 @@ namespace GameEngine {
 			Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
 		};
 
+		struct Node {
+			Matrix4x4 localMatrix;
+			std::string name;
+			std::vector<Node> children;
+		};
+
 		struct ModelData {
 			std::vector<VertexData> vertices;
 			MaterialData material;
+			Node rootNode;
 		};
 
 	public:
@@ -66,7 +78,7 @@ namespace GameEngine {
 		/// <param name="objFilename">.objファイル名</param>
 		/// <param name="filename">格納ファイル名</param>
 		/// <returns></returns>
-		static Model* CreateFromOBJ(const std::string& objFilename, const std::string& filename);
+		static Model* CreateModel(const std::string& objFilename, const std::string& filename);
 
 		/// <summary>
 		/// 球モデル生成
@@ -125,7 +137,7 @@ namespace GameEngine {
 	private:
 
 		// OBJファイル読み込み
-		ModelData LoadObjeFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename);
+		ModelData LoadModelFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename);
 
 	private:
 		//Model() = default;
@@ -158,5 +170,17 @@ namespace GameEngine {
 
 		// デフォルトのマテリアル
 		std::unique_ptr<Material> defaultMaterial_ = nullptr;
+
+		// Nodeのローカル行列を保持しておく変数
+		Matrix4x4 localMatrix_;
+
+		private:
+
+		/// <summary>
+		/// Node情報を取得
+		/// </summary>
+		/// <param name="node"></param>
+		/// <returns></returns>
+		Node ReadNode(aiNode* node);
 	};
 }

@@ -182,7 +182,7 @@ Model* Model::CreateTrianglePlane() {
 	return model;
 }
 
-Model* Model::CreateFromOBJ(const std::string& objFilename, const std::string& filename) {
+Model* Model::CreateModel(const std::string& objFilename, const std::string& filename) {
 
 	if (logManager_) {
 		logManager_->Log("\nCreateFromOBJ : Start loading OBJ file: " + filename + objFilename);
@@ -194,7 +194,7 @@ Model* Model::CreateFromOBJ(const std::string& objFilename, const std::string& f
 	if (logManager_) {
 		logManager_->Log("CreateFromOBJ : Loading OBJ file data");
 	}
-	ModelData modelData = model->LoadObjeFile("Resources", objFilename, filename);
+	ModelData modelData = model->LoadModelFile("Resources", objFilename, filename);
 
 	// 描画する時に利用する頂点数
 	model->totalVertices_ = UINT(modelData.vertices.size());
@@ -224,6 +224,8 @@ Model* Model::CreateFromOBJ(const std::string& objFilename, const std::string& f
 		logManager_->Log("CreateFromOBJ : Success loaded OBJ file: " + filename + objFilename);
 	}
 
+	model->localMatrix_ = modelData.rootNode.localMatrix;
+
 	return model;
 }
 
@@ -231,7 +233,7 @@ Model* Model::CreateFromOBJ(const std::string& objFilename, const std::string& f
 void Model::Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix,const Material* material) {
 
 	// カメラ座標に変換
-	worldTransform.SetWVPMatrix(VPMatrix);
+	worldTransform.SetWVPMatrix(localMatrix_,VPMatrix);
 
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	commandList_->IASetIndexBuffer(&indexBufferView_);
@@ -278,7 +280,7 @@ void Model::DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* camera
 	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
 }
 
-Model::ModelData Model::LoadObjeFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename) {
+Model::ModelData Model::LoadModelFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename) {
 
 	ModelData modelData; // 構築するModelData
 	
@@ -297,6 +299,7 @@ Model::ModelData Model::LoadObjeFile(const std::string& directoryPath, const std
 		// Face解析
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
 			aiFace& face = mesh->mFaces[faceIndex];
+			assert(face.mNumIndices >= 3); // 三角形より大きければ通す
 
 			// Vertex解析
 			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
@@ -333,6 +336,9 @@ Model::ModelData Model::LoadObjeFile(const std::string& directoryPath, const std
 		}
 	}
 
+	// シーン全体の階層構造を作る
+	modelData.rootNode = ReadNode(scene->mRootNode);
+
 	return modelData;
 }
 
@@ -346,4 +352,24 @@ void  Model::SetDefaultIsEnableLight(const bool& isEnableLight) {
 
 void  Model::SetDefaultUVMatrix(const Matrix4x4& uvMatrix) {
 	defaultMaterial_->SetUVMatrix(uvMatrix);
+}
+
+Model::Node Model::ReadNode(aiNode* node) {
+	Node result;
+
+	aiMatrix4x4 aiLocalMatrix = node->mTransformation; // nodeのlocalMatrixを取得
+	aiLocalMatrix.Transpose(); // 列ベクトル形式を行ベクトル形式に転置
+	for (uint32_t y = 0; y < 4; ++y) {
+		for (uint32_t x = 0; x < 4; ++x) {
+			result.localMatrix.m[y][x] = aiLocalMatrix[y][x];
+		}
+	}
+
+	result.name = node->mName.C_Str(); // Node名を格納
+	result.children.resize(node->mNumChildren); // 子供の数だけ確保
+	for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {
+		// 再帰的に読んで階層構造を作っていく
+		result.children[childIndex] = ReadNode(node->mChildren[childIndex]);
+	}
+	return result;
 }

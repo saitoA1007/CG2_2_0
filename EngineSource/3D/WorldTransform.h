@@ -56,7 +56,7 @@ namespace GameEngine {
 		/// WVP行列を作成
 		/// </summary>
 		/// <param name="VPMatrix"></param>
-		void SetWVPMatrix(const Matrix4x4& VPMatrix);
+		void SetWVPMatrix(const Matrix4x4& localMatrix, const Matrix4x4& VPMatrix);
 
 	private:
 		// コピー禁止
