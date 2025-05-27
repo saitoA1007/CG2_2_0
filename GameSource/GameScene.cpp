@@ -6,7 +6,6 @@
 using namespace GameEngine;
 
 GameScene::~GameScene() {
-	delete shereModel_;
 	delete terrainModel_;
 }
 
@@ -28,22 +27,13 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// 軸方向表示の画像
 	axisTextureHandle_ = textureManager->Load("Resources/axis/axis.jpg");
 
-	// 球モデルを生成
-	shereModel_ = Model::CreateSphere(16);
-	// モンスターボールのテクスチャを生成
-	monsterBallGH_ = textureManager->Load("Resources/monsterBall.png");
-	// 球のトランスフォームを生成
-	shereWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
-
 	// 地面モデルを生成
-	terrainModel_ = Model::CreateFromOBJ("terrain.obj","terrain");
-	grassGH_ = textureManager->Load("Resources/terrain/grass.png");
-	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
+	terrainModel_ = Model::CreateModel("plane.gltf","Plane");
+	grassGH_ = textureManager->Load("Resources/uvChecker.png");
+	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 }
 
 void GameScene::Update(GameEngine::Input* input){
-
-	shereWorldTransform_.UpdateTransformMatrix();
 
 	terrainWorldTransform_.UpdateTransformMatrix();
 
@@ -105,8 +95,6 @@ void GameScene::Draw() {
 	// 地面を描画
 	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
 
-	// 球を描画
-	shereModel_->Draw(shereWorldTransform_, monsterBallGH_, camera_->GetVPMatrix());
 
 	// 軸を描画
 	axisIndicator_->Draw(axisTextureHandle_);

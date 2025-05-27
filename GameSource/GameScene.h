@@ -48,11 +48,6 @@ private:
 	// デバックカメラの有効の判定
 	bool isDebugCameraActive_ = false;
 
-	// 球モデル
-	GameEngine::Model* shereModel_;
-	uint32_t monsterBallGH_ = 0u;
-	GameEngine::WorldTransform shereWorldTransform_;
-
 	// 地面モデル
 	GameEngine::Model* terrainModel_;
 	uint32_t grassGH_ = 0u;
