@@ -110,7 +110,7 @@ void Sprite::Draw(const uint32_t& textureHandle) {
 		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
 	}
 	// 描画！(DrawCall/ドローコール) 6個のインデックスを使用し1つのインスタンスを描画。その他は当面0で良い
-	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	commandList_->DrawIndexedInstanced(4, 1, 0, 0, 0);
 }
 
 void Sprite::SetPosition(const Vector2& position) {

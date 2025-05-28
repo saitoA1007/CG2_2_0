@@ -5,6 +5,7 @@
 #include"EngineSource/Core/PSO/LinePSO.h"
 #include"EngineSource/Core/PSO/TrianglePSO.h"
 #include"EngineSource/Core/PSO/ParticlePSO.h"
+#include"EngineSource/Core/PSO/PostProcessPSO.h"
 
 #include"EngineSource/Common/LogManager.h"
 #include"EngineSource/Common/ResourceLeakChecker.h"

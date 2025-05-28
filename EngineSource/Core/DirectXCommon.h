@@ -6,6 +6,8 @@
 #include <fstream>
 #include"EngineSource/Common/LogManager.h"
 
+#include"PSO/PostProcessPSO.h"
+
 namespace GameEngine {
 
     class DirectXCommon {
@@ -39,6 +41,21 @@ namespace GameEngine {
 
         D3D12_RENDER_TARGET_VIEW_DESC GetRTVDesc() const { return rtvDesc; }
 
+        // オフスクリーンSRV取得
+        D3D12_GPU_DESCRIPTOR_HANDLE GetOffscreenSRV() const { return offscreenSRVHandle_; }
+
+        /// <summary>
+        /// オフスクリーン用のPSOを取得
+        /// </summary>
+        /// <param name="pso"></param>
+        void SetPostProcessPSO(PostProcessPSO* pso) { postProcessPSO_ = pso; }
+
+        /// <summary>
+        /// ポストエフェクトの有効設定
+        /// </summary>
+        /// <param name="isEnable"></param>
+        void SetIsEnablePostEffect(const bool& isEnable);
+
     private:
         //DirectXCommon() = default;
         //~DirectXCommon() = default;
@@ -59,6 +76,18 @@ namespace GameEngine {
         void CreateFence();
         // GPUを待つ処理 
         void WaitForGPU();
+
+        /// <summary>
+        /// ポストプロセス用のRTV,SRVを作成
+        /// </summary>
+        /// <param name="width">テクスチャの幅</param>
+        /// <param name="height">テクスチャの高さ</param>
+        void CreateOffscreenRenderTarget(uint32_t width, uint32_t height);
+
+        /// <summary>
+        /// ポストプロセスの描画
+        /// </summary>
+        void DrawPostProcess();
 
 #ifdef _DEBUG
         void DebugLayer();
@@ -101,5 +130,18 @@ namespace GameEngine {
 
         // ログ
         LogManager* logManager_;
+
+        // オフスクリーンレンダリング用の変数
+        Microsoft::WRL::ComPtr<ID3D12Resource> offscreenRenderTarget_;
+        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> offscreenRTVHeap_;
+        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> offscreenSRVHeap_;
+        D3D12_CPU_DESCRIPTOR_HANDLE offscreenRTVHandle_{};
+        D3D12_GPU_DESCRIPTOR_HANDLE offscreenSRVHandle_{};
+
+        // ポストプロセス用PSO
+        PostProcessPSO* postProcessPSO_ = nullptr;
+
+        // ポストエフェクトを適応するかのフラグ
+        bool isEnablePostEffect_ = false;
     };
 }

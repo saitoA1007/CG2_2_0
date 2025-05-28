@@ -46,6 +46,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	std::unique_ptr<LinePSO> linePSO = std::make_unique<LinePSO>();
 	linePSO->Initialize(L"Resources/Shaders/Primitive.VS.hlsl", L"Resources/Shaders/Primitive.PS.hlsl", dxCommon->GetDevice(), dxc.get(), logManager.get());
 
+	// ポストプロセスPSO初期化
+	std::unique_ptr<PostProcessPSO> postProcessPSO = std::make_unique<PostProcessPSO>();
+	postProcessPSO->Initialize(dxCommon->GetDevice(), L"Resources/Shaders/PostEffect/PostProcessGrayScale.VS.hlsl", L"Resources/Shaders/PostEffect/PostProcessGrayScale.PS.hlsl", dxc.get(), logManager.get());
+	dxCommon->SetPostProcessPSO(postProcessPSO.get());
+
 	// ImGuiの初期化
 	std::unique_ptr<ImGuiManager> imGuiManager = std::make_unique<ImGuiManager>();
 	imGuiManager->Initialize(windowsApp.get(), dxCommon.get());

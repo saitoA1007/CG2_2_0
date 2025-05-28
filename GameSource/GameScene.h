@@ -53,6 +53,8 @@ private:
 	uint32_t grassGH_ = 0u;
 	GameEngine::WorldTransform terrainWorldTransform_;
 
+	bool isEnablePostEffect_ = false;
+
 	// ブレンドモード
 	const char* blendModeName_[6] = { "kBlendModeNone","kBlendModeNormal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen"};
 	int selectBlendNum_ = 0;
