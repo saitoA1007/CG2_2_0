@@ -120,6 +120,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\DXC.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\LinePSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\ParticlePSO.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\PostProcessPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\TrianglePSO.cpp" />
     <ClCompile Include="EngineSource\Core\TextureManager.cpp" />
     <ClCompile Include="EngineSource\Core\WindowsApp.cpp" />
@@ -167,6 +168,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\PSO\BlendMode.h" />
     <ClInclude Include="EngineSource\Core\PSO\LinePSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\ParticlePSO.h" />
+    <ClInclude Include="EngineSource\Core\PSO\PostProcessPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\TrianglePSO.h" />
     <ClInclude Include="EngineSource\Core\TextureManager.h" />
     <ClInclude Include="EngineSource\Core\WindowsApp.h" />
@@ -202,6 +204,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli" />
     <None Include="Resources\Shaders\Particle.hlsli" />
+    <None Include="Resources\Shaders\PostEffect\PostProcessGrayScale.hlsli" />
     <None Include="Resources\Shaders\Primitive.hlsli" />
   </ItemGroup>
   <ItemGroup>
@@ -222,6 +225,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <FxCompile Include="Resources\Shaders\Particle.VS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\PostProcessGrayScale.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\PostProcessGrayScale.VS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

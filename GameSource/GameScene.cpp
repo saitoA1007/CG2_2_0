@@ -28,9 +28,9 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	axisTextureHandle_ = textureManager->Load("Resources/axis/axis.jpg");
 
 	// 地面モデルを生成
-	terrainModel_ = Model::CreateModel("plane.gltf","Plane");
-	grassGH_ = textureManager->Load("Resources/uvChecker.png");
-	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	terrainModel_ = Model::CreateModel("terrain.obj","terrain");
+	grassGH_ = textureManager->Load("Resources/terrain/grass.png");
+	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 }
 
 void GameScene::Update(GameEngine::Input* input){
@@ -74,6 +74,8 @@ void GameScene::Update(GameEngine::Input* input){
 			blendMode_ = BlendMode::kBlendModeScreen;
 		}
 	}
+	ImGui::Checkbox("isEnablePostEffect", &isEnablePostEffect_);
+	dxCommon_->SetIsEnablePostEffect(isEnablePostEffect_);
 	ImGui::End();
 
 	// カメラの切り替え処理
@@ -90,11 +92,10 @@ void GameScene::Update(GameEngine::Input* input){
 void GameScene::Draw() {
 
 	// モデルの単体描画前処理
-	Model::PreDraw(PSOMode::triangle, BlendMode::kBlendModeNone);
+	Model::PreDraw(PSOMode::triangle, blendMode_);
 
 	// 地面を描画
 	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
-
 
 	// 軸を描画
 	axisIndicator_->Draw(axisTextureHandle_);
