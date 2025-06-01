@@ -8,6 +8,8 @@
 #include"EngineSource/3D/WorldTransform.h"
 #include"EngineSource/3D/WorldTransforms.h"
 
+#include"Rope.h"
+
 class GameScene {
 public:
 
@@ -54,6 +56,12 @@ private:
 	GameEngine::WorldTransform terrainWorldTransform_;
 
 	bool isEnablePostEffect_ = false;
+
+	// ロープ
+	std::unique_ptr<Rope> rope_;
+	// ロープの点モデル
+	GameEngine::Model* sphereModel_;
+	uint32_t whiteGH_ = 0u;
 
 	// ブレンドモード
 	const char* blendModeName_[6] = { "kBlendModeNone","kBlendModeNormal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen"};

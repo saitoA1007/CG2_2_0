@@ -136,6 +136,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="GameSource\GameScene.cpp" />
     <ClCompile Include="GameSource\main.cpp" />
+    <ClCompile Include="GameSource\Rope.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
@@ -192,6 +193,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="GameSource\GameEngine.h" />
     <ClInclude Include="GameSource\GameScene.h" />
+    <ClInclude Include="GameSource\Rope.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

@@ -1,12 +1,14 @@
 #include"GameScene.h"
 #include<numbers>
 #include"EngineSource/2D/ImGuiManager.h"
+#include"EngineSource/3D/PrimitiveRenderer.h"
 #include"EngineSource/Math/MyMath.h"
 
 using namespace GameEngine;
 
 GameScene::~GameScene() {
 	delete terrainModel_;
+	delete sphereModel_;
 }
 
 void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngine::DirectXCommon* dxCommon) {
@@ -31,11 +33,21 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	terrainModel_ = Model::CreateModel("terrain.obj","terrain");
 	grassGH_ = textureManager->Load("Resources/terrain/grass.png");
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
+
+	sphereModel_ = Model::CreateModel("cube.obj", "cube");
+	whiteGH_ = textureManager->Load("Resources/white4x4.png");
+	// ロープ
+	rope_ = std::make_unique<Rope>();
+	rope_->Initialize(sphereModel_, whiteGH_);
 }
 
 void GameScene::Update(GameEngine::Input* input){
 
+	// 地面の更新処理
 	terrainWorldTransform_.UpdateTransformMatrix();
+
+	// ロープの更新処理
+	rope_->Update();
 
 	// カメラ処理
 	if (isDebugCameraActive_) {
@@ -91,8 +103,16 @@ void GameScene::Update(GameEngine::Input* input){
 
 void GameScene::Draw() {
 
+	// 線の前描画処理
+	PrimitiveRenderer::PreDraw();
+	// 線を描画
+	rope_->DrawLine(camera_->GetVPMatrix());
+
 	// モデルの単体描画前処理
 	Model::PreDraw(PSOMode::triangle, blendMode_);
+
+	// 線の点を描画
+	rope_->DrawSphere(camera_->GetVPMatrix());
 
 	// 地面を描画
 	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());

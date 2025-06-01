@@ -159,6 +159,9 @@
     <ClCompile Include="EngineSource\Core\PSO\PostProcessPSO.cpp">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClCompile>
+    <ClCompile Include="GameSource\Rope.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -322,6 +325,9 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Core\PSO\PostProcessPSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSource\Rope.h">
+      <Filter>GameSource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
