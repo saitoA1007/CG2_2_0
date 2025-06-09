@@ -3,6 +3,8 @@
 
 #include"GameScene.h"
 
+#include"EngineSource/Core/PSO/BloomPSO.h"
+
 using namespace GameEngine;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
@@ -46,10 +48,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	std::unique_ptr<LinePSO> linePSO = std::make_unique<LinePSO>();
 	linePSO->Initialize(L"Resources/Shaders/Primitive.VS.hlsl", L"Resources/Shaders/Primitive.PS.hlsl", dxCommon->GetDevice(), dxc.get(), logManager.get());
 
-	// ポストプロセスPSO初期化
-	std::unique_ptr<PostProcessPSO> postProcessPSO = std::make_unique<PostProcessPSO>();
-	postProcessPSO->Initialize(dxCommon->GetDevice(), L"Resources/Shaders/PostEffect/PostProcessGrayScale.VS.hlsl", L"Resources/Shaders/PostEffect/PostProcessGrayScale.PS.hlsl", dxc.get(), logManager.get());
-	dxCommon->SetPostProcessPSO(postProcessPSO.get());
+	// BloomPSOの初期化
+	std::unique_ptr<BloomPSO> bloomPSO = std::make_unique<BloomPSO>();
+	bloomPSO->Initialize(dxCommon->GetDevice(), L"Resources/Shaders/PostEffect/Bloom.VS.hlsl", dxc.get(), logManager.get(),
+		L"Resources/Shaders/PostEffect/HighLumMask.PS.hlsl",
+		L"Resources/Shaders/PostEffect/Bloom.PS.hlsl",
+		L"Resources/Shaders/PostEffect/BloomResult.PS.hlsl",
+		L"Resources/Shaders/PostEffect/BloomComposite.hlsl");
+	dxCommon->SetBloomPSO(bloomPSO.get());
 
 	// ImGuiの初期化
 	std::unique_ptr<ImGuiManager> imGuiManager = std::make_unique<ImGuiManager>();

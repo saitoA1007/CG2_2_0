@@ -33,7 +33,7 @@ void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, LogMa
     // RTV、DSV、SRVの生成
     CreateRenderTargetViews();
     // オフスクリーンレンダリング用
-    CreateOffscreenRenderTarget(width, height);
+    CreateBloomRenderTargets(width, height);
     CreateDepthStencilView(width, height);
     // フェンスの生成
     CreateFence();
@@ -60,67 +60,65 @@ void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, LogMa
 
 void DirectXCommon::PreDraw()
 {
-	// バリア: オフスクリーンをレンダーターゲットに
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = offscreenRenderTarget_.Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	commandList_->ResourceBarrier(1, &barrier);
+    // これから書き込むバックバッファのインデックスを取得
+    backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
-	// 描画先をオフスクリーンRTVに
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvHeap_->GetCPUDescriptorHandleForHeapStart();
-	commandList_->OMSetRenderTargets(1, &offscreenRTVHandle_, false, &dsvHandle);
+    // TransitionBarrierの設定
+    D3D12_RESOURCE_BARRIER barrier{};
+    // 今回のバリアはTransition
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    // Noneにしておく
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    // バリアを張る対象のリソース。現在のバックバッファに対して行う
+    barrier.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
+    // 遷移前(現在)のResourceState
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+    // 遷移後のResourceState
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    // TransitionBarrierを張る
+    commandList_->ResourceBarrier(1, &barrier);
 
-	// 指定した色で画面全体をクリアする
-	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f }; // 青っぽい色、RGBAの順
-	commandList_->ClearRenderTargetView(offscreenRTVHandle_, clearColor, 0, nullptr);
-	// 指定した深度で画面全体をクリアする
-	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    // 描画先のRTVとDSVを設定する
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvHeap_->GetCPUDescriptorHandleForHeapStart();
+    commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex_], false, &dsvHandle);
+    // 指定した色で画面全体をクリアする
+    float clearColor[] = { 0.1f,0.25f,0.5f,1.0f }; // 青っぽい色、RGBAの順
+    commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex_], clearColor, 0, nullptr);
+    // 指定した深度で画面全体をクリアする
+    commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-	commandList_->RSSetViewports(1, &viewport_); // Viewportを設定
-	commandList_->RSSetScissorRects(1, &scissorRect_); // Scirssorを設定
+    commandList_->RSSetViewports(1, &viewport_); // Viewportを設定
+    commandList_->RSSetScissorRects(1, &scissorRect_); // Scirssorを設定
 }
 
 void DirectXCommon::PostDraw()
 {
+    D3D12_RESOURCE_BARRIER barrier{};
+    //barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    //barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    //barrier.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
+    //// バックバッファをRENDER_TARGET → PIXEL_SHADER_RESOURCEに遷移
+    //barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    //barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    //commandList_->ResourceBarrier(1, &barrier);
 
-	// バリア: オフスクリーンをピクセルシェーダリソースに
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = offscreenRenderTarget_.Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	commandList_->ResourceBarrier(1, &barrier);
+    // ブルームの描画
+    //DrawBloomEffect();
 
-	// バリア: バックバッファをレンダーターゲットに
-	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
-	D3D12_RESOURCE_BARRIER bbBarrier{};
-	bbBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	bbBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	bbBarrier.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
-	bbBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	bbBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	commandList_->ResourceBarrier(1, &bbBarrier);
-
-	// バックバッファを描画先に
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvHeap_->GetCPUDescriptorHandleForHeapStart();
-	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex_], false, &dsvHandle);
-
-	// ビューポート/シザー
-	commandList_->RSSetViewports(1, &viewport_);
-	commandList_->RSSetScissorRects(1, &scissorRect_);
-
-	// ポストプロセス描画
-	DrawPostProcess();
-
-	// 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
-	// バリア: バックバッファをPresentに
-	bbBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	bbBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	commandList_->ResourceBarrier(1, &bbBarrier);
+    // TransitionBarrierの設定
+    //D3D12_RESOURCE_BARRIER barrier{};
+    // 今回のバリアはTransition
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    // Noneにしておく
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    // バリアを張る対象のリソース。現在のバックバッファに対して行う
+    barrier.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+    // 今回はRenderTargetからPresentにする
+    // TransitionOnBarrierを張る
+    commandList_->ResourceBarrier(1, &barrier);
 
     // コマンドリストの内容を確定させる。すべてのコマンドを積んでからcloseにすること
     HRESULT hr = commandList_->Close();
@@ -262,8 +260,8 @@ void DirectXCommon::CreateRenderTargetViews()
     }
 
     // RTVの設定
-    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+    rtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    rtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
     // RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないので、ShaderVisibleはfalse
     rtvHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
@@ -280,11 +278,11 @@ void DirectXCommon::CreateRenderTargetViews()
     // RTVを2つ作るのでディスクリプタを2つ用意する(スワップチェーンに使用する画面2つ)
     // まず1つ目を作る。
     rtvHandles_[0] = GetCPUDescriptorHandle(rtvHeap_.Get(), descriptorSizeRTV_, 0);
-    device_->CreateRenderTargetView(swapChainResources_[0].Get(), &rtvDesc, rtvHandles_[0]);
+    device_->CreateRenderTargetView(swapChainResources_[0].Get(), &rtvDesc_, rtvHandles_[0]);
     // 2つ目のディスクリプタハンドルを得る(自力で)
     rtvHandles_[1] = GetCPUDescriptorHandle(rtvHeap_.Get(), descriptorSizeRTV_, 1);
     // 2つ目を作る
-    device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc, rtvHandles_[1]);
+    device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
 
     // ターゲットビューの作成を完了するログ
     if (logManager_) {
@@ -355,11 +353,10 @@ void DirectXCommon::WaitForGPU()
     }
 }
 
-void DirectXCommon::CreateOffscreenRenderTarget(uint32_t width, uint32_t height) {
-
-    // オフスクリーンレンダリング用のターゲットビューを作成
+// ブルーム用レンダーターゲット作成
+void DirectXCommon::CreateBloomRenderTargets(uint32_t width, uint32_t height) {
     if (logManager_) {
-        logManager_->Log("Start　Create OffscreenRenderTarget\n");
+        logManager_->Log("Start Create BloomRenderTargets\n");
     }
 
     // テクスチャリソース作成
@@ -383,49 +380,225 @@ void DirectXCommon::CreateOffscreenRenderTarget(uint32_t width, uint32_t height)
     CD3DX12_HEAP_PROPERTIES heapProps{};
     heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
 
-    // Resourceの生成
-    HRESULT hr = device_->CreateCommittedResource(
+    // 3つのブルーム用レンダーターゲットを作成
+    HRESULT hr;
+
+    // 明るい部分抽出用のリソースを作成
+    hr = device_->CreateCommittedResource(
         &heapProps, // Heapの設定
-        D3D12_HEAP_FLAG_NONE, // Heapの特殊な設定。特になし
-        &desc, // Resourceの設定
+        D3D12_HEAP_FLAG_NONE,  // Heapの特殊な設定。特になし
+        &desc,  // Resourceの設定
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, // データの転送される設定
         &clearValue, // Clearの最適値
-        IID_PPV_ARGS(&offscreenRenderTarget_)); // 作成するResourceポインタへのポインタ
+        IID_PPV_ARGS(&bloomBrightResource_));  // 作成するResourceポインタへのポインタ
     assert(SUCCEEDED(hr));
 
-    // RTVヒープ
-    offscreenRTVHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
-    offscreenRTVHandle_ = offscreenRTVHeap_->GetCPUDescriptorHandleForHeapStart();
-    device_->CreateRenderTargetView(offscreenRenderTarget_.Get(), nullptr, offscreenRTVHandle_);
+    // 縮小しながらブラーする用のリソースを作成
+    hr = device_->CreateCommittedResource(
+        &heapProps, D3D12_HEAP_FLAG_NONE, &desc,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        &clearValue, IID_PPV_ARGS(&bloomBlurShrinkResource_));
+    assert(SUCCEEDED(hr));
 
-    // SRVヒープ
-    offscreenSRVHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
+    // ブラーした結果を描画のリソースを作成
+    hr = device_->CreateCommittedResource(
+        &heapProps, D3D12_HEAP_FLAG_NONE, &desc,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        &clearValue, IID_PPV_ARGS(&bloomResultResource_));
+    assert(SUCCEEDED(hr));
+
+    // 合成したものを描画のリソースを作成
+    hr = device_->CreateCommittedResource(
+        &heapProps, D3D12_HEAP_FLAG_NONE, &desc,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        &clearValue, IID_PPV_ARGS(&bloomCompositeResource_));
+    assert(SUCCEEDED(hr));
+
+    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+
+    // RTV用ヒープ作成（4つ分）
+    bloomRTVHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 4, false);
+
+    // RTVを作成
+    bloomRTVHandle_[0] = GetCPUDescriptorHandle(bloomRTVHeap_.Get(), descriptorSizeRTV_, 0);
+    device_->CreateRenderTargetView(bloomBrightResource_.Get(), &rtvDesc, bloomRTVHandle_[0]);
+    // 2つ目
+    bloomRTVHandle_[1] = GetCPUDescriptorHandle(bloomRTVHeap_.Get(), descriptorSizeRTV_, 1);
+    device_->CreateRenderTargetView(bloomBlurShrinkResource_.Get(), &rtvDesc, bloomRTVHandle_[1]);
+    // 3つ目
+    bloomRTVHandle_[2] = GetCPUDescriptorHandle(bloomRTVHeap_.Get(), descriptorSizeRTV_, 2);
+    device_->CreateRenderTargetView(bloomResultResource_.Get(), &rtvDesc, bloomRTVHandle_[2]);
+    // 4つ目
+    bloomRTVHandle_[3] = GetCPUDescriptorHandle(bloomRTVHeap_.Get(), descriptorSizeRTV_, 3);
+    device_->CreateRenderTargetView(bloomCompositeResource_.Get(), &rtvDesc, bloomRTVHandle_[3]);
+
+    // SRV用ヒープ作成（4つ分）
+    bloomSRVHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4, true);
+
+    // SRV作成
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
     srvDesc.Format = desc.Format;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.Texture2D.MipLevels = 1;
-    offscreenSRVHandle_ = offscreenSRVHeap_->GetGPUDescriptorHandleForHeapStart();
-    device_->CreateShaderResourceView(offscreenRenderTarget_.Get(), &srvDesc, offscreenSRVHeap_->GetCPUDescriptorHandleForHeapStart());
 
-    // オフスクリーンレンダリング用のターゲットビューを作成を完了するログ
+    // SRVハンドル取得
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = bloomSRVHeap_->GetCPUDescriptorHandleForHeapStart();
+    bloomSRVHandle_[0] = GetGPUDescriptorHandle(bloomSRVHeap_.Get(), descriptorSizeSRV_, 0);
+    // 明るい部分抽出用SRV
+    device_->CreateShaderResourceView(bloomBrightResource_.Get(), &srvDesc, srvCPUHandle);
+
+    // ブラー1回目用SRV
+    srvCPUHandle.ptr += descriptorSizeSRV_;
+    bloomSRVHandle_[1] = GetGPUDescriptorHandle(bloomSRVHeap_.Get(), descriptorSizeSRV_, 1);
+    device_->CreateShaderResourceView(bloomBlurShrinkResource_.Get(), &srvDesc, srvCPUHandle);
+
+    // // ブラー2回目用SRV
+    srvCPUHandle.ptr += descriptorSizeSRV_;
+    bloomSRVHandle_[2] = GetGPUDescriptorHandle(bloomSRVHeap_.Get(), descriptorSizeSRV_, 2);
+    device_->CreateShaderResourceView(bloomResultResource_.Get(), &srvDesc, srvCPUHandle);
+
+    // // ブラー3回目用SRV
+    srvCPUHandle.ptr += descriptorSizeSRV_;
+    bloomSRVHandle_[3] = GetGPUDescriptorHandle(bloomSRVHeap_.Get(), descriptorSizeSRV_, 3);
+    device_->CreateShaderResourceView(bloomCompositeResource_.Get(), &srvDesc, srvCPUHandle);
+
     if (logManager_) {
-        logManager_->Log("End　Create OffscreenRenderTarget\n");
+        logManager_->Log("End Create BloomRenderTargets\n");
     }
 }
 
-void DirectXCommon::DrawPostProcess() {
-    if (!postProcessPSO_) { return; }
-    // SRVヒープセット
-    ID3D12DescriptorHeap* heaps[] = { offscreenSRVHeap_.Get() };
+// ブルームエフェクト描画
+void DirectXCommon::DrawBloomEffect() {
+   
+    // SRVヒープをセット
+    ID3D12DescriptorHeap* heaps[] = { bloomSRVHeap_.Get() };
     commandList_->SetDescriptorHeaps(1, heaps);
-    postProcessPSO_->Set(commandList_.Get());
-    postProcessPSO_->Draw(commandList_.Get(), offscreenSRVHandle_);
-}
 
-void DirectXCommon::SetIsEnablePostEffect(const bool& isEnable) {
-    // ポストエフェクトの有効化を設定
-    postProcessPSO_->SetIsEnablePostEffect(isEnable);
+    // ルート
+    commandList_->SetGraphicsRootSignature(bloomPSO_->GetRootSignature());
+
+    // 明るい部分を抽出
+    D3D12_RESOURCE_BARRIER barrier{};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    // バリアを張る対象のリソース
+    barrier.Transition.pResource = bloomBrightResource_.Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    commandList_->ResourceBarrier(1, &barrier);
+
+    // レンダーターゲット設定
+    commandList_->SetPipelineState(bloomPSO_->GetBrightPipelineState());
+    commandList_->OMSetRenderTargets(1, &bloomRTVHandle_[0], false, nullptr);
+
+    // 明るい部分抽出の描画
+    bloomPSO_->Draw(commandList_.Get(), bloomSRVHandle_[0]);
+
+    // bloomBrightResourceをSRVに戻す
+    //barrier.Transition.pResource = bloomBrightResource_.Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    commandList_->ResourceBarrier(1, &barrier);
+
+    ///=============================
+
+    // 縮小させながらブラー
+    barrier.Transition.pResource = bloomBlurShrinkResource_.Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    commandList_->ResourceBarrier(1, &barrier);
+
+    auto desc = bloomBrightResource_->GetDesc();
+    D3D12_VIEWPORT viewport = {};
+    D3D12_RECT rect = {};
+    // 描画サイズ
+    viewport.Height = static_cast<FLOAT>(desc.Height / 2);
+    viewport.Width = static_cast<FLOAT>(desc.Width / 2);
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    // rect
+    rect.left = 0;
+    rect.right = static_cast<LONG>(viewport.Width);
+    rect.top = 0;
+    rect.bottom = static_cast<LONG>(viewport.Height);
+
+    // レンダーターゲット設定
+    commandList_->SetPipelineState(bloomPSO_->GetBlurPipelineState());
+    commandList_->OMSetRenderTargets(1, &bloomRTVHandle_[1], false, nullptr);
+
+    // 縮小させながらブラーをかけたものを描画
+    for (uint32_t i = 0; i < kBloomIteration; ++i) {
+        commandList_->RSSetViewports(1, &viewport); // Viewportを設定
+        commandList_->RSSetScissorRects(1, &rect); // Scirssorを設定
+        bloomPSO_->Draw(commandList_.Get(), bloomSRVHandle_[1]);
+
+        rect.top += static_cast<LONG>(viewport.Height);
+        viewport.TopLeftX = 0;
+        viewport.TopLeftY = static_cast<FLOAT>(rect.top);
+
+        viewport.Width /= 2;
+        viewport.Height /= 2;
+        rect.bottom = rect.top + static_cast<LONG>(viewport.Height);
+    }
+
+    // bloomBlurShrinkResourceをSRVに戻す
+    //barrier.Transition.pResource = bloomBlurShrinkResource_.Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    commandList_->ResourceBarrier(1, &barrier);
+
+    //=================================
+
+    // ブラーの最終結果
+    barrier.Transition.pResource = bloomResultResource_.Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    commandList_->ResourceBarrier(1, &barrier);
+
+    // ブラーの最終結果を描画
+    commandList_->SetPipelineState(bloomPSO_->GetResultPipelineState());
+    commandList_->OMSetRenderTargets(1, &bloomRTVHandle_[2], false, nullptr);
+    // ビューポートを元に戻す
+    commandList_->RSSetViewports(1, &viewport_);
+    commandList_->RSSetScissorRects(1, &scissorRect_);
+
+    bloomPSO_->Draw(commandList_.Get(), bloomSRVHandle_[2]);
+
+    // bloomResultResourceをSRVに戻す
+    //barrier.Transition.pResource = bloomResultResource_.Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    commandList_->ResourceBarrier(1, &barrier);
+
+    //====================================-
+
+    // 合成用のリソースがある場合はバリアを設定
+    barrier.Transition.pResource = bloomCompositeResource_.Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    commandList_->ResourceBarrier(1, &barrier);
+    
+    // 合成したのを描画
+    commandList_->SetPipelineState(bloomPSO_->GetBlurCompositePipelineState());
+    commandList_->OMSetRenderTargets(1, &bloomRTVHandle_[3], false, nullptr);
+    bloomPSO_->Draw(commandList_.Get(), bloomSRVHandle_[3]);
+    
+    // 最終的にすべてのブルームリソースをSRVに戻す
+    //barrier.Transition.pResource = bloomCompositeResource_.Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    commandList_->ResourceBarrier(1, &barrier);
 }
 
 #ifdef _DEBUG

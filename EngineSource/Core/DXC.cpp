@@ -3,6 +3,8 @@
 #include"EngineSource/Common/ConvertString.h"
 #include<format>
 
+#pragma comment(lib,"dxcompiler.lib")
+
 using namespace GameEngine;
 
 void DXC::Initialize(LogManager* logManager) {
