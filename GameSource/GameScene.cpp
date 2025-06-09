@@ -30,8 +30,8 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	axisTextureHandle_ = textureManager->Load("Resources/axis/axis.jpg");
 
 	// 地面モデルを生成
-	terrainModel_ = Model::CreateModel("terrain.obj","terrain");
-	grassGH_ = textureManager->Load("Resources/terrain/grass.png");
+	terrainModel_ = Model::CreateModel("framePlane.obj","FramePlane");
+	grassGH_ = textureManager->Load("Resources/white4x4.png");
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 
 	sphereModel_ = Model::CreateModel("cube.obj", "cube");
@@ -86,8 +86,6 @@ void GameScene::Update(GameEngine::Input* input){
 			blendMode_ = BlendMode::kBlendModeScreen;
 		}
 	}
-	ImGui::Checkbox("isEnablePostEffect", &isEnablePostEffect_);
-	dxCommon_->SetIsEnablePostEffect(isEnablePostEffect_);
 	ImGui::End();
 
 	// カメラの切り替え処理

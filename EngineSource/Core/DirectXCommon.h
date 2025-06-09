@@ -5,8 +5,9 @@
 #include <array>
 #include <fstream>
 #include"EngineSource/Common/LogManager.h"
+#include"externals/DirectXTex/d3dx12.h"
 
-#include"PSO/PostProcessPSO.h"
+#include"PSO/BloomPSO.h"
 
 namespace GameEngine {
 
@@ -39,22 +40,13 @@ namespace GameEngine {
 
         DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() const { return swapChainDesc; }
 
-        D3D12_RENDER_TARGET_VIEW_DESC GetRTVDesc() const { return rtvDesc; }
-
-        // オフスクリーンSRV取得
-        D3D12_GPU_DESCRIPTOR_HANDLE GetOffscreenSRV() const { return offscreenSRVHandle_; }
+        D3D12_RENDER_TARGET_VIEW_DESC GetRTVDesc() const { return rtvDesc_; }
 
         /// <summary>
-        /// オフスクリーン用のPSOを取得
+        /// ブルームのPSOを取得
         /// </summary>
         /// <param name="pso"></param>
-        void SetPostProcessPSO(PostProcessPSO* pso) { postProcessPSO_ = pso; }
-
-        /// <summary>
-        /// ポストエフェクトの有効設定
-        /// </summary>
-        /// <param name="isEnable"></param>
-        void SetIsEnablePostEffect(const bool& isEnable);
+        void SetBloomPSO(BloomPSO* pso) { bloomPSO_ = pso; }
 
     private:
         //DirectXCommon() = default;
@@ -78,16 +70,16 @@ namespace GameEngine {
         void WaitForGPU();
 
         /// <summary>
-        /// ポストプロセス用のRTV,SRVを作成
+        /// ブルーム用のRTV,SRVを作成
         /// </summary>
         /// <param name="width">テクスチャの幅</param>
         /// <param name="height">テクスチャの高さ</param>
-        void CreateOffscreenRenderTarget(uint32_t width, uint32_t height);
+        void CreateBloomRenderTargets(uint32_t width, uint32_t height);
 
         /// <summary>
-        /// ポストプロセスの描画
+        /// ブルームエフェクトの描画
         /// </summary>
-        void DrawPostProcess();
+        void DrawBloomEffect();
 
 #ifdef _DEBUG
         void DebugLayer();
@@ -121,7 +113,7 @@ namespace GameEngine {
         D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2] = {};
 
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-        D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+        D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_ = {};
 
         // ビューポート
         D3D12_VIEWPORT viewport_{};
@@ -131,15 +123,26 @@ namespace GameEngine {
         // ログ
         LogManager* logManager_;
 
-        // オフスクリーンレンダリング用の変数
-        Microsoft::WRL::ComPtr<ID3D12Resource> offscreenRenderTarget_;
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> offscreenRTVHeap_;
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> offscreenSRVHeap_;
-        D3D12_CPU_DESCRIPTOR_HANDLE offscreenRTVHandle_{};
-        D3D12_GPU_DESCRIPTOR_HANDLE offscreenSRVHandle_{};
+        // ブルーム用レンダリングターゲット
+        Microsoft::WRL::ComPtr<ID3D12Resource> bloomBrightResource_;     // 明るい部分抽出用
+        Microsoft::WRL::ComPtr<ID3D12Resource> bloomBlurShrinkResource_; // 縮小させながらブラーをする
+        Microsoft::WRL::ComPtr<ID3D12Resource> bloomResultResource_;     // 最終敵なもの
+        Microsoft::WRL::ComPtr<ID3D12Resource> bloomCompositeResource_;  // 合成用
 
-        // ポストプロセス用PSO
-        PostProcessPSO* postProcessPSO_ = nullptr;
+        // ブラーを掛ける回数
+        const uint32_t kBloomIteration = 3;
+
+        // ブルーム用RTV
+        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> bloomRTVHeap_;
+        D3D12_CPU_DESCRIPTOR_HANDLE bloomRTVHandle_[4]{};
+
+        // ブルーム用SRV
+        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> bloomSRVHeap_;
+        // SRVハンドル
+        CD3DX12_GPU_DESCRIPTOR_HANDLE bloomSRVHandle_[4];
+
+        // ブルーム用PSO
+        BloomPSO* bloomPSO_ = nullptr;
 
         // ポストエフェクトを適応するかのフラグ
         bool isEnablePostEffect_ = false;

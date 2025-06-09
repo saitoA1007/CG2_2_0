@@ -17,6 +17,14 @@ public:
 		bool locked = false;   // 固定するかを判定(外力の影響を受けない)
 	};
 
+	// ヒモの1オブジェクトのデータ
+	struct Emitter {
+		Vector3 startPos;
+		bool isMove;
+		std::array<Node, 32> point;
+		std::array<std::unique_ptr<GameEngine::LineMesh>, 32> lineMeshs;
+	};
+
 public:
 
 	~Rope();
@@ -79,6 +87,9 @@ private:
 	const float velocityThreshold = 0.01f;
 
 	bool isPressMouse_ = false;
+
+	std::array<Emitter, 16> ropeEmitter;
+
 private:
 
 	void SolveDistanceConstraints(std::array<Node, segmentCount>& rope, int iterations);

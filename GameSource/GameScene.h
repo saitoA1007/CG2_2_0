@@ -55,8 +55,6 @@ private:
 	uint32_t grassGH_ = 0u;
 	GameEngine::WorldTransform terrainWorldTransform_;
 
-	bool isEnablePostEffect_ = false;
-
 	// ロープ
 	std::unique_ptr<Rope> rope_;
 	// ロープの点モデル

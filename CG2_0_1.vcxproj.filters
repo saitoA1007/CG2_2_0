@@ -162,6 +162,9 @@
     <ClCompile Include="GameSource\Rope.cpp">
       <Filter>GameSource</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\BloomPSO.cpp">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -240,9 +243,6 @@
       <Filter>EngineSource\Common</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Core\PSO\LinePSO.h">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\TrianglePSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Core\DirectXCommon.h">
@@ -329,6 +329,12 @@
     <ClInclude Include="GameSource\Rope.h">
       <Filter>GameSource</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\BloomPSO.h">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\TrianglePSO.h">
+      <Filter>EngineSource\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -346,6 +352,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Resources\Shaders\PostEffect\PostProcessGrayScale.hlsli">
+      <Filter>Shaders\PostEffect</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\GaussianBlur.hlsli">
       <Filter>Shaders\PostEffect</Filter>
     </None>
   </ItemGroup>
@@ -372,6 +381,21 @@
       <Filter>Shaders\PostEffect</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\PostProcessGrayScale.VS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\Bloom.VS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\Bloom.PS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\BloomResult.PS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\BloomComposite.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\HighLumMask.PS.hlsl">
       <Filter>Shaders\PostEffect</Filter>
     </FxCompile>
   </ItemGroup>

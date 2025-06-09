@@ -4,8 +4,6 @@
 #include <wrl.h>
 #include"EngineSource/Common/LogManager.h"
 
-#pragma comment(lib,"dxcompiler.lib")
-
 namespace GameEngine {
 
 	class DXC {
