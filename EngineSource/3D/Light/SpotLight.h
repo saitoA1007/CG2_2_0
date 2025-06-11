@@ -9,7 +9,7 @@ namespace GameEngine {
 	class SpotLight {
 	public:
 
-		struct SpotLightData {
+		struct alignas(16) SpotLightData {
 			Vector4 color; // ライトの色
 			Vector3 position; // ライトの位置
 			float intensity; // 輝度

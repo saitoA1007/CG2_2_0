@@ -6,7 +6,7 @@
 
 namespace GameEngine {
 
-	class AxisIndicator {
+	class AxisIndicator final {
 	public:
 		AxisIndicator() = default;
 		~AxisIndicator() = default;

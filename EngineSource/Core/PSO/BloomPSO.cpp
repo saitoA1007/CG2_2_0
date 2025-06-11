@@ -202,28 +202,3 @@ void BloomPSO::Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     commandList->DrawInstanced(4, 1, 0, 0);
 }
-
-void PostProcessSprite::Initialize(ID3D12Device* device) {
-
-    // Sprite用の頂点リソースを作る
-    vertexResourceSprite_ = CreateBufferResource(device, sizeof(VertexData) * 4);
-
-    // リソースの先頭のアドレスから使う
-    vertexBufferViewSprite_.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
-    // 使用するリソースのサイズは頂点4つ分のサイズ
-    vertexBufferViewSprite_.SizeInBytes = sizeof(VertexData) * 4;
-    // 1頂点当たりのサイズ
-    vertexBufferViewSprite_.StrideInBytes = sizeof(VertexData);
-    // 書き込むためのアドレスを取得
-    vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite_));
-
-    // 頂点インデックス
-    vertexDataSprite_[0].position = { -1.0f,-1.0f,0.0f,1.0f }; // 左下
-    vertexDataSprite_[0].texcoord = { 0.0f,1.0f };
-    vertexDataSprite_[1].position = { -1.0f,1.0f,0.0f,1.0f }; // 左上
-    vertexDataSprite_[1].texcoord = { 0.0f,0.0f };
-    vertexDataSprite_[2].position = { 1.0f,-1.0f,0.0f,1.0f }; // 右下
-    vertexDataSprite_[2].texcoord = { 1.0f,1.0f };
-    vertexDataSprite_[3].position = { 1.0f, 1.0f,0.0f,1.0f }; // 左上
-    vertexDataSprite_[3].texcoord = { 1.0f,0.0f };
-}

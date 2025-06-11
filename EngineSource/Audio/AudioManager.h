@@ -4,12 +4,20 @@
 #include <wrl.h>
 #include<vector>
 
-#pragma comment(lib,"xaudio2.lib")
+#include <mfapi.h>
+#include <mfidl.h>
+#include <mfreadwrite.h>
 
 namespace GameEngine {
 
 	class AudioManager {
 	public:
+		// 拡張子の種類
+		enum Type {
+			MP3,
+			WAV,
+		};
+
 		// チャンクヘッダ
 		struct ChunkHeader {
 			char id[4];   // チャンク毎のID
@@ -38,6 +46,8 @@ namespace GameEngine {
 			unsigned int bufferSize;
 			// 音声データの名前
 			std::string name;
+			// 拡張子の種類
+			Type type;
 		};
 
 	public:
@@ -76,11 +86,24 @@ namespace GameEngine {
 		void SoundPlayWave(const SoundData& soundData);
 
 		/// <summary>
+		/// .mp3音声を再生
+		/// </summary>
+		/// <param name="soundData"></param>
+		void SoundPlayMp3(const SoundData& soundData);
+
+		/// <summary>
 		/// .wavファイルの読み込み
 		/// </summary>
 		/// <param name="filename"></param>
 		/// <returns></returns>
 		SoundData SoundLoadWave(const std::string& filename);
+
+		/// <summary>
+		/// .mp3ファイルの読み込み
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		SoundData SoundLoadMp3(const std::wstring path);
 
 		/// <summary>
 		/// 音声データの解放
@@ -93,6 +116,5 @@ namespace GameEngine {
 		IXAudio2MasteringVoice* masterVoice_;
 
 		std::vector<SoundData> soundData_;
-
 	};
 }

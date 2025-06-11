@@ -7,7 +7,7 @@ namespace GameEngine {
 	class DirectionalLight {
 	public:
 
-		struct DirectionalLightData {
+		struct alignas(16) DirectionalLightData {
 			Vector4 color; // ライトの色
 			Vector3 direction; // ライトの向き
 			float intensity; // 輝度

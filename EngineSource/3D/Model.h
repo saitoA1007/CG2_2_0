@@ -34,12 +34,14 @@ namespace GameEngine {
 		partilce, // 複数描画用
 	};
 	
-	class Model {
+	class Model final {
 	public:
 
 		struct MaterialData {
 			std::string textureFilePath;
 			Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
+			Vector3 specularColor = { 1.0f,1.0f,1.0f};
+			float shininess = 0.0f;
 		};
 
 		struct Node {
@@ -70,6 +72,10 @@ namespace GameEngine {
 		/// </summary>
 		static void PreDraw(PSOMode psoMode,BlendMode blendMode);
 
+		/// <summary>
+		/// 描画前処理
+		/// </summary>
+		/// <param name="drawMode"></param>
 		static void PreDraw(DrawModel drawMode);
 
 		/// <summary>
@@ -78,18 +84,21 @@ namespace GameEngine {
 		/// <param name="objFilename">.objファイル名</param>
 		/// <param name="filename">格納ファイル名</param>
 		/// <returns></returns>
+		[[nodiscard]]
 		static Model* CreateModel(const std::string& objFilename, const std::string& filename);
 
 		/// <summary>
 		/// 球モデル生成
 		/// </summary>
 		/// <returns>生成されたモデル</returns>
+		[[nodiscard]]
 		static Model* CreateSphere(uint32_t subdivision);
 
 		/// <summary>
 		/// 三角形の平面を生成
 		/// </summary>
 		/// <returns></returns>
+		[[nodiscard]]
 		static Model* CreateTrianglePlane();
 
 		/// <summary>
@@ -123,6 +132,18 @@ namespace GameEngine {
 		void SetDefaultColor(const Vector4& color);
 
 		/// <summary>
+		/// 鏡面反射の色を設定
+		/// </summary>
+		/// <param name="specularColor"></param>
+		void SetDefaultSpecularColor(const Vector3& specularColor);
+
+		/// <summary>
+		/// 輝度の設定
+		/// </summary>
+		/// <param name="shininess"></param>
+		void SetDefaultShiness(const float& shininess);
+
+		/// <summary>
 		/// デフォオルトの光源の有無を設定
 		/// </summary>
 		/// <param name="isEnableLight"></param>
@@ -136,7 +157,14 @@ namespace GameEngine {
 
 	private:
 
-		// OBJファイル読み込み
+		/// <summary>
+		/// モデルデータのファイル読み込み
+		/// </summary>
+		/// <param name="directoryPath"></param>
+		/// <param name="objFilename"></param>
+		/// <param name="filename"></param>
+		/// <returns></returns>
+		[[nodiscard]]
 		ModelData LoadModelFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename);
 
 	private:
@@ -174,13 +202,14 @@ namespace GameEngine {
 		// Nodeのローカル行列を保持しておく変数
 		Matrix4x4 localMatrix_;
 
-		private:
+	private:
 
 		/// <summary>
 		/// Node情報を取得
 		/// </summary>
 		/// <param name="node"></param>
 		/// <returns></returns>
+		[[nodiscard]]
 		Node ReadNode(aiNode* node);
 	};
 }

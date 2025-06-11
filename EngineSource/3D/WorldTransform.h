@@ -10,7 +10,7 @@ namespace GameEngine {
 	/// <summary>
 	/// 単体描画用のワールド行列
 	/// </summary>
-	class WorldTransform {
+	class WorldTransform final {
 	public:
 		WorldTransform() = default;
 		~WorldTransform() = default;

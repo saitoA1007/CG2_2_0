@@ -8,3 +8,4 @@ struct VertexData {
 	Vector2 texcoord;
 	Vector3 normal;
 };
+

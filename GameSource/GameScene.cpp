@@ -30,15 +30,24 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	axisTextureHandle_ = textureManager->Load("Resources/axis/axis.jpg");
 
 	// 地面モデルを生成
-	terrainModel_ = Model::CreateModel("framePlane.obj","FramePlane");
-	grassGH_ = textureManager->Load("Resources/white4x4.png");
+	terrainModel_ = Model::CreateModel("terrain.obj","terrain");
+	terrainModel_->SetDefaultIsEnableLight(true);
+	grassGH_ = textureManager->Load("Resources/terrain/grass.png");
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
-
 	sphereModel_ = Model::CreateModel("cube.obj", "cube");
 	whiteGH_ = textureManager->Load("Resources/white4x4.png");
 	// ロープ
 	rope_ = std::make_unique<Rope>();
 	rope_->Initialize(sphereModel_, whiteGH_);
+
+	// ライト
+	lightManager_ = std::make_unique<LightManager>();
+	lightManager_->Initialize(dxCommon_->GetDevice(), true, false, false);
+	directionalData_.active = true;
+	directionalData_.color = { 1.0f,1.0f,1.0f,1.0f };
+	directionalData_.direction = { 0.0,1.0f,0.0f };
+	directionalData_.intensity = 10.0f;
+	lightManager_->SetDirectionalData(directionalData_);
 }
 
 void GameScene::Update(GameEngine::Input* input){
@@ -63,6 +72,8 @@ void GameScene::Update(GameEngine::Input* input){
 		camera_->SetCameraPosition(cameraTransform_);
 	}
 
+	lightManager_->Update();
+
 #ifdef _DEBUG
 	// 光源をデバック
 	ImGui::Begin("DebugWindow");
@@ -86,6 +97,11 @@ void GameScene::Update(GameEngine::Input* input){
 			blendMode_ = BlendMode::kBlendModeScreen;
 		}
 	}
+
+	ImGui::DragFloat3("dir", &directionalData_.direction.x, 0.01f);
+	directionalData_.direction = Normalize(directionalData_.direction);
+	ImGui::DragFloat("ind", &directionalData_.intensity, 0.01f);
+	lightManager_->SetDirectionalData(directionalData_);
 	ImGui::End();
 
 	// カメラの切り替え処理
@@ -113,6 +129,7 @@ void GameScene::Draw() {
 	rope_->DrawSphere(camera_->GetVPMatrix());
 
 	// 地面を描画
+	terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
 	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
 
 	// 軸を描画

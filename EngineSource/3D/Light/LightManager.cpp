@@ -3,16 +3,19 @@
 #include"EngineSource/Math/MyMath.h"
 using namespace GameEngine;
 
-void LightManager::Initialize(ID3D12Device* device) {
+void LightManager::Initialize(ID3D12Device* device, const bool& isDirectionalActive, const bool& isPointActive, const bool& isSpotActive) {
     // 平行光源
     directionalLight_ = std::make_unique<DirectionalLight>();
     directionalLight_->Initialize({ 1,1,1,1 }, { 0,-1,0 }, 1.0f);
+    directionalLight_->SetActive(isDirectionalActive);
     // 点光源
     pointLight_ = std::make_unique<PointLight>();
     pointLight_->Initialize({ 1,1,1,1 }, { 0,0,0 }, 1.0f);
+    pointLight_->SetLightActive(isPointActive);
     // スポットライト
     spotLight_ = std::make_unique<SpotLight>();
     spotLight_->Initialize({ 1,1,1,1 }, { 0,0,0 }, 1.0f);
+    spotLight_->SetLightActive(isSpotActive);
 
     // 平行光源のリソースを作る。
     lightGroupResource_ = CreateBufferResource(device, sizeof(LightGroupData));
@@ -26,9 +29,15 @@ void LightManager::Initialize(ID3D12Device* device) {
 
 void LightManager::Update() {
     // 更新
-    lightGroupData_->directionalLightData_ = directionalLight_->GetDirectionalLightData();
-    lightGroupData_->pointLightData_ = pointLight_->GetPointLightData();
-    lightGroupData_->spotLightData_ = spotLight_->GetSpotLightData();
+    if (lightGroupData_->directionalLightData_.active) {
+        lightGroupData_->directionalLightData_ = directionalLight_->GetDirectionalLightData();
+    }
+    if (lightGroupData_->pointLightData_.active) {
+        lightGroupData_->pointLightData_ = pointLight_->GetPointLightData();
+    }
+    if (lightGroupData_->spotLightData_.active) {
+        lightGroupData_->spotLightData_ = spotLight_->GetSpotLightData();
+    }
 }
 
 void LightManager::SetDirectionalData(const DirectionalLight::DirectionalLightData& directionalData) {
