@@ -86,8 +86,10 @@ namespace GameEngine {
 
 	private:
 
+		[[nodiscard]]
 		DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
+		[[nodiscard]]
 		Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
 
 		[[nodiscard]] Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12Device* device,

@@ -8,7 +8,7 @@ namespace GameEngine {
 	class PointLight {
 	public:
 
-		struct PointLightData {
+		struct alignas(16) PointLightData {
 			Vector4 color; // ライトの色
 			Vector3 position; // ライトの位置
 			float intensity; // 輝度

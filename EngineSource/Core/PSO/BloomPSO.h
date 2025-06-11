@@ -51,30 +51,4 @@ namespace GameEngine {
         Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_;
         VertexData* vertexDataSprite_ = nullptr;
     };
-
-
-    /// マテリアル自体は今のところ使わないのでこのクラスを使うかはわからないが一応作成
-    class PostProcessSprite {
-    public:
-        struct VertexData {
-            Vector4 position;
-            Vector2 texcoord;
-        };
-
-    public:
-
-        /// <summary>
-        /// 初期化
-        /// </summary>
-        /// <param name="device">デバイス</param>
-        void Initialize(ID3D12Device* device);
-
-    private:
-        // 頂点バッファビューを作成する
-        D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
-        // Sprite用の頂点リソース
-        Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_;
-        VertexData* vertexDataSprite_ = nullptr;
-    };
-
 }

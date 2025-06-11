@@ -49,8 +49,6 @@ namespace GameEngine {
         void SetBloomPSO(BloomPSO* pso) { bloomPSO_ = pso; }
 
     private:
-        //DirectXCommon() = default;
-        //~DirectXCommon() = default;
         DirectXCommon(const DirectXCommon&) = delete;
         DirectXCommon& operator=(const DirectXCommon&) = delete;
 

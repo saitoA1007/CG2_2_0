@@ -11,7 +11,7 @@
 
 namespace GameEngine {
 
-	class PrimitiveRenderer {
+	class PrimitiveRenderer final {
 	public:
 		// カメラ行列を送るデータ
 		struct TransformMatrix {

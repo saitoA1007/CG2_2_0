@@ -45,6 +45,7 @@ void Model::PreDraw(DrawModel drawMode) {
 	commandList_->SetPipelineState(trianglePSO_->GetFramePipelineState(drawMode)); // trianglePSOを設定
 }
 
+[[nodiscard]]
 Model* Model::CreateSphere(uint32_t subdivision) {
 
 	Model* model = new Model();
@@ -131,11 +132,12 @@ Model* Model::CreateSphere(uint32_t subdivision) {
 
 	// マテリアルを作成
 	model->defaultMaterial_ = std::make_unique<Material>();
-	model->defaultMaterial_->Initialize({1.0f,1.0f,1.0f,1.0f},false);
+	model->defaultMaterial_->Initialize({1.0f,1.0f,1.0f,1.0f}, { 1.0f,1.0f,1.0f },0.0f,false);
 
 	return model;
 }
 
+[[nodiscard]]
 Model* Model::CreateTrianglePlane() {
 
 	Model* model = new Model();
@@ -177,11 +179,12 @@ Model* Model::CreateTrianglePlane() {
 
 	// マテリアルを作成
 	model->defaultMaterial_ = std::make_unique<Material>();
-	model->defaultMaterial_->Initialize({ 1.0f,1.0f,1.0f,1.0f }, false);
+	model->defaultMaterial_->Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 0.0f, false);
 
 	return model;
 }
 
+[[nodiscard]]
 Model* Model::CreateModel(const std::string& objFilename, const std::string& filename) {
 
 	if (logManager_) {
@@ -217,7 +220,7 @@ Model* Model::CreateModel(const std::string& objFilename, const std::string& fil
 
 	// マテリアルを作成
 	model->defaultMaterial_ = std::make_unique<Material>();
-	model->defaultMaterial_->Initialize(modelData.material.color, false);
+	model->defaultMaterial_->Initialize(modelData.material.color, modelData.material.specularColor, modelData.material.shininess, false);
 
 	// OBJが無事に作成されたログを出す
 	if (logManager_) {
@@ -280,6 +283,7 @@ void Model::DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* camera
 	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
 }
 
+[[nodiscard]]
 Model::ModelData Model::LoadModelFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename) {
 
 	ModelData modelData; // 構築するModelData
@@ -334,6 +338,18 @@ Model::ModelData Model::LoadModelFile(const std::string& directoryPath, const st
 		if (AI_SUCCESS == material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor)) {
 			modelData.material.color = { diffuseColor.r, diffuseColor.g, diffuseColor.b,1.0f };
 		}
+
+		// 鏡面反射の色を取得
+		aiColor3D specularColor(1.0f, 1.0f, 1.0f);   // デフォルト値（白）
+		if (AI_SUCCESS == material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor)) {
+			modelData.material.specularColor = { specularColor.r, specularColor.g, specularColor.b};
+		}
+
+		// 輝度
+		float shininess = 0.0f; // デフォルト値
+		if (AI_SUCCESS == material->Get(AI_MATKEY_SHININESS, shininess)) {
+			modelData.material.shininess = shininess;
+		}
 	}
 
 	// シーン全体の階層構造を作る
@@ -346,6 +362,14 @@ void  Model::SetDefaultColor(const Vector4& color) {
 	defaultMaterial_->SetColor(color);
 }
 
+void Model::SetDefaultSpecularColor(const Vector3& specularColor) {
+	defaultMaterial_->SetSpecularColor(specularColor);
+}
+
+void Model::SetDefaultShiness(const float& shininess) {
+	defaultMaterial_->SetShiness(shininess);
+}
+
 void  Model::SetDefaultIsEnableLight(const bool& isEnableLight) {
 	defaultMaterial_->SetEnableLighting(isEnableLight);
 }
@@ -354,6 +378,7 @@ void  Model::SetDefaultUVMatrix(const Matrix4x4& uvMatrix) {
 	defaultMaterial_->SetUVMatrix(uvMatrix);
 }
 
+[[nodiscard]]
 Model::Node Model::ReadNode(aiNode* node) {
 	Node result;
 

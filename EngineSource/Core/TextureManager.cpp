@@ -103,6 +103,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE& TextureManager::GetTextureSrvHandlesGPU(const uint3
 	return textures_.at(textureHandle).textureSrvHandleGPU;
 }
 
+[[nodiscard]]
 DirectX::ScratchImage TextureManager::LoadTexture(const std::string& filePath)
 {
 	// テクスチャファイルを読み込んでプログラムを扱えるようにする
@@ -120,6 +121,7 @@ DirectX::ScratchImage TextureManager::LoadTexture(const std::string& filePath)
 	return mipImages;
 }
 
+[[nodiscard]]
 Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
 {
 	// metadataを基にResourceの設定

@@ -305,9 +305,6 @@
     <ClInclude Include="EngineSource\3D\Camera\Camera.h">
       <Filter>EngineSource\3D\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\3D\Camera\DebugCamera.h">
-      <Filter>EngineSource\3D\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\3D\Light\DirectionalLight.h">
       <Filter>EngineSource\3D\Light</Filter>
     </ClInclude>
@@ -333,7 +330,10 @@
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Core\PSO\TrianglePSO.h">
-      <Filter>EngineSource\Core</Filter>
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Camera\DebugCamera.h">
+      <Filter>EngineSource\3D\Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

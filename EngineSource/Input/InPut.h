@@ -6,9 +6,6 @@
 #include <wrl.h>
 #include<array>
 
-#pragma comment(lib,"dinput8.lib")
-#pragma comment(lib,"dxguid.lib")
-
 namespace GameEngine {
 
 	class Input {

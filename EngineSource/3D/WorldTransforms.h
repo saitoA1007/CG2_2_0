@@ -15,7 +15,7 @@ namespace GameEngine {
 	/// <summary>
 	/// 複数描画用のワールド行列
 	/// </summary>
-	class WorldTransforms {
+	class WorldTransforms final {
 	public:
 
 		struct TransformData {

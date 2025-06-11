@@ -9,7 +9,7 @@ void Material::StaticInitialize(ID3D12Device* device) {
 	device_ = device;
 }
 
-void Material::Initialize(const Vector4& color,const bool& isEnableLighting) {
+void Material::Initialize(const Vector4& color, const Vector3& specularColor,const float& shininess,const bool& isEnableLighting) {
 	// マテリアルリソースを作成
 	// マテリアル用のリソースを作る。color1つ分のサイズを用意する
 	materialResource_ = CreateBufferResource(device_, sizeof(MaterialData));
@@ -21,7 +21,8 @@ void Material::Initialize(const Vector4& color,const bool& isEnableLighting) {
 	materialData_->enableLighting = isEnableLighting;
 	// UVTransform行列を初期化
 	materialData_->uvTransform = MakeIdentity4x4();
-
-	materialData_->specularColor = { 1.0f,1.0f,1.0f };
-	materialData_->shininess = 20.0f;
+	// specularの色を設定
+	materialData_->specularColor = specularColor;
+	// 輝度を設定
+	materialData_->shininess = shininess;
 }

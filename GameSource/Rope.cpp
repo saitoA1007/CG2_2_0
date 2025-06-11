@@ -61,48 +61,6 @@ void Rope::Initialize(GameEngine::Model* model, const uint32_t& textureHandle) {
 		lineMeshs_[i] = std::make_unique<LineMesh>();
 		lineMeshs_[i]->Initialize(points_[i].pos, points_[i + 1].pos, { 1.0f,1.0f,1.0f,1.0f });
 	}
-
-	//==========================================================================
-	// たくさんのヒモの初期化
-	//==========================================================================
-
-	//for (uint32_t i = 0; i < ropeEmitter.size(); ++i) {
-	//
-	//	ropeEmitter[i].startPos = { 0.0f,0.1f * 2.0f * 32.0f,0.0f };
-	//	ropeEmitter[i].startPos.x = -3.2f + 0.4f * i;
-	//	ropeEmitter[i].point[0].locked = true;
-	//
-	//	for (uint32_t j = 0; j < ropeEmitter[i].point.size(); ++j) {
-	//		// 半径を求める
-	//		tmpRope.radius = 0.1f;
-	//		// 初期位置を設定
-	//		tmpRope.pos = { ropeEmitter[i].startPos.x,ropeEmitter[i].startPos.y - (static_cast<float>(i) * tmpRope.radius * 2.0f),ropeEmitter[i].startPos.z };
-	//
-	//		// 前の位置。(最初は前の位置など存在しないので、現在位置と同じ値を入れておく)
-	//		tmpRope.prePos = tmpRope.pos;
-	//
-	//		// 速度を求める
-	//		tmpRope.speed.x = (tmpRope.pos.x - tmpRope.prePos.x) / dt;
-	//		tmpRope.speed.y = (tmpRope.pos.y - tmpRope.prePos.y) / dt;
-	//		tmpRope.speed.z = (tmpRope.pos.z - tmpRope.prePos.z) / dt;
-	//
-	//		// 質量
-	//		tmpRope.mass = 0.1f;
-	//
-	//		tmpRope.locked = false;
-	//
-	//		// 各頂点情報を適応
-	//		ropeEmitter[i].point[j] = tmpRope;
-	//	}
-	//}
-	//
-	//for (uint32_t i = 0; i < ropeEmitter.size(); ++i) {
-	//	for (uint32_t j = 0; j < ropeEmitter[i].lineMeshs.size() - 1; ++j) {
-	//		 ropeEmitter[i].lineMeshs[j] = std::make_unique<LineMesh>();
-	//		 ropeEmitter[i].lineMeshs[j]->Initialize(ropeEmitter[i].point[j].pos, ropeEmitter[i].point[j + 1].pos, { 1.0f,1.0f,1.0f,1.0f });
-	//	}
-	//}
-
 }
 
 void Rope::Update() {
@@ -142,23 +100,15 @@ void Rope::Update() {
 		lineMeshs_[i]->SetPosition(points_[i].pos, points_[i + 1].pos);
 	}
 
-
 	// 先端の点を更新
 	worldTransform_.UpdateTransformMatrix();
 	
 #ifdef _DEBUG
 
 	ImGui::Begin("DebugRope");
+	//ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 
 	ImGui::DragFloat3("RopePos[0]", &startPos_.x, 0.01f);
-
-	if (ImGui::Button("back")) {
-		points_[31].pos += Vector3(2.0f, 16.0f, 16.0f);
-	}
-
-	if (ImGui::Button("Front")) {
-		points_[31].pos += Vector3(2.0f, 16.0f, -16.0f);
-	}
 
 	ImGui::End();
 #endif
@@ -169,13 +119,6 @@ void Rope::DrawLine(const Matrix4x4& VPMatrix) {
 	for (uint32_t i = 0; i < lineMeshs_.size() - 1; ++i) {
 		primitiveRenderer_->DrawLine3d(lineMeshs_[i].get(), VPMatrix);
 	}
-
-	//// たくさんのヒモを描画
-	//for (uint32_t i = 0; i < ropeEmitter.size(); ++i) {
-	//	for (uint32_t j = 0; j < ropeEmitter[i].lineMeshs.size() - 1; ++j) {
-	//		primitiveRenderer_->DrawLine3d(ropeEmitter[i].lineMeshs[j].get(), VPMatrix);
-	//	}
-	//}
 }
 
 void Rope::DrawSphere(const Matrix4x4& VPMatrix) {

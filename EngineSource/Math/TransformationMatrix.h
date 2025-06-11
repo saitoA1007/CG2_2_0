@@ -3,19 +3,19 @@
 #include"Vector4.h"
 #include"Vector3.h"
 
-struct TransformationMatrix {
+struct alignas(16) TransformationMatrix {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
 	Matrix4x4 worldInverseTranspose;
 };
 
-struct ParticleForGPU {
+struct alignas(16) ParticleForGPU {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
 	Vector4 color;
 };
 
-struct CameraForGPU {
+struct alignas(16) CameraForGPU {
 	Vector3 worldPosition;
 	float pad;
 };

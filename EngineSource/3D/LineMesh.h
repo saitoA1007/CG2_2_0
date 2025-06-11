@@ -12,7 +12,7 @@ struct VertexPosColor {
 
 namespace GameEngine {
 
-	class LineMesh {
+	class LineMesh final {
 	public:
 
 		/// <summary>

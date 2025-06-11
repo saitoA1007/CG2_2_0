@@ -3,8 +3,6 @@
 
 #include"GameScene.h"
 
-#include"EngineSource/Core/PSO/BloomPSO.h"
-
 using namespace GameEngine;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
@@ -98,6 +96,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	// ゲームシーンのインスタンスを生成
 	GameScene* gameScene = new GameScene();
 	gameScene->Initialize(textureManager.get(), dxCommon.get());
+
+	// 音を再生
+	uint32_t SH = audioManager->Load("Resources/bgm.mp3");
+	audioManager->Play(SH);
 
 	//=========================================================================
 	// メインループ

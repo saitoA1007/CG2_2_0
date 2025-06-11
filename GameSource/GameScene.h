@@ -7,6 +7,8 @@
 #include"EngineSource/3D/Model.h"
 #include"EngineSource/3D/WorldTransform.h"
 #include"EngineSource/3D/WorldTransforms.h"
+#include"EngineSource/3D/Light/LightManager.h"
+#include"EngineSource/3D/Light/DirectionalLight.h"
 
 #include"Rope.h"
 
@@ -60,6 +62,11 @@ private:
 	// ロープの点モデル
 	GameEngine::Model* sphereModel_;
 	uint32_t whiteGH_ = 0u;
+
+	// ライト
+	std::unique_ptr<GameEngine::LightManager> lightManager_;
+	// 平行光源
+	GameEngine::DirectionalLight::DirectionalLightData directionalData_;
 
 	// ブレンドモード
 	const char* blendModeName_[6] = { "kBlendModeNone","kBlendModeNormal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen"};
