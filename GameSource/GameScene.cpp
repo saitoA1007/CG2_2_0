@@ -7,6 +7,7 @@
 using namespace GameEngine;
 
 GameScene::~GameScene() {
+	delete planeModel_;
 	delete terrainModel_;
 	delete sphereModel_;
 }
@@ -29,6 +30,12 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// 軸方向表示の画像
 	axisTextureHandle_ = textureManager->Load("Resources/axis/axis.jpg");
 
+	// 平面モデルを生成
+	planeModel_ = Model::CreateModel("plane.gltf", "Plane");
+	planeGH_ = textureManager->Load("Resources/uvChecker.png");
+	planeTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{5.0f,3.0f,0.0f} };
+	planeWorldTransform_.Initialize(planeTransform_);
+
 	// 地面モデルを生成
 	terrainModel_ = Model::CreateModel("terrain.obj","terrain");
 	terrainModel_->SetDefaultIsEnableLight(true);
@@ -40,7 +47,7 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	rope_ = std::make_unique<Rope>();
 	rope_->Initialize(sphereModel_, whiteGH_);
 
-	// ライト
+	// 平行光源ライト
 	lightManager_ = std::make_unique<LightManager>();
 	lightManager_->Initialize(dxCommon_->GetDevice(), true, false, false);
 	directionalData_.active = true;
@@ -58,6 +65,10 @@ void GameScene::Update(GameEngine::Input* input){
 	// ロープの更新処理
 	rope_->Update();
 
+	// 平面の更新処理
+	planeWorldTransform_.SetTransform(planeTransform_);
+	planeWorldTransform_.UpdateTransformMatrix();
+
 	// カメラ処理
 	if (isDebugCameraActive_) {
 		// デバックカメラの更新
@@ -72,6 +83,7 @@ void GameScene::Update(GameEngine::Input* input){
 		camera_->SetCameraPosition(cameraTransform_);
 	}
 
+	// ライトの更新
 	lightManager_->Update();
 
 #ifdef _DEBUG
@@ -97,11 +109,22 @@ void GameScene::Update(GameEngine::Input* input){
 			blendMode_ = BlendMode::kBlendModeScreen;
 		}
 	}
+	// 平行光源
+	if (ImGui::TreeNode("DirectionalLight")) {
+		ImGui::DragFloat3("dir", &directionalData_.direction.x, 0.01f);
+		directionalData_.direction = Normalize(directionalData_.direction);
+		ImGui::DragFloat("ind", &directionalData_.intensity, 0.01f);
+		lightManager_->SetDirectionalData(directionalData_);
+		ImGui::TreePop();
+	}
+	// 平面
+	if (ImGui::TreeNode("plane")) {
+		ImGui::DragFloat3("scale", &planeTransform_.scale.x, 0.01f);
+		ImGui::DragFloat3("rotate", &planeTransform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("translate", &planeTransform_.translate.x, 0.01f);
+		ImGui::TreePop();
+	}
 
-	ImGui::DragFloat3("dir", &directionalData_.direction.x, 0.01f);
-	directionalData_.direction = Normalize(directionalData_.direction);
-	ImGui::DragFloat("ind", &directionalData_.intensity, 0.01f);
-	lightManager_->SetDirectionalData(directionalData_);
 	ImGui::End();
 
 	// カメラの切り替え処理
@@ -127,6 +150,9 @@ void GameScene::Draw() {
 
 	// 線の点を描画
 	rope_->DrawSphere(camera_->GetVPMatrix());
+
+	// 平面を描画
+	planeModel_->Draw(planeWorldTransform_, planeGH_, camera_->GetVPMatrix());
 
 	// 地面を描画
 	terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());

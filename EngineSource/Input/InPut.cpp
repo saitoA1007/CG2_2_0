@@ -1,6 +1,8 @@
 #include"InPut.h"
 #include<cassert>
 
+#include"EngineSource/Math/MyMath.h"
+
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
 
@@ -105,6 +107,8 @@ const Vector2& Input::GetMouseDelta() {
 	// マウス位置の差分を取得
 	mouseDelta_.x = mousePosition_.x - preMousePosition_.x;
 	mouseDelta_.y = mousePosition_.y - preMousePosition_.y;
+	// 正規化
+	mouseDelta_ = Normalize(mouseDelta_);
 	return mouseDelta_;
 }
 

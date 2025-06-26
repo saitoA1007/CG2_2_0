@@ -38,6 +38,15 @@ namespace GameEngine {
 
 		Vector3 GetWorldPosition();
 
+		/// <summary>
+		/// カメラをターゲットの方向に向かせる
+		/// </summary>
+		/// <param name="eye">カメラの位置</param>
+		/// <param name="center">ターゲットの位置</param>
+		/// <param name="up">向き</param>
+		/// <returns></returns>
+		Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
+
 	private:
 		// 拡縮
 		Vector3 scale_ = { 1.0f,1.0f,1.0f };
@@ -55,7 +64,17 @@ namespace GameEngine {
 		// 累積回転行列
 		Matrix4x4 rotateMatrix_;
 
+		// マウス
+		Vector2 mouseDelta_{};
+
+		// 距離
+		float distance_ = 20.0f;
+
+		// 目標となる座標
+		Vector3 targetPos_ = { 0.0f,0.0f,0.0f };
+
 		Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
 		CameraForGPU* cameraForGPU_ = nullptr;
+
 	};
 }

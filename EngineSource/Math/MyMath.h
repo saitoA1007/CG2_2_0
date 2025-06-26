@@ -1,4 +1,5 @@
 #pragma once
+#include"Vector2.h"
 #include"Vector3.h"
 #include"Matrix4x4.h"
 
@@ -9,8 +10,10 @@ Vector3 Subtract(const Vector3& v1, const Vector3& v2);
 
 // ベクトルの長さを求める
 float Length(const Vector3& v);
+float Length(const Vector2& v);
 // ベクトルの正規化
 Vector3 Normalize(const Vector3& v);
+Vector2 Normalize(const Vector2& v);
 // 内積
 float Dot(const Vector3& v1, const Vector3& v2);
 // 外積

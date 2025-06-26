@@ -97,10 +97,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	GameScene* gameScene = new GameScene();
 	gameScene->Initialize(textureManager.get(), dxCommon.get());
 
-	// 音を再生
-	uint32_t SH = audioManager->Load("Resources/bgm.mp3");
-	audioManager->Play(SH);
-
 	//=========================================================================
 	// メインループ
 	//=========================================================================

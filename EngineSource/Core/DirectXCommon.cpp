@@ -499,7 +499,6 @@ void DirectXCommon::DrawBloomEffect() {
     bloomPSO_->Draw(commandList_.Get(), bloomSRVHandle_[0]);
 
     // bloomBrightResourceをSRVに戻す
-    //barrier.Transition.pResource = bloomBrightResource_.Get();
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
@@ -548,7 +547,6 @@ void DirectXCommon::DrawBloomEffect() {
     }
 
     // bloomBlurShrinkResourceをSRVに戻す
-    //barrier.Transition.pResource = bloomBlurShrinkResource_.Get();
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
@@ -573,7 +571,6 @@ void DirectXCommon::DrawBloomEffect() {
     bloomPSO_->Draw(commandList_.Get(), bloomSRVHandle_[2]);
 
     // bloomResultResourceをSRVに戻す
-    //barrier.Transition.pResource = bloomResultResource_.Get();
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
@@ -594,7 +591,6 @@ void DirectXCommon::DrawBloomEffect() {
     bloomPSO_->Draw(commandList_.Get(), bloomSRVHandle_[3]);
     
     // 最終的にすべてのブルームリソースをSRVに戻す
-    //barrier.Transition.pResource = bloomCompositeResource_.Get();
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
