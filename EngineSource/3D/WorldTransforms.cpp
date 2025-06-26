@@ -22,14 +22,14 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance) {
 	}
 
 	// 頂点数を設定
-	numInstance = kNumInstance;
+	numInstance_ = kNumInstance;
 
 	// Instancing用のTransformationMatrixリソースを作る
-	instancingResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(ParticleForGPU) * numInstance);
+	instancingResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(ParticleForGPU) * numInstance_);
 	// 書き込むためのアドレスを取得
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
 	// 単位行列を書き込んでおく
-	for (uint32_t index = 0; index < numInstance; ++index) {
+	for (uint32_t index = 0; index < numInstance_; ++index) {
 		instancingData_[index].WVP = MakeIdentity4x4();
 		instancingData_[index].World = MakeIdentity4x4();
 		instancingData_[index].color = { 1.0f,1.0f,1.0f,1.0f };
@@ -42,7 +42,7 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance) {
 	instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	instancingSrvDesc.Buffer.FirstElement = 0;
 	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	instancingSrvDesc.Buffer.NumElements = numInstance;
+	instancingSrvDesc.Buffer.NumElements = numInstance_;
 	instancingSrvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
 	instancingSrvHandleCPU_ = GetCPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), StaticSrvIndex_ + 130);
 	instancingSrvHandleGPU_ = GetGPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), StaticSrvIndex_ + 130);

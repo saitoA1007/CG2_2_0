@@ -7,7 +7,11 @@ Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
 }
 
 float Length(const Vector3& v) {
-	return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+	return std::sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+float Length(const Vector2& v) {
+	return std::sqrtf(v.x * v.x + v.y * v.y);
 }
 
 Vector3 Normalize(const Vector3& v) {
@@ -16,6 +20,15 @@ Vector3 Normalize(const Vector3& v) {
 		return Vector3(0.0f, 0.0f, 0.0f);
 	} else {
 		return Vector3(v.x / length, v.y / length, v.z / length);
+	}
+}
+
+Vector2 Normalize(const Vector2& v) {
+	float length = Length(v);
+	if (length == 0.0f) {
+		return Vector2(0.0f, 0.0f);
+	} else {
+		return Vector2(v.x / length, v.y / length);
 	}
 }
 
@@ -52,8 +65,8 @@ Matrix4x4 Multiply(const Matrix4x4& matrix1, const Matrix4x4& matrix2) {
 Matrix4x4 MakeRotateXMatrix(const float& theta) {
 	Matrix4x4 result = {
 		1, 0, 0, 0,
-		0, cosf(theta), sinf(theta), 0,
-		0, -sinf(theta), cosf(theta), 0,
+		0, std::cosf(theta), std::sinf(theta), 0,
+		0, -std::sinf(theta), std::cosf(theta), 0,
 		0, 0, 0, 1
 	};
 	return result;
@@ -61,9 +74,9 @@ Matrix4x4 MakeRotateXMatrix(const float& theta) {
 
 Matrix4x4 MakeRotateYMatrix(const float& theta) {
 	Matrix4x4 result = {
-		cosf(theta), 0, -sinf(theta), 0,
+		std::cosf(theta), 0, -std::sinf(theta), 0,
 		0, 1, 0, 0,
-		sinf(theta), 0, cosf(theta), 0,
+		std::sinf(theta), 0, std::cosf(theta), 0,
 		0, 0, 0, 1
 	};
 	return result;
@@ -71,8 +84,8 @@ Matrix4x4 MakeRotateYMatrix(const float& theta) {
 
 Matrix4x4 MakeRotateZMatrix(const float& theta) {
 	Matrix4x4 result = {
-		cosf(theta), sinf(theta), 0, 0,
-		-sinf(theta), cosf(theta), 0, 0,
+		std::cosf(theta), std::sinf(theta), 0, 0,
+		-std::sinf(theta), std::cosf(theta), 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	};
@@ -172,7 +185,7 @@ Matrix4x4 InverseTranspose(const Matrix4x4& matrix) {
 }
 
 Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
-	float h = 1 / tanf(fovY / 2);
+	float h = 1 / std::tanf(fovY / 2);
 	float w = h / aspectRatio;
 	Matrix4x4 result = {
 		w, 0, 0, 0,

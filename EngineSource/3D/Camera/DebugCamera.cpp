@@ -1,13 +1,15 @@
 #include"DebugCamera.h"
 #include"EngineSource/Math/MyMath.h"
 #include"EngineSource/Common/CreateBufferResource.h"
+#include"EngineSource/2D/ImGuiManager.h"
+
 using namespace GameEngine;
 
 void DebugCamera::Initialize(const Vector3& translate,int width, int height, ID3D12Device* device) {
 	translate_ = translate;
 	viewMatrix_ = InverseMatrix(MakeAffineMatrix(scale_, rotate_, translate_));
 	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 200.0f);
-	rotateMatrix_ = MakeIdentity4x4();
+	rotateMatrix_ = LookAt(translate_, targetPos_, { 0.0f,1.0f,0.0f });
 
 	// カメラリソースを作成
 	cameraResource_ = CreateBufferResource(device, sizeof(CameraForGPU));
@@ -20,62 +22,53 @@ void DebugCamera::Initialize(const Vector3& translate,int width, int height, ID3
 
 void DebugCamera::Update(Input* input) {
 
-	// 右クリックで回転する処理
-	if (input->IsPressMouse(1)) {
-		Vector2 delta = input->GetMouseDelta();
-
-		Matrix4x4 rotateX = MakeRotateXMatrix(-delta.y * 0.01f);
-		Matrix4x4 rotateY = MakeRotateYMatrix(-delta.x * 0.01f);
-
-		rotateMatrix_ = Multiply(rotateMatrix_, Multiply(rotateX, rotateY));
-	}
-
-	Vector3 move = { 0.0f, 0.0f, 0.0f };
-
-	// マウスの中ボタンを押す時、移動出来る
+	// 中クリックで移動
 	if (input->IsPressMouse(2)) {
-		// X軸の移動
-		if (input->GetMouseDelta().x > 0.0f) { move.x -= 1.0f; }
-		if (input->GetMouseDelta().x < 0.0f) { move.x += 1.0f; }
-		// Y軸の移動
-		if (input->GetMouseDelta().y < 0.0f) { move.y -= 1.0f; }
-		if (input->GetMouseDelta().y > 0.0f) { move.y += 1.0f; }
+
+		Vector2 mouseDelta_ = input->GetMouseDelta() * 0.05f;
+		targetPos_.x -= mouseDelta_.x;
+		targetPos_.y += mouseDelta_.y;
 	} else {
-		// 前後
-		if (input->GetWheel() > 0.0f) {
-			move.z += 1.0f; 
-		}
-		if (input->GetWheel() < 0.0f) { 
-			move.z -= 1.0f; 
+
+		// ホイールで距離を調整する
+		distance_ -= input->GetWheel() * 0.05f;
+		distance_ = std::clamp(distance_, 2.0f, 100.0f);
+
+		// 右クリックで回転する処理
+		if (input->IsPressMouse(1)) {
+			mouseDelta_ += input->GetMouseDelta() * 0.05f;
 		}
 	}
-
-	// 正規化（斜め移動でもスピード一定）
-	float length = std::sqrt(move.x * move.x + move.y * move.y + move.z * move.z);
-	if (length > 0.0f) {
-		move.x /= length;
-		move.y /= length;
-		move.z /= length;
-
-		const float speed = 0.05f;
-
-		// x,zだけ回す
-		float rotatedX = move.x * cosf(rotate_.y) - move.z * sinf(rotate_.y);
-		float rotatedZ = move.x * sinf(rotate_.y) + move.z * cosf(rotate_.y);
-
-		// 移動
-		translate_.x += rotatedX * speed;
-		translate_.y += move.y * speed; // Yはそのまま
-		translate_.z += rotatedZ * (speed + 0.1f);
-	}
+	
+	// 球面座標系で移動
+	translate_.x = targetPos_.x + distance_ * std::sinf(mouseDelta_.y) * std::sinf(mouseDelta_.x);
+	translate_.y = targetPos_.y + distance_ * std::cosf(mouseDelta_.y);
+	translate_.z = targetPos_.z + distance_ * std::sinf(mouseDelta_.y) * std::cosf(mouseDelta_.x);
+	
+	// 回転行列に変換
+	rotateMatrix_ = LookAt(translate_, targetPos_, { 0.0f,1.0f,0.0f });
 
 	// ワールド行列
-	worldMatrix_ = Multiply(MakeTranslateMatrix(translate_),rotateMatrix_);
+	worldMatrix_ = rotateMatrix_;
+	worldMatrix_.m[3][0] = translate_.x;
+	worldMatrix_.m[3][1] = translate_.y;
+	worldMatrix_.m[3][2] = translate_.z;
 
+	//worldMatrix_ = MakeTranslateMatrix(translate_);
 	cameraForGPU_->worldPosition = GetWorldPosition();
-
 	// カメラの変更した内容を適用する処理
 	viewMatrix_ = InverseMatrix(worldMatrix_);
+
+#ifdef _DEBUG
+
+	ImGui::Begin("DebugCamera");
+	ImGui::DragFloat2("mouseDelta", &mouseDelta_.x, 0.1f);
+	ImGui::Text("x:%f,y:%f", input->GetMouseDelta().x, input->GetMouseDelta().y);
+	ImGui::DragFloat3("CameraPos", &translate_.x,0.01f);
+	ImGui::DragFloat3("CaeraRotate", &rotate_.x, 0.01f);
+	ImGui::End();
+#endif
+
 }
 
 Matrix4x4 DebugCamera::GetVPMatrix() {
@@ -94,4 +87,18 @@ Vector3 DebugCamera::GetWorldPosition() {
 	worldPos.y = worldMatrix_.m[3][1];
 	worldPos.z = worldMatrix_.m[3][2];
 	return worldPos;
+}
+
+Matrix4x4 DebugCamera::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {
+	Vector3 f = Normalize(center - eye); // 前方向ベクトル
+	Vector3 s = Normalize(Cross(up,f)); // 右方向ベクトル
+	Vector3 u = Cross(f,s); // 上方向ベクトル
+
+	Matrix4x4 result = { {
+		{ s.x,  s.y, s.z, 0 },
+		{ u.x,  u.y, u.z, 0 },
+		{ f.x,  f.y, f.z, 0 },
+		{ 0.0f, 0.0f, 0.0f, 1}
+	} };
+	return result;
 }

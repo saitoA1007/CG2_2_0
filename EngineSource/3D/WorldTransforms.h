@@ -51,7 +51,7 @@ namespace GameEngine {
 		/// 描画するモデルの数
 		/// </summary>
 		/// <returns></returns>
-		const uint32_t GetNumInstance() { return numInstance; }
+		const uint32_t GetNumInstance() { return numInstance_; }
 	public:
 
 		std::vector<TransformData> transformDatas_;
@@ -72,7 +72,7 @@ namespace GameEngine {
 		static uint32_t StaticSrvIndex_;
 
 		// transformData配列数
-		uint32_t numInstance = 0;
+		uint32_t numInstance_ = 0;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
 		ParticleForGPU* instancingData_ = nullptr;

@@ -63,10 +63,20 @@ private:
 	GameEngine::Model* sphereModel_;
 	uint32_t whiteGH_ = 0u;
 
+	// 平面モデル
+	GameEngine::Model* planeModel_;
+	uint32_t planeGH_ = 0u;
+	Transform planeTransform_{};
+	GameEngine::WorldTransform planeWorldTransform_;
+
 	// ライト
 	std::unique_ptr<GameEngine::LightManager> lightManager_;
 	// 平行光源
 	GameEngine::DirectionalLight::DirectionalLightData directionalData_;
+	// 点光源
+	GameEngine::PointLight::PointLightData pointLightData_;
+	// スポットライト
+	GameEngine::SpotLight::SpotLightData spotLightData_;
 
 	// ブレンドモード
 	const char* blendModeName_[6] = { "kBlendModeNone","kBlendModeNormal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen"};
