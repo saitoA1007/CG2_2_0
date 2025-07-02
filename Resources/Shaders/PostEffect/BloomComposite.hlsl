@@ -11,7 +11,7 @@ float4 main(VertexShaderOutput input) : SV_TARGET
     float32_t4 result = texColor;
 	
     float32_t4 bloomColor = gTexBloomResult.Sample(gSampler, input.texcoord);
-    result += bloomColor;
+    result += bloomColor * 1.0f;
 
     return result;
 }

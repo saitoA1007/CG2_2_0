@@ -18,6 +18,23 @@ void DebugCamera::Initialize(const Vector3& translate,int width, int height, ID3
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPU_));
 	// 単位行列を書き込んでおく
 	cameraForGPU_->worldPosition = translate_;
+
+	// 球面座標系で移動
+	translate_.x = targetPos_.x + distance_ * std::sinf(mouseDelta_.y) * std::sinf(mouseDelta_.x);
+	translate_.y = targetPos_.y + distance_ * std::cosf(mouseDelta_.y);
+	translate_.z = targetPos_.z + distance_ * std::sinf(mouseDelta_.y) * std::cosf(mouseDelta_.x);
+	// 回転行列に変換
+	rotateMatrix_ = LookAt(translate_, targetPos_, { 0.0f,1.0f,0.0f });
+	// ワールド行列
+	worldMatrix_ = rotateMatrix_;
+	worldMatrix_.m[3][0] = translate_.x;
+	worldMatrix_.m[3][1] = translate_.y;
+	worldMatrix_.m[3][2] = translate_.z;
+
+	//worldMatrix_ = MakeTranslateMatrix(translate_);
+	cameraForGPU_->worldPosition = GetWorldPosition();
+	// カメラの変更した内容を適用する処理
+	viewMatrix_ = InverseMatrix(worldMatrix_);
 }
 
 void DebugCamera::Update(Input* input) {

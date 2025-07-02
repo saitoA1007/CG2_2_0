@@ -14,10 +14,10 @@ float4 main(VertexShaderOutput input) : SV_TARGET
     float32_t dy = 1.0f / h;
 
     float32_t4 bloomAccum = float32_t4(0, 0, 0, 0);
-    float32_t2 uvSize = float32_t2(1, 0.5);
+    float32_t2 uvSize = float32_t2(0.5, 0.5);
     float32_t2 uvOffset = float32_t2(0, 0);
 
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 5; ++i)
     {
         bloomAccum += Get5x5GaussianBlur(gTexShrinkHighLum, gSampler, input.texcoord * uvSize + uvOffset, dx, dy, float32_t4(uvOffset, uvOffset + uvSize));
         uvOffset.y += uvSize.y;

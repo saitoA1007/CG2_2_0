@@ -55,6 +55,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		L"Resources/Shaders/PostEffect/BloomComposite.hlsl");
 	dxCommon->SetBloomPSO(bloomPSO.get());
 
+	// CopyPSOの初期化
+	std::unique_ptr<CopyPSO> copyPSO = std::make_unique<CopyPSO>();
+	copyPSO->Initialize(dxCommon->GetDevice(), L"Resources/Shaders/PostEffect/Copy.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc.get(), logManager.get());
+	dxCommon->SetCopyPSO(copyPSO.get());
+
 	// ImGuiの初期化
 	std::unique_ptr<ImGuiManager> imGuiManager = std::make_unique<ImGuiManager>();
 	imGuiManager->Initialize(windowsApp.get(), dxCommon.get());
@@ -132,9 +137,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		gameScene->Draw();
 
 		// ImGuiの描画処理
-		imGuiManager->Draw();
+		//imGuiManager->Draw();
 		// 描画後処理
-		dxCommon->PostDraw();
+		dxCommon->PostDraw(imGuiManager.get());
 	}
 
 	// ゲームシーンの解放

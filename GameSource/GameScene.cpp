@@ -8,8 +8,12 @@ using namespace GameEngine;
 
 GameScene::~GameScene() {
 	delete planeModel_;
+	delete boxModel_;
 	delete terrainModel_;
 	delete sphereModel_;
+
+	delete neonTextModel_;
+	delete neonFrameModel_;
 }
 
 void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngine::DirectXCommon* dxCommon) {
@@ -47,6 +51,19 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	rope_ = std::make_unique<Rope>();
 	rope_->Initialize(sphereModel_, whiteGH_);
 
+	// 箱
+	boxModel_ = Model::CreateModel("cube.obj", "cube");
+	boxTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,0.0f} };
+	boxWorldTransform_.Initialize(boxTransform_);
+
+	// ネオン
+	neonTextTransform_ = { {1.0f,1.0f,1.0f},{0.0f,3.2f,0.0f},{0.0f,2.0f,0.0f} };
+	neonTextModel_ = Model::CreateModel("neonText.obj", "NeonText");
+	neonTextModel_->SetDefaultColor({ 1.0f,0.0f,1.0f,1.0f });
+	neonFrameModel_ = Model::CreateModel("neonFrame.obj", "NeonFrame");
+	neonFrameModel_->SetDefaultColor({ 0.0f,0.0f,1.0f,1.0f });
+	neonTextWorldTransform_.Initialize(neonTextTransform_);
+
 	// 平行光源ライト
 	lightManager_ = std::make_unique<LightManager>();
 	lightManager_->Initialize(dxCommon_->GetDevice(), true, false, false);
@@ -64,6 +81,9 @@ void GameScene::Update(GameEngine::Input* input){
 
 	// ロープの更新処理
 	rope_->Update();
+
+	boxWorldTransform_.UpdateTransformMatrix();
+	neonTextWorldTransform_.UpdateTransformMatrix();
 
 	// 平面の更新処理
 	planeWorldTransform_.SetTransform(planeTransform_);
@@ -124,7 +144,15 @@ void GameScene::Update(GameEngine::Input* input){
 		ImGui::DragFloat3("translate", &planeTransform_.translate.x, 0.01f);
 		ImGui::TreePop();
 	}
+	ImGui::DragFloat3("boxPos", &boxTransform_.translate.x, 0.01f);
+	boxWorldTransform_.SetTranslate(boxTransform_.translate);
 
+	// ネオン
+	ImGui::DragFloat3("NeonPos", &neonTextTransform_.translate.x, 0.01f);
+	neonTextWorldTransform_.SetTranslate(neonTextTransform_.translate);
+
+	ImGui::ColorEdit3("neonColor",&color_.x);
+	neonTextModel_->SetDefaultColor(color_);
 	ImGui::End();
 
 	// カメラの切り替え処理
@@ -141,15 +169,23 @@ void GameScene::Update(GameEngine::Input* input){
 void GameScene::Draw() {
 
 	// 線の前描画処理
-	PrimitiveRenderer::PreDraw();
-	// 線を描画
-	rope_->DrawLine(camera_->GetVPMatrix());
+	//PrimitiveRenderer::PreDraw();
+	//// 線を描画
+	//rope_->DrawLine(camera_->GetVPMatrix());
 
 	// モデルの単体描画前処理
 	Model::PreDraw(PSOMode::triangle, blendMode_);
 
+	// 箱
+	boxModel_->Draw(boxWorldTransform_, whiteGH_, camera_->GetVPMatrix());
+
+	// ネオン
+	neonTextModel_->Draw(neonTextWorldTransform_, whiteGH_, camera_->GetVPMatrix());
+	// フレーム
+	neonFrameModel_->Draw(neonTextWorldTransform_, whiteGH_, camera_->GetVPMatrix());
+
 	// 線の点を描画
-	rope_->DrawSphere(camera_->GetVPMatrix());
+	//rope_->DrawSphere(camera_->GetVPMatrix());
 
 	// 平面を描画
 	planeModel_->Draw(planeWorldTransform_, planeGH_, camera_->GetVPMatrix());
@@ -159,5 +195,5 @@ void GameScene::Draw() {
 	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
 
 	// 軸を描画
-	axisIndicator_->Draw(axisTextureHandle_);
+	//axisIndicator_->Draw(axisTextureHandle_);
 }

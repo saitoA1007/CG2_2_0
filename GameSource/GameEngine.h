@@ -7,6 +7,7 @@
 #include"EngineSource/Core/PSO/ParticlePSO.h"
 #include"EngineSource/Core/PSO/PostProcessPSO.h"
 #include"EngineSource/Core/PSO/BloomPSO.h"
+#include"EngineSource/Core/PSO/CopyPSO.h"
 
 #include"EngineSource/Common/LogManager.h"
 #include"EngineSource/Common/ResourceLeakChecker.h"
