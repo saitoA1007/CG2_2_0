@@ -8,8 +8,12 @@
 #include"externals/DirectXTex/d3dx12.h"
 
 #include"PSO/BloomPSO.h"
+#include"PSO/CopyPSO.h"
 
 namespace GameEngine {
+
+    // 前方宣言
+    class ImGuiManager;
 
     class DirectXCommon {
     public:
@@ -21,7 +25,7 @@ namespace GameEngine {
         // 描画前処理
         void PreDraw();
         // 描画後処理
-        void PostDraw();
+        void PostDraw(ImGuiManager* imGuiManager);
 
     public:
         ID3D12Device* GetDevice() const { return device_.Get(); }
@@ -47,6 +51,12 @@ namespace GameEngine {
         /// </summary>
         /// <param name="pso"></param>
         void SetBloomPSO(BloomPSO* pso) { bloomPSO_ = pso; }
+
+        /// <summary>
+        /// 画像コピー用のPSOを取得
+        /// </summary>
+        /// <param name="copyPSO"></param>
+        void SetCopyPSO(CopyPSO* copyPSO) { copyPSO_ = copyPSO; }
 
     private:
         DirectXCommon(const DirectXCommon&) = delete;
@@ -122,25 +132,29 @@ namespace GameEngine {
         LogManager* logManager_;
 
         // ブルーム用レンダリングターゲット
+        Microsoft::WRL::ComPtr<ID3D12Resource> DrawObjectResource_;     // 純粋にオブジェクトの描画をする用
+
         Microsoft::WRL::ComPtr<ID3D12Resource> bloomBrightResource_;     // 明るい部分抽出用
         Microsoft::WRL::ComPtr<ID3D12Resource> bloomBlurShrinkResource_; // 縮小させながらブラーをする
         Microsoft::WRL::ComPtr<ID3D12Resource> bloomResultResource_;     // 最終敵なもの
         Microsoft::WRL::ComPtr<ID3D12Resource> bloomCompositeResource_;  // 合成用
 
         // ブラーを掛ける回数
-        const uint32_t kBloomIteration = 3;
+        const uint32_t kBloomIteration = 5;
 
         // ブルーム用RTV
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> bloomRTVHeap_;
-        D3D12_CPU_DESCRIPTOR_HANDLE bloomRTVHandle_[4]{};
+        D3D12_CPU_DESCRIPTOR_HANDLE bloomRTVHandle_[5]{};
 
         // ブルーム用SRV
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> bloomSRVHeap_;
         // SRVハンドル
-        CD3DX12_GPU_DESCRIPTOR_HANDLE bloomSRVHandle_[4];
+        CD3DX12_GPU_DESCRIPTOR_HANDLE bloomSRVHandle_[5];
 
         // ブルーム用PSO
         BloomPSO* bloomPSO_ = nullptr;
+
+        CopyPSO* copyPSO_ = nullptr;
 
         // ポストエフェクトを適応するかのフラグ
         bool isEnablePostEffect_ = false;
