@@ -5,6 +5,15 @@ Texture2D<float32_t4> gTexHighLum : register(t1);
 Texture2D<float32_t4> gTexShrinkHighLum : register(t2);
 SamplerState gSampler : register(s0);
 
+struct BloomParameter
+{
+    float32_t highLumMask; // 明るさの範囲
+    float32_t sigma; // ぼかしの強さ
+    int32_t bloomIteration;
+    float32_t intensity;
+};
+ConstantBuffer<BloomParameter> gBloomParameter : register(b0);
+
 float4 main(VertexShaderOutput input) : SV_TARGET
 {
     float32_t w, h, levels;
@@ -17,7 +26,7 @@ float4 main(VertexShaderOutput input) : SV_TARGET
     float32_t2 uvSize = float32_t2(0.5, 0.5);
     float32_t2 uvOffset = float32_t2(0, 0);
 
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < gBloomParameter.bloomIteration; ++i)
     {
         bloomAccum += Get5x5GaussianBlur(gTexShrinkHighLum, gSampler, input.texcoord * uvSize + uvOffset, dx, dy, float32_t4(uvOffset, uvOffset + uvSize));
         uvOffset.y += uvSize.y;

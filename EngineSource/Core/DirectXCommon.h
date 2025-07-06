@@ -15,6 +15,12 @@ namespace GameEngine {
     // 前方宣言
     class ImGuiManager;
 
+    enum class PostEffectMode {
+        GrayScale,
+        Bloom,
+        GaussianBlur,
+    };
+
     class DirectXCommon {
     public:
         DirectXCommon() = default;
@@ -57,6 +63,9 @@ namespace GameEngine {
         /// </summary>
         /// <param name="copyPSO"></param>
         void SetCopyPSO(CopyPSO* copyPSO) { copyPSO_ = copyPSO; }
+
+        
+        PostEffectMode postEffectMode_ = PostEffectMode::GaussianBlur;
 
     private:
         DirectXCommon(const DirectXCommon&) = delete;
@@ -158,5 +167,19 @@ namespace GameEngine {
 
         // ポストエフェクトを適応するかのフラグ
         bool isEnablePostEffect_ = false;
+
+        // 画面クリアの色{ 0.1f,0.25f,0.5f,1.0f }
+        float clearColor_[4] = { 0.0f,1.0f,0.0f,1.0f };
+
+        // ぼかし処理用リソース
+        Microsoft::WRL::ComPtr<ID3D12Resource> blurResource_; 
+
+        // RTVハンドル
+        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> blurRTVHeap_;
+        D3D12_CPU_DESCRIPTOR_HANDLE blurRTVHandle_{};
+        // ガウスぼかし用SRV
+        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> blurSRVHeap_;
+        // SRVハンドル
+        CD3DX12_GPU_DESCRIPTOR_HANDLE blurSRVHandle_;
     };
 }

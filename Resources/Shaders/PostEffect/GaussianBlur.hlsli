@@ -1,4 +1,9 @@
 
+float32_t Gaussian(float32_t x, float32_t sigma)
+{
+    return exp(-(x * x) / (2.0f * sigma * sigma));
+}
+
 float32_t4 Get5x5GaussianBlur(Texture2D<float32_t4> tex, SamplerState smp, float32_t2 uv, float32_t dx, float32_t dy, float32_t4 rect)
 {
     float32_t4 ret = tex.Sample(smp, uv);

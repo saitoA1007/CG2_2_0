@@ -18,6 +18,13 @@ namespace GameEngine {
             Vector2 texcoord;
         };
 
+        struct ConstBuffer {
+            float highLumMask;  // 明るさの範囲
+            float sigma;  // ぼかしの強さ
+            int32_t  bloomIteration;
+            float intensity;
+        };
+
     public:
         BloomPSO() = default;
         ~BloomPSO() = default;
@@ -34,6 +41,12 @@ namespace GameEngine {
         ID3D12PipelineState* GetResultPipelineState() const { return blurResultPipelineState_.Get(); }
         ID3D12PipelineState* GetBlurCompositePipelineState() const { return blurCompositePipelineState_.Get(); }
 
+        // ブルームを調整するためのパラメーター
+        ID3D12Resource* GetBloomParameterResource()const { return bloomParameterResource_.Get(); }
+
+        uint32_t GetBloomIteration() const { return constBuffer_->bloomIteration; }
+
+        ConstBuffer* constBuffer_ = nullptr;
     private:
         BloomPSO(const BloomPSO&) = delete;
         BloomPSO& operator=(const BloomPSO&) = delete;
@@ -50,5 +63,9 @@ namespace GameEngine {
         // Sprite用の頂点リソース
         Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_;
         VertexData* vertexDataSprite_ = nullptr;
+
+        // ブルーム処理で調整するためのパラメーターのリソース
+        Microsoft::WRL::ComPtr<ID3D12Resource> bloomParameterResource_;
+       
     };
 }

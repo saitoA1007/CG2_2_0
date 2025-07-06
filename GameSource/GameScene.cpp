@@ -4,6 +4,8 @@
 #include"EngineSource/3D/PrimitiveRenderer.h"
 #include"EngineSource/Math/MyMath.h"
 
+#include"ColorEditor.h"
+
 using namespace GameEngine;
 
 GameScene::~GameScene() {
@@ -72,6 +74,8 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	directionalData_.direction = { 0.0,1.0f,0.0f };
 	directionalData_.intensity = 10.0f;
 	lightManager_->SetDirectionalData(directionalData_);
+
+	//boxModel_->SetDefaultColor({1.0f,1.0f,1.0f,1.0f});
 }
 
 void GameScene::Update(GameEngine::Input* input){
@@ -147,12 +151,19 @@ void GameScene::Update(GameEngine::Input* input){
 	ImGui::DragFloat3("boxPos", &boxTransform_.translate.x, 0.01f);
 	boxWorldTransform_.SetTranslate(boxTransform_.translate);
 
-	// ネオン
-	ImGui::DragFloat3("NeonPos", &neonTextTransform_.translate.x, 0.01f);
-	neonTextWorldTransform_.SetTranslate(neonTextTransform_.translate);
+	//ImGui::ColorEdit3("boxcolor", &color_.x);
+	//boxModel_->SetDefaultColor(color_);
+	//
+	//Vector3 hsv = ColorConverter::RGBtoHSV({color_.x,color_.y,color_.z});
+	//ImGui::Text("h:%.3f,s:%.3f,v:%.3f", hsv.x, hsv.y, hsv.z);
+		
 
-	ImGui::ColorEdit3("neonColor",&color_.x);
-	neonTextModel_->SetDefaultColor(color_);
+	// ネオン
+	//ImGui::DragFloat3("NeonPos", &neonTextTransform_.translate.x, 0.01f);
+	//neonTextWorldTransform_.SetTranslate(neonTextTransform_.translate);
+
+	//ImGui::ColorEdit3("neonColor",&color_.x);
+	//neonTextModel_->SetDefaultColor(color_);
 	ImGui::End();
 
 	// カメラの切り替え処理
@@ -175,14 +186,14 @@ void GameScene::Draw() {
 
 	// モデルの単体描画前処理
 	Model::PreDraw(PSOMode::triangle, blendMode_);
-
+	
 	// 箱
 	boxModel_->Draw(boxWorldTransform_, whiteGH_, camera_->GetVPMatrix());
 
 	// ネオン
-	neonTextModel_->Draw(neonTextWorldTransform_, whiteGH_, camera_->GetVPMatrix());
+	//neonTextModel_->Draw(neonTextWorldTransform_, whiteGH_, camera_->GetVPMatrix());
 	// フレーム
-	neonFrameModel_->Draw(neonTextWorldTransform_, whiteGH_, camera_->GetVPMatrix());
+	//neonFrameModel_->Draw(neonTextWorldTransform_, whiteGH_, camera_->GetVPMatrix());
 
 	// 線の点を描画
 	//rope_->DrawSphere(camera_->GetVPMatrix());

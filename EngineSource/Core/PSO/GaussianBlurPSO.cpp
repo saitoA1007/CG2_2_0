@@ -1,4 +1,4 @@
-#include"BloomPSO.h"
+#include"GaussianBlurPSO.h"
 #include "EngineSource/Common/ConvertString.h"
 #include"EngineSource/Common/CreateBufferResource.h"
 #include <d3dcompiler.h>
@@ -6,12 +6,11 @@
 
 using namespace GameEngine;
 
-void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC* dxc, LogManager* logManager,
-    const std::wstring brightPsPath, const std::wstring blurPsPath, const std::wstring resultPsPath, const std::wstring compositePsPath) {
+void GaussianBlurPSO::Initialize(ID3D12Device* device, DXC* dxc, LogManager* logManager) {
 
     // 初期化を開始するログ
     if (logManager) {
-        logManager->Log("PostProcessPSO Class start Initialize\n");
+        logManager->Log("GaussianBlurPSO Class start Initialize\n");
     }
 
     // RootSignature作成
@@ -22,7 +21,7 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
     // RootSignature: SRV(テクスチャ)のみ
     D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
     descriptorRange[0].BaseShaderRegister = 0; // 0から始まる
-    descriptorRange[0].NumDescriptors = 4; // 数は4つ
+    descriptorRange[0].NumDescriptors = 1; // 数は1つ
     descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // SRVを使う
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // offsetを自動計算
 
@@ -32,11 +31,9 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
     rootParameters[0].DescriptorTable.pDescriptorRanges = descriptorRange; // Tableの中身の配列を指定
     rootParameters[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange); // Tableで利用する数
-
     rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;  // CBVを使う
     rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;  // PixelShaderで使う
     rootParameters[1].Descriptor.ShaderRegister = 0;  // レジスタ番号0
-
     descriptionRootSignature.pParameters = rootParameters;  // ルートパラメータ配列へのポインタ
     descriptionRootSignature.NumParameters = _countof(rootParameters);  // 配列の長さ
 
@@ -95,27 +92,15 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
 
     // シェーダ読み込み
     Microsoft::WRL::ComPtr<IDxcBlob> vsBlob;
-    vsBlob = dxc->CompileShader(vsPath,
+    vsBlob = dxc->CompileShader(L"Resources/Shaders/PostEffect/Bloom.VS.hlsl",
         L"vs_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
     assert(vsBlob != nullptr);
-    
-    Microsoft::WRL::ComPtr<IDxcBlob> brightPsBlob, blurPsBlob, resultPsBlob, blurCompositePsBlob;
-    // 明るい部分を抽出する用
-    brightPsBlob = dxc->CompileShader(brightPsPath,
+
+    Microsoft::WRL::ComPtr<IDxcBlob> psBlob;
+
+    psBlob = dxc->CompileShader(L"Resources/Shaders/PostEffect/Bloom.PS.hlsl",
         L"ps_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
-    assert(brightPsBlob != nullptr);
-    // ぼかす用
-    blurPsBlob = dxc->CompileShader(blurPsPath,
-        L"ps_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
-    assert(blurPsBlob != nullptr);
-    // ぼかした結果をまとめる用
-    resultPsBlob = dxc->CompileShader(resultPsPath,
-        L"ps_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
-    assert(resultPsBlob != nullptr);
-    // 元の画像と合成する用
-    blurCompositePsBlob = dxc->CompileShader(compositePsPath,
-        L"ps_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
-    assert(blurCompositePsBlob != nullptr);
+    assert(psBlob != nullptr);
 
     // DepthStencilStateの設定
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
@@ -129,7 +114,7 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
     graphicsPipelineStateDesc.RasterizerState = rasterizerDesc; // RasterizerState
     graphicsPipelineStateDesc.BlendState = blendDesc;  // ブレンドモードを設定
     graphicsPipelineStateDesc.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };// VertexShader
-    graphicsPipelineStateDesc.PS = { brightPsBlob->GetBufferPointer(), brightPsBlob->GetBufferSize() };// PixelShader
+    graphicsPipelineStateDesc.PS = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };// PixelShader
     // DepthStencilの設定
     graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
     graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -145,30 +130,12 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
     // 実際に生成
     // 明るい部分を抽出するPipeline
     hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-        IID_PPV_ARGS(&brightPipelineState_));
-    assert(SUCCEEDED(hr));
-
-    // ぼかしのPipeline
-    graphicsPipelineStateDesc.PS = { blurPsBlob->GetBufferPointer(), blurPsBlob->GetBufferSize() };// PixelShader
-    hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-        IID_PPV_ARGS(&blurPipelineState_));
-    assert(SUCCEEDED(hr));
-
-    // ぼかしの結果のPipeline
-    graphicsPipelineStateDesc.PS = { resultPsBlob->GetBufferPointer(), resultPsBlob->GetBufferSize() };// PixelShader
-    hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-        IID_PPV_ARGS(&blurResultPipelineState_));
-    assert(SUCCEEDED(hr));
-
-    // 元の画像との合成用のPipeline
-    graphicsPipelineStateDesc.PS = { blurCompositePsBlob->GetBufferPointer(), blurCompositePsBlob->GetBufferSize() };// PixelShader
-    hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-        IID_PPV_ARGS(&blurCompositePipelineState_));
+        IID_PPV_ARGS(&pipelineState_));
     assert(SUCCEEDED(hr));
 
     // 初期化を終了するログ
     if (logManager) {
-        logManager->Log("PostProcessPSO Class End Initialize\n");
+        logManager->Log("GaussianBlurPSO Class End Initialize\n");
     }
 
     // Sprite用の頂点リソースを作る
@@ -194,20 +161,21 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
     vertexDataSprite_[3].texcoord = { 1.0f,0.0f };
 
     // パラメーター調整用
-    bloomParameterResource_ = CreateBufferResource(device, sizeof(ConstBuffer));
+    blurParameterResource_ = CreateBufferResource(device, sizeof(ConstBuffer));
     // 書き込むためのアドレスを取得
-    bloomParameterResource_->Map(0, nullptr, reinterpret_cast<void**>(&constBuffer_));
+    blurParameterResource_->Map(0, nullptr, reinterpret_cast<void**>(&constBuffer_));
     constBuffer_->bloomIteration = 5;
     constBuffer_->highLumMask = 0.8f;
     constBuffer_->sigma = 1.0f;
     constBuffer_->intensity = 1.0f;
 }
 
-void BloomPSO::Set(ID3D12GraphicsCommandList* commandList) {
-    commandList->SetGraphicsRootSignature(rootSignature_.Get());      
+void GaussianBlurPSO::Set(ID3D12GraphicsCommandList* commandList) {
+    commandList->SetGraphicsRootSignature(rootSignature_.Get());
+
 }
 
-void BloomPSO::Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE inputSRV) {
+void GaussianBlurPSO::Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE inputSRV) {
     commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite_);
     commandList->SetGraphicsRootDescriptorTable(0, inputSRV);
     // フルスクリーン三角形
