@@ -46,6 +46,9 @@
     <Filter Include="Shaders\PostEffect">
       <UniqueIdentifier>{9aaebbf4-668b-4853-a5f6-7f7e94f8b607}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineSource\Core\PostProcess">
+      <UniqueIdentifier>{8171682b-3501-4f1d-a5c2-9f1c26ee4526}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -166,6 +169,18 @@
       <Filter>EngineSource\Core\PSO</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Core\PSO\CopyPSO.cpp">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSource\ColorEditor.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PostProcess\PostEffectManager.cpp">
+      <Filter>EngineSource\Core\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PostProcess\GaussianBlur.cpp">
+      <Filter>EngineSource\Core\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\GaussianBlurPSO.cpp">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClCompile>
   </ItemGroup>
@@ -341,6 +356,21 @@
     <ClInclude Include="EngineSource\Core\PSO\CopyPSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
+    <ClInclude Include="GameSource\ColorEditor.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PostProcess\BasePostEffect.h">
+      <Filter>EngineSource\Core\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PostProcess\PostEffectManager.h">
+      <Filter>EngineSource\Core\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PostProcess\GaussianBlur.h">
+      <Filter>EngineSource\Core\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\GaussianBlurPSO.h">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -365,6 +395,9 @@
     </None>
     <None Include="Resources\Shaders\PostEffect\CopyImage.hlsli">
       <Filter>Shaders\PostEffect</Filter>
+    </None>
+    <None Include="Resources\Shaders\ColorConvert.hlsli">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -102,6 +102,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	GameScene* gameScene = new GameScene();
 	gameScene->Initialize(textureManager.get(), dxCommon.get());
 
+	int iteration = 3;
+	float highLumMask = 0.8f;
+	float intensity = 1.0f;
+
 	//=========================================================================
 	// メインループ
 	//=========================================================================
@@ -123,6 +127,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
 		// ゲームシーンの更新処理
 		gameScene->Update(input.get());
+
+		ImGui::Begin("Bloom");
+
+		ImGui::SliderInt("iteration", &iteration, 1, 5);
+		bloomPSO->constBuffer_->bloomIteration = static_cast<uint32_t>(iteration);
+
+		ImGui::SliderFloat("HighLumMask", &highLumMask, 0.0f,1.0f);
+		bloomPSO->constBuffer_->highLumMask = highLumMask;
+
+		ImGui::SliderFloat("Intensity", &intensity, 0.0f, 10.0f);
+		bloomPSO->constBuffer_->intensity = intensity;
+
+		ImGui::End();
 
 		//====================================================================
 		// 描画処理

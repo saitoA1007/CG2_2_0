@@ -75,9 +75,8 @@ void DirectXCommon::PreDraw()
     commandList_->OMSetRenderTargets(1, &bloomRTVHandle_[0], false, &dsvHandle);
 
     // 指定した色で画面全体をクリアする
-    //float clearColor[] = { 0.1f,0.25f,0.5f,1.0f }; // 青っぽい色、RGBAの順
-    float clearColor[] = { 0.0f,1.0f,0.0f,1.0f };
-    commandList_->ClearRenderTargetView(bloomRTVHandle_[0], clearColor, 0, nullptr);
+    //float clearColor[] = { 0.0f,1.0f,0.0f,1.0f };
+    commandList_->ClearRenderTargetView(bloomRTVHandle_[0], clearColor_, 0, nullptr);
     // 指定した深度で画面全体をクリアする
     commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
@@ -125,7 +124,7 @@ void DirectXCommon::PostDraw(ImGuiManager* imGuiManager)
     ID3D12DescriptorHeap* heaps[] = { srvHeap_.Get() };
     commandList_->SetDescriptorHeaps(1, heaps);
 
-     // ImGuiを描画
+    // ImGuiを描画
     imGuiManager->Draw();
 
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
@@ -388,7 +387,7 @@ void DirectXCommon::CreateBloomRenderTargets(uint32_t width, uint32_t height) {
     // Clearの最適値
     D3D12_CLEAR_VALUE clearValue{};
     clearValue.Format = desc.Format;
-    clearValue.Color[0] = 0.0f; clearValue.Color[1] = 1.0f; clearValue.Color[2] = 0.0f; clearValue.Color[3] = 1.0f;
+    clearValue.Color[0] = clearColor_[0]; clearValue.Color[1] = clearColor_[1]; clearValue.Color[2] = clearColor_[2]; clearValue.Color[3] = clearColor_[3];
 
     // 利用するHeapの設定。
     CD3DX12_HEAP_PROPERTIES heapProps{};
@@ -527,6 +526,8 @@ void DirectXCommon::DrawBloomEffect() {
     commandList_->SetPipelineState(bloomPSO_->GetBrightPipelineState());
     commandList_->OMSetRenderTargets(1, &bloomRTVHandle_[1], false, nullptr);
     
+    commandList_->SetGraphicsRootConstantBufferView(1, bloomPSO_->GetBloomParameterResource()->GetGPUVirtualAddress());
+
     // 明るい部分抽出の描画
     bloomPSO_->Draw(commandList_.Get(), bloomSRVHandle_[0]);
 
@@ -566,7 +567,7 @@ void DirectXCommon::DrawBloomEffect() {
     commandList_->OMSetRenderTargets(1, &bloomRTVHandle_[2], false, nullptr);
 
     // 縮小させながらブラーをかけたものを描画
-    for (uint32_t i = 0; i < kBloomIteration; ++i) {
+    for (uint32_t i = 0; i < bloomPSO_->GetBloomIteration(); ++i) {
         commandList_->RSSetViewports(1, &viewport); // Viewportを設定
         commandList_->RSSetScissorRects(1, &rect); // Scirssorを設定
         bloomPSO_->Draw(commandList_.Get(), bloomSRVHandle_[0]);
@@ -602,6 +603,7 @@ void DirectXCommon::DrawBloomEffect() {
     commandList_->RSSetViewports(1, &viewport_);
     commandList_->RSSetScissorRects(1, &scissorRect_);
 
+    commandList_->SetGraphicsRootConstantBufferView(1, bloomPSO_->GetBloomParameterResource()->GetGPUVirtualAddress());
     bloomPSO_->Draw(commandList_.Get(), bloomSRVHandle_[0]);
 
     // bloomResultResourceをSRVに戻す
@@ -622,6 +624,7 @@ void DirectXCommon::DrawBloomEffect() {
     // 合成したのを描画
     commandList_->SetPipelineState(bloomPSO_->GetBlurCompositePipelineState());
     commandList_->OMSetRenderTargets(1, &bloomRTVHandle_[4], false, nullptr);
+    commandList_->SetGraphicsRootConstantBufferView(1, bloomPSO_->GetBloomParameterResource()->GetGPUVirtualAddress());
     bloomPSO_->Draw(commandList_.Get(), bloomSRVHandle_[0]);
     
     // 最終的にすべてのブルームリソースをSRVに戻す
