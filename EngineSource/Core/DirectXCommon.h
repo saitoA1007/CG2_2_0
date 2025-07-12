@@ -9,6 +9,7 @@
 
 #include"PSO/BloomPSO.h"
 #include"PSO/CopyPSO.h"
+#include"PSO/GaussianBlurPSO.h"
 
 namespace GameEngine {
 
@@ -64,8 +65,10 @@ namespace GameEngine {
         /// <param name="copyPSO"></param>
         void SetCopyPSO(CopyPSO* copyPSO) { copyPSO_ = copyPSO; }
 
+        void SetGaussianBlurPSO(GaussianBlurPSO* gaussianBlurPSO) { gaussianBlurPSO_ = gaussianBlurPSO; }
+
         
-        PostEffectMode postEffectMode_ = PostEffectMode::GaussianBlur;
+        PostEffectMode postEffectMode_ = PostEffectMode::Bloom;
 
     private:
         DirectXCommon(const DirectXCommon&) = delete;
@@ -97,6 +100,20 @@ namespace GameEngine {
         /// ブルームエフェクトの描画
         /// </summary>
         void DrawBloomEffect();
+
+    private:
+
+        /// <summary>
+        /// ガウスぼかし用のRTV,SRVを作成
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        void CreateGaussianBlurRenderTargets(uint32_t width, uint32_t height);
+
+        /// <summary>
+        /// ガウスぼかしを適応
+        /// </summary>
+        void DrawGaussianBlurEffect();
 
 #ifdef _DEBUG
         void DebugLayer();
@@ -148,28 +165,23 @@ namespace GameEngine {
         Microsoft::WRL::ComPtr<ID3D12Resource> bloomResultResource_;     // 最終敵なもの
         Microsoft::WRL::ComPtr<ID3D12Resource> bloomCompositeResource_;  // 合成用
 
-        // ブラーを掛ける回数
-        const uint32_t kBloomIteration = 5;
-
         // ブルーム用RTV
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> bloomRTVHeap_;
         D3D12_CPU_DESCRIPTOR_HANDLE bloomRTVHandle_[5]{};
-
-        // ブルーム用SRV
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> bloomSRVHeap_;
         // SRVハンドル
         CD3DX12_GPU_DESCRIPTOR_HANDLE bloomSRVHandle_[5];
 
         // ブルーム用PSO
         BloomPSO* bloomPSO_ = nullptr;
 
+        // コピー用PSO
         CopyPSO* copyPSO_ = nullptr;
 
         // ポストエフェクトを適応するかのフラグ
         bool isEnablePostEffect_ = false;
 
-        // 画面クリアの色{ 0.1f,0.25f,0.5f,1.0f }
-        float clearColor_[4] = { 0.0f,1.0f,0.0f,1.0f };
+        // 画面クリアの色
+        float clearColor_[4] = { 0.2f,0.2f,0.2f,1.0f };
 
         // ぼかし処理用リソース
         Microsoft::WRL::ComPtr<ID3D12Resource> blurResource_; 
@@ -177,9 +189,13 @@ namespace GameEngine {
         // RTVハンドル
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> blurRTVHeap_;
         D3D12_CPU_DESCRIPTOR_HANDLE blurRTVHandle_{};
-        // ガウスぼかし用SRV
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> blurSRVHeap_;
         // SRVハンドル
         CD3DX12_GPU_DESCRIPTOR_HANDLE blurSRVHandle_;
+
+        // ポストエフェクトで使うSRVヒープ
+        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> postEffectSRVHeap_;
+
+        // ガウスぼかし
+        GaussianBlurPSO* gaussianBlurPSO_ = nullptr;
     };
 }

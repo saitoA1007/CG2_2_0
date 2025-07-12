@@ -12,10 +12,12 @@ GameScene::~GameScene() {
 	delete planeModel_;
 	delete boxModel_;
 	delete terrainModel_;
-	delete sphereModel_;
 
 	delete neonTextModel_;
 	delete neonFrameModel_;
+
+	// グリッドの解放
+	delete gridModel_;
 }
 
 void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngine::DirectXCommon* dxCommon) {
@@ -36,6 +38,13 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// 軸方向表示の画像
 	axisTextureHandle_ = textureManager->Load("Resources/axis/axis.jpg");
 
+	// white4x4テクスチャをロード
+	whiteGH_ = textureManager->Load("Resources/white4x4.png");
+
+	// グリッドの初期化
+	gridModel_ = Model::CreateGridPlane({200.0f,200.0f});
+	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+
 	// 平面モデルを生成
 	planeModel_ = Model::CreateModel("plane.gltf", "Plane");
 	planeGH_ = textureManager->Load("Resources/uvChecker.png");
@@ -47,11 +56,6 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	terrainModel_->SetDefaultIsEnableLight(true);
 	grassGH_ = textureManager->Load("Resources/terrain/grass.png");
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
-	sphereModel_ = Model::CreateModel("cube.obj", "cube");
-	whiteGH_ = textureManager->Load("Resources/white4x4.png");
-	// ロープ
-	rope_ = std::make_unique<Rope>();
-	rope_->Initialize(sphereModel_, whiteGH_);
 
 	// 箱
 	boxModel_ = Model::CreateModel("cube.obj", "cube");
@@ -74,17 +78,12 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	directionalData_.direction = { 0.0,1.0f,0.0f };
 	directionalData_.intensity = 10.0f;
 	lightManager_->SetDirectionalData(directionalData_);
-
-	//boxModel_->SetDefaultColor({1.0f,1.0f,1.0f,1.0f});
 }
 
 void GameScene::Update(GameEngine::Input* input){
 
 	// 地面の更新処理
 	terrainWorldTransform_.UpdateTransformMatrix();
-
-	// ロープの更新処理
-	rope_->Update();
 
 	boxWorldTransform_.UpdateTransformMatrix();
 	neonTextWorldTransform_.UpdateTransformMatrix();
@@ -109,6 +108,10 @@ void GameScene::Update(GameEngine::Input* input){
 
 	// ライトの更新
 	lightManager_->Update();
+
+	// グリッドの更新処理
+	gridWorldTransform_.SetTranslate(Vector3(debugCamera_->GetTargetPosition().x,0.0f, debugCamera_->GetTargetPosition().z));
+	gridWorldTransform_.UpdateTransformMatrix();
 
 #ifdef _DEBUG
 	// 光源をデバック
@@ -148,6 +151,7 @@ void GameScene::Update(GameEngine::Input* input){
 		ImGui::DragFloat3("translate", &planeTransform_.translate.x, 0.01f);
 		ImGui::TreePop();
 	}
+
 	ImGui::DragFloat3("boxPos", &boxTransform_.translate.x, 0.01f);
 	boxWorldTransform_.SetTranslate(boxTransform_.translate);
 
@@ -156,14 +160,14 @@ void GameScene::Update(GameEngine::Input* input){
 	//
 	//Vector3 hsv = ColorConverter::RGBtoHSV({color_.x,color_.y,color_.z});
 	//ImGui::Text("h:%.3f,s:%.3f,v:%.3f", hsv.x, hsv.y, hsv.z);
-		
 
 	// ネオン
 	//ImGui::DragFloat3("NeonPos", &neonTextTransform_.translate.x, 0.01f);
 	//neonTextWorldTransform_.SetTranslate(neonTextTransform_.translate);
-
-	//ImGui::ColorEdit3("neonColor",&color_.x);
+	//
+	//ImGui::ColorEdit3("neonTextColor",&color_.x);
 	//neonTextModel_->SetDefaultColor(color_);
+
 	ImGui::End();
 
 	// カメラの切り替え処理
@@ -179,31 +183,29 @@ void GameScene::Update(GameEngine::Input* input){
 
 void GameScene::Draw() {
 
-	// 線の前描画処理
-	//PrimitiveRenderer::PreDraw();
-	//// 線を描画
-	//rope_->DrawLine(camera_->GetVPMatrix());
-
 	// モデルの単体描画前処理
-	Model::PreDraw(PSOMode::triangle, blendMode_);
+	Model::PreDraw(PSOMode::Triangle, blendMode_);
 	
 	// 箱
 	boxModel_->Draw(boxWorldTransform_, whiteGH_, camera_->GetVPMatrix());
 
 	// ネオン
 	//neonTextModel_->Draw(neonTextWorldTransform_, whiteGH_, camera_->GetVPMatrix());
-	// フレーム
+	//// フレーム
 	//neonFrameModel_->Draw(neonTextWorldTransform_, whiteGH_, camera_->GetVPMatrix());
-
-	// 線の点を描画
-	//rope_->DrawSphere(camera_->GetVPMatrix());
 
 	// 平面を描画
 	planeModel_->Draw(planeWorldTransform_, planeGH_, camera_->GetVPMatrix());
 
 	// 地面を描画
-	terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
-	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
+	//terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
+	///terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
+
+	// モデルの単体描画前処理
+	Model::PreDraw(PSOMode::Grid, blendMode_);
+
+	// グリッドを描画
+	gridModel_->DrawGrid(gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
 
 	// 軸を描画
 	//axisIndicator_->Draw(axisTextureHandle_);

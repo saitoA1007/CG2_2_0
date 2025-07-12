@@ -93,21 +93,34 @@ void TrianglePSO::Initialize(const std::wstring& vsPath, const std::wstring& psP
 	D3D12_RASTERIZER_DESC rasterizerDesc[DrawModel::kCountOfDrawMode]{};
 	for (uint32_t i = 0; i < DrawModel::kCountOfDrawMode; ++i) {
 
-		if (i == DrawModel::Fill) {
+		switch (i) {
+		case DrawModel::FillFront:
 			// 裏面(時計回り)を表示しない
 			rasterizerDesc[i].CullMode = D3D12_CULL_MODE_BACK;
 			// 三角形の中を塗りつぶす
 			rasterizerDesc[i].FillMode = D3D12_FILL_MODE_SOLID;
-		} else if (i == DrawModel::Frame) {
+			break;
+
+		case DrawModel::FrameFront:
 			// 裏面(時計回り)を表示しない
 			rasterizerDesc[i].CullMode = D3D12_CULL_MODE_BACK;
 			// 三角形の中を塗りつぶす
 			rasterizerDesc[i].FillMode = D3D12_FILL_MODE_WIREFRAME;
-		} else if (i == DrawModel::FrameBack) {
+			break;
+
+		case DrawModel::FrameBack:
 			// 表(反時計回り)を表示しない
 			rasterizerDesc[i].CullMode = D3D12_CULL_MODE_FRONT;
 			// 三角形の中を塗りつぶす
 			rasterizerDesc[i].FillMode = D3D12_FILL_MODE_WIREFRAME;
+			break;
+
+		case DrawModel::None:
+			// 両面表示
+			rasterizerDesc[i].CullMode = D3D12_CULL_MODE_NONE;
+			// 三角形の中を塗りつぶす
+			rasterizerDesc[i].FillMode = D3D12_FILL_MODE_SOLID;
+			break;
 		}
 	}
 
@@ -141,26 +154,37 @@ void TrianglePSO::Initialize(const std::wstring& vsPath, const std::wstring& psP
 			blendDesc_[i].RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO; // アルファ値のデスティネーション
 		}
 
-		if (i == kBlendModeNormal) {
+		switch (i) {
+
+		case kBlendModeNormal:
 			blendDesc_[i].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // SrcA
 			blendDesc_[i].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD; // 加算ブレンド
 			blendDesc_[i].RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA; // (1-SrcA)
-		} else if (i == kBlendModeAdd) {
+			break;
+
+		case kBlendModeAdd:
 			blendDesc_[i].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // SrcA
 			blendDesc_[i].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD; // 加算ブレンド
 			blendDesc_[i].RenderTarget[0].DestBlend = D3D12_BLEND_ONE; // (1-SrcA)
-		} else if (i == kBlendModeSubtract) {
+			break;
+
+		case kBlendModeSubtract:
 			blendDesc_[i].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // SrcA
 			blendDesc_[i].RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT; // 加算ブレンド
 			blendDesc_[i].RenderTarget[0].DestBlend = D3D12_BLEND_ONE; // (1-SrcA)
-		} else if (i == kBlendModeMultily) {
+			break;
+
+		case kBlendModeMultily:
 			blendDesc_[i].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // SrcA
 			blendDesc_[i].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD; // 加算ブレンド
 			blendDesc_[i].RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR; // (1-SrcA)
-		}else if (i == kBlendModeScreen) {
+			break;
+
+		case kBlendModeScreen:
 			blendDesc_[i].RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR; // SrcA
 			blendDesc_[i].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD; // 加算ブレンド
 			blendDesc_[i].RenderTarget[0].DestBlend = D3D12_BLEND_ONE; // (1-SrcA)
+			break;
 		}
 	}
 
@@ -168,7 +192,7 @@ void TrianglePSO::Initialize(const std::wstring& vsPath, const std::wstring& psP
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();// RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;// InputLayout
-	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc[DrawModel::Fill]; // RasterizerState
+	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc[DrawModel::FillFront]; // RasterizerState
 	graphicsPipelineStateDesc.VS = { vertexShaderBlob_->GetBufferPointer(),
 	vertexShaderBlob_->GetBufferSize() };// VertexShader
 	graphicsPipelineStateDesc.PS = { pixelShaderBlob_->GetBufferPointer(),

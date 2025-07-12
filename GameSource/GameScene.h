@@ -10,8 +10,6 @@
 #include"EngineSource/3D/Light/LightManager.h"
 #include"EngineSource/3D/Light/DirectionalLight.h"
 
-#include"Rope.h"
-
 class GameScene {
 public:
 
@@ -52,16 +50,17 @@ private:
 	// デバックカメラの有効の判定
 	bool isDebugCameraActive_ = false;
 
+	// white4x4テクスチャ
+	uint32_t whiteGH_ = 0u;
+
+	// グリッドを描画するためのモデル
+	GameEngine::Model* gridModel_;
+	GameEngine::WorldTransform gridWorldTransform_;
+
 	// 地面モデル
 	GameEngine::Model* terrainModel_;
 	uint32_t grassGH_ = 0u;
 	GameEngine::WorldTransform terrainWorldTransform_;
-
-	// ロープ
-	std::unique_ptr<Rope> rope_;
-	// ロープの点モデル
-	GameEngine::Model* sphereModel_;
-	uint32_t whiteGH_ = 0u;
 
 	// 平面モデル
 	GameEngine::Model* planeModel_;

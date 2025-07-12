@@ -21,9 +21,10 @@ namespace GameEngine {
     };
 
     enum DrawModel {
-        Fill, // 中身を描画
-        Frame, // フレームを描画
+        FillFront, // 中身を描画
+        FrameFront, // フレームを描画
         FrameBack, // 後ろ側を描画
+        None, // 両面描画
 
         kCountOfDrawMode,
     };

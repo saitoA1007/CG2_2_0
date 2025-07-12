@@ -36,3 +36,12 @@ float32_t4 Get5x5GaussianBlur(Texture2D<float32_t4> tex, SamplerState smp, float
 
     return float32_t4(blurColor.rgb, ret.a);
 }
+
+static const float32_t PI = 3.14159265f;
+
+float gauss(float x, float y, float sigma)
+{
+    float exponent = -(x * x + y * y) * rcp(2.0f * sigma * sigma);
+    float denominator = 2.0f * PI * sigma * sigma;
+    return exp(exponent) * rcp(denominator);
+}

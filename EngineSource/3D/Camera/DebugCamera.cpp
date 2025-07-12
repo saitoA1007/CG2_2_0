@@ -20,9 +20,9 @@ void DebugCamera::Initialize(const Vector3& translate,int width, int height, ID3
 	cameraForGPU_->worldPosition = translate_;
 
 	// 球面座標系で移動
-	translate_.x = targetPos_.x + distance_ * std::sinf(mouseDelta_.y) * std::sinf(mouseDelta_.x);
-	translate_.y = targetPos_.y + distance_ * std::cosf(mouseDelta_.y);
-	translate_.z = targetPos_.z + distance_ * std::sinf(mouseDelta_.y) * std::cosf(mouseDelta_.x);
+	translate_.x = targetPos_.x + distance_ * std::sinf(mouseMove_.y) * std::sinf(mouseMove_.x);
+	translate_.y = targetPos_.y + distance_ * std::cosf(mouseMove_.y);
+	translate_.z = targetPos_.z + distance_ * std::sinf(mouseMove_.y) * std::cosf(mouseMove_.x);
 	// 回転行列に変換
 	rotateMatrix_ = LookAt(translate_, targetPos_, { 0.0f,1.0f,0.0f });
 	// ワールド行列
@@ -42,9 +42,26 @@ void DebugCamera::Update(Input* input) {
 	// 中クリックで移動
 	if (input->IsPressMouse(2)) {
 
-		Vector2 mouseDelta_ = input->GetMouseDelta() * 0.05f;
-		targetPos_.x -= mouseDelta_.x;
-		targetPos_.y += mouseDelta_.y;
+		// ターゲットの移動量
+		Vector3 targetMove{0.0f,0.0f,0.0f};
+
+		// X軸の移動
+		if (input->GetMouseDelta().x > 0.0f) { targetMove.x = -1.0f; }
+		if (input->GetMouseDelta().x < 0.0f) { targetMove.x = 1.0f; }
+		// Y軸の移動
+		if (input->GetMouseDelta().y < 0.0f) { targetMove.y = -1.0f; }
+		if (input->GetMouseDelta().y > 0.0f) { targetMove.y = 1.0f; }
+
+		// カメラの向き
+		Vector3 forward = Normalize(targetPos_ - translate_);  
+		// 上方向
+		Vector3 up = { 0.0f, 1.0f, 0.0f };
+		// 横方向
+		Vector3 right = Normalize(Cross(up, forward));
+		// カメラから見てx,y軸に移動量を求める
+		Vector3 moveVec = right * targetMove.x + up * targetMove.y;
+		// ターゲットに加算
+		targetPos_ += moveVec * kTargetSpeed;
 	} else {
 
 		// ホイールで距離を調整する
@@ -53,17 +70,17 @@ void DebugCamera::Update(Input* input) {
 
 		// 右クリックで回転する処理
 		if (input->IsPressMouse(1)) {
-			mouseDelta_ += input->GetMouseDelta() * 0.05f;
+			mouseMove_ += input->GetMouseDelta() * 0.05f;
 		}
 	}
 	
 	// 球面座標系で移動
-	translate_.x = targetPos_.x + distance_ * std::sinf(mouseDelta_.y) * std::sinf(mouseDelta_.x);
-	translate_.y = targetPos_.y + distance_ * std::cosf(mouseDelta_.y);
-	translate_.z = targetPos_.z + distance_ * std::sinf(mouseDelta_.y) * std::cosf(mouseDelta_.x);
+	translate_.x = targetPos_.x + distance_ * std::sinf(mouseMove_.y) * std::sinf(mouseMove_.x);
+	translate_.y = targetPos_.y + distance_ * std::cosf(mouseMove_.y);
+	translate_.z = targetPos_.z + distance_ * std::sinf(mouseMove_.y) * std::cosf(mouseMove_.x);
 	
 	// 回転行列に変換
-	rotateMatrix_ = LookAt(translate_, targetPos_, { 0.0f,1.0f,0.0f });
+	rotateMatrix_ = LookAt(translate_, targetPos_, {0.0f,1.0f,0.0f});
 
 	// ワールド行列
 	worldMatrix_ = rotateMatrix_;
@@ -71,7 +88,6 @@ void DebugCamera::Update(Input* input) {
 	worldMatrix_.m[3][1] = translate_.y;
 	worldMatrix_.m[3][2] = translate_.z;
 
-	//worldMatrix_ = MakeTranslateMatrix(translate_);
 	cameraForGPU_->worldPosition = GetWorldPosition();
 	// カメラの変更した内容を適用する処理
 	viewMatrix_ = InverseMatrix(worldMatrix_);
@@ -79,10 +95,15 @@ void DebugCamera::Update(Input* input) {
 #ifdef _DEBUG
 
 	ImGui::Begin("DebugCamera");
-	ImGui::DragFloat2("mouseDelta", &mouseDelta_.x, 0.1f);
+	ImGui::DragFloat2("mouseDelta", &mouseMove_.x, 0.1f);
 	ImGui::Text("x:%f,y:%f", input->GetMouseDelta().x, input->GetMouseDelta().y);
 	ImGui::DragFloat3("CameraPos", &translate_.x,0.01f);
 	ImGui::DragFloat3("CaeraRotate", &rotate_.x, 0.01f);
+
+	if (ImGui::Button("ResetTargetPosition")) {
+		targetPos_ = { 0.0f,0.0f,0.0f };
+	}
+
 	ImGui::End();
 #endif
 

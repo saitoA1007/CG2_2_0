@@ -41,27 +41,27 @@ float32_t3 HSVToRGB(float32_t3 hsv) {
 
     float32_t3 rgb;
 
-    if (hsv.h < 60.0f)
+    if (hsv.x < 60.0f)
     {
         rgb = float32_t3(c, x, 0.0f);
 
     }
-    else if (hsv.h < 120.0f)
+    else if (hsv.x < 120.0f)
     {
         rgb = float32_t3(x, c, 0.0f);
 
     }
-    else if (hsv.h < 180.0f)
+    else if (hsv.x < 180.0f)
     {
         rgb = float32_t3(0.0f, c, x);
 
     }
-    else if (hsv.h < 240.0f)
+    else if (hsv.x < 240.0f)
     {
         rgb = float32_t3(0.0f, x, c);
 
     }
-    else if (hsv.h < 300.0f)
+    else if (hsv.x < 300.0f)
     {
         rgb = float32_t3(x, 0.0f, c);
 

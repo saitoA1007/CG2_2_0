@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 #include <d3d12.h>
 #include<dxcapi.h>
 #include<iostream>
@@ -8,11 +9,11 @@
 
 namespace GameEngine {
 
-    class LinePSO {
+    class GridPSO {
     public:
 
-        LinePSO() = default;
-        ~LinePSO() = default;
+        GridPSO() = default;
+        ~GridPSO() = default;
 
         // 初期化
         void Initialize(const std::wstring& vsPath, const std::wstring& psPath, ID3D12Device* device, DXC* dxc, LogManager* logManager);
@@ -21,8 +22,8 @@ namespace GameEngine {
         ID3D12RootSignature* GetRootSignature() { return rootSignature_.Get(); }
 
     private:
-        LinePSO(const LinePSO&) = delete;
-        LinePSO& operator=(const LinePSO&) = delete;
+        GridPSO(const GridPSO&) = delete;
+        GridPSO& operator=(const GridPSO&) = delete;
 
         ID3D12Device* device_ = nullptr;
 

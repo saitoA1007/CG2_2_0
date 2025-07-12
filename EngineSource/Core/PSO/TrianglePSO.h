@@ -24,7 +24,7 @@ namespace GameEngine {
 
         ID3D12PipelineState* GetPipelineState(BlendMode blendMode) { return graphicsPipelineState_[blendMode].Get(); }
 
-        ID3D12PipelineState* GetFramePipelineState(DrawModel drawMode) { return frameGraphicsPipelineState_[drawMode].Get(); }
+        ID3D12PipelineState* GetDrawModePipelineState(DrawModel drawMode) { return frameGraphicsPipelineState_[drawMode].Get(); }
 
     private:
         TrianglePSO(const TrianglePSO&) = delete;

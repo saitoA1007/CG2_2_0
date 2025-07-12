@@ -22,6 +22,7 @@
 #include<assimp/scene.h>
 #include<assimp/postprocess.h>
 
+#include"EngineSource/Core/PSO/GridPSO.h"
 
 namespace GameEngine {
 
@@ -29,9 +30,10 @@ namespace GameEngine {
 	class TextureManager;
 	class WorldTransform;
 
-	enum PSOMode {
-		triangle, // 単体描画用
-		partilce, // 複数描画用
+	enum class PSOMode {
+		Triangle, // 単体描画用
+		Partilce, // 複数描画用
+		Grid,  // グリッド描画用
 	};
 	
 	class Model final {
@@ -56,6 +58,10 @@ namespace GameEngine {
 			Node rootNode;
 		};
 
+		struct GridVertexData {
+			Vector4 position;
+		};
+
 	public:
 		Model() = default;
 		~Model() = default;
@@ -65,8 +71,8 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="device"></param>
 		/// <param name="commandList"></param>
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,TrianglePSO* trianglePSO, ParticlePSO* particlePSO, LogManager* logManager);
-		
+		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,TrianglePSO* trianglePSO, ParticlePSO* particlePSO, GridPSO* gridPSO, LogManager* logManager);
+
 		/// <summary>
 		/// 描画前処理
 		/// </summary>
@@ -102,6 +108,14 @@ namespace GameEngine {
 		static Model* CreateTrianglePlane();
 
 		/// <summary>
+		/// グリッドを描画
+		/// </summary>
+		/// <param name="size">グリッドサイズ</param>
+		/// <returns></returns>
+		[[nodiscard]]
+		static Model* CreateGridPlane(const Vector2& size);
+
+		/// <summary>
 		/// 生成したモデルを描画
 		/// </summary>
 		/// <param name="worldMatrix">ワールド行列</param>
@@ -118,6 +132,11 @@ namespace GameEngine {
 		/// <param name="VPMatrix"></param>
 		/// <param name="material"></param>
 		void Draw(const uint32_t& numInstance,WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material = nullptr);
+
+		/// <summary>
+		/// グリッドを描画
+		/// </summary>
+		void DrawGrid(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* cameraResource);
 
 		/// <summary>
 		/// モデルに光源を適応させる
@@ -180,6 +199,8 @@ namespace GameEngine {
 		// PSO設定
 		static TrianglePSO* trianglePSO_;
 		static ParticlePSO* particlePSO_;
+
+		static GridPSO* gridPSO_;
 
 		// ログ
 		static LogManager* logManager_;
