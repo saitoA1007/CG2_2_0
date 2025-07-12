@@ -19,10 +19,8 @@ namespace GameEngine {
         };
 
         struct ConstBuffer {
-            float highLumMask;  // 明るさの範囲
             float sigma;  // ぼかしの強さ
-            int32_t  bloomIteration;
-            float intensity;
+            float padding[3];
         };
 
     public:
@@ -45,8 +43,7 @@ namespace GameEngine {
         GaussianBlurPSO& operator=(const GaussianBlurPSO&) = delete;
 
         Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-
-        Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_; // 明るい部分を抽出する
+        Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_;
 
         // 頂点バッファビューを作成する
         D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};

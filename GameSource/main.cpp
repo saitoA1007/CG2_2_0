@@ -55,6 +55,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		L"Resources/Shaders/PostEffect/BloomComposite.hlsl");
 	dxCommon->SetBloomPSO(bloomPSO.get());
 
+	// グリッド用の初期化
+	std::unique_ptr<GridPSO> gridPSO = std::make_unique<GridPSO>();
+	gridPSO->Initialize(L"Resources/Shaders/Grid.VS.hlsl", L"Resources/Shaders/Grid.PS.hlsl", dxCommon->GetDevice(), dxc.get(), logManager.get());
+
+	// ガウスぼかし用の初期化
+	std::unique_ptr<GaussianBlurPSO> gaussianBlurPSO = std::make_unique<GaussianBlurPSO>();
+	gaussianBlurPSO->Initialize(dxCommon->GetDevice(), dxc.get(), logManager.get());
+	dxCommon->SetGaussianBlurPSO(gaussianBlurPSO.get());
+
 	// CopyPSOの初期化
 	std::unique_ptr<CopyPSO> copyPSO = std::make_unique<CopyPSO>();
 	copyPSO->Initialize(dxCommon->GetDevice(), L"Resources/Shaders/PostEffect/Copy.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc.get(), logManager.get());
@@ -79,7 +88,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	// 画像の初期化
 	Sprite::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), textureManager.get(), windowsApp->kWindowWidth, windowsApp->kWindowHeight);
 	// 3dを描画する処理の初期化
-	Model::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), textureManager.get(), trianglePSO.get(), particlePSO.get(), logManager.get());
+	Model::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), textureManager.get(), trianglePSO.get(), particlePSO.get(), gridPSO.get(), logManager.get());
 	// 線を描画する処理の初期化
 	PrimitiveRenderer::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), linePSO.get(), logManager.get());
 	// ワールドトランスフォームの初期化
@@ -102,9 +111,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	GameScene* gameScene = new GameScene();
 	gameScene->Initialize(textureManager.get(), dxCommon.get());
 
-	int iteration = 3;
+	int iteration = 1;
 	float highLumMask = 0.8f;
-	float intensity = 1.0f;
+	float intensity = 0.5f;
+
+	bool isBloom = true;
 
 	//=========================================================================
 	// メインループ
@@ -128,18 +139,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		// ゲームシーンの更新処理
 		gameScene->Update(input.get());
 
+		// 取り敢えず仮置き
 		ImGui::Begin("Bloom");
-
 		ImGui::SliderInt("iteration", &iteration, 1, 5);
 		bloomPSO->constBuffer_->bloomIteration = static_cast<uint32_t>(iteration);
-
 		ImGui::SliderFloat("HighLumMask", &highLumMask, 0.0f,1.0f);
 		bloomPSO->constBuffer_->highLumMask = highLumMask;
-
 		ImGui::SliderFloat("Intensity", &intensity, 0.0f, 10.0f);
 		bloomPSO->constBuffer_->intensity = intensity;
-
+		
+		ImGui::Checkbox("isbloomPost", &isBloom);
+		//ImGui::SliderFloat("Sigma", &gaussianBlurPSO->constBuffer_->sigma,0.1f,10.0f);
 		ImGui::End();
+
+		if (isBloom) {
+			dxCommon->postEffectMode_ = PostEffectMode::Bloom;
+		} else {
+			dxCommon->postEffectMode_ = PostEffectMode::GaussianBlur;
+		}
 
 		//====================================================================
 		// 描画処理

@@ -35,6 +35,10 @@ void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, LogMa
     CreateRenderTargetViews();
     // オフスクリーンレンダリング用
     CreateBloomRenderTargets(width, height);
+
+    // ガウスぼかし用
+    CreateGaussianBlurRenderTargets(width, height);
+
     CreateDepthStencilView(width, height);
     // フェンスの生成
     CreateFence();
@@ -75,7 +79,6 @@ void DirectXCommon::PreDraw()
     commandList_->OMSetRenderTargets(1, &bloomRTVHandle_[0], false, &dsvHandle);
 
     // 指定した色で画面全体をクリアする
-    //float clearColor[] = { 0.0f,1.0f,0.0f,1.0f };
     commandList_->ClearRenderTargetView(bloomRTVHandle_[0], clearColor_, 0, nullptr);
     // 指定した深度で画面全体をクリアする
     commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
@@ -94,8 +97,18 @@ void DirectXCommon::PostDraw(ImGuiManager* imGuiManager)
     PostProcessBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     commandList_->ResourceBarrier(1, &PostProcessBarrier);
 
-    // ブルーム処理したものを描画
-    DrawBloomEffect();
+    switch (postEffectMode_) {
+
+    case PostEffectMode::Bloom:
+        // ブルーム処理したものを描画
+        DrawBloomEffect();
+        break;
+
+    case PostEffectMode::GaussianBlur:
+        // ガウスぼかしを描画
+        DrawGaussianBlurEffect();
+        break;
+    }
 
     // バリア: バックバッファをレンダーターゲットに
     backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
@@ -117,8 +130,18 @@ void DirectXCommon::PostDraw(ImGuiManager* imGuiManager)
     commandList_->RSSetViewports(1, &viewport_);
     commandList_->RSSetScissorRects(1, &scissorRect_);
 
-    // ポストプロセスを行った最終結果を描画する
-    copyPSO_->Draw(commandList_.Get(), bloomSRVHandle_[4]);
+    switch (postEffectMode_) {
+
+    case PostEffectMode::Bloom:
+        // ポストプロセスを行った最終結果を描画する
+        copyPSO_->Draw(commandList_.Get(), bloomSRVHandle_[4]);
+        break;
+
+    case PostEffectMode::GaussianBlur:
+        // ポストプロセスを行った最終結果を描画する
+        copyPSO_->Draw(commandList_.Get(), blurSRVHandle_);
+        break;
+    }
     
     // ディスクリプタヒープをポストエフェクトを用から切り替える
     ID3D12DescriptorHeap* heaps[] = { srvHeap_.Get() };
@@ -393,7 +416,7 @@ void DirectXCommon::CreateBloomRenderTargets(uint32_t width, uint32_t height) {
     CD3DX12_HEAP_PROPERTIES heapProps{};
     heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
 
-    // 3つのブルーム用レンダーターゲットを作成
+    // 5つのブルーム用レンダーターゲットを作成
     HRESULT hr;
 
     // オブジェクトを描画する用のリソースを作成
@@ -461,7 +484,7 @@ void DirectXCommon::CreateBloomRenderTargets(uint32_t width, uint32_t height) {
     device_->CreateRenderTargetView(bloomCompositeResource_.Get(), &rtvDesc, bloomRTVHandle_[4]);
 
     // SRV用ヒープ作成（5つ分）
-    bloomSRVHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 5, true);
+    postEffectSRVHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 16, true);
 
     // SRV作成
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -471,29 +494,29 @@ void DirectXCommon::CreateBloomRenderTargets(uint32_t width, uint32_t height) {
     srvDesc.Texture2D.MipLevels = 1;
 
     // SRVハンドル取得
-    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = bloomSRVHeap_->GetCPUDescriptorHandleForHeapStart();
-    bloomSRVHandle_[0] = GetGPUDescriptorHandle(bloomSRVHeap_.Get(), descriptorSizeSRV_, 0);
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = postEffectSRVHeap_->GetCPUDescriptorHandleForHeapStart();
+    bloomSRVHandle_[0] = GetGPUDescriptorHandle(postEffectSRVHeap_.Get(), descriptorSizeSRV_, 0);
     // 明るい部分抽出用SRV
     device_->CreateShaderResourceView(DrawObjectResource_.Get(), &srvDesc, srvCPUHandle);
 
     // // ブラー3回目用SRV
     srvCPUHandle.ptr += descriptorSizeSRV_;
-    bloomSRVHandle_[1] = GetGPUDescriptorHandle(bloomSRVHeap_.Get(), descriptorSizeSRV_, 1);
+    bloomSRVHandle_[1] = GetGPUDescriptorHandle(postEffectSRVHeap_.Get(), descriptorSizeSRV_, 1);
     device_->CreateShaderResourceView(bloomBrightResource_.Get(), &srvDesc, srvCPUHandle);
 
     // ブラー2回目用SRV
     srvCPUHandle.ptr += descriptorSizeSRV_;
-    bloomSRVHandle_[2] = GetGPUDescriptorHandle(bloomSRVHeap_.Get(), descriptorSizeSRV_, 2);
+    bloomSRVHandle_[2] = GetGPUDescriptorHandle(postEffectSRVHeap_.Get(), descriptorSizeSRV_, 2);
     device_->CreateShaderResourceView(bloomBlurShrinkResource_.Get(), &srvDesc, srvCPUHandle);
 
     // // ブラー3回目用SRV
     srvCPUHandle.ptr += descriptorSizeSRV_;
-    bloomSRVHandle_[3] = GetGPUDescriptorHandle(bloomSRVHeap_.Get(), descriptorSizeSRV_, 3);
+    bloomSRVHandle_[3] = GetGPUDescriptorHandle(postEffectSRVHeap_.Get(), descriptorSizeSRV_, 3);
     device_->CreateShaderResourceView(bloomResultResource_.Get(), &srvDesc, srvCPUHandle);
 
     // // ブラー4回目用SRV
     srvCPUHandle.ptr += descriptorSizeSRV_;
-    bloomSRVHandle_[4] = GetGPUDescriptorHandle(bloomSRVHeap_.Get(), descriptorSizeSRV_, 4);
+    bloomSRVHandle_[4] = GetGPUDescriptorHandle(postEffectSRVHeap_.Get(), descriptorSizeSRV_, 4);
     device_->CreateShaderResourceView(bloomCompositeResource_.Get(), &srvDesc, srvCPUHandle);
 
     if (logManager_) {
@@ -505,7 +528,7 @@ void DirectXCommon::CreateBloomRenderTargets(uint32_t width, uint32_t height) {
 void DirectXCommon::DrawBloomEffect() {
    
     // SRVヒープをセット
-    ID3D12DescriptorHeap* heaps[] = { bloomSRVHeap_.Get() };
+    ID3D12DescriptorHeap* heaps[] = { postEffectSRVHeap_.Get() };
     commandList_->SetDescriptorHeaps(1, heaps);
 
     // ルート
@@ -628,6 +651,108 @@ void DirectXCommon::DrawBloomEffect() {
     bloomPSO_->Draw(commandList_.Get(), bloomSRVHandle_[0]);
     
     // 最終的にすべてのブルームリソースをSRVに戻す
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    commandList_->ResourceBarrier(1, &barrier);
+}
+
+void DirectXCommon::CreateGaussianBlurRenderTargets(uint32_t width, uint32_t height) {
+    if (logManager_) {
+        logManager_->Log("Start Create GaussianBlurRenderTargets\n");
+    }
+
+    // テクスチャリソース作成
+    D3D12_RESOURCE_DESC desc{};
+    desc.Width = width;   // テクスチャの幅
+    desc.Height = height; // テクスチャの高さ
+    desc.MipLevels = 1;  // mipMapの数
+    desc.DepthOrArraySize = 1; //  奥行 or 配列Textureの配列数
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // TextureのFormat
+    desc.SampleDesc.Count = 1; // ダンプリングのカウント
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D; // Textureの次元数
+    desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+    // Clearの最適値
+    D3D12_CLEAR_VALUE clearValue{};
+    clearValue.Format = desc.Format;
+    clearValue.Color[0] = clearColor_[0]; clearValue.Color[1] = clearColor_[1]; clearValue.Color[2] = clearColor_[2]; clearValue.Color[3] = clearColor_[3];
+
+    // 利用するHeapの設定。
+    CD3DX12_HEAP_PROPERTIES heapProps{};
+    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+    // 3つのブルーム用レンダーターゲットを作成
+    HRESULT hr;
+
+    // オブジェクトを描画する用のリソースを作成
+    hr = device_->CreateCommittedResource(
+        &heapProps, // Heapの設定
+        D3D12_HEAP_FLAG_NONE,  // Heapの特殊な設定。特になし
+        &desc,  // Resourceの設定
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, // データの転送される設定
+        &clearValue, // Clearの最適値
+        IID_PPV_ARGS(&blurResource_));  // 作成するResourceポインタへのポインタ
+    assert(SUCCEEDED(hr));
+
+    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+
+    // RTV用ヒープ作成
+    blurRTVHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
+
+    // RTVを作成
+    blurRTVHandle_ = GetCPUDescriptorHandle(blurRTVHeap_.Get(), descriptorSizeRTV_, 0);
+    device_->CreateRenderTargetView(blurResource_.Get(), &rtvDesc, blurRTVHandle_);
+
+    // SRV作成
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Texture2D.MipLevels = 1;
+
+    // SRVハンドル取得
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = postEffectSRVHeap_->GetCPUDescriptorHandleForHeapStart();
+    blurSRVHandle_ = GetGPUDescriptorHandle(postEffectSRVHeap_.Get(), descriptorSizeSRV_, 5);
+
+    for (int i = 0; i < 5; ++i) {
+        srvCPUHandle.ptr += descriptorSizeSRV_;
+    }
+
+    // 明るい部分抽出用SRV
+    device_->CreateShaderResourceView(blurResource_.Get(), &srvDesc, srvCPUHandle);
+
+    if (logManager_) {
+        logManager_->Log("End Create GaussianBlurRenderTargets\n");
+    }
+}
+
+void DirectXCommon::DrawGaussianBlurEffect() {
+    // SRVヒープをセット
+    ID3D12DescriptorHeap* heaps[] = { postEffectSRVHeap_.Get() };
+    commandList_->SetDescriptorHeaps(1, heaps);
+
+    // 明るい部分を抽出
+    D3D12_RESOURCE_BARRIER barrier{};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    // バリアを張る対象のリソース
+    barrier.Transition.pResource = blurResource_.Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    commandList_->ResourceBarrier(1, &barrier);
+
+    // レンダーターゲット設定
+    commandList_->SetPipelineState(bloomPSO_->GetBrightPipelineState());
+    commandList_->OMSetRenderTargets(1, &blurRTVHandle_, false, nullptr);
+
+    // ぼかしの描画
+    gaussianBlurPSO_->Draw(commandList_.Get(), bloomSRVHandle_[0]);
+
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;

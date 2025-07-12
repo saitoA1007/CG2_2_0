@@ -39,6 +39,12 @@ namespace GameEngine {
 		Vector3 GetWorldPosition();
 
 		/// <summary>
+		/// カメラの注視点の位置を取得
+		/// </summary>
+		/// <returns></returns>
+		Vector3 GetTargetPosition() const { return targetPos_; }
+
+		/// <summary>
 		/// カメラをターゲットの方向に向かせる
 		/// </summary>
 		/// <param name="eye">カメラの位置</param>
@@ -64,17 +70,20 @@ namespace GameEngine {
 		// 累積回転行列
 		Matrix4x4 rotateMatrix_;
 
-		// マウス
-		Vector2 mouseDelta_{};
-
-		// 距離
-		float distance_ = 20.0f;
+		// マウスの移動量
+		Vector2 mouseMove_{3.1f,1.0f};
 
 		// 目標となる座標
 		Vector3 targetPos_ = { 0.0f,0.0f,0.0f };
 
+		// 距離
+		float distance_ = 40.0f;
+
+		// ターゲットを動かす速度
+		static inline const float kTargetSpeed = 0.5f;
+
+		// GPUにカメラの位置を送る用のリソース
 		Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
 		CameraForGPU* cameraForGPU_ = nullptr;
-
 	};
 }

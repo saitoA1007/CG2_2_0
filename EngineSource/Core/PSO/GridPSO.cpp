@@ -1,15 +1,15 @@
-#include"LinePSO.h"
+#include"GridPSO.h"
 #include<cassert>
 using namespace GameEngine;
 
-void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath, ID3D12Device* device, DXC* dxc, LogManager* logManager) {
+void GridPSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath, ID3D12Device* device, DXC* dxc, LogManager* logManager) {
 
 	// ログを取得
 	logManager_ = logManager;
 
 	// 初期化を開始するログ
 	if (logManager_) {
-		logManager_->Log("LinePSO Class start Initialize\n");
+		logManager_->Log("GridPSO Class start Initialize\n");
 	}
 
 	// RootSignature作成
@@ -18,12 +18,15 @@ void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	// RootParameter作成。
-	D3D12_ROOT_PARAMETER rootParameters[1] = {};
+	D3D12_ROOT_PARAMETER rootParameters[2] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX; // VertexShaderで使う
 	rootParameters[0].Descriptor.ShaderRegister = 0; // レジスタ番号0を使う
-	descriptionRootSignature.pParameters = rootParameters; // ルートパラメータ配列へのポインタ
-	descriptionRootSignature.NumParameters = 1; // 配列の長さ
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+	rootParameters[1].Descriptor.ShaderRegister = 1; // レジスタ番号1を使う
+	descriptionRootSignature.pParameters = rootParameters;  // ルートパラメータ配列へのポインタ
+	descriptionRootSignature.NumParameters = _countof(rootParameters);  // 配列の長さ
 	// Samplerを使用しないので0にする
 	descriptionRootSignature.pStaticSamplers = nullptr;
 	descriptionRootSignature.NumStaticSamplers = 0;
@@ -44,15 +47,11 @@ void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath,
 	assert(SUCCEEDED(hr));
 
 	// InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[1] = {};
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	inputElementDescs[1].SemanticName = "COLOR";
-	inputElementDescs[1].SemanticIndex = 0;
-	inputElementDescs[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;  // 色をRGBAで送る
-	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
@@ -69,14 +68,13 @@ void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath,
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO; // アルファ値のデスティネーション
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD; // アルファ値の加算ブレンド
 	// すべての色要素を書き込む
-	blendDesc.RenderTarget[0].RenderTargetWriteMask =
-		D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 	// RasiterzerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	// 線には不要なのでNone
+	// デバック用グリッドには不要なのでNone
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-	rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 	// Zクリップを有効
 	rasterizerDesc.DepthClipEnable = TRUE;
 
@@ -112,15 +110,12 @@ void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath,
 	// DepthStencilの設定
 	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
 	// 書き込むRTVの情報
 	graphicsPipelineStateDesc.NumRenderTargets = 1;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-
-	// 使用するトロポジ(形状)のタイプ。線
-	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE; // 線描画に変更
-
-	// どのように画面に色を打ち込んむかの設定（気にしなくて良い）
+	// 使用するトロポジ(形状)のタイプ。三角形
+	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	// どのように画面に色を打ち込んむかの設定
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 	// 実際に生成
@@ -130,6 +125,6 @@ void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath,
 
 	// 初期化を終了するログ
 	if (logManager_) {
-		logManager_->Log("LinePSO Class End Initialize\n");
+		logManager_->Log("GridPSO Class End Initialize\n");
 	}
 }

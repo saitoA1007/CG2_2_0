@@ -11,7 +11,7 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
 
     // 初期化を開始するログ
     if (logManager) {
-        logManager->Log("PostProcessPSO Class start Initialize\n");
+        logManager->Log("BloomPSO Class start Initialize\n");
     }
 
     // RootSignature作成
@@ -168,7 +168,7 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
 
     // 初期化を終了するログ
     if (logManager) {
-        logManager->Log("PostProcessPSO Class End Initialize\n");
+        logManager->Log("BloomPSO Class End Initialize\n");
     }
 
     // Sprite用の頂点リソースを作る
@@ -197,7 +197,7 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
     bloomParameterResource_ = CreateBufferResource(device, sizeof(ConstBuffer));
     // 書き込むためのアドレスを取得
     bloomParameterResource_->Map(0, nullptr, reinterpret_cast<void**>(&constBuffer_));
-    constBuffer_->bloomIteration = 5;
+    constBuffer_->bloomIteration = 1;
     constBuffer_->highLumMask = 0.8f;
     constBuffer_->sigma = 1.0f;
     constBuffer_->intensity = 1.0f;

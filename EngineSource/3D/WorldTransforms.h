@@ -54,6 +54,7 @@ namespace GameEngine {
 		const uint32_t GetNumInstance() { return numInstance_; }
 	public:
 
+		// 各要素のトランスフォーム
 		std::vector<TransformData> transformDatas_;
 
 		/// <summary>

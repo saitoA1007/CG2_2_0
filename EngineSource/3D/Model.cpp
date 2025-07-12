@@ -20,29 +20,45 @@ ParticlePSO* Model::particlePSO_ = nullptr;
 LogManager* Model::logManager_ = nullptr;
 TextureManager* Model::textureManager_ = nullptr;
 
-void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, TrianglePSO* trianglePSO, ParticlePSO* particlePSO, LogManager* logManager) {
+GridPSO* Model::gridPSO_ = nullptr;
+
+void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, TrianglePSO* trianglePSO, ParticlePSO* particlePSO, GridPSO* gridPSO, LogManager* logManager) {
 	device_ = device;
 	commandList_ = commandList;
 	logManager_ = logManager;
 	textureManager_ = textureManager;
 	trianglePSO_ = trianglePSO;
 	particlePSO_ = particlePSO;
+	gridPSO_ = gridPSO;
 }
 
 void Model::PreDraw(PSOMode psoMode, BlendMode blendMode) {
-	// 単体描画と複数描画の設定
-	if (psoMode == PSOMode::triangle) {
+	
+	switch (psoMode) {
+
+		// 単体描画設定
+	case PSOMode::Triangle:
 		commandList_->SetGraphicsRootSignature(trianglePSO_->GetRootSignature());  // RootSignatureを設定。
 		commandList_->SetPipelineState(trianglePSO_->GetPipelineState(blendMode)); // trianglePSOを設定
-	} else if(psoMode == PSOMode::partilce) {
+		break;
+
+		// 複数描画設定
+	case PSOMode::Partilce:
 		commandList_->SetGraphicsRootSignature(particlePSO_->GetRootSignature());  // RootSignatureを設定。
 		commandList_->SetPipelineState(particlePSO_->GetPipelineState(blendMode)); // particlePSOを設定
+		break;
+
+		// グリッド描画設定
+	case PSOMode::Grid:
+		commandList_->SetGraphicsRootSignature(gridPSO_->GetRootSignature());  // RootSignatureを設定。
+		commandList_->SetPipelineState(gridPSO_->GetPipelineState()); // trianglePSOを設定
+		break;
 	}
 }
 
-void Model::PreDraw(DrawModel drawMode) {
+void Model::PreDraw(DrawModel drowMode) {
 	commandList_->SetGraphicsRootSignature(trianglePSO_->GetRootSignature());  // RootSignatureを設定。
-	commandList_->SetPipelineState(trianglePSO_->GetFramePipelineState(drawMode)); // trianglePSOを設定
+	commandList_->SetPipelineState(trianglePSO_->GetDrawModePipelineState(drowMode)); // trianglePSOを設定
 }
 
 [[nodiscard]]
@@ -185,6 +201,67 @@ Model* Model::CreateTrianglePlane() {
 }
 
 [[nodiscard]]
+Model* Model::CreateGridPlane(const Vector2& size) {
+
+	Model* model = new Model();
+
+	// 頂点数とインデックス数を計算
+	model->totalVertices_ = 4;
+	model->totalIndices_ = 6;
+
+	// 頂点バッファを作成
+	// vertexResourceを作成
+	model->vertexResource_ = CreateBufferResource(device_, sizeof(GridVertexData) * model->totalVertices_);
+	// リソースの先頭のアドレスから使う
+	model->vertexBufferView_.BufferLocation = model->vertexResource_->GetGPUVirtualAddress();
+	// 使用するリソースのサイズは頂点3つ分のサイズ
+	model->vertexBufferView_.SizeInBytes = sizeof(GridVertexData) * model->totalVertices_;
+	// 1頂点あたりのサイズ
+	model->vertexBufferView_.StrideInBytes = sizeof(GridVertexData);
+
+	// 頂点データを生成
+	// 頂点リソースにデータを書き込む
+	GridVertexData* vertexData = nullptr;
+	// 書き込むためのアドレスを取得
+	model->vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+
+	float left = -size.x / 2.0f;
+	float right = size.x / 2.0f;
+	float top = size.y / 2.0f;
+	float bottom = -size.y / 2.0f;
+
+	// 左上
+	vertexData[0].position = { left,0.0f,top,1.0f }; // 左下
+	// 右上
+	vertexData[1].position = { right,0.0f,top,1.0f }; // 左上
+	// 左下
+	vertexData[2].position = { left,0.0f,bottom,1.0f }; // 右下
+	// 右下
+	vertexData[3].position = { right,0.0f,bottom,1.0f }; // 左上
+
+	// インデックスバッファを作成
+	// 球用の頂点インデックスのリソースを作る
+	model->indexResource_ = CreateBufferResource(device_, sizeof(uint32_t) * model->totalIndices_);
+	// リソースの先頭のアドレスから使う
+	model->indexBufferView_.BufferLocation = model->indexResource_->GetGPUVirtualAddress();
+	// 使用するリソースのサイズはインデックス6つ分のサイズ
+	model->indexBufferView_.SizeInBytes = sizeof(uint32_t) * model->totalIndices_;
+	// インデックスはuint32_tとする
+	model->indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+
+	// インデックスデータを生成
+	// インデックスリソースにデータを書き込む
+	uint32_t* indexData = nullptr;
+	model->indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	// 三角形
+	indexData[0] = 0;  indexData[1] = 1;  indexData[2] = 2;
+	// 三角形2
+	indexData[3] = 1;  indexData[4] = 3;  indexData[5] = 2;
+
+	return model;
+}
+
+[[nodiscard]]
 Model* Model::CreateModel(const std::string& objFilename, const std::string& filename) {
 
 	if (logManager_) {
@@ -281,6 +358,18 @@ void Model::Draw(const uint32_t& numInstance,WorldTransforms& worldTransforms, c
 void Model::DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource) {
 	commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+}
+
+void Model::DrawGrid(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* cameraResource) {
+
+	worldTransform.SetWVPMatrix(VPMatrix);
+
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	commandList_->IASetIndexBuffer(&indexBufferView_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, cameraResource->GetGPUVirtualAddress());
+	commandList_->DrawIndexedInstanced(totalIndices_, 1, 0, 0, 0);
 }
 
 [[nodiscard]]

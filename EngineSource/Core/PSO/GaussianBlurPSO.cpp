@@ -92,13 +92,13 @@ void GaussianBlurPSO::Initialize(ID3D12Device* device, DXC* dxc, LogManager* log
 
     // シェーダ読み込み
     Microsoft::WRL::ComPtr<IDxcBlob> vsBlob;
-    vsBlob = dxc->CompileShader(L"Resources/Shaders/PostEffect/Bloom.VS.hlsl",
+    vsBlob = dxc->CompileShader(L"Resources/Shaders/PostEffect/GaussianBlur.VS.hlsl",
         L"vs_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
     assert(vsBlob != nullptr);
 
     Microsoft::WRL::ComPtr<IDxcBlob> psBlob;
 
-    psBlob = dxc->CompileShader(L"Resources/Shaders/PostEffect/Bloom.PS.hlsl",
+    psBlob = dxc->CompileShader(L"Resources/Shaders/PostEffect/GaussianBlur.PS.hlsl",
         L"ps_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
     assert(psBlob != nullptr);
 
@@ -164,20 +164,22 @@ void GaussianBlurPSO::Initialize(ID3D12Device* device, DXC* dxc, LogManager* log
     blurParameterResource_ = CreateBufferResource(device, sizeof(ConstBuffer));
     // 書き込むためのアドレスを取得
     blurParameterResource_->Map(0, nullptr, reinterpret_cast<void**>(&constBuffer_));
-    constBuffer_->bloomIteration = 5;
-    constBuffer_->highLumMask = 0.8f;
-    constBuffer_->sigma = 1.0f;
-    constBuffer_->intensity = 1.0f;
+    constBuffer_->sigma = 2.0f;
 }
 
 void GaussianBlurPSO::Set(ID3D12GraphicsCommandList* commandList) {
-    commandList->SetGraphicsRootSignature(rootSignature_.Get());
-
+   
 }
 
 void GaussianBlurPSO::Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE inputSRV) {
+
+    commandList->SetGraphicsRootSignature(rootSignature_.Get());
+    commandList->SetPipelineState(pipelineState_.Get());
+
     commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite_);
     commandList->SetGraphicsRootDescriptorTable(0, inputSRV);
+    commandList->SetGraphicsRootConstantBufferView(1, blurParameterResource_->GetGPUVirtualAddress());
+
     // フルスクリーン三角形
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     commandList->DrawInstanced(4, 1, 0, 0);
