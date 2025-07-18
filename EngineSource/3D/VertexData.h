@@ -2,6 +2,10 @@
 #include"EngineSource/Math/Vector4.h"
 #include"EngineSource/Math/Vector3.h"
 #include"EngineSource/Math/Vector2.h"
+#include"EngineSource/Math/Matrix4x4.h"
+
+#include<iostream>
+#include<vector>
 
 struct VertexData {
 	Vector4 position;
@@ -9,3 +13,25 @@ struct VertexData {
 	Vector3 normal;
 };
 
+struct LoadMaterialData {
+	std::string textureFilePath;
+	Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
+	Vector3 specularColor = { 1.0f,1.0f,1.0f };
+	float shininess = 0.0f;
+};
+
+struct Node {
+	Matrix4x4 localMatrix;
+	std::string name;
+	std::vector<Node> children;
+};
+
+struct ModelData {
+	std::vector<VertexData> vertices;
+	LoadMaterialData material;
+	Node rootNode;
+};
+
+struct GridVertexData {
+	Vector4 position;
+};
