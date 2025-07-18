@@ -1,22 +1,19 @@
 #pragma once
 #include <d3d12.h>
+#include<vector>
+#include <wrl.h>
+
 #include"VertexData.h"
-#include"EngineSource/Math/Vector4.h"
-#include"EngineSource/Math/Vector3.h"
-#include"EngineSource/Math/Vector2.h"
-#include"EngineSource/Math/Matrix4x4.h"
+#include"Mesh.h"
+#include"Material.h"
+#include"WorldTransforms.h"
+
 #include"EngineSource/Math/TransformationMatrix.h"
 #include"EngineSource/Common/LogManager.h"
 #include"EngineSource/Core/PSO/TrianglePSO.h"
 #include"EngineSource/Core/PSO/ParticlePSO.h"
-#include<iostream>
-#include<vector>
-#include <wrl.h>
-
 #include"EngineSource/3D/Light/LightManager.h"
 #include"EngineSource/3D/Camera/Camera.h"
-#include"Material.h"
-#include"WorldTransforms.h"
 
 #include<assimp/Importer.hpp>
 #include<assimp/scene.h>
@@ -37,31 +34,6 @@ namespace GameEngine {
 	};
 	
 	class Model final {
-	public:
-
-		struct MaterialData {
-			std::string textureFilePath;
-			Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
-			Vector3 specularColor = { 1.0f,1.0f,1.0f};
-			float shininess = 0.0f;
-		};
-
-		struct Node {
-			Matrix4x4 localMatrix;
-			std::string name;
-			std::vector<Node> children;
-		};
-
-		struct ModelData {
-			std::vector<VertexData> vertices;
-			MaterialData material;
-			Node rootNode;
-		};
-
-		struct GridVertexData {
-			Vector4 position;
-		};
-
 	public:
 		Model() = default;
 		~Model() = default;
@@ -187,7 +159,6 @@ namespace GameEngine {
 		ModelData LoadModelFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename);
 
 	private:
-		//Model() = default;
 		Model(Model&) = delete;
 		Model& operator=(Model&) = delete;
 
@@ -196,26 +167,19 @@ namespace GameEngine {
 		// コマンドリスト
 		static ID3D12GraphicsCommandList* commandList_;
 
+		// ログ
+		static LogManager* logManager_;
+
 		// PSO設定
 		static TrianglePSO* trianglePSO_;
 		static ParticlePSO* particlePSO_;
-
 		static GridPSO* gridPSO_;
-
-		// ログ
-		static LogManager* logManager_;
 
 		// テクスチャ
 		static TextureManager* textureManager_;
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
-		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
-
-		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
-		D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
-
-		uint32_t totalVertices_ = 0;
-		uint32_t totalIndices_ = 0;
+		// メッシュ
+		std::unique_ptr<Mesh> mesh_ = nullptr;
 
 		// デフォルトのマテリアル
 		std::unique_ptr<Material> defaultMaterial_ = nullptr;

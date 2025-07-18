@@ -183,6 +183,9 @@
     <ClCompile Include="EngineSource\Core\PSO\GridPSO.cpp">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\3D\Mesh.cpp">
+      <Filter>EngineSource\3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -370,6 +373,9 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Core\PSO\GridPSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Mesh.h">
+      <Filter>EngineSource\3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

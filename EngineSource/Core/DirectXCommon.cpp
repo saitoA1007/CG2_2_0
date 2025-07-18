@@ -142,10 +142,16 @@ void DirectXCommon::PostDraw(ImGuiManager* imGuiManager)
         copyPSO_->Draw(commandList_.Get(), blurSRVHandle_);
         break;
     }
-    
+
     // ディスクリプタヒープをポストエフェクトを用から切り替える
     ID3D12DescriptorHeap* heaps[] = { srvHeap_.Get() };
     commandList_->SetDescriptorHeaps(1, heaps);
+
+    //ImGui::Begin("Scene");
+    //ImVec2 region = ImGui::GetContentRegionAvail();
+    //// シーン描画のテクスチャ貼り付け等
+    //ImGui::Image((ImTextureID)bloomSRVHandle_[4].ptr, region);
+    //ImGui::End();
 
     // ImGuiを描画
     imGuiManager->Draw();

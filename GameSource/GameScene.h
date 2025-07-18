@@ -82,16 +82,10 @@ private:
 	GameEngine::Model* boxModel_;
 	GameEngine::WorldTransform boxWorldTransform_;
 
-	// ネオン文字
-	Transform neonTextTransform_;
-	GameEngine::Model* neonTextModel_;
-	GameEngine::Model* neonFrameModel_;
-	GameEngine::WorldTransform neonTextWorldTransform_;
-
-	Vector4 color_ = { 0.0f,0.0f,0.0f,1.0f };
-
 	// ブレンドモード
 	const char* blendModeName_[6] = { "kBlendModeNone","kBlendModeNormal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen"};
 	int selectBlendNum_ = 0;
 	GameEngine::BlendMode blendMode_ = GameEngine::BlendMode::kBlendModeNormal;
+
+	GameEngine::TextureManager* textureManager_;
 };

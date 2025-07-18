@@ -116,6 +116,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Light\SpotLight.cpp" />
     <ClCompile Include="EngineSource\3D\LineMesh.cpp" />
     <ClCompile Include="EngineSource\3D\Material.cpp" />
+    <ClCompile Include="EngineSource\3D\Mesh.cpp" />
     <ClCompile Include="EngineSource\3D\Model.cpp" />
     <ClCompile Include="EngineSource\3D\PrimitiveRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\WorldTransform.cpp" />
@@ -162,6 +163,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Light\SpotLight.h" />
     <ClInclude Include="EngineSource\3D\LineMesh.h" />
     <ClInclude Include="EngineSource\3D\Material.h" />
+    <ClInclude Include="EngineSource\3D\Mesh.h" />
     <ClInclude Include="EngineSource\3D\Model.h" />
     <ClInclude Include="EngineSource\3D\PrimitiveRenderer.h" />
     <ClInclude Include="EngineSource\3D\VertexData.h" />

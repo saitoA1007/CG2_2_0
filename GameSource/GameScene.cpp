@@ -13,9 +13,6 @@ GameScene::~GameScene() {
 	delete boxModel_;
 	delete terrainModel_;
 
-	delete neonTextModel_;
-	delete neonFrameModel_;
-
 	// グリッドの解放
 	delete gridModel_;
 }
@@ -24,6 +21,8 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 
 	// DirectX機能を受け取る
 	dxCommon_ = dxCommon;
+
+	textureManager_ = textureManager;
 
 	// カメラの初期化
 	camera_ = std::make_unique<Camera>();
@@ -62,14 +61,6 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	boxTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,0.0f} };
 	boxWorldTransform_.Initialize(boxTransform_);
 
-	// ネオン
-	neonTextTransform_ = { {1.0f,1.0f,1.0f},{0.0f,3.2f,0.0f},{0.0f,2.0f,0.0f} };
-	neonTextModel_ = Model::CreateModel("neonText.obj", "NeonText");
-	neonTextModel_->SetDefaultColor({ 1.0f,0.0f,1.0f,1.0f });
-	neonFrameModel_ = Model::CreateModel("neonFrame.obj", "NeonFrame");
-	neonFrameModel_->SetDefaultColor({ 0.0f,0.0f,1.0f,1.0f });
-	neonTextWorldTransform_.Initialize(neonTextTransform_);
-
 	// 平行光源ライト
 	lightManager_ = std::make_unique<LightManager>();
 	lightManager_->Initialize(dxCommon_->GetDevice(), true, false, false);
@@ -86,7 +77,6 @@ void GameScene::Update(GameEngine::Input* input){
 	terrainWorldTransform_.UpdateTransformMatrix();
 
 	boxWorldTransform_.UpdateTransformMatrix();
-	neonTextWorldTransform_.UpdateTransformMatrix();
 
 	// 平面の更新処理
 	planeWorldTransform_.SetTransform(planeTransform_);
@@ -161,13 +151,6 @@ void GameScene::Update(GameEngine::Input* input){
 	//Vector3 hsv = ColorConverter::RGBtoHSV({color_.x,color_.y,color_.z});
 	//ImGui::Text("h:%.3f,s:%.3f,v:%.3f", hsv.x, hsv.y, hsv.z);
 
-	// ネオン
-	//ImGui::DragFloat3("NeonPos", &neonTextTransform_.translate.x, 0.01f);
-	//neonTextWorldTransform_.SetTranslate(neonTextTransform_.translate);
-	//
-	//ImGui::ColorEdit3("neonTextColor",&color_.x);
-	//neonTextModel_->SetDefaultColor(color_);
-
 	ImGui::End();
 
 	// カメラの切り替え処理
@@ -178,6 +161,15 @@ void GameScene::Update(GameEngine::Input* input){
 			isDebugCameraActive_ = true;
 		}
 	}
+
+	//ImGui::Begin("Scene");
+	////ImGui::Image(textureManager_->GetTextureSrvHandlesGPU(grassGH_), { 800.0f,600.0f });
+	//ImVec2 region = ImGui::GetContentRegionAvail();
+	//D3D12_GPU_DESCRIPTOR_HANDLE& srvHandle = textureManager_->GetTextureSrvHandlesGPU(grassGH_);
+	//ImGui::Image((ImTextureID)srvHandle.ptr, region);
+	//
+	//ImGui::End();
+
 #endif 
 }
 
@@ -188,11 +180,6 @@ void GameScene::Draw() {
 	
 	// 箱
 	boxModel_->Draw(boxWorldTransform_, whiteGH_, camera_->GetVPMatrix());
-
-	// ネオン
-	//neonTextModel_->Draw(neonTextWorldTransform_, whiteGH_, camera_->GetVPMatrix());
-	//// フレーム
-	//neonFrameModel_->Draw(neonTextWorldTransform_, whiteGH_, camera_->GetVPMatrix());
 
 	// 平面を描画
 	planeModel_->Draw(planeWorldTransform_, planeGH_, camera_->GetVPMatrix());
