@@ -18,6 +18,7 @@ float32_t4 main(VertexShaderOutput input) : SV_TARGET
 
     // グリッド線の中心からの距離
     float32_t2 grid = abs(frac(coord - 0.5f) - 0.5f) / fwidth(coord);
+    
     float32_t lineValue = min(grid.x, grid.y);
 
     // =============================

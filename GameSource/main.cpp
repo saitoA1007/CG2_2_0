@@ -53,7 +53,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		L"Resources/Shaders/PostEffect/Bloom.PS.hlsl",
 		L"Resources/Shaders/PostEffect/BloomResult.PS.hlsl",
 		L"Resources/Shaders/PostEffect/BloomComposite.hlsl");
-	dxCommon->SetBloomPSO(bloomPSO.get());
 
 	// グリッド用の初期化
 	std::unique_ptr<GridPSO> gridPSO = std::make_unique<GridPSO>();
@@ -62,12 +61,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	// ガウスぼかし用の初期化
 	std::unique_ptr<GaussianBlurPSO> gaussianBlurPSO = std::make_unique<GaussianBlurPSO>();
 	gaussianBlurPSO->Initialize(dxCommon->GetDevice(), dxc.get(), logManager.get());
-	dxCommon->SetGaussianBlurPSO(gaussianBlurPSO.get());
 
 	// CopyPSOの初期化
 	std::unique_ptr<CopyPSO> copyPSO = std::make_unique<CopyPSO>();
 	copyPSO->Initialize(dxCommon->GetDevice(), L"Resources/Shaders/PostEffect/Copy.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc.get(), logManager.get());
 	dxCommon->SetCopyPSO(copyPSO.get());
+
+	// ポストエフェクトの初期化
+	PostEffectManager::StaticInitialize(bloomPSO.get(), logManager.get());
 
 	// ImGuiの初期化
 	std::unique_ptr<ImGuiManager> imGuiManager = std::make_unique<ImGuiManager>();
@@ -113,9 +114,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
 	int iteration = 1;
 	float highLumMask = 0.8f;
-	float intensity = 0.5f;
-
-	bool isBloom = true;
+	float intensity = 0.0f;
 
 	//=========================================================================
 	// メインループ
@@ -147,16 +146,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		bloomPSO->constBuffer_->highLumMask = highLumMask;
 		ImGui::SliderFloat("Intensity", &intensity, 0.0f, 10.0f);
 		bloomPSO->constBuffer_->intensity = intensity;
-		
-		ImGui::Checkbox("isbloomPost", &isBloom);
-		//ImGui::SliderFloat("Sigma", &gaussianBlurPSO->constBuffer_->sigma,0.1f,10.0f);
+
 		ImGui::End();
 
-		if (isBloom) {
-			dxCommon->postEffectMode_ = PostEffectMode::Bloom;
-		} else {
-			dxCommon->postEffectMode_ = PostEffectMode::GaussianBlur;
-		}
+		ImGui::Begin("Scene");
+	    ImVec2 sceneWindowSize = ImGui::GetContentRegionAvail();
+	    D3D12_GPU_DESCRIPTOR_HANDLE& srvHandle = dxCommon->GetSRVHandle();
+		ImGui::Image((ImTextureID)srvHandle.ptr, sceneWindowSize);
+		//ImGui::Image((ImTextureID)srvHandle.ptr, {1280.0f,720.0f});
+	    ImGui::End();
 
 		//====================================================================
 		// 描画処理
