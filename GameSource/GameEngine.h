@@ -12,6 +12,8 @@
 #include"EngineSource/Core/PSO/GridPSO.h"
 #include"EngineSource/Core/PSO/GaussianBlurPSO.h"
 
+#include"EngineSource/Core/PostProcess/PostEffectManager.h"
+
 #include"EngineSource/Common/LogManager.h"
 #include"EngineSource/Common/ResourceLeakChecker.h"
 #include"EngineSource/Common/CrashHandle.h"

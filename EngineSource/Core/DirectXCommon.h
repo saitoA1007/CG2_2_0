@@ -7,20 +7,14 @@
 #include"EngineSource/Common/LogManager.h"
 #include"externals/DirectXTex/d3dx12.h"
 
-#include"PSO/BloomPSO.h"
 #include"PSO/CopyPSO.h"
-#include"PSO/GaussianBlurPSO.h"
+
+#include"EngineSource/Core/PostProcess/PostEffectManager.h"
 
 namespace GameEngine {
 
     // 前方宣言
     class ImGuiManager;
-
-    enum class PostEffectMode {
-        GrayScale,
-        Bloom,
-        GaussianBlur,
-    };
 
     class DirectXCommon {
     public:
@@ -54,21 +48,12 @@ namespace GameEngine {
         D3D12_RENDER_TARGET_VIEW_DESC GetRTVDesc() const { return rtvDesc_; }
 
         /// <summary>
-        /// ブルームのPSOを取得
-        /// </summary>
-        /// <param name="pso"></param>
-        void SetBloomPSO(BloomPSO* pso) { bloomPSO_ = pso; }
-
-        /// <summary>
         /// 画像コピー用のPSOを取得
         /// </summary>
         /// <param name="copyPSO"></param>
         void SetCopyPSO(CopyPSO* copyPSO) { copyPSO_ = copyPSO; }
 
-        void SetGaussianBlurPSO(GaussianBlurPSO* gaussianBlurPSO) { gaussianBlurPSO_ = gaussianBlurPSO; }
-
-        
-        PostEffectMode postEffectMode_ = PostEffectMode::Bloom;
+        CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSRVHandle() { return postEffectManager_->GetSRVHandle(); }
 
     private:
         DirectXCommon(const DirectXCommon&) = delete;
@@ -88,32 +73,6 @@ namespace GameEngine {
         void CreateFence();
         // GPUを待つ処理 
         void WaitForGPU();
-
-        /// <summary>
-        /// ブルーム用のRTV,SRVを作成
-        /// </summary>
-        /// <param name="width">テクスチャの幅</param>
-        /// <param name="height">テクスチャの高さ</param>
-        void CreateBloomRenderTargets(uint32_t width, uint32_t height);
-
-        /// <summary>
-        /// ブルームエフェクトの描画
-        /// </summary>
-        void DrawBloomEffect();
-
-    private:
-
-        /// <summary>
-        /// ガウスぼかし用のRTV,SRVを作成
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        void CreateGaussianBlurRenderTargets(uint32_t width, uint32_t height);
-
-        /// <summary>
-        /// ガウスぼかしを適応
-        /// </summary>
-        void DrawGaussianBlurEffect();
 
 #ifdef _DEBUG
         void DebugLayer();
@@ -157,45 +116,13 @@ namespace GameEngine {
         // ログ
         LogManager* logManager_;
 
-        // ブルーム用レンダリングターゲット
-        Microsoft::WRL::ComPtr<ID3D12Resource> DrawObjectResource_;     // 純粋にオブジェクトの描画をする用
-
-        Microsoft::WRL::ComPtr<ID3D12Resource> bloomBrightResource_;     // 明るい部分抽出用
-        Microsoft::WRL::ComPtr<ID3D12Resource> bloomBlurShrinkResource_; // 縮小させながらブラーをする
-        Microsoft::WRL::ComPtr<ID3D12Resource> bloomResultResource_;     // 最終敵なもの
-        Microsoft::WRL::ComPtr<ID3D12Resource> bloomCompositeResource_;  // 合成用
-
-        // ブルーム用RTV
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> bloomRTVHeap_;
-        D3D12_CPU_DESCRIPTOR_HANDLE bloomRTVHandle_[5]{};
-        // SRVハンドル
-        CD3DX12_GPU_DESCRIPTOR_HANDLE bloomSRVHandle_[5];
-
-        // ブルーム用PSO
-        BloomPSO* bloomPSO_ = nullptr;
-
         // コピー用PSO
         CopyPSO* copyPSO_ = nullptr;
-
-        // ポストエフェクトを適応するかのフラグ
-        bool isEnablePostEffect_ = false;
 
         // 画面クリアの色
         float clearColor_[4] = { 0.2f,0.2f,0.2f,1.0f };
 
-        // ぼかし処理用リソース
-        Microsoft::WRL::ComPtr<ID3D12Resource> blurResource_; 
-
-        // RTVハンドル
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> blurRTVHeap_;
-        D3D12_CPU_DESCRIPTOR_HANDLE blurRTVHandle_{};
-        // SRVハンドル
-        CD3DX12_GPU_DESCRIPTOR_HANDLE blurSRVHandle_;
-
-        // ポストエフェクトで使うSRVヒープ
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> postEffectSRVHeap_;
-
-        // ガウスぼかし
-        GaussianBlurPSO* gaussianBlurPSO_ = nullptr;
+        // ポストエフェクト
+        std::unique_ptr<PostEffectManager> postEffectManager_;
     };
 }

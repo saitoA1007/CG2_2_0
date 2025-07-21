@@ -125,7 +125,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Common\LogManager.cpp" />
     <ClCompile Include="EngineSource\Core\DirectXCommon.cpp" />
     <ClCompile Include="EngineSource\Core\DXC.cpp" />
-    <ClCompile Include="EngineSource\Core\PostProcess\GaussianBlur.cpp" />
     <ClCompile Include="EngineSource\Core\PostProcess\PostEffectManager.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\BloomPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\CopyPSO.cpp" />
@@ -181,7 +180,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\DirectXCommon.h" />
     <ClInclude Include="EngineSource\Core\DXC.h" />
     <ClInclude Include="EngineSource\Core\PostProcess\BasePostEffect.h" />
-    <ClInclude Include="EngineSource\Core\PostProcess\GaussianBlur.h" />
     <ClInclude Include="EngineSource\Core\PostProcess\PostEffectManager.h" />
     <ClInclude Include="EngineSource\Core\PSO\BlendMode.h" />
     <ClInclude Include="EngineSource\Core\PSO\BloomPSO.h" />

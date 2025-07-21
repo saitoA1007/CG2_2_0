@@ -100,7 +100,7 @@ void GameScene::Update(GameEngine::Input* input){
 	lightManager_->Update();
 
 	// グリッドの更新処理
-	gridWorldTransform_.SetTranslate(Vector3(debugCamera_->GetTargetPosition().x,0.0f, debugCamera_->GetTargetPosition().z));
+	gridWorldTransform_.SetTranslate(Vector3(debugCamera_->GetTargetPosition().x,-0.1f, debugCamera_->GetTargetPosition().z));
 	gridWorldTransform_.UpdateTransformMatrix();
 
 #ifdef _DEBUG
@@ -153,6 +153,8 @@ void GameScene::Update(GameEngine::Input* input){
 
 	ImGui::End();
 
+#endif 
+
 	// カメラの切り替え処理
 	if (input->TriggerKey(DIK_SPACE)) {
 		if (isDebugCameraActive_) {
@@ -161,16 +163,6 @@ void GameScene::Update(GameEngine::Input* input){
 			isDebugCameraActive_ = true;
 		}
 	}
-
-	//ImGui::Begin("Scene");
-	////ImGui::Image(textureManager_->GetTextureSrvHandlesGPU(grassGH_), { 800.0f,600.0f });
-	//ImVec2 region = ImGui::GetContentRegionAvail();
-	//D3D12_GPU_DESCRIPTOR_HANDLE& srvHandle = textureManager_->GetTextureSrvHandlesGPU(grassGH_);
-	//ImGui::Image((ImTextureID)srvHandle.ptr, region);
-	//
-	//ImGui::End();
-
-#endif 
 }
 
 void GameScene::Draw() {
@@ -185,8 +177,8 @@ void GameScene::Draw() {
 	planeModel_->Draw(planeWorldTransform_, planeGH_, camera_->GetVPMatrix());
 
 	// 地面を描画
-	//terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
-	///terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
+	terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
+	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
 
 	// モデルの単体描画前処理
 	Model::PreDraw(PSOMode::Grid, blendMode_);
