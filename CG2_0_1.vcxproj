@@ -126,6 +126,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\DirectXCommon.cpp" />
     <ClCompile Include="EngineSource\Core\DXC.cpp" />
     <ClCompile Include="EngineSource\Core\FPSCounter.cpp" />
+    <ClCompile Include="EngineSource\Core\GameEngine.cpp" />
     <ClCompile Include="EngineSource\Core\PostProcess\PostEffectManager.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\BloomPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\CopyPSO.cpp" />
