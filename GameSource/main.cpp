@@ -53,14 +53,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		engine->bloomPSO_->constBuffer_->intensity = intensity;
 
 		ImGui::End();
-
-		ImGui::Begin("Scene");
-	    ImVec2 sceneWindowSize = ImGui::GetContentRegionAvail();
-	    D3D12_GPU_DESCRIPTOR_HANDLE& srvHandle = engine->dxCommon_->GetSRVHandle();
-		ImGui::Image((ImTextureID)srvHandle.ptr, sceneWindowSize);
-		//ImGui::Image((ImTextureID)srvHandle.ptr, {1280.0f,720.0f});
-	    ImGui::End();
-
+		
 		// 更新後処理
 		engine->PostUpdate();
 
