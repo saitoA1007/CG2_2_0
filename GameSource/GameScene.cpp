@@ -33,16 +33,16 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 
 	// 軸方向表示の初期化
 	axisIndicator_ = std::make_unique<AxisIndicator>();
-	axisIndicator_->Initialize("axis.obj");
+	axisIndicator_->Initialize();
 	// 軸方向表示の画像
-	axisTextureHandle_ = textureManager->Load("Resources/axis/axis.jpg");
+	axisTextureHandle_ = textureManager->Load("Resources/Models/Axis/axis.jpg");
 
 	// fps計測器の初期化
 	fpsCounter_ = std::make_unique<FpsCounter>();
 	fpsCounter_->Initialize();
 
 	// white4x4テクスチャをロード
-	whiteGH_ = textureManager->Load("Resources/white4x4.png");
+	whiteGH_ = textureManager->Load("Resources/Textures/white4x4.png");
 
 	// グリッドの初期化
 	gridModel_ = Model::CreateGridPlane({200.0f,200.0f});
@@ -50,18 +50,18 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 
 	// 平面モデルを生成
 	planeModel_ = Model::CreateModel("plane.gltf", "Plane");
-	planeGH_ = textureManager->Load("Resources/uvChecker.png");
+	planeGH_ = textureManager->Load("Resources/Textures/uvChecker.png");
 	planeTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{5.0f,3.0f,0.0f} };
 	planeWorldTransform_.Initialize(planeTransform_);
 
 	// 地面モデルを生成
-	terrainModel_ = Model::CreateModel("terrain.obj","terrain");
+	terrainModel_ = Model::CreateModel("terrain.obj","Terrain");
 	terrainModel_->SetDefaultIsEnableLight(true);
-	grassGH_ = textureManager->Load("Resources/terrain/grass.png");
+	grassGH_ = textureManager->Load("Resources/Models/Terrain/grass.png");
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 箱
-	boxModel_ = Model::CreateModel("cube.obj", "cube");
+	boxModel_ = Model::CreateModel("cube.obj", "Cube");
 	boxTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,0.0f} };
 	boxWorldTransform_.Initialize(boxTransform_);
 
@@ -119,18 +119,25 @@ void GameScene::Update(GameEngine::Input* input){
 	ImGui::DragFloat3("CameraScale", &cameraTransform_.scale.x, 0.01f);
 	// ブレンドモードの切り替え
 	if (ImGui::Combo("BlendMode", &selectBlendNum_, blendModeName_, IM_ARRAYSIZE(blendModeName_))) {
-		if (selectBlendNum_ == BlendMode::kBlendModeNone) {
+		switch (selectBlendNum_) {
+		case BlendMode::kBlendModeNone:
 			blendMode_ = BlendMode::kBlendModeNone;
-		} else if (selectBlendNum_ == BlendMode::kBlendModeNormal) {
+			break;
+		case BlendMode::kBlendModeNormal:
 			blendMode_ = BlendMode::kBlendModeNormal;
-		} else if (selectBlendNum_ == BlendMode::kBlendModeAdd) {
+			break;
+		case BlendMode::kBlendModeAdd:
 			blendMode_ = BlendMode::kBlendModeAdd;
-		} else if (selectBlendNum_ == BlendMode::kBlendModeSubtract) {
+			break;
+		case BlendMode::kBlendModeSubtract:
 			blendMode_ = BlendMode::kBlendModeSubtract;
-		} else if (selectBlendNum_ == BlendMode::kBlendModeMultily) {
+			break;
+		case BlendMode::kBlendModeMultily:
 			blendMode_ = BlendMode::kBlendModeMultily;
-		} else if (selectBlendNum_ == BlendMode::kBlendModeScreen) {
+			break;
+		case BlendMode::kBlendModeScreen:
 			blendMode_ = BlendMode::kBlendModeScreen;
+			break;
 		}
 	}
 	// 平行光源
@@ -152,18 +159,12 @@ void GameScene::Update(GameEngine::Input* input){
 	ImGui::DragFloat3("boxPos", &boxTransform_.translate.x, 0.01f);
 	boxWorldTransform_.SetTranslate(boxTransform_.translate);
 
-	//ImGui::ColorEdit3("boxcolor", &color_.x);
-	//boxModel_->SetDefaultColor(color_);
-	//
-	//Vector3 hsv = ColorConverter::RGBtoHSV({color_.x,color_.y,color_.z});
-	//ImGui::Text("h:%.3f,s:%.3f,v:%.3f", hsv.x, hsv.y, hsv.z);
-
 	ImGui::End();
 
 	// Fps計測器の描画
 	fpsCounter_->DrawImGui();
 
-#endif 
+#endif
 
 	// カメラの切り替え処理
 	if (input->TriggerKey(DIK_SPACE)) {

@@ -20,78 +20,18 @@ Sprite* Sprite::Create(Vector2 position, Vector2 size,  Vector4 color) {
 
 	Sprite* sprite = new Sprite();
 
+	// 座標と大きさを取得
 	sprite->position_ = position;
 	sprite->size_ = size;
 
-	// Sprite用の頂点リソースを作る
-	sprite->vertexResourceSprite_ = CreateBufferResource(device_, sizeof(VertexData) * 4);
-	
-	// リソースの先頭のアドレスから使う
-	sprite->vertexBufferViewSprite_.BufferLocation = sprite->vertexResourceSprite_->GetGPUVirtualAddress();
-	// 使用するリソースのサイズは頂点4つ分のサイズ
-	sprite->vertexBufferViewSprite_.SizeInBytes = sizeof(VertexData) * 4;
-	// 1頂点当たりのサイズ
-	sprite->vertexBufferViewSprite_.StrideInBytes = sizeof(VertexData);
-	// 書き込むためのアドレスを取得
-	sprite->vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&sprite->vertexDataSprite_));
+	// メッシュを作成
+	sprite->CreateMesh();
 
-	// 画像のサイズを決める
-	float left = 0.0f;
-	float right = size.x;
-	float top = 0.0f;
-	float bottom = size.y;
-	
-	// 頂点インデックス
-	sprite->vertexDataSprite_[0].position = { left,bottom,0.0f,1.0f }; // 左下
-	sprite->vertexDataSprite_[0].texcoord = { 0.0f,1.0f };
-	sprite->vertexDataSprite_[0].normal = { 0.0f,0.0f,-1.0f };
-	sprite->vertexDataSprite_[1].position = { left,top,0.0f,1.0f }; // 左上
-	sprite->vertexDataSprite_[1].texcoord = { 0.0f,0.0f };
-	sprite->vertexDataSprite_[1].normal = { 0.0f,0.0f,-1.0f };
-	sprite->vertexDataSprite_[2].position = { right,bottom,0.0f,1.0f }; // 右下
-	sprite->vertexDataSprite_[2].texcoord = { 1.0f,1.0f };
-	sprite->vertexDataSprite_[2].normal = { 0.0f,0.0f,-1.0f };
-	sprite->vertexDataSprite_[3].position = { right,top,0.0f,1.0f }; // 左上
-	sprite->vertexDataSprite_[3].texcoord = { 1.0f,0.0f };
-	sprite->vertexDataSprite_[3].normal = { 0.0f,0.0f,-1.0f };
+	// マテリアルを作成
+	sprite->CreateMaterial(color);
 
-	// Sprite用の頂点インデックスのリソースを作る
-	sprite->indexResourceSprite_ = CreateBufferResource(device_, sizeof(uint32_t) * 6);
-	// リソースの先頭のアドレスから使う
-	sprite->indexBufferViewSprite_.BufferLocation = sprite->indexResourceSprite_->GetGPUVirtualAddress();
-	// 使用するリソースのサイズはインデックス6つ分のサイズ
-	sprite->indexBufferViewSprite_.SizeInBytes = sizeof(uint32_t) * 6;
-	// インデックスはuint32_tとする
-	sprite->indexBufferViewSprite_.Format = DXGI_FORMAT_R32_UINT;
-	// インデックスリソースにデータを書き込む
-	uint32_t* indexDataSprite = nullptr;
-	sprite->indexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
-	// 三角形
-	indexDataSprite[0] = 0;  indexDataSprite[1] = 1;  indexDataSprite[2] = 2;
-	// 三角形2
-	indexDataSprite[3] = 1;  indexDataSprite[4] = 3;  indexDataSprite[5] = 2;
-
-	// Sprite用のマテリアルリソースを作る
-	sprite->materialResourceSprite_ = CreateBufferResource(device_, sizeof(Material::MaterialData));
-	// 書き込むためのアドレスを取得
-	sprite->materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&sprite->materialDataSprite_));
-	// 色の設定
-	sprite->materialDataSprite_->color = color;
-	// SpriteはLightingしないのでfalseに設定する
-	sprite->materialDataSprite_->enableLighting = false;
-	// UVTransform行列を初期化
-	sprite->materialDataSprite_->uvTransform = MakeIdentity4x4();
-
-	// Sprite用のTransformationMatrix用のリソースを作る。TransformationMatrix 1つ分のサイズを用意する
-	sprite->transformationMatirxResourceSprite_ = CreateBufferResource(device_, sizeof(TransformationMatrix));
-	// 書き込むためのアドレスを取得
-	sprite->transformationMatirxResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&sprite->transformationMatrixDataSprite_));
-	// 座標を元にワールド行列の生成
-	sprite->worldMatrix_ = MakeTranslateMatrix({ position.x,position.y,0.0f });
-	// 座標を適用
-	sprite->transformationMatrixDataSprite_->WVP = Multiply(sprite->worldMatrix_,orthoMatrix_);
-	// 単位行列を書き込んでおく
-	sprite->transformationMatrixDataSprite_->World = MakeIdentity4x4();
+	// ワールドトランスフォームを作成
+	sprite->CreateTransform();
 
 	return sprite;
 }
@@ -131,6 +71,42 @@ void Sprite::SetSize(const Vector2& size) {
 
 	// 頂点インデックス
 	vertexDataSprite_[0].position = { left,bottom,0.0f,1.0f }; // 左下
+	vertexDataSprite_[1].position = { left,top,0.0f,1.0f }; // 左上
+	vertexDataSprite_[2].position = { right,bottom,0.0f,1.0f }; // 右下
+	vertexDataSprite_[3].position = { right,top,0.0f,1.0f }; // 左上
+}
+
+void Sprite::SetColor(const Vector4& color) {
+	// 色の設定
+	materialDataSprite_->color = color;
+}
+
+void Sprite::SetUvMatrix(const Transform& transform) {
+	// uv行列の設定
+	materialDataSprite_->uvTransform = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+}
+
+void Sprite::CreateMesh() {
+	// Sprite用の頂点リソースを作る
+	vertexResourceSprite_ = CreateBufferResource(device_, sizeof(VertexData) * 4);
+
+	// リソースの先頭のアドレスから使う
+	vertexBufferViewSprite_.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
+	// 使用するリソースのサイズは頂点4つ分のサイズ
+	vertexBufferViewSprite_.SizeInBytes = sizeof(VertexData) * 4;
+	// 1頂点当たりのサイズ
+	vertexBufferViewSprite_.StrideInBytes = sizeof(VertexData);
+	// 書き込むためのアドレスを取得
+	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite_));
+
+	// 画像のサイズを決める
+	float left = 0.0f;
+	float right = size_.x;
+	float top = 0.0f;
+	float bottom = size_.y;
+
+	// 頂点インデックス
+	vertexDataSprite_[0].position = { left,bottom,0.0f,1.0f }; // 左下
 	vertexDataSprite_[0].texcoord = { 0.0f,1.0f };
 	vertexDataSprite_[0].normal = { 0.0f,0.0f,-1.0f };
 	vertexDataSprite_[1].position = { left,top,0.0f,1.0f }; // 左上
@@ -142,14 +118,46 @@ void Sprite::SetSize(const Vector2& size) {
 	vertexDataSprite_[3].position = { right,top,0.0f,1.0f }; // 左上
 	vertexDataSprite_[3].texcoord = { 1.0f,0.0f };
 	vertexDataSprite_[3].normal = { 0.0f,0.0f,-1.0f };
+
+	// Sprite用の頂点インデックスのリソースを作る
+	indexResourceSprite_ = CreateBufferResource(device_, sizeof(uint32_t) * 6);
+	// リソースの先頭のアドレスから使う
+	indexBufferViewSprite_.BufferLocation = indexResourceSprite_->GetGPUVirtualAddress();
+	// 使用するリソースのサイズはインデックス6つ分のサイズ
+	indexBufferViewSprite_.SizeInBytes = sizeof(uint32_t) * 6;
+	// インデックスはuint32_tとする
+	indexBufferViewSprite_.Format = DXGI_FORMAT_R32_UINT;
+	// インデックスリソースにデータを書き込む
+	uint32_t* indexDataSprite = nullptr;
+	indexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
+	// 三角形
+	indexDataSprite[0] = 0;  indexDataSprite[1] = 1;  indexDataSprite[2] = 2;
+	// 三角形2
+	indexDataSprite[3] = 1;  indexDataSprite[4] = 3;  indexDataSprite[5] = 2;
 }
 
-void Sprite::SetColor(const Vector4& color) {
+void Sprite::CreateMaterial(const Vector4& color) {
+	// Sprite用のマテリアルリソースを作る
+	materialResourceSprite_ = CreateBufferResource(device_, sizeof(Material::MaterialData));
+	// 書き込むためのアドレスを取得
+	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite_));
 	// 色の設定
 	materialDataSprite_->color = color;
+	// SpriteはLightingしないのでfalseに設定する
+	materialDataSprite_->enableLighting = false;
+	// UVTransform行列を初期化
+	materialDataSprite_->uvTransform = MakeIdentity4x4();
 }
 
-void Sprite::SetUvMatrix(const Transform& transform) {
-	// uv行列の設定
-	materialDataSprite_->uvTransform = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+void Sprite::CreateTransform() {
+	// Sprite用のTransformationMatrix用のリソースを作る。TransformationMatrix 1つ分のサイズを用意する
+	transformationMatirxResourceSprite_ = CreateBufferResource(device_, sizeof(TransformationMatrix));
+	// 書き込むためのアドレスを取得
+	transformationMatirxResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite_));
+	// 座標を元にワールド行列の生成
+	worldMatrix_ = MakeTranslateMatrix({ position_.x,position_.y,0.0f });
+	// 座標を適用
+	transformationMatrixDataSprite_->WVP = Multiply(worldMatrix_, orthoMatrix_);
+	// 単位行列を書き込んでおく
+	transformationMatrixDataSprite_->World = MakeIdentity4x4();
 }

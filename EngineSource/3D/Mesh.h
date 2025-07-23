@@ -36,6 +36,25 @@ namespace GameEngine {
 		/// <param name="modelData">読み込んだモデルデータ</param>
 		void CreateModelMesh(ID3D12Device* device,ModelData modelData);
 
+		/// <summary>
+		/// リングのメッシュを作成
+		/// </summary>
+		/// <param name="device">デバイス</param>
+		/// <param name="subdivision">分割数</param>
+		/// <param name="outerDiameter">外径</param>
+		/// <param name="innerDiameter">内径</param>
+		void CreateRingMesh(ID3D12Device* device,const uint32_t& subdivision,const float& outerRadius,const float& innerRadius);
+
+		/// <summary>
+		/// 円柱のメッシュを作成
+		/// </summary>
+		/// <param name="device"></param>
+		/// <param name="subdivision"></param>
+		/// <param name="topRadius"></param>
+		/// <param name="bottomRadius"></param>
+		/// <param name="height"></param>
+		void CreateCylinderMesh(ID3D12Device* device, const uint32_t& subdivision, const float& topRadius, const float& bottomRadius, const float& height);
+
 	public:
 
 		/// <summary>
