@@ -9,6 +9,7 @@
 #include"externals/DirectXTex/d3dx12.h"
 
 #include"EngineSource/Core/DirectXCommon.h"
+#include"EngineSource/Core/ResourceCounter.h"
 
 namespace GameEngine {
 

@@ -5,7 +5,7 @@
 
 namespace GameEngine {
 
-	class WindowsApp {
+	class WindowsApp final {
 	public:
 		WindowsApp() = default;
 		~WindowsApp() = default;

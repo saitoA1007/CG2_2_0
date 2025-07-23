@@ -6,7 +6,7 @@
 
 namespace GameEngine {
 
-	class DXC {
+	class DXC final {
 	public:
 
 		/// <summary>

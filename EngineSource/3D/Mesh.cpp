@@ -181,8 +181,8 @@ void Mesh::CreateSphereMesh(ID3D12Device* device, uint32_t subdivision) {
 
 void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData) {
 	// 描画する時に利用する頂点数
-	totalVertices_ = UINT(modelData.vertices.size());
-	totalIndices_ = 0;
+	totalVertices_ = static_cast<UINT>(modelData.vertices.size());
+	totalIndices_ = static_cast<UINT>(modelData.indices.size());
 
 	// 頂点リソースを作る
 	vertexResource_ = CreateBufferResource(device, sizeof(VertexData) * modelData.vertices.size());
@@ -195,6 +195,22 @@ void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData) {
 	VertexData* vertexData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));// 書き込むためのアドレスを取得
 	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());// 頂点データをリソースにコピー
+
+	// インデックスバッファを作成
+	// 球用の頂点インデックスのリソースを作る
+	indexResource_ = CreateBufferResource(device, sizeof(uint32_t) * totalIndices_);
+	// リソースの先頭のアドレスから使う
+	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	// 使用するリソースのサイズはインデックス6つ分のサイズ
+	indexBufferView_.SizeInBytes = sizeof(uint32_t) * totalIndices_;
+	// インデックスはuint32_tとする
+	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+
+	// インデックスデータを生成
+	// インデックスリソースにデータを書き込む
+	uint32_t* indexData = nullptr;
+	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	std::memcpy(indexData, modelData.indices.data(), sizeof(uint32_t) * modelData.indices.size());
 }
 
 void Mesh::CreateRingMesh(ID3D12Device* device,const uint32_t& subdivision,const float& outerRadius,const float& innerRadius) {

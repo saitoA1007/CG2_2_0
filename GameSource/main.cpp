@@ -1,4 +1,4 @@
-#include"GameEngine.h"
+#include"EngineSource/Core/GameEngine.h"
 #include<iostream>
 
 #include"GameScene.h"
@@ -70,6 +70,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	// ポストエフェクトの初期化
 	PostEffectManager::StaticInitialize(bloomPSO.get(), logManager.get());
 
+	// スプライトのPSOを初期化
+	std::unique_ptr<SpritePSO> spritePSO = std::make_unique<SpritePSO>();
+	spritePSO->Initialize(L"Resources/Shaders/Sprite.VS.hlsl", L"Resources/Shaders/Sprite.PS.hlsl", dxCommon->GetDevice(), dxc.get(), logManager.get());
+
 	// ImGuiの初期化
 	std::unique_ptr<ImGuiManager> imGuiManager = std::make_unique<ImGuiManager>();
 	imGuiManager->Initialize(windowsApp.get(), dxCommon.get());
@@ -87,7 +91,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	textureManager->Initialize(dxCommon.get(), logManager.get());
 	
 	// 画像の初期化
-	Sprite::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), textureManager.get(), windowsApp->kWindowWidth, windowsApp->kWindowHeight);
+	Sprite::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), textureManager.get(), spritePSO.get(), windowsApp->kWindowWidth, windowsApp->kWindowHeight);
 	// 3dを描画する処理の初期化
 	Model::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), textureManager.get(), trianglePSO.get(), particlePSO.get(), gridPSO.get(), logManager.get());
 	// 線を描画する処理の初期化
@@ -109,7 +113,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	//=================================================================
 
 	// ゲームシーンのインスタンスを生成
-	GameScene* gameScene = new GameScene();
+	std::unique_ptr<GameScene> gameScene = std::make_unique<GameScene>();
 	gameScene->Initialize(textureManager.get(), dxCommon.get());
 
 	int iteration = 1;
@@ -168,14 +172,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		// ゲームシーンの描画処理
 		gameScene->Draw();
 
-		// ImGuiの描画処理
-		//imGuiManager->Draw();
 		// 描画後処理
 		dxCommon->PostDraw(imGuiManager.get());
 	}
-
-	// ゲームシーンの解放
-	delete gameScene;
 
 	/// 解放処理
 

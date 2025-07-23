@@ -3,6 +3,7 @@
 #include"EngineSource/Common/CreateBufferResource.h"
 #include"EngineSource/Common/DescriptorHandle.h"
 #include<format>
+#include"ResourceCounter.h"
 
 using namespace GameEngine;
 
@@ -83,9 +84,11 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 	srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;// 2Dテクスチャ
 	srvDesc_.Texture2D.MipLevels = UINT(metadata_->mipLevels);
 
+	// 指定した数よりリソースが多ければエラーを発生
+	assert(static_cast<uint32_t>(ResourceCount::kMaxTextureCount) > index_ + static_cast<uint32_t>(ResourceCount::kStartTextureCount));
 	// SRVを作成するDescriptorHeapの場所を決める。先頭はImGuiが使っているのでその次を使う
-	textures_.at(index_).textureSrvHandleCPU = GetCPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), index_ + 1);
-	textures_.at(index_).textureSrvHandleGPU = GetGPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), index_ + 1);
+	textures_.at(index_).textureSrvHandleCPU = GetCPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), index_ + static_cast<uint32_t>(ResourceCount::kStartTextureCount));
+	textures_.at(index_).textureSrvHandleGPU = GetGPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), index_ + static_cast<uint32_t>(ResourceCount::kStartTextureCount));
 	logManager_->Log(std::format("CPU Handle: {}, GPU Handle: {}", textures_.at(index_).textureSrvHandleCPU.ptr, textures_.at(index_).textureSrvHandleGPU.ptr));
 	// SRVを作成
 	dxCommon_->GetDevice()->CreateShaderResourceView(textures_.at(index_).textureResource.Get(), &srvDesc_, textures_.at(index_).textureSrvHandleCPU);

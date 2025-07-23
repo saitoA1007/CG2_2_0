@@ -7,6 +7,7 @@
 
 #include"EngineSource/Common/LogManager.h"
 #include"EngineSource/Core/PSO/BloomPSO.h"
+#include"EngineSource/Core/ResourceCounter.h"
 
 namespace GameEngine {
 
@@ -77,7 +78,7 @@ namespace GameEngine {
         // ポストエフェクトのためのRTVを計測
         uint32_t rtvIndex_ = 0;
         // ポストエフェクトのためのSRVを計測
-        uint32_t srvIndex_ = 50;
+        uint32_t srvIndex_ = static_cast<uint32_t>(ResourceCount::kStartOffScreenCount);
 
         // コピー描画用リソース
         Microsoft::WRL::ComPtr<ID3D12Resource> DrawObjectResource_;

@@ -35,6 +35,8 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance) {
 		instancingData_[index].color = { 1.0f,1.0f,1.0f,1.0f };
 	}
 
+	// 指定のリソースの総数を超えたらエラーを発生
+	assert(static_cast<uint32_t>(ResourceCount::kMaxModelCount) > StaticSrvIndex_ + static_cast<uint32_t>(ResourceCount::kStartModelCount));
 	// SRVの作成
 	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
 	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -44,8 +46,8 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance) {
 	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 	instancingSrvDesc.Buffer.NumElements = numInstance_;
 	instancingSrvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
-	instancingSrvHandleCPU_ = GetCPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), StaticSrvIndex_ + 130);
-	instancingSrvHandleGPU_ = GetGPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), StaticSrvIndex_ + 130);
+	instancingSrvHandleCPU_ = GetCPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), StaticSrvIndex_ + static_cast<uint32_t>(ResourceCount::kStartModelCount));
+	instancingSrvHandleGPU_ = GetGPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), StaticSrvIndex_ + static_cast<uint32_t>(ResourceCount::kStartModelCount));
 	dxCommon_->GetDevice()->CreateShaderResourceView(instancingResource_.Get(), &instancingSrvDesc, instancingSrvHandleCPU_);
 
 	// srvを更新
