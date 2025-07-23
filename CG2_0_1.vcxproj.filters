@@ -183,6 +183,9 @@
     <ClCompile Include="EngineSource\3D\Mesh.cpp">
       <Filter>EngineSource\3D</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\Core\FPSCounter.cpp">
+      <Filter>EngineSource\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -370,6 +373,9 @@
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Mesh.h">
       <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\FPSCounter.h">
+      <Filter>EngineSource\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

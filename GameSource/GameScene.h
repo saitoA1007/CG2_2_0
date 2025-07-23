@@ -1,6 +1,7 @@
 #pragma once
 #include"EngineSource/Input/InPut.h"
 #include"EngineSource/Core/TextureManager.h"
+#include"EngineSource/Core/FPSCounter.h"
 #include"EngineSource/3D/Camera/Camera.h"
 #include"EngineSource/3D/Camera/DebugCamera.h"
 #include"EngineSource/3D/AxisIndicator.h"
@@ -49,6 +50,9 @@ private:
 	std::unique_ptr<GameEngine::DebugCamera> debugCamera_;
 	// デバックカメラの有効の判定
 	bool isDebugCameraActive_ = false;
+
+	// FPS計測器
+	std::unique_ptr<GameEngine::FpsCounter> fpsCounter_;
 
 	// white4x4テクスチャ
 	uint32_t whiteGH_ = 0u;

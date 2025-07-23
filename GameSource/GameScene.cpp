@@ -37,6 +37,10 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// 軸方向表示の画像
 	axisTextureHandle_ = textureManager->Load("Resources/axis/axis.jpg");
 
+	// fps計測器の初期化
+	fpsCounter_ = std::make_unique<FpsCounter>();
+	fpsCounter_->Initialize();
+
 	// white4x4テクスチャをロード
 	whiteGH_ = textureManager->Load("Resources/white4x4.png");
 
@@ -72,6 +76,9 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 }
 
 void GameScene::Update(GameEngine::Input* input){
+
+	// Fps計測器の更新処理
+	fpsCounter_->Update();
 
 	// 地面の更新処理
 	terrainWorldTransform_.UpdateTransformMatrix();
@@ -152,6 +159,9 @@ void GameScene::Update(GameEngine::Input* input){
 	//ImGui::Text("h:%.3f,s:%.3f,v:%.3f", hsv.x, hsv.y, hsv.z);
 
 	ImGui::End();
+
+	// Fps計測器の描画
+	fpsCounter_->DrawImGui();
 
 #endif 
 
