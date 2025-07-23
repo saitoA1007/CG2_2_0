@@ -221,26 +221,32 @@ ModelData Model::LoadModelFile(const std::string& directoryPath, const std::stri
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals()); // 法線がないMeshは今回は非対応
 		assert(mesh->HasTextureCoords(0)); // TexcoordがないMeshは今回は非対応
+		// 最初に頂点分メモリを確保する
+		modelData.vertices.resize(mesh->mNumVertices);
 
+		// Vertex解析
+		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
+			aiVector3D& position = mesh->mVertices[vertexIndex];
+			aiVector3D& normal = mesh->mNormals[vertexIndex];
+			aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+			VertexData vertex;
+			vertex.position = { position.x,position.y,position.z,1.0f };
+			vertex.normal = { normal.x,normal.y,normal.z };
+			vertex.texcoord = { texcoord.x,texcoord.y };
+			// 右手->左手に変換する
+			vertex.position.x *= -1.0f;
+			vertex.normal.x *= -1.0f;
+			modelData.vertices[vertexIndex] = vertex;
+		}
+		
 		// Face解析
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
 			aiFace& face = mesh->mFaces[faceIndex];
 			assert(face.mNumIndices >= 3); // 三角形より大きければ通す
 
-			// Vertex解析
 			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
 				uint32_t vertexIndex = face.mIndices[element];
-				aiVector3D& position = mesh->mVertices[vertexIndex];
-				aiVector3D& normal = mesh->mNormals[vertexIndex];
-				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
-				VertexData vertex;
-				vertex.position = { position.x,position.y,position.z,1.0f };
-				vertex.normal = { normal.x,normal.y,normal.z };
-				vertex.texcoord = { texcoord.x,texcoord.y};
-				// 右手->左手に変換する
-				vertex.position.x *= -1.0f;
-				vertex.normal.x *= -1.0f;
-				modelData.vertices.push_back(vertex);
+				modelData.indices.push_back(vertexIndex);
 			}
 		}
 	}

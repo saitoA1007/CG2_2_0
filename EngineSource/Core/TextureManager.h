@@ -12,7 +12,7 @@
 
 namespace GameEngine {
 
-	class TextureManager {
+	class TextureManager final {
 	public:
 		// テクスチャ
 		struct Texture {

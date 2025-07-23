@@ -10,13 +10,14 @@
 #include"PSO/CopyPSO.h"
 
 #include"EngineSource/Core/PostProcess/PostEffectManager.h"
+#include"EngineSource/Core/ResourceCounter.h"
 
 namespace GameEngine {
 
     // 前方宣言
     class ImGuiManager;
 
-    class DirectXCommon {
+    class DirectXCommon final {
     public:
         DirectXCommon() = default;
         ~DirectXCommon() = default;

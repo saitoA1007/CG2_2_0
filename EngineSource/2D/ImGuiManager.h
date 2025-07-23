@@ -8,7 +8,7 @@
 
 namespace GameEngine {
 
-	class ImGuiManager {
+	class ImGuiManager final {
 	public:
 		ImGuiManager() = default;
 		~ImGuiManager() = default;
