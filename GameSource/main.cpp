@@ -7,106 +7,9 @@ using namespace GameEngine;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
-	//============================================================
 	// エンジン部分の初期化処理
-	//============================================================
-
-#pragma region
-	// 誰も補足しなかった場合に(Unhandled)、補足する関数を登録
-	SetUnhandledExceptionFilter(ExportDump);
-
-	// ログの初期化
-	LogManager::Create();
-	std::unique_ptr<LogManager> logManager = std::make_unique<LogManager>();
-
-	// ウィンドウの作成
-	std::unique_ptr<WindowsApp> windowsApp = std::make_unique<WindowsApp>();
-	windowsApp->CreateGameWindow(L"CG2_LE2A_05_サイトウ_アオイ", 1280, 720);
-
-	// リソースチェックのデバック
-	D3DResourceLeakChecker leakCheck;
-
-	// DirectXCommonの初期化
-	std::unique_ptr<DirectXCommon> dxCommon = std::make_unique<DirectXCommon>();
-	dxCommon->Initialize(windowsApp->GetHwnd(), windowsApp->kWindowWidth, windowsApp->kWindowHeight, logManager.get());
-
-	// dxcCompilerの初期化
-	std::unique_ptr<DXC> dxc = std::make_unique<DXC>();
-	dxc->Initialize(logManager.get());
-
-	// 三角形のPSO設定の初期化
-	std::unique_ptr<TrianglePSO> trianglePSO = std::make_unique<TrianglePSO>();
-	trianglePSO->Initialize(L"Resources/Shaders/Object3d.VS.hlsl", L"Resources/Shaders/Object3d.PS.hlsl",dxCommon->GetDevice(),dxc.get(), logManager.get());
-
-	// パーティクル(複数描画用)のPSO設定を初期化
-	std::unique_ptr<ParticlePSO> particlePSO = std::make_unique<ParticlePSO>();
-	particlePSO->Initialize(L"Resources/Shaders/Particle.VS.hlsl", L"Resources/Shaders/particle.PS.hlsl", dxCommon->GetDevice(), dxc.get(), logManager.get());
-
-	// 線のPSO設定の初期化
-	std::unique_ptr<LinePSO> linePSO = std::make_unique<LinePSO>();
-	linePSO->Initialize(L"Resources/Shaders/Primitive.VS.hlsl", L"Resources/Shaders/Primitive.PS.hlsl", dxCommon->GetDevice(), dxc.get(), logManager.get());
-
-	// BloomPSOの初期化
-	std::unique_ptr<BloomPSO> bloomPSO = std::make_unique<BloomPSO>();
-	bloomPSO->Initialize(dxCommon->GetDevice(), L"Resources/Shaders/PostEffect/Bloom.VS.hlsl", dxc.get(), logManager.get(),
-		L"Resources/Shaders/PostEffect/HighLumMask.PS.hlsl",
-		L"Resources/Shaders/PostEffect/Bloom.PS.hlsl",
-		L"Resources/Shaders/PostEffect/BloomResult.PS.hlsl",
-		L"Resources/Shaders/PostEffect/BloomComposite.hlsl");
-
-	// グリッド用の初期化
-	std::unique_ptr<GridPSO> gridPSO = std::make_unique<GridPSO>();
-	gridPSO->Initialize(L"Resources/Shaders/Grid.VS.hlsl", L"Resources/Shaders/Grid.PS.hlsl", dxCommon->GetDevice(), dxc.get(), logManager.get());
-
-	// ガウスぼかし用の初期化
-	std::unique_ptr<GaussianBlurPSO> gaussianBlurPSO = std::make_unique<GaussianBlurPSO>();
-	gaussianBlurPSO->Initialize(dxCommon->GetDevice(), dxc.get(), logManager.get());
-
-	// CopyPSOの初期化
-	std::unique_ptr<CopyPSO> copyPSO = std::make_unique<CopyPSO>();
-	copyPSO->Initialize(dxCommon->GetDevice(), L"Resources/Shaders/PostEffect/Copy.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc.get(), logManager.get());
-	dxCommon->SetCopyPSO(copyPSO.get());
-
-	// ポストエフェクトの初期化
-	PostEffectManager::StaticInitialize(bloomPSO.get(), logManager.get());
-
-	// スプライトのPSOを初期化
-	std::unique_ptr<SpritePSO> spritePSO = std::make_unique<SpritePSO>();
-	spritePSO->Initialize(L"Resources/Shaders/Sprite.VS.hlsl", L"Resources/Shaders/Sprite.PS.hlsl", dxCommon->GetDevice(), dxc.get(), logManager.get());
-
-	// ImGuiの初期化
-	std::unique_ptr<ImGuiManager> imGuiManager = std::make_unique<ImGuiManager>();
-	imGuiManager->Initialize(windowsApp.get(), dxCommon.get());
-
-	// 入力処理を初期化
-	std::unique_ptr<Input> input = std::make_unique<Input>();
-	input->Initialize(hInstance, windowsApp->GetHwnd());
-
-	// 音声の初期化
-	std::unique_ptr<AudioManager> audioManager = std::make_unique<AudioManager>();
-	audioManager->Initialize();
-
-	// テクスチャの初期化
-	std::shared_ptr<TextureManager> textureManager = std::make_shared<TextureManager>();
-	textureManager->Initialize(dxCommon.get(), logManager.get());
-	
-	// 画像の初期化
-	Sprite::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), textureManager.get(), spritePSO.get(), windowsApp->kWindowWidth, windowsApp->kWindowHeight);
-	// 3dを描画する処理の初期化
-	Model::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), textureManager.get(), trianglePSO.get(), particlePSO.get(), gridPSO.get(), logManager.get());
-	// 線を描画する処理の初期化
-	PrimitiveRenderer::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList(), linePSO.get(), logManager.get());
-	// ワールドトランスフォームの初期化
-	WorldTransform::StaticInitialize(dxCommon->GetDevice());
-	WorldTransforms::StaticInitialize(dxCommon.get());
-	// マテリアルの初期化
-	Material::StaticInitialize(dxCommon->GetDevice());
-	// 線を描画する為のメッシュの初期化
-	LineMesh::StaticInitialize(dxCommon->GetDevice());
-
-	// 軸方向表示の初期化
-	AxisIndicator::StaticInitialize(dxCommon->GetCommandList());
-#pragma endregion
+	std::unique_ptr<Engine> engine = std::make_unique<Engine>();
+	engine->Initialize(L"CG2_LE2A_05_サイトウ_アオイ", 1280, 720, hInstance);
 
 	//=================================================================
 	// 宣言と初期化
@@ -114,7 +17,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
 	// ゲームシーンのインスタンスを生成
 	std::unique_ptr<GameScene> gameScene = std::make_unique<GameScene>();
-	gameScene->Initialize(textureManager.get(), dxCommon.get());
+	gameScene->Initialize(engine->textureManager_.get(), engine->dxCommon_.get());
 
 	int iteration = 1;
 	float highLumMask = 0.8f;
@@ -126,63 +29,56 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
 	// ウィンドウのxボタンが押されるまでループ
 	while (true) {
-		if (windowsApp->ProcessMessage()) {
+		if (engine->IsWindowOpen()) {
 			break;
 		}
-
-		// キー入力の更新処理
-		input->Update();
-		// ImGuiにフレームが始まる旨を伝える
-		imGuiManager->BeginFrame();
 
 		//==================================================================
 		// 更新処理
 		//==================================================================
 
+		// 更新前処理
+		engine->PreUpdate();
+
 		// ゲームシーンの更新処理
-		gameScene->Update(input.get());
+		gameScene->Update(engine->input_.get());
 
 		// 取り敢えず仮置き
 		ImGui::Begin("Bloom");
 		ImGui::SliderInt("iteration", &iteration, 1, 5);
-		bloomPSO->constBuffer_->bloomIteration = static_cast<uint32_t>(iteration);
+		engine->bloomPSO_->constBuffer_->bloomIteration = static_cast<uint32_t>(iteration);
 		ImGui::SliderFloat("HighLumMask", &highLumMask, 0.0f,1.0f);
-		bloomPSO->constBuffer_->highLumMask = highLumMask;
+		engine->bloomPSO_->constBuffer_->highLumMask = highLumMask;
 		ImGui::SliderFloat("Intensity", &intensity, 0.0f, 10.0f);
-		bloomPSO->constBuffer_->intensity = intensity;
+		engine->bloomPSO_->constBuffer_->intensity = intensity;
 
 		ImGui::End();
 
 		ImGui::Begin("Scene");
 	    ImVec2 sceneWindowSize = ImGui::GetContentRegionAvail();
-	    D3D12_GPU_DESCRIPTOR_HANDLE& srvHandle = dxCommon->GetSRVHandle();
+	    D3D12_GPU_DESCRIPTOR_HANDLE& srvHandle = engine->dxCommon_->GetSRVHandle();
 		ImGui::Image((ImTextureID)srvHandle.ptr, sceneWindowSize);
 		//ImGui::Image((ImTextureID)srvHandle.ptr, {1280.0f,720.0f});
 	    ImGui::End();
+
+		// 更新後処理
+		engine->PostUpdate();
 
 		//====================================================================
 		// 描画処理
 		//====================================================================
 
-		// ImGuiの受付終了
-		imGuiManager->EndFrame();
 		// 描画前処理
-		dxCommon->PreDraw();
-
+		engine->PreDraw();
+		
 		// ゲームシーンの描画処理
 		gameScene->Draw();
 
 		// 描画後処理
-		dxCommon->PostDraw(imGuiManager.get());
+		engine->PostDraw();
 	}
 
 	/// 解放処理
-
-	// テクスチャの解放
-	textureManager->Finalize();
-	// ImGuiの解放処理
-	imGuiManager->Finalize();
-	// WindowAppの解放
-	windowsApp->BreakGameWindow();
+	engine->Finalize();
 	return 0;
 }

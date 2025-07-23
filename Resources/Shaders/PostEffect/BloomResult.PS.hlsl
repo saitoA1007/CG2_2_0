@@ -28,12 +28,12 @@ float4 main(VertexShaderOutput input) : SV_TARGET
 
     for (int i = 0; i < gBloomParameter.bloomIteration; ++i)
     {
-        bloomAccum += Get5x5GaussianBlur(gTexShrinkHighLum, gSampler, input.texcoord * uvSize + uvOffset, dx, dy, float32_t4(uvOffset, uvOffset + uvSize));
+        bloomAccum += Get3x3GaussianBlur(gTexShrinkHighLum, gSampler, input.texcoord * uvSize + uvOffset, dx, dy, float32_t4(uvOffset, uvOffset + uvSize));
         uvOffset.y += uvSize.y;
         uvSize *= 0.5f;
     }
 
-    float32_t4 bloomColor = Get5x5GaussianBlur(gTexHighLum, gSampler, input.texcoord, dx, dy, float32_t4(0, 0, 1, 1)) + saturate(bloomAccum);
+    float32_t4 bloomColor = Get3x3GaussianBlur(gTexHighLum, gSampler, input.texcoord, dx, dy, float32_t4(0, 0, 1, 1)) + saturate(bloomAccum);
     return bloomColor;
 }
 

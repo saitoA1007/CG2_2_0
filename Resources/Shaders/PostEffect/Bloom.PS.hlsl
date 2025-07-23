@@ -14,5 +14,5 @@ float4 main(VertexShaderOutput input) : SV_TARGET
     float32_t dx = 1.0f / w;
     float32_t dy = 1.0f / h;
     
-    return Get5x5GaussianBlur(gTexHighLum, gSampler, input.texcoord, dx, dy, float32_t4(0, 0, 1, 1));
+    return Get3x3GaussianBlur(gTexHighLum, gSampler, input.texcoord, dx, dy, float32_t4(0, 0, 1, 1));
 }
