@@ -10,10 +10,7 @@ void ImGuiManager::Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-	
 	io.Fonts->Build();
 
 	ImGui::StyleColorsDark();

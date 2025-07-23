@@ -86,7 +86,6 @@ namespace GameEngine {
 		static ID3D12GraphicsCommandList* commandList_;
 		// 射影行列
 		static Matrix4x4 orthoMatrix_;
-
 		// テクスチャ
 		static TextureManager* textureManager_;
 
@@ -116,5 +115,23 @@ namespace GameEngine {
 		// Sprite用のTransformationMatrix用のリソース
 		Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatirxResourceSprite_;
 		TransformationMatrix* transformationMatrixDataSprite_ = nullptr;
+
+	private:
+
+		/// <summary>
+		/// メッシュを作成
+		/// </summary>
+		void CreateMesh();
+
+		/// <summary>
+		/// マテリアルを作成
+		/// </summary>
+		/// <param name="color"></param>
+		void CreateMaterial(const Vector4& color);
+
+		/// <summary>
+		/// トランスフォームを作成
+		/// </summary>
+		void CreateTransform();
 	};
 }

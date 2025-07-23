@@ -196,3 +196,146 @@ void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData) {
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));// 書き込むためのアドレスを取得
 	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());// 頂点データをリソースにコピー
 }
+
+void Mesh::CreateRingMesh(ID3D12Device* device,const uint32_t& subdivision,const float& outerRadius,const float& innerRadius) {
+	// 頂点数とインデックス数を計算
+	totalVertices_ = subdivision * 2;
+	totalIndices_ = subdivision * 6;
+
+	// 頂点バッファを作成
+	// vertexResourceを作成
+	vertexResource_ = CreateBufferResource(device, sizeof(GridVertexData) * totalVertices_);
+	// リソースの先頭のアドレスから使う
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	// 使用するリソースのサイズは頂点3つ分のサイズ
+	vertexBufferView_.SizeInBytes = sizeof(GridVertexData) * totalVertices_;
+	// 1頂点あたりのサイズ
+	vertexBufferView_.StrideInBytes = sizeof(GridVertexData);
+
+	// 頂点データを生成
+	// 頂点リソースにデータを書き込む
+	VertexData* vertexData = nullptr;
+	// 書き込むためのアドレスを取得
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / static_cast<float>(subdivision);
+
+	for (uint32_t index = 0; index < subdivision; ++index) {
+		float angle = index * radianPerDivide;
+		float sin = std::sinf(angle);
+		float cos = std::cosf(angle);
+		float u = static_cast<float>(index) / static_cast<float>(subdivision);
+
+		 // 外周の頂点
+		vertexData[index * 2 + 0].position = { cos * outerRadius, 0.0f, sin * outerRadius };
+		vertexData[index * 2 + 0].texcoord = { u, 0.0f };
+		vertexData[index * 2 + 0].normal = {0.0f,0.0f,1.0f};
+		// 内周の頂点
+		vertexData[index * 2 + 1].position = { cos * innerRadius, 0.0f, sin * innerRadius };
+		vertexData[index * 2 + 1].texcoord = { u, 1.0f };
+		vertexData[index * 2 + 1].normal = { 0.0f,0.0f,1.0f };
+	}
+
+	// インデックスバッファを作成
+	// 球用の頂点インデックスのリソースを作る
+	indexResource_ = CreateBufferResource(device, sizeof(uint32_t) * totalIndices_);
+	// リソースの先頭のアドレスから使う
+	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	// 使用するリソースのサイズはインデックス6つ分のサイズ
+	indexBufferView_.SizeInBytes = sizeof(uint32_t) * totalIndices_;
+	// インデックスはuint32_tとする
+	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+
+	// インデックスデータを生成
+	// インデックスリソースにデータを書き込む
+	uint32_t* indexData = nullptr;
+	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+
+	for (uint32_t index = 0; index < subdivision; ++index) {
+		uint32_t p0 = (index * 2 + 0) % (subdivision * 2);
+		uint32_t p1 = (index * 2 + 1) % (subdivision * 2);
+		uint32_t p2 = (index * 2 + 2) % (subdivision * 2);
+		uint32_t p3 = (index * 2 + 3) % (subdivision * 2);
+
+		// 三角形1
+		indexData[index * 6 + 0] = p0;
+		indexData[index * 6 + 1] = p1;
+		indexData[index * 6 + 2] = p2;
+		// 三角形2
+		indexData[index * 6 + 3] = p2;
+		indexData[index * 6 + 4] = p1;
+		indexData[index * 6 + 5] = p3;
+	}
+}
+
+void Mesh::CreateCylinderMesh(ID3D12Device* device, const uint32_t& subdivision, const float& topRadius, const float& bottomRadius, const float& height) {
+	// 頂点数とインデックス数を計算
+	totalVertices_ = subdivision * 2;
+	totalIndices_ = subdivision * 6;
+
+	// 頂点バッファを作成
+	// vertexResourceを作成
+	vertexResource_ = CreateBufferResource(device, sizeof(GridVertexData) * totalVertices_);
+	// リソースの先頭のアドレスから使う
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	// 使用するリソースのサイズは頂点3つ分のサイズ
+	vertexBufferView_.SizeInBytes = sizeof(GridVertexData) * totalVertices_;
+	// 1頂点あたりのサイズ
+	vertexBufferView_.StrideInBytes = sizeof(GridVertexData);
+
+	// 頂点データを生成
+	// 頂点リソースにデータを書き込む
+	VertexData* vertexData = nullptr;
+	// 書き込むためのアドレスを取得
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / static_cast<float>(subdivision);
+	const float halfHeight = height * 0.5f;
+
+	for (uint32_t index = 0; index < subdivision; ++index) {
+		float angle = index * radianPerDivide;
+		float sin = std::sinf(angle);
+		float cos = std::cosf(angle);
+		float u = static_cast<float>(index) / static_cast<float>(subdivision);
+
+		// 上面の頂点
+		vertexData[index * 2 + 0].position = { cos * topRadius, +halfHeight, sin * topRadius };
+		vertexData[index * 2 + 0].texcoord = { u, 0.0f };
+		vertexData[index * 2 + 0].normal = {cos,0.0f,sin};
+		// 下面の頂点
+		vertexData[index * 2 + 1].position = { cos * bottomRadius, -halfHeight, sin * bottomRadius };
+		vertexData[index * 2 + 1].texcoord = { u, 1.0f };
+		vertexData[index * 2 + 1].normal = {cos,0.0f,sin};
+	}
+
+	// インデックスバッファを作成
+	// 球用の頂点インデックスのリソースを作る
+	indexResource_ = CreateBufferResource(device, sizeof(uint32_t) * totalIndices_);
+	// リソースの先頭のアドレスから使う
+	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	// 使用するリソースのサイズはインデックス6つ分のサイズ
+	indexBufferView_.SizeInBytes = sizeof(uint32_t) * totalIndices_;
+	// インデックスはuint32_tとする
+	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+
+	// インデックスデータを生成
+	// インデックスリソースにデータを書き込む
+	uint32_t* indexData = nullptr;
+	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+
+	for (uint32_t index = 0; index < subdivision; ++index) {
+		uint32_t p0 = (index * 2 + 0) % (subdivision * 2);
+		uint32_t p1 = (index * 2 + 1) % (subdivision * 2);
+		uint32_t p2 = (index * 2 + 2) % (subdivision * 2);
+		uint32_t p3 = (index * 2 + 3) % (subdivision * 2);
+
+		// 三角形1
+		indexData[index * 6 + 0] = p0;
+		indexData[index * 6 + 1] = p1;
+		indexData[index * 6 + 2] = p2;
+		// 三角形2
+		indexData[index * 6 + 3] = p2;
+		indexData[index * 6 + 4] = p1;
+		indexData[index * 6 + 5] = p3;
+	}
+}

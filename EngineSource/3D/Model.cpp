@@ -119,7 +119,7 @@ Model* Model::CreateModel(const std::string& objFilename, const std::string& fil
 	if (logManager_) {
 		logManager_->Log("CreateFromAssimp : Loading Model file data");
 	}
-	ModelData modelData = model->LoadModelFile("Resources", objFilename, filename);
+	ModelData modelData = model->LoadModelFile("Resources/Models", objFilename, filename);
 
 	// モデルが無事に作成されたログを出す
 	if (logManager_) {

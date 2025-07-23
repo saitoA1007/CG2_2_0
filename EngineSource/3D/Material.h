@@ -21,6 +21,10 @@ namespace GameEngine {
 
 	public:
 
+		/// <summary>
+		/// 静的初期化
+		/// </summary>
+		/// <param name="device"></param>
 		static void StaticInitialize(ID3D12Device* device);
 
 		/// <summary>

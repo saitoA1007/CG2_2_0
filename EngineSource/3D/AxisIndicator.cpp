@@ -9,8 +9,8 @@ void AxisIndicator::StaticInitialize(ID3D12GraphicsCommandList* commandList) {
 	commandList_ = commandList;
 }
 
-void AxisIndicator::Initialize(const std::string& modelName) {
-	model_ = std::unique_ptr<Model>(Model::CreateModel(modelName, "axis"));
+void AxisIndicator::Initialize() {
+	model_ = std::unique_ptr<Model>(Model::CreateModel("axis.obj", "Axis"));
 
 	transform_.scale = { 1.0f,1.0f,1.0f };
 	transform_.rotate = { 0.0f,0.0f,0.0f };

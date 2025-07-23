@@ -20,7 +20,7 @@ namespace GameEngine {
 		/// <summary>
 		/// 初期化
 		/// </summary>
-		void Initialize(const std::string& modelName);
+		void Initialize();
 
 		/// <summary>
 		/// 更新
