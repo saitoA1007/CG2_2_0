@@ -72,7 +72,7 @@ Model* Model::CreateSphere(uint32_t subdivision) {
 
 	// マテリアルを作成
 	model->defaultMaterial_ = std::make_unique<Material>();
-	model->defaultMaterial_->Initialize({1.0f,1.0f,1.0f,1.0f}, { 1.0f,1.0f,1.0f },0.0f,false);
+	model->defaultMaterial_->Initialize({1.0f,1.0f,1.0f,1.0f}, { 1.0f,1.0f,1.0f },500.0f,false);
 
 	return model;
 }
@@ -88,7 +88,7 @@ Model* Model::CreateTrianglePlane() {
 
 	// マテリアルを作成
 	model->defaultMaterial_ = std::make_unique<Material>();
-	model->defaultMaterial_->Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 0.0f, false);
+	model->defaultMaterial_->Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 1.0f, false);
 
 	return model;
 }
@@ -137,6 +137,9 @@ Model* Model::CreateModel(const std::string& objFilename, const std::string& fil
 	// ローカル行列を取得
 	model->localMatrix_ = modelData.rootNode.localMatrix;
 
+	// モデルのロード
+	model->isLoad_ = true;
+
 	return model;
 }
 
@@ -144,7 +147,11 @@ Model* Model::CreateModel(const std::string& objFilename, const std::string& fil
 void Model::Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix,const Material* material) {
 
 	// カメラ座標に変換
-	worldTransform.SetWVPMatrix(localMatrix_,VPMatrix);
+	if (isLoad_) {
+		worldTransform.SetWVPMatrix(localMatrix_, VPMatrix);
+	} else {
+		worldTransform.SetWVPMatrix(VPMatrix);
+	}
 
 	commandList_->IASetVertexBuffers(0, 1, &mesh_->GetVertexBufferView());
 	commandList_->IASetIndexBuffer(&mesh_->GetIndexBufferView());
@@ -220,7 +227,6 @@ ModelData Model::LoadModelFile(const std::string& directoryPath, const std::stri
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals()); // 法線がないMeshは今回は非対応
-		assert(mesh->HasTextureCoords(0)); // TexcoordがないMeshは今回は非対応
 		// 最初に頂点分メモリを確保する
 		modelData.vertices.resize(mesh->mNumVertices);
 
@@ -228,14 +234,22 @@ ModelData Model::LoadModelFile(const std::string& directoryPath, const std::stri
 		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
 			aiVector3D& position = mesh->mVertices[vertexIndex];
 			aiVector3D& normal = mesh->mNormals[vertexIndex];
-			aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
 			VertexData vertex;
 			vertex.position = { position.x,position.y,position.z,1.0f };
 			vertex.normal = { normal.x,normal.y,normal.z };
-			vertex.texcoord = { texcoord.x,texcoord.y };
 			// 右手->左手に変換する
 			vertex.position.x *= -1.0f;
 			vertex.normal.x *= -1.0f;
+			
+			// UVの適応
+			if (mesh->HasTextureCoords(0)) {
+				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+				vertex.texcoord = { texcoord.x, texcoord.y };
+			} else {
+				// UVがない場合、XZ平面に投影したUVを仮生成
+				vertex.texcoord = { (position.x + 1.0f) * 0.5f, (position.z + 1.0f) * 0.5f };
+			}
+
 			modelData.vertices[vertexIndex] = vertex;
 		}
 		

@@ -187,6 +187,8 @@ namespace GameEngine {
 		// Nodeのローカル行列を保持しておく変数
 		Matrix4x4 localMatrix_;
 
+		bool isLoad_ = false;
+
 	private:
 
 		/// <summary>

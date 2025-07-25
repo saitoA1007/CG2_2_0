@@ -150,6 +150,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="GameSource\ColorEditor.cpp" />
+    <ClCompile Include="GameSource\DrawTaskModel.cpp" />
     <ClCompile Include="GameSource\GameScene.cpp" />
     <ClCompile Include="GameSource\main.cpp" />
   </ItemGroup>
@@ -218,6 +219,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="GameSource\ColorEditor.h" />
+    <ClInclude Include="GameSource\DrawTaskModel.h" />
     <ClInclude Include="GameSource\GameScene.h" />
   </ItemGroup>
   <ItemGroup>

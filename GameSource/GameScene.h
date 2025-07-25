@@ -10,6 +10,9 @@
 #include"EngineSource/3D/WorldTransforms.h"
 #include"EngineSource/3D/Light/LightManager.h"
 #include"EngineSource/3D/Light/DirectionalLight.h"
+#include"EngineSource/2D/Sprite.h"
+
+#include"GameSource/DrawTaskModel.h"
 
 class GameScene {
 public:
@@ -43,7 +46,7 @@ private:
 	std::unique_ptr<GameEngine::AxisIndicator> axisIndicator_;
 
 	// カメラトラスフォーム
-	Transform cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,-20.0f} };
+	Transform cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,-10.0f} };
 	// カメラ
 	std::unique_ptr<GameEngine::Camera> camera_;
 	// デバックカメラ
@@ -68,9 +71,8 @@ private:
 
 	// 平面モデル
 	GameEngine::Model* planeModel_;
-	uint32_t planeGH_ = 0u;
-	Transform planeTransform_{};
-	GameEngine::WorldTransform planeWorldTransform_;
+	uint32_t uvCheckerGH_ = 0u;
+	uint32_t checkerBoardGH_ = 0u;
 
 	// ライト
 	std::unique_ptr<GameEngine::LightManager> lightManager_;
@@ -81,15 +83,18 @@ private:
 	// スポットライト
 	GameEngine::SpotLight::SpotLightData spotLightData_;
 
-	// 箱
-	Transform boxTransform_;
-	GameEngine::Model* boxModel_;
-	GameEngine::WorldTransform boxWorldTransform_;
-
-	// ブレンドモード
-	const char* blendModeName_[6] = { "kBlendModeNone","kBlendModeNormal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen"};
-	int selectBlendNum_ = 0;
-	GameEngine::BlendMode blendMode_ = GameEngine::BlendMode::kBlendModeNormal;
-
+	// テクスチャの管理
 	GameEngine::TextureManager* textureManager_;
+
+	// 評価課題のモデルを描画する
+	std::unique_ptr<DrawTaskModel> drawTaskModels_;
+
+	// 球モデル
+	GameEngine::Model* sphereModel_;
+	// ティーポッドモデル
+	GameEngine::Model* UtahTeapotModel_;
+	// ウサギモデル
+	GameEngine::Model* bunnyModel_;
+	// スザンヌモデル
+	GameEngine::Model* suzanneModel_;
 };

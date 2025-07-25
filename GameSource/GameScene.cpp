@@ -10,7 +10,11 @@ using namespace GameEngine;
 
 GameScene::~GameScene() {
 	delete planeModel_;
-	delete boxModel_;
+	delete sphereModel_;
+	delete UtahTeapotModel_;
+	delete bunnyModel_;
+	delete suzanneModel_;
+
 	delete terrainModel_;
 
 	// グリッドの解放
@@ -22,6 +26,7 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// DirectX機能を受け取る
 	dxCommon_ = dxCommon;
 
+	// テクスチャ機能を受け取る
 	textureManager_ = textureManager;
 
 	// カメラの初期化
@@ -48,31 +53,53 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	gridModel_ = Model::CreateGridPlane({200.0f,200.0f});
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
-	// 平面モデルを生成
-	planeModel_ = Model::CreateModel("plane.gltf", "Plane");
-	planeGH_ = textureManager->Load("Resources/Textures/uvChecker.png");
-	planeTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{5.0f,3.0f,0.0f} };
-	planeWorldTransform_.Initialize(planeTransform_);
-
 	// 地面モデルを生成
 	terrainModel_ = Model::CreateModel("terrain.obj","Terrain");
 	terrainModel_->SetDefaultIsEnableLight(true);
 	grassGH_ = textureManager->Load("Resources/Models/Terrain/grass.png");
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 
-	// 箱
-	boxModel_ = Model::CreateModel("cube.obj", "Cube");
-	boxTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,0.0f} };
-	boxWorldTransform_.Initialize(boxTransform_);
-
 	// 平行光源ライト
 	lightManager_ = std::make_unique<LightManager>();
 	lightManager_->Initialize(dxCommon_->GetDevice(), true, false, false);
 	directionalData_.active = true;
 	directionalData_.color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalData_.direction = { 0.0,1.0f,0.0f };
-	directionalData_.intensity = 10.0f;
+	directionalData_.direction = { 0.0,0.0f,1.0f };
+	directionalData_.intensity = 1.0f;
 	lightManager_->SetDirectionalData(directionalData_);
+
+	// 平面モデルを生成
+	planeModel_ = Model::CreateModel("plane.obj", "Plane");
+	planeModel_->SetDefaultIsEnableLight(true);
+	uvCheckerGH_ = textureManager->Load("Resources/Textures/uvChecker.png");
+	checkerBoardGH_ = textureManager->Load("Resources/Models/Teapot/checkerBoard.png");
+	// 球モデルを生成
+	sphereModel_ = Model::CreateSphere(16);
+	sphereModel_->SetDefaultIsEnableLight(true);
+	// ティーポッドモデルを生成
+	UtahTeapotModel_ = Model::CreateModel("teapot.obj", "Teapot");
+	UtahTeapotModel_->SetDefaultIsEnableLight(true);
+	// ウサギモデルを生成
+	bunnyModel_ = Model::CreateModel("bunny.obj", "Bunny");
+	bunnyModel_->SetDefaultIsEnableLight(true);
+	// スザンヌモデルを生成
+	suzanneModel_ = Model::CreateModel("suzanne.obj", "Suzanne");
+	suzanneModel_->SetDefaultIsEnableLight(true);
+
+	// 評価課題のモデルを描画するクラスの初期化
+	drawTaskModels_ = std::make_unique<DrawTaskModel>();
+	drawTaskModels_->Initialize(uvCheckerGH_, whiteGH_);
+
+	// 平面モデルをセット
+	drawTaskModels_->SetPlane(planeModel_);
+	// 球モデルをセット
+	drawTaskModels_->SetSphere(sphereModel_);
+	// ティーポッドモデルをセット
+	drawTaskModels_->SetUtahTeapot(UtahTeapotModel_, checkerBoardGH_);
+	// ウサギモデルをセット
+	drawTaskModels_->SetBunny(bunnyModel_);
+	// スザンヌモデルをセット
+	drawTaskModels_->SetSuzanne(suzanneModel_);
 }
 
 void GameScene::Update(GameEngine::Input* input){
@@ -83,11 +110,8 @@ void GameScene::Update(GameEngine::Input* input){
 	// 地面の更新処理
 	terrainWorldTransform_.UpdateTransformMatrix();
 
-	boxWorldTransform_.UpdateTransformMatrix();
-
-	// 平面の更新処理
-	planeWorldTransform_.SetTransform(planeTransform_);
-	planeWorldTransform_.UpdateTransformMatrix();
+	// 更新
+	drawTaskModels_->Update();
 
 	// カメラ処理
 	if (isDebugCameraActive_) {
@@ -113,51 +137,19 @@ void GameScene::Update(GameEngine::Input* input){
 #ifdef _DEBUG
 	// 光源をデバック
 	ImGui::Begin("DebugWindow");
-	// カメラのトラスフォーム
-	ImGui::DragFloat3("CameraPos", &cameraTransform_.translate.x, 0.01f);
-	ImGui::DragFloat3("CameraRotate", &cameraTransform_.rotate.x, 0.01f);
-	ImGui::DragFloat3("CameraScale", &cameraTransform_.scale.x, 0.01f);
-	// ブレンドモードの切り替え
-	if (ImGui::Combo("BlendMode", &selectBlendNum_, blendModeName_, IM_ARRAYSIZE(blendModeName_))) {
-		switch (selectBlendNum_) {
-		case BlendMode::kBlendModeNone:
-			blendMode_ = BlendMode::kBlendModeNone;
-			break;
-		case BlendMode::kBlendModeNormal:
-			blendMode_ = BlendMode::kBlendModeNormal;
-			break;
-		case BlendMode::kBlendModeAdd:
-			blendMode_ = BlendMode::kBlendModeAdd;
-			break;
-		case BlendMode::kBlendModeSubtract:
-			blendMode_ = BlendMode::kBlendModeSubtract;
-			break;
-		case BlendMode::kBlendModeMultily:
-			blendMode_ = BlendMode::kBlendModeMultily;
-			break;
-		case BlendMode::kBlendModeScreen:
-			blendMode_ = BlendMode::kBlendModeScreen;
-			break;
-		}
-	}
+
+	// モデルのデバック
+	drawTaskModels_->DebugWindow();
+
 	// 平行光源
-	if (ImGui::TreeNode("DirectionalLight")) {
-		ImGui::DragFloat3("dir", &directionalData_.direction.x, 0.01f);
+	if (ImGui::TreeNodeEx("Light", ImGuiTreeNodeFlags_Framed)) {
+		ImGui::DragFloat3("Dirction", &directionalData_.direction.x, 0.01f);
 		directionalData_.direction = Normalize(directionalData_.direction);
-		ImGui::DragFloat("ind", &directionalData_.intensity, 0.01f);
+		ImGui::DragFloat("Intensity", &directionalData_.intensity, 0.01f);
+		ImGui::ColorEdit3("Color", &directionalData_.color.x);
 		lightManager_->SetDirectionalData(directionalData_);
 		ImGui::TreePop();
 	}
-	// 平面
-	if (ImGui::TreeNode("plane")) {
-		ImGui::DragFloat3("scale", &planeTransform_.scale.x, 0.01f);
-		ImGui::DragFloat3("rotate", &planeTransform_.rotate.x, 0.01f);
-		ImGui::DragFloat3("translate", &planeTransform_.translate.x, 0.01f);
-		ImGui::TreePop();
-	}
-
-	ImGui::DragFloat3("boxPos", &boxTransform_.translate.x, 0.01f);
-	boxWorldTransform_.SetTranslate(boxTransform_.translate);
 
 	ImGui::End();
 
@@ -178,21 +170,24 @@ void GameScene::Update(GameEngine::Input* input){
 
 void GameScene::Draw() {
 
-	// モデルの単体描画前処理
-	Model::PreDraw(PSOMode::Triangle, blendMode_);
-	
-	// 箱
-	boxModel_->Draw(boxWorldTransform_, whiteGH_, camera_->GetVPMatrix());
+	// スプライトの描画前処理
+	Sprite::PreDraw(BlendMode::kBlendModeNormal);
 
-	// 平面を描画
-	planeModel_->Draw(planeWorldTransform_, planeGH_, camera_->GetVPMatrix());
+	// 描画
+	drawTaskModels_->Draw2D();
+
+	// モデルの単体描画前処理
+	Model::PreDraw(PSOMode::Triangle, BlendMode::kBlendModeNormal);
 
 	// 地面を描画
-	terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
-	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
+	//terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
+	//terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
+
+	// 描画
+	drawTaskModels_->Draw3D(camera_->GetVPMatrix(), lightManager_->GetResource(), camera_->GetCameraResource());
 
 	// モデルの単体描画前処理
-	Model::PreDraw(PSOMode::Grid, blendMode_);
+	Model::PreDraw(PSOMode::Grid, BlendMode::kBlendModeNormal);
 
 	// グリッドを描画
 	gridModel_->DrawGrid(gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());

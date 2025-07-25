@@ -45,9 +45,9 @@ namespace GameEngine {
 		/// <summary>
 		/// エンジンの初期化
 		/// </summary>
-		/// <param name="title"></param>
-		/// <param name="width"></param>
-		/// <param name="height"></param>
+		/// <param name="title">タイトルバーの名前</param>
+		/// <param name="width">画面の横幅</param>
+		/// <param name="height">画面の縦幅</param>
 		void Initialize(const std::wstring& title, const uint32_t& width, const uint32_t& height, HINSTANCE hInstance);
 
 		/// <summary>
@@ -140,6 +140,7 @@ namespace GameEngine {
 
 		/// Input =============================
 
+		// 入力処理
 		std::unique_ptr<Input> input_;
 
 	private:

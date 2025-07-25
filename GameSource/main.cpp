@@ -51,9 +51,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		engine->bloomPSO_->constBuffer_->highLumMask = highLumMask;
 		ImGui::SliderFloat("Intensity", &intensity, 0.0f, 10.0f);
 		engine->bloomPSO_->constBuffer_->intensity = intensity;
-
 		ImGui::End();
-		
+
 		// 更新後処理
 		engine->PostUpdate();
 

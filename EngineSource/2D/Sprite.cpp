@@ -30,6 +30,8 @@ Sprite* Sprite::Create(Vector2 position, Vector2 size,  Vector4 color) {
 	// 座標と大きさを取得
 	sprite->position_ = position;
 	sprite->size_ = size;
+	// 座標を元にワールド行列の生成
+	sprite->worldMatrix_ = MakeTranslateMatrix({ position.x,position.y,0.0f });
 
 	// メッシュを作成
 	sprite->CreateMesh();
@@ -52,7 +54,7 @@ void Sprite::Draw(const uint32_t& textureHandle) {
 		commandList_->SetGraphicsRootDescriptorTable(1, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
 	}
 	// 描画
-	commandList_->DrawIndexedInstanced(4, 1, 0, 0, 0);
+	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
 void Sprite::SetPosition(const Vector2& position) {
@@ -114,7 +116,7 @@ void Sprite::CreateMesh() {
 	vertexData_[1].texcoord = { 0.0f,0.0f };
 	vertexData_[2].position = { right,bottom,0.0f,1.0f }; // 右下
 	vertexData_[2].texcoord = { 1.0f,1.0f };
-	vertexData_[3].position = { right,top,0.0f,1.0f }; // 左上
+	vertexData_[3].position = { right,top,0.0f,1.0f }; // 右上
 	vertexData_[3].texcoord = { 1.0f,0.0f };
 
 	// Sprite用の頂点インデックスのリソースを作る
