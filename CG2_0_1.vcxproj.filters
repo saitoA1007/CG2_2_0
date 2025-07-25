@@ -192,6 +192,9 @@
     <ClCompile Include="EngineSource\Core\GameEngine.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
+    <ClCompile Include="GameSource\DrawTaskModel.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -388,6 +391,9 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Core\GameEngine.h">
       <Filter>EngineSource\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSource\DrawTaskModel.h">
+      <Filter>GameSource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

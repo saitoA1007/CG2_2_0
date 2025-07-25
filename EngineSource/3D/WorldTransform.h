@@ -60,6 +60,8 @@ namespace GameEngine {
 
 		void SetWVPMatrix(const Matrix4x4& VPMatrix);
 
+		Transform transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
 	private:
 		// コピー禁止
 		WorldTransform(const WorldTransform&) = delete;
@@ -68,7 +70,6 @@ namespace GameEngine {
 		static ID3D12Device* device_;
 
 		Matrix4x4 worldMatrix_;
-		Transform transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 		TransformationMatrix* transformationMatrixData_ = nullptr;

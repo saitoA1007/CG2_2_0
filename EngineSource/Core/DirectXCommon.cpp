@@ -101,6 +101,9 @@ void DirectXCommon::PostDraw(ImGuiManager* imGuiManager)
 
 #endif
 
+    //copyPSO_->Draw(commandList_.Get(), postEffectManager_->GetSRVHandle());
+    //imGuiManager->Draw();
+
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
     // バリア: バックバッファをPresentに
     SwapchainBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
