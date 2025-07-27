@@ -14,6 +14,7 @@ GameScene::~GameScene() {
 	delete UtahTeapotModel_;
 	delete bunnyModel_;
 	delete suzanneModel_;
+	delete multiMeshModel_;
 
 	delete terrainModel_;
 
@@ -85,6 +86,9 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// スザンヌモデルを生成
 	suzanneModel_ = Model::CreateModel("suzanne.obj", "Suzanne");
 	suzanneModel_->SetDefaultIsEnableLight(true);
+	// マルチメッシュを生成
+	multiMeshModel_ = Model::CreateModel("multiMesh.obj", "MultiMesh");
+	multiMeshModel_->SetDefaultIsEnableLight(true);
 
 	// 評価課題のモデルを描画するクラスの初期化
 	drawTaskModels_ = std::make_unique<DrawTaskModel>();
@@ -100,6 +104,8 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	drawTaskModels_->SetBunny(bunnyModel_);
 	// スザンヌモデルをセット
 	drawTaskModels_->SetSuzanne(suzanneModel_);
+	// マルチメッシュをセット
+	drawTaskModels_->SetMultiMesh(multiMeshModel_);
 }
 
 void GameScene::Update(GameEngine::Input* input){

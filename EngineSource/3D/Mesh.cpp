@@ -1,6 +1,7 @@
 #include"Mesh.h"
 #include"EngineSource/Common/CreateBufferResource.h"
 
+#include<cassert>
 #include<numbers>
 
 using namespace GameEngine;
@@ -179,22 +180,26 @@ void Mesh::CreateSphereMesh(ID3D12Device* device, uint32_t subdivision) {
 	}
 }
 
-void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData) {
+void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData, const uint32_t& index) {
+
+	// 要素が無ければエラー
+	assert(modelData.meshes.size() > index);
+
 	// 描画する時に利用する頂点数
-	totalVertices_ = static_cast<UINT>(modelData.vertices.size());
-	totalIndices_ = static_cast<UINT>(modelData.indices.size());
+	totalVertices_ = static_cast<UINT>(modelData.meshes[index].vertices.size());
+	totalIndices_ = static_cast<UINT>(modelData.meshes[index].indices.size());
 
 	// 頂点リソースを作る
-	vertexResource_ = CreateBufferResource(device, sizeof(VertexData) * modelData.vertices.size());
+	vertexResource_ = CreateBufferResource(device, sizeof(VertexData) * modelData.meshes[index].vertices.size());
 	// 頂点バッファビューを作成する
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();// リソースの先頭のアドレスから使う
-	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());// 使用するリソースのサイズは頂点サイズ
+	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData.meshes[index].vertices.size());// 使用するリソースのサイズは頂点サイズ
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);// 1頂点あたりのサイズ
 
 	// 頂点リソースにデータを書き込む
 	VertexData* vertexData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));// 書き込むためのアドレスを取得
-	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());// 頂点データをリソースにコピー
+	std::memcpy(vertexData, modelData.meshes[index].vertices.data(), sizeof(VertexData) * modelData.meshes[index].vertices.size());// 頂点データをリソースにコピー
 
 	// インデックスバッファを作成
 	// 球用の頂点インデックスのリソースを作る
@@ -210,7 +215,7 @@ void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData) {
 	// インデックスリソースにデータを書き込む
 	uint32_t* indexData = nullptr;
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
-	std::memcpy(indexData, modelData.indices.data(), sizeof(uint32_t) * modelData.indices.size());
+	std::memcpy(indexData, modelData.meshes[index].indices.data(), sizeof(uint32_t) * modelData.meshes[index].indices.size());
 }
 
 void Mesh::CreateRingMesh(ID3D12Device* device,const uint32_t& subdivision,const float& outerRadius,const float& innerRadius) {

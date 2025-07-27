@@ -178,16 +178,22 @@ namespace GameEngine {
 		// テクスチャ
 		static TextureManager* textureManager_;
 
-		// メッシュ
-		std::unique_ptr<Mesh> mesh_ = nullptr;
+		// 複数メッシュに対応
+		std::vector<std::unique_ptr<Mesh>> meshes_;
 
 		// デフォルトのマテリアル
 		std::unique_ptr<Material> defaultMaterial_ = nullptr;
+
+		// 複数マテリアルに対応
+		std::vector<std::unique_ptr<Material>> material_;
 
 		// Nodeのローカル行列を保持しておく変数
 		Matrix4x4 localMatrix_;
 
 		bool isLoad_ = false;
+
+		// メッシュの数
+		int meshCount_ = 0;
 
 	private:
 
