@@ -13,6 +13,7 @@ public:
 		UtahTeapot,
 		StanfordBunny,
 		Suzanne,
+		MultiMesh,
 	};
 	
 public:
@@ -79,10 +80,16 @@ public:
 	/// <param name="suzanneModel"></param>
 	void SetSuzanne(GameEngine::Model* suzanneModel) { suzanneModel_ = suzanneModel; }
 
+	/// <summary>
+	/// マルチメッシュモデルを設定
+	/// </summary>
+	/// <param name="multiMeshModel"></param>
+	void SetMultiMesh(GameEngine::Model* multiMeshModel) { multiMeshModel_ = multiMeshModel; }
+
 private:
 
 	// 描画モデル
-	const char* kModelName_[5] = { "Plane","Sphere","UtahTeapot","StanfordBunny","Suzanne"};
+	const char* kModelName_[6] = { "Plane","Sphere","UtahTeapot","StanfordBunny","Suzanne","MultiMesh"};
 	int selectModelNum_ = 0;
 
 	// スプライトの描画状態を管理
@@ -123,4 +130,8 @@ private:
 	// スザンヌ
 	GameEngine::Model* suzanneModel_ = nullptr;
 	Transform suzanneTransform_;
+
+	// マルチメッシュ
+	GameEngine::Model* multiMeshModel_ = nullptr;
+	Transform multiMeshTransform_;
 };

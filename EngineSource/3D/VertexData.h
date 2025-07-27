@@ -26,9 +26,13 @@ struct Node {
 	std::vector<Node> children;
 };
 
-struct ModelData {
+struct MeshData {
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
+};
+
+struct ModelData {
+	std::vector<MeshData> meshes;
 	LoadMaterialData material;
 	Node rootNode;
 };

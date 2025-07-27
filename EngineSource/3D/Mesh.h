@@ -34,7 +34,7 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="device">デバイス</param>
 		/// <param name="modelData">読み込んだモデルデータ</param>
-		void CreateModelMesh(ID3D12Device* device,ModelData modelData);
+		void CreateModelMesh(ID3D12Device* device,ModelData modelData,const uint32_t& index);
 
 		/// <summary>
 		/// リングのメッシュを作成

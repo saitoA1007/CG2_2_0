@@ -26,6 +26,8 @@ void DrawTaskModel::Initialize(const uint32_t& uvCheckerGH, const uint32_t& whit
 	bunnyTransform_ = { {1.0f,1.0f,1.0f},{0.0f,2.8f,0.0f},{0.0f,0.0f,0.0f} };
 	// スザンヌ
 	suzanneTransform_ = { {1.0f,1.0f,1.0f},{0.0f,3.1f,0.0f},{0.0f,0.0f,0.0f} };
+	// マルチメッシュ
+	multiMeshTransform_ = { {1.0f,1.0f,1.0f},{0.0f,3.1f,0.0f},{0.0f,0.0f,0.0f} };
 
 	// 行列の初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
@@ -91,6 +93,14 @@ void DrawTaskModel::Draw3D(const Matrix4x4& VPMatrix, ID3D12Resource* lightGroup
 		}
 		suzanneModel_->Draw(worldTransform_, whiteGH_, VPMatrix);
 		break;
+
+	case ModelMode::MultiMesh:
+		// マルチメッシュ
+		if (isLightOn_) {
+			multiMeshModel_->DrawLight(lightGroupResource, cameraResource);
+		}
+		multiMeshModel_->Draw(worldTransform_, uvCheckerGH_, VPMatrix);
+		break;
 	}
 }
 
@@ -150,6 +160,13 @@ void DrawTaskModel::DebugWindow() {
 			ImGui::DragFloat3("Translate", &suzanneTransform_.translate.x, 0.01f);
 			worldTransform_.transform_ = suzanneTransform_;
 			break;
+
+		case ModelMode::MultiMesh:
+			ImGui::DragFloat3("Scale", &multiMeshTransform_.scale.x, 0.01f);
+			ImGui::DragFloat3("Rotate", &multiMeshTransform_.rotate.x, 0.01f);
+			ImGui::DragFloat3("Translate", &multiMeshTransform_.translate.x, 0.01f);
+			worldTransform_.transform_ = multiMeshTransform_;
+			break;
 		}
 
 		if (ImGui::Checkbox("isEnableLight", &isLightOn_)) {
@@ -165,6 +182,8 @@ void DrawTaskModel::DebugWindow() {
 				bunnyModel_->SetDefaultIsEnableLight(true);
 				// スザンヌモデル
 				suzanneModel_->SetDefaultIsEnableLight(true);
+				// マルチメッシュモデル
+				multiMeshModel_->SetDefaultIsEnableLight(true);
 			} else {
 				planeModel_->SetDefaultIsEnableLight(false);
 				// 球モデル
@@ -175,6 +194,8 @@ void DrawTaskModel::DebugWindow() {
 				bunnyModel_->SetDefaultIsEnableLight(false);
 				// スザンヌモデル
 				suzanneModel_->SetDefaultIsEnableLight(false);
+				// マルチメッシュモデル
+				multiMeshModel_->SetDefaultIsEnableLight(false);
 			}	
 		}
 

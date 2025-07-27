@@ -67,8 +67,9 @@ Model* Model::CreateSphere(uint32_t subdivision) {
 	Model* model = new Model();
 
 	// メッシュを作成
-	model->mesh_ = std::make_unique<Mesh>();
-	model->mesh_->CreateSphereMesh(device_,subdivision);
+	std::unique_ptr<Mesh> tmpMesh = std::make_unique<Mesh>();
+	tmpMesh->CreateSphereMesh(device_, subdivision);
+	model->meshes_.push_back(std::move(tmpMesh));
 
 	// マテリアルを作成
 	model->defaultMaterial_ = std::make_unique<Material>();
@@ -83,8 +84,9 @@ Model* Model::CreateTrianglePlane() {
 	Model* model = new Model();
 
 	// メッシュを作成
-	model->mesh_ = std::make_unique<Mesh>();
-	model->mesh_->CreateTrianglePlaneMesh(device_);
+	std::unique_ptr<Mesh> tmpMesh = std::make_unique<Mesh>();
+	tmpMesh->CreateTrianglePlaneMesh(device_);
+	model->meshes_.push_back(std::move(tmpMesh));
 
 	// マテリアルを作成
 	model->defaultMaterial_ = std::make_unique<Material>();
@@ -99,8 +101,9 @@ Model* Model::CreateGridPlane(const Vector2& size) {
 	Model* model = new Model();
 
 	// メッシュを作成
-	model->mesh_ = std::make_unique<Mesh>();
-	model->mesh_->CreatePlaneMesh(device_, size);
+	std::unique_ptr<Mesh> tmpMesh = std::make_unique<Mesh>();
+	tmpMesh->CreatePlaneMesh(device_, size);
+	model->meshes_.push_back(std::move(tmpMesh));
 
 	return model;
 }
@@ -127,8 +130,12 @@ Model* Model::CreateModel(const std::string& objFilename, const std::string& fil
 	}
 
 	// メッシュを作成
-	model->mesh_ = std::make_unique<Mesh>();
-	model->mesh_->CreateModelMesh(device_, modelData);
+	for (uint32_t index = 0; index < modelData.meshes.size(); ++index) {
+		std::unique_ptr<Mesh> tmpMesh = std::make_unique<Mesh>();
+		tmpMesh->CreateModelMesh(device_, modelData, index);
+
+		model->meshes_.push_back(std::move(tmpMesh));
+	}
 	
 	// マテリアルを作成
 	model->defaultMaterial_ = std::make_unique<Material>();
@@ -153,22 +160,24 @@ void Model::Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, 
 		worldTransform.SetWVPMatrix(VPMatrix);
 	}
 
-	commandList_->IASetVertexBuffers(0, 1, &mesh_->GetVertexBufferView());
-	commandList_->IASetIndexBuffer(&mesh_->GetIndexBufferView());
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	// マテリアルが設定されていなければデフォルトのマテリアルを使う
-	if (material == nullptr) {
-		commandList_->SetGraphicsRootConstantBufferView(0, defaultMaterial_->GetMaterialResource()->GetGPUVirtualAddress());
-	} else {
-		commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-	}
-	commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
+	for (uint32_t i = 0; i < meshes_.size(); ++i) {
+		commandList_->IASetVertexBuffers(0, 1, &meshes_[i]->GetVertexBufferView());
+		commandList_->IASetIndexBuffer(&meshes_[i]->GetIndexBufferView());
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		// マテリアルが設定されていなければデフォルトのマテリアルを使う
+		if (material == nullptr) {
+			commandList_->SetGraphicsRootConstantBufferView(0, defaultMaterial_->GetMaterialResource()->GetGPUVirtualAddress());
+		} else {
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+		}
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
 
-	if (mesh_->GetTotalIndices() != 0) {
-		commandList_->DrawIndexedInstanced(mesh_->GetTotalIndices(), 1, 0, 0, 0);
-	} else {
-		commandList_->DrawInstanced(mesh_->GetTotalVertices(), 1, 0, 0);
+		if (meshes_[i]->GetTotalIndices() != 0) {
+			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
+		} else {
+			commandList_->DrawInstanced(meshes_[i]->GetTotalVertices(), 1, 0, 0);
+		}
 	}
 }
 
@@ -176,22 +185,24 @@ void Model::Draw(const uint32_t& numInstance,WorldTransforms& worldTransforms, c
 	// カメラ座標に変換
 	worldTransforms.SetWVPMatrix(numInstance,VPMatrix);
 
-	commandList_->IASetVertexBuffers(0, 1, &mesh_->GetVertexBufferView());
-	commandList_->IASetIndexBuffer(&mesh_->GetIndexBufferView());
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	// マテリアルが設定されていなければデフォルトのマテリアルを使う
-	if (material == nullptr) {
-		commandList_->SetGraphicsRootConstantBufferView(0, defaultMaterial_->GetMaterialResource()->GetGPUVirtualAddress());
-	} else {
-		commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-	}
-	commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
-	commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
+	for (uint32_t i = 0; i < meshes_.size(); ++i) {
+		commandList_->IASetVertexBuffers(0, 1, &meshes_[i]->GetVertexBufferView());
+		commandList_->IASetIndexBuffer(&meshes_[i]->GetIndexBufferView());
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		// マテリアルが設定されていなければデフォルトのマテリアルを使う
+		if (material == nullptr) {
+			commandList_->SetGraphicsRootConstantBufferView(0, defaultMaterial_->GetMaterialResource()->GetGPUVirtualAddress());
+		} else {
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+		}
+		commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
+		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
 
-	if (mesh_->GetTotalIndices() != 0) {
-		commandList_->DrawIndexedInstanced(mesh_->GetTotalIndices(), 1, 0, 0, 0);
-	} else {
-		commandList_->DrawInstanced(mesh_->GetTotalVertices(), 1, 0, 0);
+		if (meshes_[i]->GetTotalIndices() != 0) {
+			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
+		} else {
+			commandList_->DrawInstanced(meshes_[i]->GetTotalVertices(), 1, 0, 0);
+		}
 	}
 }
 
@@ -204,43 +215,43 @@ void Model::DrawGrid(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, 
 
 	worldTransform.SetWVPMatrix(VPMatrix);
 
-	commandList_->IASetVertexBuffers(0, 1, &mesh_->GetVertexBufferView());
-	commandList_->IASetIndexBuffer(&mesh_->GetIndexBufferView());
+	commandList_->IASetVertexBuffers(0, 1, &meshes_[0]->GetVertexBufferView());
+	commandList_->IASetIndexBuffer(&meshes_[0]->GetIndexBufferView());
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, cameraResource->GetGPUVirtualAddress());
-	commandList_->DrawIndexedInstanced(mesh_->GetTotalIndices(), 1, 0, 0, 0);
+	commandList_->DrawIndexedInstanced(meshes_[0]->GetTotalIndices(), 1, 0, 0, 0);
 }
 
 [[nodiscard]]
 ModelData Model::LoadModelFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename) {
 
-	ModelData modelData; // 構築するModelData
-	
-	// objファイルを読み込み
+	ModelData modelData;
+
+	// ファイルを読み込み
 	Assimp::Importer importer;
 	std::string filePath = directoryPath + "/" + filename + "/" + objFilename;
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
-	assert(scene->HasMeshes()); // メッシュがないのは対応しない
-		
+	assert(scene && scene->HasMeshes()); // メッシュがないのは対応しない
+
 	// Mesh解析
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals()); // 法線がないMeshは今回は非対応
+
 		// 最初に頂点分メモリを確保する
-		modelData.vertices.resize(mesh->mNumVertices);
+		MeshData meshData;
+		meshData.vertices.resize(mesh->mNumVertices);
 
 		// Vertex解析
 		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
 			aiVector3D& position = mesh->mVertices[vertexIndex];
 			aiVector3D& normal = mesh->mNormals[vertexIndex];
 			VertexData vertex;
-			vertex.position = { position.x,position.y,position.z,1.0f };
-			vertex.normal = { normal.x,normal.y,normal.z };
 			// 右手->左手に変換する
-			vertex.position.x *= -1.0f;
-			vertex.normal.x *= -1.0f;
-			
+			vertex.position = { -position.x, position.y, position.z, 1.0f };
+			vertex.normal = { -normal.x, normal.y, normal.z };
+
 			// UVの適応
 			if (mesh->HasTextureCoords(0)) {
 				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
@@ -250,20 +261,22 @@ ModelData Model::LoadModelFile(const std::string& directoryPath, const std::stri
 				vertex.texcoord = { (position.x + 1.0f) * 0.5f, (position.z + 1.0f) * 0.5f };
 			}
 
-			modelData.vertices[vertexIndex] = vertex;
+			meshData.vertices[vertexIndex] = vertex;
 		}
-		
+
 		// Face解析
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
 			aiFace& face = mesh->mFaces[faceIndex];
-			assert(face.mNumIndices >= 3); // 三角形より大きければ通す
-
-			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
-				uint32_t vertexIndex = face.mIndices[element];
-				modelData.indices.push_back(vertexIndex);
+			assert(face.mNumIndices >= 3);
+			for (uint32_t i = 0; i < face.mNumIndices; ++i) {
+				meshData.indices.push_back(face.mIndices[i]);
 			}
 		}
+
+		modelData.meshes.push_back(std::move(meshData));
 	}
+
+	//=========================================================
 
 	// Material解析
 	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {

@@ -97,4 +97,6 @@ private:
 	GameEngine::Model* bunnyModel_;
 	// スザンヌモデル
 	GameEngine::Model* suzanneModel_;
+	// マルチメッシュ
+	GameEngine::Model* multiMeshModel_;
 };
