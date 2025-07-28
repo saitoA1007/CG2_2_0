@@ -189,6 +189,27 @@ Vector2 Input::GetRightStick() {
 	return result;
 }
 
+bool Input::GetPushPadLeftTrigger(const float& value) {
+
+	float lt = static_cast<float>(controllerState_.Gamepad.bLeftTrigger);
+
+	if (lt > value) {
+		return true;
+	}
+	return false;
+}
+
+bool Input::GetPushPadRightTrigger(const float& value) {
+
+	float rt = static_cast<float>(controllerState_.Gamepad.bRightTrigger);
+
+	if (rt > value) {
+		return true;
+	}
+	return false;
+}
+
 bool Input::IsPadConnected() const {
 	return (controllerState_.dwPacketNumber != 0);
 }
+
