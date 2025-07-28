@@ -88,7 +88,7 @@ namespace GameEngine {
 		static Model* CreateGridPlane(const Vector2& size);
 
 		/// <summary>
-		/// 生成したモデルを描画(差し替え)
+		/// 生成したモデルを描画(画像差し替え用)
 		/// </summary>
 		/// <param name="worldMatrix">ワールド行列</param>
 		/// <param name="directionalLightResource">光源</param>
@@ -97,7 +97,7 @@ namespace GameEngine {
 		void Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material = nullptr);
 
 		/// <summary>
-		/// 生成したモデルを描画
+		/// 生成したモデルを描画(元のテクスチャを使用)
 		/// </summary>
 		/// <param name="worldMatrix">ワールド行列</param>
 		/// <param name="directionalLightResource">光源</param>
@@ -115,7 +115,7 @@ namespace GameEngine {
 		void Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource, const Material* material = nullptr);
 
 		/// <summary>
-		/// 生成したモデルを複数描画
+		/// 生成したモデルの複数描画
 		/// </summary>
 		/// <param name="worldTransforms"></param>
 		/// <param name="textureHandle"></param>
@@ -163,6 +163,13 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="uvMatrix"></param>
 		void SetDefaultUVMatrix(const Matrix4x4& uvMatrix, const uint32_t& index = 0);
+
+		/// <summary>
+		/// デフォルトのuvMatrixを設定
+		/// </summary>
+		/// <param name="uvTransform"></param>
+		/// <param name="index"></param>
+		void SetDefaultUVMatrix(const Transform& uvTransform, const uint32_t& index = 0);
 
 	private:
 

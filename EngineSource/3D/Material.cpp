@@ -26,3 +26,7 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 	// 輝度を設定
 	materialData_->shininess = shininess;
 }
+
+void Material::SetUVTransform(Transform uvTransform) {
+	materialData_->uvTransform = MakeAffineMatrix(uvTransform.scale, uvTransform.rotate, uvTransform.translate);
+}

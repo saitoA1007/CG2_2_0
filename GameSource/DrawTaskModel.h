@@ -16,6 +16,11 @@ public:
 		MultiMesh,
 		MultiMaterial
 	};
+
+	struct MaterialData {
+		Vector4 color;
+		Transform uvTransform;
+	};
 	
 public:
 
@@ -144,4 +149,5 @@ private:
 	// マルチマテリアル
 	GameEngine::Model* multiMaterialModel_ = nullptr;
 	Transform multiMaterialTransform_;
+	MaterialData multiMaterial_[2];
 };

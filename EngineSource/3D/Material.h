@@ -2,6 +2,7 @@
 #include"EngineSource/Math/Vector4.h"
 #include"EngineSource/Math/Vector3.h"
 #include"EngineSource/Math/Matrix4x4.h"
+#include"EngineSource/Math/Transform.h"
 #include<iostream>
 #include <d3d12.h>
 #include <wrl.h>
@@ -76,6 +77,12 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="uvMatrix"></param>
 		void SetUVMatrix(Matrix4x4 uvMatrix) { materialData_->uvTransform = uvMatrix; }
+
+		/// <summary>
+		/// uvトランスフォームを設定
+		/// </summary>
+		/// <param name="uvTransform"></param>
+		void SetUVTransform(Transform uvTransform);
 
 		void SetTextureHandle(const uint32_t& tex) { textureHandle_ = tex; }
 

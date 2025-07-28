@@ -30,6 +30,11 @@ void DrawTaskModel::Initialize(const uint32_t& uvCheckerGH, const uint32_t& whit
 	multiMeshTransform_ = { {1.0f,1.0f,1.0f},{0.0f,3.1f,0.0f},{0.0f,0.0f,0.0f} };
 	// マルチマテリアル
 	multiMaterialTransform_ = { {1.0f,1.0f,1.0f},{0.0f,3.1f,0.0f},{0.0f,0.0f,0.0f} };
+	// マテリアルの初期化
+	multiMaterial_[0].uvTransform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	multiMaterial_[0].color = { 1.0f,1.0f,1.0f,1.0f };
+	multiMaterial_[1].uvTransform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	multiMaterial_[1].color = { 1.0f,1.0f,1.0f,1.0f };
 
 	// 行列の初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
@@ -183,6 +188,30 @@ void DrawTaskModel::DebugWindow() {
 			ImGui::DragFloat3("Rotate", &multiMaterialTransform_.rotate.x, 0.01f);
 			ImGui::DragFloat3("Translate", &multiMaterialTransform_.translate.x, 0.01f);
 			worldTransform_.transform_ = multiMaterialTransform_;
+
+			if (ImGui::TreeNodeEx("Material", ImGuiTreeNodeFlags_Framed)) {
+
+				if (ImGui::TreeNode("Material : 0")) {
+					ImGui::DragFloat3("Scale", &multiMaterial_[0].uvTransform.scale.x, 0.01f);
+					ImGui::DragFloat3("Rotate", &multiMaterial_[0].uvTransform.rotate.x, 0.01f);
+					ImGui::DragFloat3("Translate", &multiMaterial_[0].uvTransform.translate.x, 0.01f);
+					multiMaterialModel_->SetDefaultUVMatrix(multiMaterial_[0].uvTransform, 0);
+					ImGui::ColorEdit3("Color", &multiMaterial_[0].color.x);
+					multiMaterialModel_->SetDefaultColor(multiMaterial_[0].color, 0);
+					ImGui::TreePop();
+				}
+
+				if (ImGui::TreeNode("Material : 1")) {
+					ImGui::DragFloat3("Scale", &multiMaterial_[1].uvTransform.scale.x, 0.01f);
+					ImGui::DragFloat3("Rotate", &multiMaterial_[1].uvTransform.rotate.x, 0.01f);
+					ImGui::DragFloat3("Translate", &multiMaterial_[1].uvTransform.translate.x, 0.01f);
+					multiMaterialModel_->SetDefaultUVMatrix(multiMaterial_[1].uvTransform, 1);
+					ImGui::ColorEdit3("Color", &multiMaterial_[1].color.x);
+					multiMaterialModel_->SetDefaultColor(multiMaterial_[1].color, 1);
+					ImGui::TreePop();
+				}
+				ImGui::TreePop();
+			}
 			break;
 		}
 
