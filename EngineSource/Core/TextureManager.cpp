@@ -3,6 +3,7 @@
 #include"EngineSource/Common/CreateBufferResource.h"
 #include"EngineSource/Common/DescriptorHandle.h"
 #include<format>
+#include <filesystem>
 #include"ResourceCounter.h"
 
 using namespace GameEngine;
@@ -34,7 +35,7 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 
 	// もし同じテクスチャを読み込んだのであれば、すでに格納されている配列番号を返す。
 	for (int i = 0; i < textures_.size(); ++i) {
-		if (textures_.at(i).fileName == fileName) {
+		if (textures_.at(i).fileName == GetFileName(fileName)) {
 			// 終了したこと、同じテクスチャを読み込んでいることを伝える
 			if (logManager_) {
 				logManager_->Log("End LoadTexture : " + fileName + ". This texture data already loaded");
@@ -56,7 +57,7 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 		std::abort();
 	}
 	// テクスチャ名を記録
-	textures_.at(index_).fileName = fileName;
+	textures_.at(index_).fileName = GetFileName(fileName);
 
 		// テクスチャを読み込む
 	textures_.at(index_).mipImage = LoadTexture(fileName);
@@ -173,4 +174,8 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(ID3D12R
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
 	commandList->ResourceBarrier(1, &barrier);
 	return intermediateResource;
+}
+
+std::string TextureManager::GetFileName(const std::string& fullPath) {
+	return std::filesystem::path(fullPath).filename().string();
 }

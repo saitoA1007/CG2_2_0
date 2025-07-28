@@ -15,6 +15,7 @@ GameScene::~GameScene() {
 	delete bunnyModel_;
 	delete suzanneModel_;
 	delete multiMeshModel_;
+	delete multiMaterialModel_;
 
 	delete terrainModel_;
 
@@ -22,10 +23,15 @@ GameScene::~GameScene() {
 	delete gridModel_;
 }
 
-void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngine::DirectXCommon* dxCommon) {
+void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngine::DirectXCommon* dxCommon, GameEngine::AudioManager* audioManager) {
 
 	// DirectX機能を受け取る
 	dxCommon_ = dxCommon;
+
+	// 音声機能を受け取る
+	audioManager_ = audioManager;
+	// ロード
+	seHandle_ = audioManager_->Load("Resources/Sounds/se.mp3");
 
 	// テクスチャ機能を受け取る
 	textureManager_ = textureManager;
@@ -73,7 +79,6 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	planeModel_ = Model::CreateModel("plane.obj", "Plane");
 	planeModel_->SetDefaultIsEnableLight(true);
 	uvCheckerGH_ = textureManager->Load("Resources/Textures/uvChecker.png");
-	checkerBoardGH_ = textureManager->Load("Resources/Models/Teapot/checkerBoard.png");
 	// 球モデルを生成
 	sphereModel_ = Model::CreateSphere(16);
 	sphereModel_->SetDefaultIsEnableLight(true);
@@ -89,23 +94,28 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// マルチメッシュを生成
 	multiMeshModel_ = Model::CreateModel("multiMesh.obj", "MultiMesh");
 	multiMeshModel_->SetDefaultIsEnableLight(true);
+	// マルチマテリアル
+	multiMaterialModel_ = Model::CreateModel("multiMaterial.obj", "MultiMaterial");
+	multiMaterialModel_->SetDefaultIsEnableLight(true,0);
+	multiMaterialModel_->SetDefaultIsEnableLight(true,1);
 
 	// 評価課題のモデルを描画するクラスの初期化
 	drawTaskModels_ = std::make_unique<DrawTaskModel>();
 	drawTaskModels_->Initialize(uvCheckerGH_, whiteGH_);
-
 	// 平面モデルをセット
 	drawTaskModels_->SetPlane(planeModel_);
 	// 球モデルをセット
 	drawTaskModels_->SetSphere(sphereModel_);
 	// ティーポッドモデルをセット
-	drawTaskModels_->SetUtahTeapot(UtahTeapotModel_, checkerBoardGH_);
+	drawTaskModels_->SetUtahTeapot(UtahTeapotModel_);
 	// ウサギモデルをセット
 	drawTaskModels_->SetBunny(bunnyModel_);
 	// スザンヌモデルをセット
 	drawTaskModels_->SetSuzanne(suzanneModel_);
 	// マルチメッシュをセット
 	drawTaskModels_->SetMultiMesh(multiMeshModel_);
+	// マルチマテリアル
+	drawTaskModels_->SetMultiMaterial(multiMaterialModel_);
 }
 
 void GameScene::Update(GameEngine::Input* input){
@@ -157,6 +167,13 @@ void GameScene::Update(GameEngine::Input* input){
 		ImGui::TreePop();
 	}
 
+	ImGui::End();
+
+	ImGui::Begin("AudioManager");
+	// ボタンを押したらseを再生
+	if(ImGui::Button("PlayerSound")) {
+		audioManager_->Play(seHandle_);
+	}
 	ImGui::End();
 
 	// Fps計測器の描画

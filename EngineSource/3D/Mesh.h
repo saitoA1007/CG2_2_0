@@ -81,6 +81,12 @@ namespace GameEngine {
 		/// <returns></returns>
 		const uint32_t GetTotalIndices()const { return totalIndices_; }
 
+		/// <summary>
+		/// メッシュに対応するマテリアル番号を取得
+		/// </summary>
+		/// <returns></returns>
+		const uint32_t GetMaterialIndex() const { return materialIndex_; }
+
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
@@ -90,5 +96,8 @@ namespace GameEngine {
 
 		uint32_t totalVertices_ = 0;
 		uint32_t totalIndices_ = 0;
+
+		// メッシュに対応するマテリアル番号
+		uint32_t materialIndex_ = 0;
 	};
 }

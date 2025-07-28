@@ -94,5 +94,7 @@ namespace GameEngine {
 
 		[[nodiscard]] Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12Device* device,
 			ID3D12GraphicsCommandList* commandList);
+
+		std::string GetFileName(const std::string& fullPath);
 	};
 }

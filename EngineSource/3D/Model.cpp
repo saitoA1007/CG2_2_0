@@ -72,8 +72,9 @@ Model* Model::CreateSphere(uint32_t subdivision) {
 	model->meshes_.push_back(std::move(tmpMesh));
 
 	// マテリアルを作成
-	model->defaultMaterial_ = std::make_unique<Material>();
-	model->defaultMaterial_->Initialize({1.0f,1.0f,1.0f,1.0f}, { 1.0f,1.0f,1.0f },500.0f,false);
+	std::unique_ptr<Material> tmpMaterial = std::make_unique<Material>();
+	tmpMaterial->Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 500.0f, false);
+	model->materials_.push_back(std::move(tmpMaterial));
 
 	return model;
 }
@@ -89,8 +90,9 @@ Model* Model::CreateTrianglePlane() {
 	model->meshes_.push_back(std::move(tmpMesh));
 
 	// マテリアルを作成
-	model->defaultMaterial_ = std::make_unique<Material>();
-	model->defaultMaterial_->Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 1.0f, false);
+	std::unique_ptr<Material> tmpMaterial = std::make_unique<Material>();
+	tmpMaterial->Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 500.0f, false);
+	model->materials_.push_back(std::move(tmpMaterial));
 
 	return model;
 }
@@ -136,10 +138,22 @@ Model* Model::CreateModel(const std::string& objFilename, const std::string& fil
 
 		model->meshes_.push_back(std::move(tmpMesh));
 	}
-	
+
 	// マテリアルを作成
-	model->defaultMaterial_ = std::make_unique<Material>();
-	model->defaultMaterial_->Initialize(modelData.material.color, modelData.material.specularColor, modelData.material.shininess, false);
+	//model->numMaterial_ = modelData.materials.size();
+	for (uint32_t index = 0; index < modelData.materials.size(); ++index) {
+		std::unique_ptr<Material> tmpMaterial = std::make_unique<Material>();
+		tmpMaterial->Initialize(modelData.materials[index].color, modelData.materials[index].specularColor, modelData.materials[index].shininess, false);
+
+		// テクスチャ情報があればを取得
+		if (!modelData.materials[index].textureFilePath.empty()) {
+
+			uint32_t textureHandle = textureManager_->Load(modelData.materials[index].textureFilePath);
+			tmpMaterial->SetTextureHandle(textureHandle);
+		}
+
+		model->materials_.push_back(std::move(tmpMaterial));
+	}
 
 	// ローカル行列を取得
 	model->localMatrix_ = modelData.rootNode.localMatrix;
@@ -151,7 +165,7 @@ Model* Model::CreateModel(const std::string& objFilename, const std::string& fil
 }
 
 // 描画
-void Model::Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix,const Material* material) {
+void Model::Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material) {
 
 	// カメラ座標に変換
 	if (isLoad_) {
@@ -166,13 +180,72 @@ void Model::Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, 
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
-			commandList_->SetGraphicsRootConstantBufferView(0, defaultMaterial_->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, materials_[meshes_[i]->GetMaterialIndex()]->GetMaterialResource()->GetGPUVirtualAddress());
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
 
+		if (meshes_[i]->GetTotalIndices() != 0) {
+			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
+		} else {
+			commandList_->DrawInstanced(meshes_[i]->GetTotalVertices(), 1, 0, 0);
+		}
+	}
+}
+
+void Model::Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, const Material* material) {
+	// カメラ座標に変換
+	if (isLoad_) {
+		worldTransform.SetWVPMatrix(localMatrix_, VPMatrix);
+	} else {
+		worldTransform.SetWVPMatrix(VPMatrix);
+	}
+
+	for (uint32_t i = 0; i < meshes_.size(); ++i) {
+		commandList_->IASetVertexBuffers(0, 1, &meshes_[i]->GetVertexBufferView());
+		commandList_->IASetIndexBuffer(&meshes_[i]->GetIndexBufferView());
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		// マテリアルが設定されていなければデフォルトのマテリアルを使う
+		if (material == nullptr) {
+			commandList_->SetGraphicsRootConstantBufferView(0, materials_[meshes_[i]->GetMaterialIndex()]->GetMaterialResource()->GetGPUVirtualAddress());
+		} else {
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+		}
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(materials_[meshes_[i]->GetMaterialIndex()]->GetTextureHandle()));
+
+		if (meshes_[i]->GetTotalIndices() != 0) {
+			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
+		} else {
+			commandList_->DrawInstanced(meshes_[i]->GetTotalVertices(), 1, 0, 0);
+		}
+	}
+}
+
+void Model::Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource, const Material* material) {
+	// カメラ座標に変換
+	if (isLoad_) {
+		worldTransform.SetWVPMatrix(localMatrix_, VPMatrix);
+	} else {
+		worldTransform.SetWVPMatrix(VPMatrix);
+	}
+
+	for (uint32_t i = 0; i < meshes_.size(); ++i) {
+		commandList_->IASetVertexBuffers(0, 1, &meshes_[i]->GetVertexBufferView());
+		commandList_->IASetIndexBuffer(&meshes_[i]->GetIndexBufferView());
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		// マテリアルが設定されていなければデフォルトのマテリアルを使う
+		if (material == nullptr) {
+			commandList_->SetGraphicsRootConstantBufferView(0, materials_[meshes_[i]->GetMaterialIndex()]->GetMaterialResource()->GetGPUVirtualAddress());
+		} else {
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+		}
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(materials_[meshes_[i]->GetMaterialIndex()]->GetTextureHandle()));
+		commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
 		if (meshes_[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
 		} else {
@@ -191,7 +264,7 @@ void Model::Draw(const uint32_t& numInstance,WorldTransforms& worldTransforms, c
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
-			commandList_->SetGraphicsRootConstantBufferView(0, defaultMaterial_->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, materials_[meshes_[i]->GetMaterialIndex()]->GetMaterialResource()->GetGPUVirtualAddress());
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
 		}
@@ -242,6 +315,8 @@ ModelData Model::LoadModelFile(const std::string& directoryPath, const std::stri
 		// 最初に頂点分メモリを確保する
 		MeshData meshData;
 		meshData.vertices.resize(mesh->mNumVertices);
+		// 使用するマテリアル番号を保存
+		meshData.materialIndex = mesh->mMaterialIndex - 1;
 
 		// Vertex解析
 		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
@@ -276,35 +351,41 @@ ModelData Model::LoadModelFile(const std::string& directoryPath, const std::stri
 		modelData.meshes.push_back(std::move(meshData));
 	}
 
-	//=========================================================
+	// 最初に頂点分メモリを確保する(こちら側の配列の書き方に変える)
+	modelData.materials.resize(scene->mNumMaterials - 1);
 
 	// Material解析
-	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
-		aiMaterial* material = scene->mMaterials[materialIndex];
+	for (uint32_t materialIndex = 0; materialIndex < modelData.materials.size(); ++materialIndex) {
+		aiMaterial* material = scene->mMaterials[materialIndex + 1];
+		LoadMaterialData materialData;
+
 		// テクスチャを取得
 		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
 			aiString textureFilePath;
-			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
-			modelData.material.textureFilePath = directoryPath + "/" + filename + "/" + textureFilePath.C_Str();
+			if (material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath) == AI_SUCCESS) {
+				materialData.textureFilePath = directoryPath + "/" + filename + "/" + textureFilePath.C_Str();
+			}
 		}
 
 		// 色を取得
-		aiColor3D diffuseColor(1.0f, 1.0f, 1.0f);   // デフォルト値（白）
+		aiColor3D diffuseColor(1.0f, 1.0f, 1.0f);
 		if (AI_SUCCESS == material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor)) {
-			modelData.material.color = { diffuseColor.r, diffuseColor.g, diffuseColor.b,1.0f };
+			materialData.color = { diffuseColor.r, diffuseColor.g, diffuseColor.b, 1.0f };
 		}
 
 		// 鏡面反射の色を取得
-		aiColor3D specularColor(1.0f, 1.0f, 1.0f);   // デフォルト値（白）
+		aiColor3D specularColor(1.0f, 1.0f, 1.0f);
 		if (AI_SUCCESS == material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor)) {
-			modelData.material.specularColor = { specularColor.r, specularColor.g, specularColor.b};
+			materialData.specularColor = { specularColor.r, specularColor.g, specularColor.b };
 		}
 
 		// 輝度
-		float shininess = 0.0f; // デフォルト値
+		float shininess = 0.0f;
 		if (AI_SUCCESS == material->Get(AI_MATKEY_SHININESS, shininess)) {
-			modelData.material.shininess = shininess;
+			materialData.shininess = shininess;
 		}
+
+		modelData.materials[materialIndex] = materialData;
 	}
 
 	// シーン全体の階層構造を作る
@@ -313,24 +394,24 @@ ModelData Model::LoadModelFile(const std::string& directoryPath, const std::stri
 	return modelData;
 }
 
-void  Model::SetDefaultColor(const Vector4& color) {
-	defaultMaterial_->SetColor(color);
+void  Model::SetDefaultColor(const Vector4& color, const uint32_t& index) {
+	materials_[index]->SetColor(color);
 }
 
-void Model::SetDefaultSpecularColor(const Vector3& specularColor) {
-	defaultMaterial_->SetSpecularColor(specularColor);
+void Model::SetDefaultSpecularColor(const Vector3& specularColor, const uint32_t& index) {
+	materials_[index]->SetSpecularColor(specularColor);
 }
 
-void Model::SetDefaultShiness(const float& shininess) {
-	defaultMaterial_->SetShiness(shininess);
+void Model::SetDefaultShiness(const float& shininess, const uint32_t& index) {
+	materials_[index]->SetShiness(shininess);
 }
 
-void  Model::SetDefaultIsEnableLight(const bool& isEnableLight) {
-	defaultMaterial_->SetEnableLighting(isEnableLight);
+void  Model::SetDefaultIsEnableLight(const bool& isEnableLight, const uint32_t& index) {
+	materials_[index]->SetEnableLighting(isEnableLight);
 }
 
-void  Model::SetDefaultUVMatrix(const Matrix4x4& uvMatrix) {
-	defaultMaterial_->SetUVMatrix(uvMatrix);
+void  Model::SetDefaultUVMatrix(const Matrix4x4& uvMatrix, const uint32_t& index) {
+	materials_[index]->SetUVMatrix(uvMatrix);
 }
 
 [[nodiscard]]
