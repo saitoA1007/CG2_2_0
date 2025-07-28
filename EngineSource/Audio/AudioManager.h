@@ -78,6 +78,13 @@ namespace GameEngine {
 		void Play(uint32_t soundHandle);
 
 	private:
+
+		Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
+		IXAudio2MasteringVoice* masterVoice_;
+
+		std::vector<SoundData> soundData_;
+
+	private:
 		/// <summary>
 		/// .wav音声を再生
 		/// </summary>
@@ -109,12 +116,5 @@ namespace GameEngine {
 		/// 音声データの解放
 		/// </summary>
 		void SoundUnload();
-
-	private:
-
-		Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
-		IXAudio2MasteringVoice* masterVoice_;
-
-		std::vector<SoundData> soundData_;
 	};
 }

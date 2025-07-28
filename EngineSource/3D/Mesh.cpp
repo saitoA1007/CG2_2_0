@@ -185,6 +185,9 @@ void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData, const uint3
 	// 要素が無ければエラー
 	assert(modelData.meshes.size() > index);
 
+	// メッシュに対応するマテリアル番号
+	materialIndex_ = modelData.meshes[index].materialIndex;
+
 	// 描画する時に利用する頂点数
 	totalVertices_ = static_cast<UINT>(modelData.meshes[index].vertices.size());
 	totalIndices_ = static_cast<UINT>(modelData.meshes[index].indices.size());

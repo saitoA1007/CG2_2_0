@@ -28,6 +28,8 @@ void DrawTaskModel::Initialize(const uint32_t& uvCheckerGH, const uint32_t& whit
 	suzanneTransform_ = { {1.0f,1.0f,1.0f},{0.0f,3.1f,0.0f},{0.0f,0.0f,0.0f} };
 	// マルチメッシュ
 	multiMeshTransform_ = { {1.0f,1.0f,1.0f},{0.0f,3.1f,0.0f},{0.0f,0.0f,0.0f} };
+	// マルチマテリアル
+	multiMaterialTransform_ = { {1.0f,1.0f,1.0f},{0.0f,3.1f,0.0f},{0.0f,0.0f,0.0f} };
 
 	// 行列の初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
@@ -59,7 +61,7 @@ void DrawTaskModel::Draw3D(const Matrix4x4& VPMatrix, ID3D12Resource* lightGroup
 		if (isLightOn_) {
 			planeModel_->DrawLight(lightGroupResource, cameraResource);
 		}
-		planeModel_->Draw(worldTransform_, uvCheckerGH_, VPMatrix);
+		planeModel_->Draw(worldTransform_, VPMatrix);
 		break;
 
 	case ModelMode::sphere:
@@ -75,7 +77,7 @@ void DrawTaskModel::Draw3D(const Matrix4x4& VPMatrix, ID3D12Resource* lightGroup
 		if (isLightOn_) {
 			utahTeapotModel_->DrawLight(lightGroupResource, cameraResource);
 		}
-		utahTeapotModel_->Draw(worldTransform_, checkerBoardGH_, VPMatrix);
+		utahTeapotModel_->Draw(worldTransform_, VPMatrix);
 		break;
 
 	case ModelMode::StanfordBunny:
@@ -83,7 +85,7 @@ void DrawTaskModel::Draw3D(const Matrix4x4& VPMatrix, ID3D12Resource* lightGroup
 		if (isLightOn_) {
 			bunnyModel_->DrawLight(lightGroupResource, cameraResource);
 		}
-		bunnyModel_->Draw(worldTransform_, uvCheckerGH_, VPMatrix);
+		bunnyModel_->Draw(worldTransform_, VPMatrix);
 		break;
 
 	case ModelMode::Suzanne:
@@ -99,7 +101,15 @@ void DrawTaskModel::Draw3D(const Matrix4x4& VPMatrix, ID3D12Resource* lightGroup
 		if (isLightOn_) {
 			multiMeshModel_->DrawLight(lightGroupResource, cameraResource);
 		}
-		multiMeshModel_->Draw(worldTransform_, uvCheckerGH_, VPMatrix);
+		multiMeshModel_->Draw(worldTransform_, VPMatrix);
+		break;
+
+	case ModelMode::MultiMaterial:
+		// マルチマテリアル
+		if (isLightOn_) {
+			multiMaterialModel_->Draw(worldTransform_, VPMatrix, lightGroupResource, cameraResource);
+		}
+		multiMaterialModel_->Draw(worldTransform_, VPMatrix);
 		break;
 	}
 }
@@ -167,6 +177,13 @@ void DrawTaskModel::DebugWindow() {
 			ImGui::DragFloat3("Translate", &multiMeshTransform_.translate.x, 0.01f);
 			worldTransform_.transform_ = multiMeshTransform_;
 			break;
+
+		case ModelMode::MultiMaterial:
+			ImGui::DragFloat3("Scale", &multiMaterialTransform_.scale.x, 0.01f);
+			ImGui::DragFloat3("Rotate", &multiMaterialTransform_.rotate.x, 0.01f);
+			ImGui::DragFloat3("Translate", &multiMaterialTransform_.translate.x, 0.01f);
+			worldTransform_.transform_ = multiMaterialTransform_;
+			break;
 		}
 
 		if (ImGui::Checkbox("isEnableLight", &isLightOn_)) {
@@ -184,6 +201,9 @@ void DrawTaskModel::DebugWindow() {
 				suzanneModel_->SetDefaultIsEnableLight(true);
 				// マルチメッシュモデル
 				multiMeshModel_->SetDefaultIsEnableLight(true);
+				// マルチマテリアル
+				multiMaterialModel_->SetDefaultIsEnableLight(true, 0);
+				multiMaterialModel_->SetDefaultIsEnableLight(true, 1);
 			} else {
 				planeModel_->SetDefaultIsEnableLight(false);
 				// 球モデル
@@ -196,6 +216,9 @@ void DrawTaskModel::DebugWindow() {
 				suzanneModel_->SetDefaultIsEnableLight(false);
 				// マルチメッシュモデル
 				multiMeshModel_->SetDefaultIsEnableLight(false);
+				// マルチマテリアル
+				multiMaterialModel_->SetDefaultIsEnableLight(false, 0);
+				multiMaterialModel_->SetDefaultIsEnableLight(false, 1);
 			}	
 		}
 

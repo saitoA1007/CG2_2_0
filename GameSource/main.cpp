@@ -17,7 +17,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
 	// ゲームシーンのインスタンスを生成
 	std::unique_ptr<GameScene> gameScene = std::make_unique<GameScene>();
-	gameScene->Initialize(engine->textureManager_.get(), engine->dxCommon_.get());
+	gameScene->Initialize(engine->textureManager_.get(), engine->dxCommon_.get(),engine->audioManager_.get());
 
 	int iteration = 1;
 	float highLumMask = 0.8f;

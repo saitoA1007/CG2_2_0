@@ -88,13 +88,31 @@ namespace GameEngine {
 		static Model* CreateGridPlane(const Vector2& size);
 
 		/// <summary>
-		/// 生成したモデルを描画
+		/// 生成したモデルを描画(差し替え)
 		/// </summary>
 		/// <param name="worldMatrix">ワールド行列</param>
 		/// <param name="directionalLightResource">光源</param>
 		/// <param name="textureHandle">テクスチャハンドル</param>
 		/// <param name="material">マテリアル : 何の書かなければデフォルトのマテリアルを適応</param>
-		void Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix,const Material* material = nullptr);
+		void Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material = nullptr);
+
+		/// <summary>
+		/// 生成したモデルを描画
+		/// </summary>
+		/// <param name="worldMatrix">ワールド行列</param>
+		/// <param name="directionalLightResource">光源</param>
+		/// <param name="material">マテリアル : 何の書かなければデフォルトのマテリアルを適応</param>
+		void Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, const Material* material = nullptr);
+
+		/// <summary>
+		/// 生成したモデルの描画(ライト適応、複数マテリアル対応)
+		/// </summary>
+		/// <param name="worldTransform"></param>
+		/// <param name="VPMatrix"></param>
+		/// <param name="lightGroupResource"></param>
+		/// <param name="cameraResource"></param>
+		/// <param name="material"></param>
+		void Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource, const Material* material = nullptr);
 
 		/// <summary>
 		/// 生成したモデルを複数描画
@@ -120,31 +138,31 @@ namespace GameEngine {
 		/// デフォルトの色を設定
 		/// </summary>
 		/// <param name="color"></param>
-		void SetDefaultColor(const Vector4& color);
+		void SetDefaultColor(const Vector4& color,const uint32_t& index = 0);
 
 		/// <summary>
 		/// 鏡面反射の色を設定
 		/// </summary>
 		/// <param name="specularColor"></param>
-		void SetDefaultSpecularColor(const Vector3& specularColor);
+		void SetDefaultSpecularColor(const Vector3& specularColor, const uint32_t& index = 0);
 
 		/// <summary>
 		/// 輝度の設定
 		/// </summary>
 		/// <param name="shininess"></param>
-		void SetDefaultShiness(const float& shininess);
+		void SetDefaultShiness(const float& shininess, const uint32_t& index = 0);
 
 		/// <summary>
 		/// デフォオルトの光源の有無を設定
 		/// </summary>
 		/// <param name="isEnableLight"></param>
-		void SetDefaultIsEnableLight(const bool& isEnableLight);
+		void SetDefaultIsEnableLight(const bool& isEnableLight, const uint32_t& index = 0);
 
 		/// <summary>
 		/// デフォルトのuvMatrixを設定
 		/// </summary>
 		/// <param name="uvMatrix"></param>
-		void SetDefaultUVMatrix(const Matrix4x4& uvMatrix);
+		void SetDefaultUVMatrix(const Matrix4x4& uvMatrix, const uint32_t& index = 0);
 
 	private:
 
@@ -157,6 +175,8 @@ namespace GameEngine {
 		/// <returns></returns>
 		[[nodiscard]]
 		ModelData LoadModelFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename);
+		 
+		const uint32_t& GetNumMaterial() const { return numMaterial_; }
 
 	private:
 		Model(Model&) = delete;
@@ -181,19 +201,16 @@ namespace GameEngine {
 		// 複数メッシュに対応
 		std::vector<std::unique_ptr<Mesh>> meshes_;
 
-		// デフォルトのマテリアル
-		std::unique_ptr<Material> defaultMaterial_ = nullptr;
-
 		// 複数マテリアルに対応
-		std::vector<std::unique_ptr<Material>> material_;
+		std::vector<std::unique_ptr<Material>> materials_;
 
 		// Nodeのローカル行列を保持しておく変数
 		Matrix4x4 localMatrix_;
 
 		bool isLoad_ = false;
 
-		// メッシュの数
-		int meshCount_ = 0;
+		// マテリアルの数
+		uint32_t numMaterial_ = 1;
 
 	private:
 

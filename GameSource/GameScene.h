@@ -11,6 +11,7 @@
 #include"EngineSource/3D/Light/LightManager.h"
 #include"EngineSource/3D/Light/DirectionalLight.h"
 #include"EngineSource/2D/Sprite.h"
+#include"EngineSource/Audio/AudioManager.h"
 
 #include"GameSource/DrawTaskModel.h"
 
@@ -23,7 +24,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="textureManager"></param>
-	void Initialize(GameEngine::TextureManager* textureManager, GameEngine::DirectXCommon* dxCommon);
+	void Initialize(GameEngine::TextureManager* textureManager, GameEngine::DirectXCommon* dxCommon,GameEngine::AudioManager* audioManager);
 
 	/// <summary>
 	/// 更新処理
@@ -38,7 +39,13 @@ public:
 
 private:
 
+	// dx機能
 	GameEngine::DirectXCommon* dxCommon_;
+
+	// 音声機能
+	GameEngine::AudioManager* audioManager_;
+	// seハンドル
+	uint32_t seHandle_ = 0u;
 
 	// 軸方向モデル用のテクスチャハンドル
 	uint32_t axisTextureHandle_ = 0u;
@@ -72,7 +79,6 @@ private:
 	// 平面モデル
 	GameEngine::Model* planeModel_;
 	uint32_t uvCheckerGH_ = 0u;
-	uint32_t checkerBoardGH_ = 0u;
 
 	// ライト
 	std::unique_ptr<GameEngine::LightManager> lightManager_;
@@ -99,4 +105,6 @@ private:
 	GameEngine::Model* suzanneModel_;
 	// マルチメッシュ
 	GameEngine::Model* multiMeshModel_;
+	// マルチマテリアル
+	GameEngine::Model* multiMaterialModel_;
 };

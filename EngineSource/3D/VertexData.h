@@ -29,11 +29,12 @@ struct Node {
 struct MeshData {
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
+	uint32_t materialIndex; // 使用するマテリアル
 };
 
 struct ModelData {
 	std::vector<MeshData> meshes;
-	LoadMaterialData material;
+	std::vector<LoadMaterialData> materials;
 	Node rootNode;
 };
 

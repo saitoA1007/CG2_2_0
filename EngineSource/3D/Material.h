@@ -77,6 +77,10 @@ namespace GameEngine {
 		/// <param name="uvMatrix"></param>
 		void SetUVMatrix(Matrix4x4 uvMatrix) { materialData_->uvTransform = uvMatrix; }
 
+		void SetTextureHandle(const uint32_t& tex) { textureHandle_ = tex; }
+
+		const uint32_t& GetTextureHandle() { return textureHandle_; }
+
 	private:
 
 		static ID3D12Device* device_;
@@ -84,5 +88,8 @@ namespace GameEngine {
 		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 		// マテリアルにデータを書き込む
 		MaterialData* materialData_ = nullptr;
+
+		// テクスチャ情報
+		uint32_t textureHandle_ = 1;
 	};
 }

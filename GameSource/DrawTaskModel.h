@@ -14,6 +14,7 @@ public:
 		StanfordBunny,
 		Suzanne,
 		MultiMesh,
+		MultiMaterial
 	};
 	
 public:
@@ -66,7 +67,7 @@ public:
 	/// ティーポッドモデルを設定
 	/// </summary>
 	/// <param name="UtahTeapotModel"></param>
-	void SetUtahTeapot(GameEngine::Model* utahTeapotModel, const uint32_t& checkerBoardGH) {utahTeapotModel_ = utahTeapotModel; checkerBoardGH_ = checkerBoardGH;}
+	void SetUtahTeapot(GameEngine::Model* utahTeapotModel) {utahTeapotModel_ = utahTeapotModel;}
 
 	/// <summary>
 	/// ウサギモデルを設定
@@ -86,10 +87,16 @@ public:
 	/// <param name="multiMeshModel"></param>
 	void SetMultiMesh(GameEngine::Model* multiMeshModel) { multiMeshModel_ = multiMeshModel; }
 
+	/// <summary>
+	/// マルチマテリアルモデルを設定
+	/// </summary>
+	/// <param name="multiMaterialModel"></param>
+	void SetMultiMaterial(GameEngine::Model* multiMaterialModel) { multiMaterialModel_ = multiMaterialModel; }
+
 private:
 
 	// 描画モデル
-	const char* kModelName_[6] = { "Plane","Sphere","UtahTeapot","StanfordBunny","Suzanne","MultiMesh"};
+	const char* kModelName_[7] = { "Plane","Sphere","UtahTeapot","StanfordBunny","Suzanne","MultiMesh","MultiMaterial"};
 	int selectModelNum_ = 0;
 
 	// スプライトの描画状態を管理
@@ -101,7 +108,6 @@ private:
 	// テクスチャ
 	uint32_t uvCheckerGH_ = 0u;
 	uint32_t whiteGH_ = 0u;
-	uint32_t checkerBoardGH_ = 0u;
 
 	// スプライト
 	GameEngine::Sprite* sprite_;
@@ -134,4 +140,8 @@ private:
 	// マルチメッシュ
 	GameEngine::Model* multiMeshModel_ = nullptr;
 	Transform multiMeshTransform_;
+
+	// マルチマテリアル
+	GameEngine::Model* multiMaterialModel_ = nullptr;
+	Transform multiMaterialTransform_;
 };
