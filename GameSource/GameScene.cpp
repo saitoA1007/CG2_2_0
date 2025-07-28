@@ -166,12 +166,11 @@ void GameScene::Update(GameEngine::Input* input){
 		lightManager_->SetDirectionalData(directionalData_);
 		ImGui::TreePop();
 	}
-
 	ImGui::End();
 
 	ImGui::Begin("AudioManager");
 	// ボタンを押したらseを再生
-	if(ImGui::Button("PlayerSound")) {
+	if(ImGui::Button("PlaySound")) {
 		audioManager_->Play(seHandle_);
 	}
 	ImGui::End();
@@ -226,6 +225,7 @@ void GameScene::CheckControllPadState(GameEngine::Input* input) {
 	ImGui::Begin("CheckControllPadState");
 	
 	ImGui::Text("IsPadConnected : %s", input->IsPadConnected() ? "true" : "false");
+
 	ImGui::Text("Button R1 : %s", input->IsPushPad(XINPUT_GAMEPAD_RIGHT_SHOULDER) ? "true" : "false");
 	ImGui::Text("Button L1 : %s", input->IsPushPad(XINPUT_GAMEPAD_LEFT_SHOULDER) ? "true" : "false");
 

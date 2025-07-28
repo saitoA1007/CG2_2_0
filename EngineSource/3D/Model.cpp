@@ -414,6 +414,10 @@ void  Model::SetDefaultUVMatrix(const Matrix4x4& uvMatrix, const uint32_t& index
 	materials_[index]->SetUVMatrix(uvMatrix);
 }
 
+void Model::SetDefaultUVMatrix(const Transform& uvTransform, const uint32_t& index) {
+	materials_[index]->SetUVTransform(uvTransform);
+}
+
 [[nodiscard]]
 Node Model::ReadNode(aiNode* node) {
 	Node result;
