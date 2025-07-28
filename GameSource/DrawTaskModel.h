@@ -125,29 +125,52 @@ private:
 	// 平面
 	GameEngine::Model* planeModel_ = nullptr;
 	Transform planeTransform_;
+	MaterialData  planeMaterial_;
+
+	// 複数モデル描画用の平面
+	GameEngine::WorldTransform secondPlaneWorldTransform_;
+	GameEngine::Material secondPlaneMaterial_;
+	MaterialData  secondPlaneMaterialData_;
 
 	// 球
 	GameEngine::Model* sphereModel_ = nullptr;
 	Transform sphereTransform_;
+	MaterialData  sphereMaterial_;
 
 	// ティーポッド
 	GameEngine::Model* utahTeapotModel_ = nullptr;
 	Transform utahTeapotTransform_;
+	MaterialData teapotMaterial_;
 
 	// ウサギ
 	GameEngine::Model* bunnyModel_ = nullptr;
 	Transform bunnyTransform_;
+	MaterialData  bunnyMaterial_;
 
 	// スザンヌ
 	GameEngine::Model* suzanneModel_ = nullptr;
 	Transform suzanneTransform_;
+	MaterialData  suzanneMaterial_;
 
 	// マルチメッシュ
 	GameEngine::Model* multiMeshModel_ = nullptr;
 	Transform multiMeshTransform_;
+	MaterialData  multiMeshMaterial_;
 
 	// マルチマテリアル
 	GameEngine::Model* multiMaterialModel_ = nullptr;
 	Transform multiMaterialTransform_;
 	MaterialData multiMaterial_[2];
+
+	private:
+
+		/// <summary>
+		/// モデルのSRT要素のデバック
+		/// </summary>
+		void DebugModelSRT();
+
+		/// <summary>
+		/// モデルのマテリアル要素のデバック
+		/// </summary>
+		void DebugModelMaterial();
 };

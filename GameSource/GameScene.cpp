@@ -150,7 +150,6 @@ void GameScene::Update(GameEngine::Input* input){
 	gridWorldTransform_.SetTranslate(Vector3(debugCamera_->GetTargetPosition().x,-0.1f, debugCamera_->GetTargetPosition().z));
 	gridWorldTransform_.UpdateTransformMatrix();
 
-#ifdef _DEBUG
 	// 光源をデバック
 	ImGui::Begin("DebugWindow");
 
@@ -180,7 +179,6 @@ void GameScene::Update(GameEngine::Input* input){
 
 	// パッドの入力状態を確認する
 	CheckControllPadState(input);
-#endif
 
 	// カメラの切り替え処理
 	if (input->TriggerKey(DIK_SPACE)) {
@@ -223,19 +221,27 @@ void GameScene::Draw() {
 void GameScene::CheckControllPadState(GameEngine::Input* input) {
 
 	ImGui::Begin("CheckControllPadState");
-	
 	ImGui::Text("IsPadConnected : %s", input->IsPadConnected() ? "true" : "false");
-
-	ImGui::Text("Button R1 : %s", input->IsPushPad(XINPUT_GAMEPAD_RIGHT_SHOULDER) ? "true" : "false");
-	ImGui::Text("Button L1 : %s", input->IsPushPad(XINPUT_GAMEPAD_LEFT_SHOULDER) ? "true" : "false");
-
+	ImGui::Text("");
+	ImGui::Text("Button Start : %s", input->IsPushPad(XINPUT_GAMEPAD_START) ? "true" : "false");
+	ImGui::Text("Button Back : %s", input->IsPushPad(XINPUT_GAMEPAD_BACK) ? "true" : "false");
+	ImGui::Text("");
+	ImGui::Text("Button RB : %s", input->IsPushPad(XINPUT_GAMEPAD_RIGHT_SHOULDER) ? "true" : "false");
+	ImGui::Text("Button LB : %s", input->IsPushPad(XINPUT_GAMEPAD_LEFT_SHOULDER) ? "true" : "false");
+	ImGui::Text("Button RT : %s", input->GetPushPadRightTrigger() ? "true" : "false");
+	ImGui::Text("Button LT : %s", input->GetPushPadLeftTrigger() ? "true" : "false");
+	ImGui::Text("");
 	ImGui::Text("Button A : %s", input->IsPushPad(XINPUT_GAMEPAD_A) ? "true" : "false");
 	ImGui::Text("Button B : %s", input->IsPushPad(XINPUT_GAMEPAD_B) ? "true" : "false");
 	ImGui::Text("Button X : %s", input->IsPushPad(XINPUT_GAMEPAD_X) ? "true" : "false");
 	ImGui::Text("Button Y : %s", input->IsPushPad(XINPUT_GAMEPAD_Y) ? "true" : "false");
-
-	ImGui::Text("LeftStick : (%.0f, %.0f)", input->GetLeftStick().x, input->GetLeftStick().y);
-	ImGui::Text("RightStick : (%.0f, %.0f)", input->GetRightStick().x, input->GetRightStick().y);
-	
+	ImGui::Text("");
+	ImGui::Text("Button Up : %s", input->IsPushPad(XINPUT_GAMEPAD_DPAD_UP) ? "true" : "false");
+	ImGui::Text("Button Down : %s", input->IsPushPad(XINPUT_GAMEPAD_DPAD_DOWN) ? "true" : "false");
+	ImGui::Text("Button Left : %s", input->IsPushPad(XINPUT_GAMEPAD_DPAD_LEFT) ? "true" : "false");
+	ImGui::Text("Button Right : %s", input->IsPushPad(XINPUT_GAMEPAD_DPAD_RIGHT) ? "true" : "false");
+	ImGui::Text("");
+	ImGui::Text("LeftStickDirection : (%.2f, %.2f)", input->GetLeftStick().x, input->GetLeftStick().y);
+	ImGui::Text("RightStickDirection : (%.2f, %.2f)", input->GetRightStick().x, input->GetRightStick().y);
 	ImGui::End();
 }
