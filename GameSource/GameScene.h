@@ -107,4 +107,11 @@ private:
 	GameEngine::Model* multiMeshModel_;
 	// マルチマテリアル
 	GameEngine::Model* multiMaterialModel_;
+
+private:
+
+	/// <summary>
+	/// パッドの入力状態を確認する
+	/// </summary>
+	void CheckControllPadState(GameEngine::Input* input);
 };

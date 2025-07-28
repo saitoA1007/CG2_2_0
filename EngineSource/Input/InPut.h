@@ -1,10 +1,12 @@
 #pragma once
+#pragma once
 #include"EngineSource/Math/Vector2.h"
 #include<iostream>
 #define DIRECTINPUT_VERSION 0x0800 // DirectInputのバージョン指定
 #include <dinput.h>
 #include <wrl.h>
 #include<array>
+#include <Xinput.h>
 
 namespace GameEngine {
 
@@ -69,6 +71,38 @@ namespace GameEngine {
 		/// <returns>ホイールスクロール量。奥側に回したら+。Windowsの設定で逆にしてたら逆</returns>
 		int32_t GetWheel() const;
 
+		/// <summary>
+		/// パッドの押下ををチェック
+		/// </summary>
+		/// <param name="button"></param>
+		/// <returns></returns>
+		bool IsPushPad(WORD button) const;
+
+		/// <summary>
+		/// パッドのトリガーをチェック
+		/// </summary>
+		/// <param name="button"></param>
+		/// <returns></returns>
+		bool IsTriggerPad(WORD button) const;
+
+		/// <summary>
+		/// パッドの左スティック座標を取得
+		/// </summary>
+		/// <returns></returns>
+		Vector2 GetLeftStick();
+
+		/// <summary>
+		/// パッドの右スティック座標を取得
+		/// </summary>
+		/// <returns></returns>
+		Vector2 GetRightStick();
+
+		/// <summary>
+		/// パッドの接続を確認
+		/// </summary>
+		/// <returns></returns>
+		bool IsPadConnected() const;
+
 	private:
 		Input(const Input&) = delete;
 		const Input& operator=(const Input&) = delete;
@@ -87,5 +121,8 @@ namespace GameEngine {
 		Vector2 mousePosition_;
 		Vector2 preMousePosition_;
 		Vector2 mouseDelta_;
+
+		XINPUT_STATE controllerState_;
+		XINPUT_STATE preControllerState_;
 	};
 }
