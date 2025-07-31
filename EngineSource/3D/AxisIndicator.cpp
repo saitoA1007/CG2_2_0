@@ -46,10 +46,10 @@ void AxisIndicator::Update(const Matrix4x4& rotate) {
 	camera_.Update();
 }
 
-void AxisIndicator::Draw(const uint32_t& textureHandle) {
+void AxisIndicator::Draw() {
 	// 画面左上に表示されるようにする
 	commandList_->RSSetViewports(1, &viewport_); // Viewportを設定
 	commandList_->RSSetScissorRects(1, &scissorRect_); // Scirssorを設定
 	// 軸を表示するモデルを描画
-	model_->Draw(worldTransform_, textureHandle, camera_.GetVPMatrix());
+	model_->Draw(worldTransform_, camera_.GetVPMatrix());
 }

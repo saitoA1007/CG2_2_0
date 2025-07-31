@@ -47,8 +47,6 @@ private:
 	// seハンドル
 	uint32_t seHandle_ = 0u;
 
-	// 軸方向モデル用のテクスチャハンドル
-	uint32_t axisTextureHandle_ = 0u;
 	// 軸方向表示
 	std::unique_ptr<GameEngine::AxisIndicator> axisIndicator_;
 

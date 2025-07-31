@@ -30,7 +30,7 @@ namespace GameEngine {
 		/// <summary>
 		/// 描画
 		/// </summary>
-		void Draw(const uint32_t& textureHandle);
+		void Draw();
 
 	private:
 		AxisIndicator(const AxisIndicator&) = delete;
