@@ -3,6 +3,8 @@
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
 
+#include"externals/imgui/ImGuizmo.h"
+
 #include"EngineSource/Core/WindowsApp.h"
 #include"EngineSource/Core/DirectXCommon.h"
 

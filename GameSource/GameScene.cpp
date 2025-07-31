@@ -46,8 +46,6 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	// 軸方向表示の初期化
 	axisIndicator_ = std::make_unique<AxisIndicator>();
 	axisIndicator_->Initialize();
-	// 軸方向表示の画像
-	axisTextureHandle_ = textureManager->Load("Resources/Models/Axis/axis.jpg");
 
 	// fps計測器の初期化
 	fpsCounter_ = std::make_unique<FpsCounter>();
@@ -172,6 +170,7 @@ void GameScene::Update(GameEngine::Input* input){
 	if(ImGui::Button("PlaySound")) {
 		audioManager_->Play(seHandle_);
 	}
+
 	ImGui::End();
 
 	// Fps計測器の描画
@@ -202,8 +201,8 @@ void GameScene::Draw() {
 	Model::PreDraw(PSOMode::Triangle, BlendMode::kBlendModeNormal);
 
 	// 地面を描画
-	//terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
-	//terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
+	terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
+	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
 
 	// 描画
 	drawTaskModels_->Draw3D(camera_->GetVPMatrix(), lightManager_->GetResource(), camera_->GetCameraResource());
@@ -215,7 +214,7 @@ void GameScene::Draw() {
 	gridModel_->DrawGrid(gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
 
 	// 軸を描画
-	//axisIndicator_->Draw(axisTextureHandle_);
+	//axisIndicator_->);
 }
 
 void GameScene::CheckControllPadState(GameEngine::Input* input) {

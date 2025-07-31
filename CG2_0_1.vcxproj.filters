@@ -195,6 +195,9 @@
     <ClCompile Include="GameSource\DrawTaskModel.cpp">
       <Filter>GameSource</Filter>
     </ClCompile>
+    <ClCompile Include="externals\imgui\ImGuizmo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -394,6 +397,9 @@
     </ClInclude>
     <ClInclude Include="GameSource\DrawTaskModel.h">
       <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\ImGuizmo.h">
+      <Filter>imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
