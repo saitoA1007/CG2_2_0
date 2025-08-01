@@ -48,11 +48,12 @@ namespace GameEngine {
 		/// <summary>
 		/// スプライト生成
 		/// </summary>
-		/// <param name="texNumber">テクスチャハンドル</param>
 		/// <param name="position">座標</param>
+		/// <param name="size">サイズ</param>
+		/// <param name="anchorPoint">アンカーポイント</param>
 		/// <param name="color">色</param>
-		/// <returns>生成されたスプライト</returns>
-		static Sprite* Create(Vector2 position, Vector2 size, Vector4 color = { 1, 1, 1, 1 });
+		/// <returns></returns>
+		static Sprite* Create(const Vector2& position,const Vector2& size,const Vector2& anchorPoint,const Vector4& color = { 1, 1, 1, 1 });
 
 	public:
 
@@ -126,6 +127,8 @@ namespace GameEngine {
 		Vector2 position_{};
 		// スプライト幅、高さ
 		Vector2 size_ = { 100.0f, 100.0f };
+		// アンカーポイント
+		Vector2 anchorPoint_{};
 		// ワールド行列
 		Matrix4x4 worldMatrix_;
 

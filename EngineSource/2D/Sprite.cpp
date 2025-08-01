@@ -23,13 +23,14 @@ void Sprite::PreDraw(BlendMode blendMode) {
 	commandList_->SetPipelineState(spritePSO_->GetPipelineState(blendMode)); // spritePSOを設定
 }
 
-Sprite* Sprite::Create(Vector2 position, Vector2 size,  Vector4 color) {
+Sprite* Sprite::Create(const Vector2& position,const Vector2& size,const Vector2& anchorPoint,const Vector4& color) {
 
 	Sprite* sprite = new Sprite();
 
 	// 座標と大きさを取得
 	sprite->position_ = position;
 	sprite->size_ = size;
+	sprite->anchorPoint_ = anchorPoint;
 	// 座標を元にワールド行列の生成
 	sprite->worldMatrix_ = MakeTranslateMatrix({ position.x,position.y,0.0f });
 
@@ -67,11 +68,11 @@ void Sprite::SetPosition(const Vector2& position) {
 
 void Sprite::SetSize(const Vector2& size) {
 	size_ = size;
-	// 画像のサイズを決める
-	float left = 0.0f;
-	float right = size.x;
-	float top = 0.0f;
-	float bottom = size.y;
+	// 画像のサイズを決める	
+	float left = -anchorPoint_.x * size_.x;
+	float right = (1.0f - anchorPoint_.x) * size_.x;
+	float top = -anchorPoint_.y * size_.y;
+	float bottom = (1.0f - anchorPoint_.y) * size_.y;
 
 	// 頂点インデックス
 	vertexData_[0].position = { left,bottom,0.0f,1.0f }; // 左下
@@ -103,11 +104,11 @@ void Sprite::CreateMesh() {
 	// 書き込むためのアドレスを取得
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
-	// 画像のサイズを決める
-	float left = 0.0f;
-	float right = size_.x;
-	float top = 0.0f;
-	float bottom = size_.y;
+	// 画像のサイズを決める	
+	float left = -anchorPoint_.x * size_.x;
+	float right = (1.0f - anchorPoint_.x) * size_.x;
+	float top = -anchorPoint_.y * size_.y;
+	float bottom = (1.0f - anchorPoint_.y) * size_.y;
 
 	// 頂点インデックス
 	vertexData_[0].position = { left,bottom,0.0f,1.0f }; // 左下
