@@ -14,7 +14,7 @@ void DrawTaskModel::Initialize(const uint32_t& uvCheckerGH, const uint32_t& whit
 	whiteGH_ = whiteGH;
 
 	// スプライト
-	sprite_ = Sprite::Create({0.0f,0.0f},{640.0f,360.0f},{1.0f,1.0f,1.0f,1.0f});
+	sprite_ = Sprite::Create({ 0.0f,0.0f }, { 640.0f,360.0f }, {0.0f,0.0f}, { 1.0f,1.0f,1.0f,1.0f });
 
 	// 平面
 	planeTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
