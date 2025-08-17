@@ -5,6 +5,48 @@
 
 static const double M_PI = 3.14159265358979323846;
 
+struct Quaternion {
+	float x;
+	float y;
+	float z;
+	float w;
+
+	Quaternion operator+(const Quaternion& other) { return { x + other.x, y + other.y, z + other.z, w + other.w }; }
+	Quaternion operator*(const float& other) { return { x * other, y * other, z * other, w * other }; }
+	friend Quaternion operator*(float other, const Quaternion& q) { return { q.x * other, q.y * other, q.z * other, q.w * other }; }
+	Quaternion operator-() const { return { -x, -y, -z,-w }; }
+};
+
+// Quaternionの積
+Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs);
+// 単位Quaternionを返す
+Quaternion IdentityQuaternion();
+// 共役Quaternionを返す
+Quaternion Conjugate(const Quaternion& quaternion);
+// Quaernionのnormを返す
+float Norm(const Quaternion& quaternion);
+// 正規化したQuaternionを返す
+Quaternion Normalize(const Quaternion& quaternion);
+// 逆Quaternionを返す
+Quaternion Inverse(const Quaternion& quaternion);
+// 任意軸回転行列を表すQuaternionの生成
+Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle);
+// ベクトルをQuaternionで回転させた結果のベクトルを求める
+Vector3 RotateVector(const Vector3& vector, const Quaternion& quaternion);
+// Quaternionから回転行列を求める
+Matrix4x4 MakeRotateMatrix(const Quaternion& q);
+// 球面線形補間
+Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t);
+// 内積
+float Dot(const Quaternion& a, const Quaternion& b);
+// 4x4行列の任意軸回転行列の作成
+Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
+
+
+Quaternion MakeEulerQuaternion(float pitch, float yaw, float roll);
+
+Matrix4x4 MakeWorldMatrixFromEulerRotation(const Vector3 position, const Vector3& rotateEuler, const Vector3& scale);
+
 // 減算
 Vector3 Subtract(const Vector3& v1, const Vector3& v2);
 

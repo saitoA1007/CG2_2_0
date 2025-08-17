@@ -7,6 +7,7 @@
 #include"Mesh.h"
 #include"Material.h"
 #include"WorldTransforms.h"
+#include"AnimationData.h"
 
 #include"EngineSource/Math/TransformationMatrix.h"
 #include"EngineSource/Common/LogManager.h"
@@ -172,20 +173,6 @@ namespace GameEngine {
 		void SetDefaultUVMatrix(const Transform& uvTransform, const uint32_t& index = 0);
 
 	private:
-
-		/// <summary>
-		/// モデルデータのファイル読み込み
-		/// </summary>
-		/// <param name="directoryPath"></param>
-		/// <param name="objFilename"></param>
-		/// <param name="filename"></param>
-		/// <returns></returns>
-		[[nodiscard]]
-		ModelData LoadModelFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename);
-		 
-		const uint32_t& GetNumMaterial() const { return numMaterial_; }
-
-	private:
 		Model(Model&) = delete;
 		Model& operator=(Model&) = delete;
 
@@ -222,11 +209,32 @@ namespace GameEngine {
 	private:
 
 		/// <summary>
+		/// モデルデータのファイル読み込み
+		/// </summary>
+		/// <param name="directoryPath"></param>
+		/// <param name="objFilename"></param>
+		/// <param name="filename"></param>
+		/// <returns></returns>
+		[[nodiscard]]
+		ModelData LoadModelFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename);
+
+		const uint32_t& GetNumMaterial() const { return numMaterial_; }
+
+		/// <summary>
 		/// Node情報を取得
 		/// </summary>
 		/// <param name="node"></param>
 		/// <returns></returns>
 		[[nodiscard]]
 		Node ReadNode(aiNode* node);
+
+		/// <summary>
+		/// アニメーションデータを読み込み
+		/// </summary>
+		/// <param name="directoryPath"></param>
+		/// <param name="objFilename"></param>
+		/// <param name="filename"></param>
+		/// <returns></returns>
+		Animation LoadAnimationFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename);
 	};
 }

@@ -11,7 +11,8 @@ void WorldTransform::StaticInitialize(ID3D12Device* device) {
 
 void WorldTransform::Initialize(const Transform& transform) {
 	transform_ = transform;
-	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	//worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	worldMatrix_ = MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
 
 	// トランスフォーメーション行列リソースを作成
 	// TransformationMatrix用のリソースを作る。TransformationMatrix 1つ分のサイズを用意する
@@ -26,7 +27,8 @@ void WorldTransform::Initialize(const Transform& transform) {
 }
 
 void WorldTransform::UpdateTransformMatrix() {
-	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	//worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	worldMatrix_ = MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
 	transformationMatrixData_->World = worldMatrix_;
 	transformationMatrixData_->worldInverseTranspose = InverseTranspose(worldMatrix_);
 }
