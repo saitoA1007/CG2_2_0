@@ -13,8 +13,6 @@
 #include"EngineSource/2D/Sprite.h"
 #include"EngineSource/Audio/AudioManager.h"
 
-#include"GameSource/DrawTaskModel.h"
-
 class GameScene {
 public:
 
@@ -89,22 +87,6 @@ private:
 
 	// テクスチャの管理
 	GameEngine::TextureManager* textureManager_;
-
-	// 評価課題のモデルを描画する
-	std::unique_ptr<DrawTaskModel> drawTaskModels_;
-
-	// 球モデル
-	GameEngine::Model* sphereModel_;
-	// ティーポッドモデル
-	GameEngine::Model* UtahTeapotModel_;
-	// ウサギモデル
-	GameEngine::Model* bunnyModel_;
-	// スザンヌモデル
-	GameEngine::Model* suzanneModel_;
-	// マルチメッシュ
-	GameEngine::Model* multiMeshModel_;
-	// マルチマテリアル
-	GameEngine::Model* multiMaterialModel_;
 
 private:
 

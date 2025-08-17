@@ -438,3 +438,47 @@ Node Model::ReadNode(aiNode* node) {
 	}
 	return result;
 }
+
+Animation  Model::LoadAnimationFile(const std::string& directoryPath, const std::string& objFilename, const std::string& filename) {
+
+	Animation animation;
+	Assimp::Importer importer;
+	std::string filePath = directoryPath + "/" + filename + "/" + objFilename;
+	const aiScene* scene = importer.ReadFile(filePath.c_str(), 0);
+	assert(scene->mNumAnimations != 0); // アニメーションがない
+	aiAnimation* animationAssimp = scene->mAnimations[0];  // 最初のアニメーションだけ採用。
+	animation.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond); // 時間の単位を秒に変換
+
+	// assimpでは個々のNodeのAnimationをchannelと呼んでいるのでchannelを回してNodeAnimationの情報を取ってくる
+	for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; ++channelIndex) {
+		aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
+		NodeAnimation& nodeAnimation = animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
+		// 位置
+		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys; ++keyIndex) {
+			aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
+			KeyframeVector3 keyframe;
+			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);  // ここも秒に変換
+			keyframe.value = { -keyAssimp.mValue.x,keyAssimp.mValue.y,keyAssimp.mValue.z }; // 右手->左手
+			nodeAnimation.translate.push_back(keyframe);
+		}
+		// 回転
+		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumRotationKeys; ++keyIndex) {
+			aiQuatKey& keyAssimp = nodeAnimationAssimp->mRotationKeys[keyIndex];
+			KeyframeQuaternion keyframe;
+			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+			keyframe.value = { keyAssimp.mValue.x,-keyAssimp.mValue.y, -keyAssimp.mValue.z, keyAssimp.mValue.w };
+			nodeAnimation.rotate.push_back(keyframe);
+		}
+		// 拡縮
+		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumScalingKeys; ++keyIndex) {
+			aiVectorKey& keyAssimp = nodeAnimationAssimp->mScalingKeys[keyIndex];
+			KeyframeVector3 keyframe;
+			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+			keyframe.value = { keyAssimp.mValue.x,keyAssimp.mValue.y, keyAssimp.mValue.z };
+			nodeAnimation.scale.push_back(keyframe);
+		}
+	}
+
+	// 解析結果を返す
+	return animation;
+}

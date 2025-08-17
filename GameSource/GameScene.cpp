@@ -10,12 +10,6 @@ using namespace GameEngine;
 
 GameScene::~GameScene() {
 	delete planeModel_;
-	delete sphereModel_;
-	delete UtahTeapotModel_;
-	delete bunnyModel_;
-	delete suzanneModel_;
-	delete multiMeshModel_;
-	delete multiMaterialModel_;
 
 	delete terrainModel_;
 
@@ -77,43 +71,6 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	planeModel_ = Model::CreateModel("plane.obj", "Plane");
 	planeModel_->SetDefaultIsEnableLight(true);
 	uvCheckerGH_ = textureManager->Load("Resources/Textures/uvChecker.png");
-	// 球モデルを生成
-	sphereModel_ = Model::CreateSphere(16);
-	sphereModel_->SetDefaultIsEnableLight(true);
-	// ティーポッドモデルを生成
-	UtahTeapotModel_ = Model::CreateModel("teapot.obj", "Teapot");
-	UtahTeapotModel_->SetDefaultIsEnableLight(true);
-	// ウサギモデルを生成
-	bunnyModel_ = Model::CreateModel("bunny.obj", "Bunny");
-	bunnyModel_->SetDefaultIsEnableLight(true);
-	// スザンヌモデルを生成
-	suzanneModel_ = Model::CreateModel("suzanne.obj", "Suzanne");
-	suzanneModel_->SetDefaultIsEnableLight(true);
-	// マルチメッシュを生成
-	multiMeshModel_ = Model::CreateModel("multiMesh.obj", "MultiMesh");
-	multiMeshModel_->SetDefaultIsEnableLight(true);
-	// マルチマテリアル
-	multiMaterialModel_ = Model::CreateModel("multiMaterial.obj", "MultiMaterial");
-	multiMaterialModel_->SetDefaultIsEnableLight(true,0);
-	multiMaterialModel_->SetDefaultIsEnableLight(true,1);
-
-	// 評価課題のモデルを描画するクラスの初期化
-	drawTaskModels_ = std::make_unique<DrawTaskModel>();
-	drawTaskModels_->Initialize(uvCheckerGH_, whiteGH_);
-	// 平面モデルをセット
-	drawTaskModels_->SetPlane(planeModel_);
-	// 球モデルをセット
-	drawTaskModels_->SetSphere(sphereModel_);
-	// ティーポッドモデルをセット
-	drawTaskModels_->SetUtahTeapot(UtahTeapotModel_);
-	// ウサギモデルをセット
-	drawTaskModels_->SetBunny(bunnyModel_);
-	// スザンヌモデルをセット
-	drawTaskModels_->SetSuzanne(suzanneModel_);
-	// マルチメッシュをセット
-	drawTaskModels_->SetMultiMesh(multiMeshModel_);
-	// マルチマテリアル
-	drawTaskModels_->SetMultiMaterial(multiMaterialModel_);
 }
 
 void GameScene::Update(GameEngine::Input* input){
@@ -123,9 +80,6 @@ void GameScene::Update(GameEngine::Input* input){
 
 	// 地面の更新処理
 	terrainWorldTransform_.UpdateTransformMatrix();
-
-	// 更新
-	drawTaskModels_->Update();
 
 	// カメラ処理
 	if (isDebugCameraActive_) {
@@ -150,9 +104,6 @@ void GameScene::Update(GameEngine::Input* input){
 
 	// 光源をデバック
 	ImGui::Begin("DebugWindow");
-
-	// モデルのデバック
-	drawTaskModels_->DebugWindow();
 
 	// 平行光源
 	if (ImGui::TreeNodeEx("Light", ImGuiTreeNodeFlags_Framed)) {
@@ -179,6 +130,28 @@ void GameScene::Update(GameEngine::Input* input){
 	// パッドの入力状態を確認する
 	CheckControllPadState(input);
 
+	ImGui::Begin("Gizmo Example");
+
+	// 3. ImGuizmo 設定（画像の上に描く！）
+	//ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+	ImGuizmo::SetDrawlist();
+	ImGuizmo::SetOrthographic(false);
+	ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+
+	// 4. ギズモ表示（カメラ行列と一致させる）
+	float view[16];       // → GPUと同じビュー行列
+	float proj[16]; // → GPUと同じプロジェクション行列
+	float model[16];      // → オブジェクトの現在の行列
+
+	// コピー
+	std::memcpy(view, camera_->GetViewMatrix().m, sizeof(float) * 16);
+	std::memcpy(proj, camera_->GetProjectionMatrix().m, sizeof(float) * 16);
+	std::memcpy(model, terrainWorldTransform_.GetWorldMatrix().m, sizeof(float) * 16);
+
+	ImGuizmo::Manipulate(view, proj, ImGuizmo::TRANSLATE, ImGuizmo::LOCAL, model);
+
+	ImGui::End();
+
 	// カメラの切り替え処理
 	if (input->TriggerKey(DIK_SPACE)) {
 		if (isDebugCameraActive_) {
@@ -191,21 +164,12 @@ void GameScene::Update(GameEngine::Input* input){
 
 void GameScene::Draw() {
 
-	// スプライトの描画前処理
-	Sprite::PreDraw(BlendMode::kBlendModeNormal);
-
-	// 描画
-	drawTaskModels_->Draw2D();
-
 	// モデルの単体描画前処理
 	Model::PreDraw(PSOMode::Triangle, BlendMode::kBlendModeNormal);
 
 	// 地面を描画
 	terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
 	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
-
-	// 描画
-	drawTaskModels_->Draw3D(camera_->GetVPMatrix(), lightManager_->GetResource(), camera_->GetCameraResource());
 
 	// モデルの単体描画前処理
 	Model::PreDraw(PSOMode::Grid, BlendMode::kBlendModeNormal);
