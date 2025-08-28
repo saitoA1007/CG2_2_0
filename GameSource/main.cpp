@@ -4,6 +4,7 @@
 #include"GameScene.h"
 
 #include"EngineSource/Core/FPSCounter.h"
+#include"GameParamEditor.h"
 
 using namespace GameEngine;
 
@@ -21,6 +22,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	//=================================================================
 	// 宣言と初期化
 	//=================================================================
+
+	// 全てのデバック用ファイルを読み込み
+	//GameParamEditor::GetInstance()->LoadFiles();
 
 	// ゲームシーンのインスタンスを生成
 	std::unique_ptr<GameScene> gameScene = std::make_unique<GameScene>();
@@ -49,6 +53,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
 		// 更新前処理
 		engine->PreUpdate();
+
+		// パラメーターの更新処理
+		GameParamEditor::GetInstance()->Update();
 
 		// ゲームシーンの更新処理
 		gameScene->Update(engine->input_.get());

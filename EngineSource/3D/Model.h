@@ -16,6 +16,7 @@
 #include"EngineSource/Core/PSO/TrianglePSO.h"
 #include"EngineSource/Core/PSO/ParticlePSO.h"
 #include"EngineSource/Core/PSO/GridPSO.h"
+#include"EngineSource/Core/PSO/BasePSO.h"
 
 #include"EngineSource/3D/Light/LightManager.h"
 #include"EngineSource/3D/Camera/Camera.h"
@@ -49,13 +50,21 @@ namespace GameEngine {
 		/// <summary>
 		/// 描画前処理
 		/// </summary>
+		/// <param name="psoMode">描画モードを設定</param>
+		/// <param name="blendMode">ブレンドモードを設定</param>
 		static void PreDraw(PSOMode psoMode,BlendMode blendMode);
 
 		/// <summary>
 		/// 描画前処理
 		/// </summary>
-		/// <param name="drawMode"></param>
+		/// <param name="drawMode">描画状態を設定</param>
 		static void PreDraw(DrawModel drawMode);
+
+		/// <summary>
+		/// 描画前処理
+		/// </summary>
+		/// <param name="pso">psoを設定</param>
+		static void PreDraw(BasePSO* pso);
 
 		/// <summary>
 		/// OBJファイルからメッシュ生成
@@ -87,6 +96,8 @@ namespace GameEngine {
 		/// <returns></returns>
 		[[nodiscard]]
 		static Model* CreateGridPlane(const Vector2& size);
+
+	public:
 
 		/// <summary>
 		/// 生成したモデルを描画(画像差し替え用)
@@ -134,6 +145,8 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="directionalLightResource"></param>
 		void DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource);
+
+	public:
 
 		/// <summary>
 		/// デフォルトの色を設定

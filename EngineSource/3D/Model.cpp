@@ -60,6 +60,11 @@ void Model::PreDraw(DrawModel drowMode) {
 	commandList_->SetPipelineState(trianglePSO_->GetDrawModePipelineState(drowMode)); // trianglePSOを設定
 }
 
+void Model::PreDraw(BasePSO* pso) {
+	commandList_->SetGraphicsRootSignature(pso->GetRootSignature());  // RootSignatureを設定。
+	commandList_->SetPipelineState(pso->GetPipelineState()); // 指定したPSOを設定
+}
+
 [[nodiscard]]
 Model* Model::CreateSphere(uint32_t subdivision) {
 
