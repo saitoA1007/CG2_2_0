@@ -49,6 +49,12 @@
     <Filter Include="EngineSource\Core\PostProcess">
       <UniqueIdentifier>{8171682b-3501-4f1d-a5c2-9f1c26ee4526}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineSource\Core\ComputePSO">
+      <UniqueIdentifier>{a95699a8-7684-43b6-bb86-b9ce27351bd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\CS">
+      <UniqueIdentifier>{01452b33-ca37-47b9-8958-22bed032796c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -194,6 +200,12 @@
     </ClCompile>
     <ClCompile Include="externals\imgui\ImGuizmo.cpp">
       <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\ComputePSO\ParticleCSPSO.cpp">
+      <Filter>EngineSource\Core\ComputePSO</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Particle.cpp">
+      <Filter>EngineSource\3D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -398,6 +410,12 @@
     <ClInclude Include="EngineSource\3D\AnimationData.h">
       <Filter>EngineSource\3D</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSource\Core\ComputePSO\ParticleCSPSO.h">
+      <Filter>EngineSource\Core\ComputePSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Particle.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -431,6 +449,9 @@
     </None>
     <None Include="Resources\Shaders\Sprite.hlsli">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\CS\ParticleCS.hlsli">
+      <Filter>Shaders\CS</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -496,6 +517,15 @@
     </FxCompile>
     <FxCompile Include="Resources\Shaders\Sprite.PS.hlsl">
       <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\CS\Particle.CS.hlsl">
+      <Filter>Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\CS\ParticleC.VS.hlsl">
+      <Filter>Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\CS\ParticleC.PS.hlsl">
+      <Filter>Shaders\CS</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
