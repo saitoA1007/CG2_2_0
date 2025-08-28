@@ -1,4 +1,4 @@
-#include"PostProcessPSO.h"
+#include"RadialBlurPSO.h"
 #include "EngineSource/Common/ConvertString.h"
 #include"EngineSource/Common/CreateBufferResource.h"
 #include <d3dcompiler.h>
@@ -6,11 +6,11 @@
 
 using namespace GameEngine;
 
-void PostProcessPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, const std::wstring& psPath, DXC* dxc, LogManager* logManager) {
+void RadialBlurPSO::Initialize(ID3D12Device* device, DXC* dxc, LogManager* logManager) {
 
     // 初期化を開始するログ
     if (logManager) {
-        logManager->Log("PostProcessPSO Class start Initialize\n");
+        logManager->Log("RadialBlurPSO Class start Initialize\n");
     }
 
     // RootSignature作成
@@ -31,22 +31,23 @@ void PostProcessPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
     rootParameters[0].DescriptorTable.pDescriptorRanges = descriptorRange; // Tableの中身の配列を指定
     rootParameters[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange); // Tableで利用する数
-    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;  // CBVを使う
-    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;  // PixelShaderで使う
-    rootParameters[1].Descriptor.ShaderRegister = 0;  // レジスタ番号0
+
+    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
+    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShdaderで使う 
+    rootParameters[1].Descriptor.ShaderRegister = 0; // レジスタ番号0を使う
+
     descriptionRootSignature.pParameters = rootParameters;  // ルートパラメータ配列へのポインタ
     descriptionRootSignature.NumParameters = _countof(rootParameters);  // 配列の長さ
 
-
     D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
     staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
-    staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; //0-1の範囲外をリピート 
+    staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; //0-1の範囲外をリピート
     staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER; // 比較しない
     staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // ありったけのMIpmapを使う
     staticSamplers[0].ShaderRegister = 0; // レジスタ番号0を使う
-    staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う 
+    staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
     descriptionRootSignature.pStaticSamplers = staticSamplers;
     descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
@@ -65,24 +66,15 @@ void PostProcessPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath
         IID_PPV_ARGS(&rootSignature_));
     assert(SUCCEEDED(hr));
 
-    D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
-    inputElementDescs[0].SemanticName = "POSITION";
-    inputElementDescs[0].SemanticIndex = 0;
-    inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-    inputElementDescs[1].SemanticName = "TEXCOORD";
-    inputElementDescs[1].SemanticIndex = 0;
-    inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-    inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+    // InputLayout
     D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-    inputLayoutDesc.pInputElementDescs = inputElementDescs;
-    inputLayoutDesc.NumElements = _countof(inputElementDescs);
+    inputLayoutDesc.pInputElementDescs = nullptr;
+    inputLayoutDesc.NumElements = 0;
 
     // ブレンドモード
     D3D12_BLEND_DESC blendDesc{};
     // すべての色要素を書き込む
-    blendDesc.RenderTarget[0].RenderTargetWriteMask =
-        D3D12_COLOR_WRITE_ENABLE_ALL;
+    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
     // RasiterzerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
@@ -92,12 +84,14 @@ void PostProcessPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
     // シェーダ読み込み
-    Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, psBlob;
-    vsBlob = dxc->CompileShader(vsPath,
+    Microsoft::WRL::ComPtr<IDxcBlob> vsBlob;
+    vsBlob = dxc->CompileShader(L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.VS.hlsl",
         L"vs_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
     assert(vsBlob != nullptr);
 
-    psBlob = dxc->CompileShader(psPath,
+    Microsoft::WRL::ComPtr<IDxcBlob> psBlob;
+    // 明るい部分を抽出する用
+    psBlob = dxc->CompileShader(L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.PS.hlsl",
         L"ps_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
     assert(psBlob != nullptr);
 
@@ -126,56 +120,29 @@ void PostProcessPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath
     graphicsPipelineStateDesc.SampleDesc.Count = 1;
     graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-	// 実際に生成
-	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-		IID_PPV_ARGS(&pipelineState_));
-	assert(SUCCEEDED(hr));
+    // 実際に生成
+    hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
+        IID_PPV_ARGS(&pipelineState_));
+    assert(SUCCEEDED(hr));
 
     // 初期化を終了するログ
     if (logManager) {
-        logManager->Log("PostProcessPSO Class End Initialize\n");
+        logManager->Log("RadialBlurPSO Class End Initialize\n");
     }
 
-
-    // Sprite用の頂点リソースを作る
-    vertexResourceSprite_ = CreateBufferResource(device, sizeof(VertexData) * 4);
-
-    // リソースの先頭のアドレスから使う
-    vertexBufferViewSprite_.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
-    // 使用するリソースのサイズは頂点4つ分のサイズ
-    vertexBufferViewSprite_.SizeInBytes = sizeof(VertexData) * 4;
-    // 1頂点当たりのサイズ
-    vertexBufferViewSprite_.StrideInBytes = sizeof(VertexData);
+    // パラメーター調整用
+    parameterResource_ = CreateBufferResource(device, sizeof(RadialBlurData));
     // 書き込むためのアドレスを取得
-    vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite_));
-
-    // 頂点インデックス
-    vertexDataSprite_[0].position = { -1.0f,-1.0f,0.0f,1.0f }; // 左下
-    vertexDataSprite_[0].texcoord = { 0.0f,1.0f };
-    vertexDataSprite_[1].position = { -1.0f,1.0f,0.0f,1.0f }; // 左上
-    vertexDataSprite_[1].texcoord = { 0.0f,0.0f };
-    vertexDataSprite_[2].position = { 1.0f,-1.0f,0.0f,1.0f }; // 右下
-    vertexDataSprite_[2].texcoord = { 1.0f,1.0f };
-    vertexDataSprite_[3].position = { 1.0f, 1.0f,0.0f,1.0f }; // 左上
-    vertexDataSprite_[3].texcoord = { 1.0f,0.0f };
-
-    // マテリアル
-    materialResource_ = CreateBufferResource(device, sizeof(MaterialData));
-    // 書き込むためのアドレスを取得
-    materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
-    materialData_->isEnablePostEffect = false;
+    parameterResource_->Map(0, nullptr, reinterpret_cast<void**>(&radialBlurData_));
+    radialBlurData_->centerPos = { 0.5f,0.5f };
+    radialBlurData_->numSamles = 2;
+    radialBlurData_->blurWidth = 0.01f;
 }
 
-void PostProcessPSO::Set(ID3D12GraphicsCommandList* commandList) {
+void RadialBlurPSO::Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE inputSRV) {
     commandList->SetGraphicsRootSignature(rootSignature_.Get());
     commandList->SetPipelineState(pipelineState_.Get());
-}
-
-void PostProcessPSO::Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE inputSRV) {
-    commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite_);
     commandList->SetGraphicsRootDescriptorTable(0, inputSRV);
-    commandList->SetGraphicsRootConstantBufferView(1, materialResource_->GetGPUVirtualAddress());
-    // フルスクリーン三角形
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-    commandList->DrawInstanced(4, 1, 0, 0);
+    commandList->SetGraphicsRootConstantBufferView(1, parameterResource_->GetGPUVirtualAddress());
+    commandList->DrawInstanced(3, 1, 0, 0);
 }

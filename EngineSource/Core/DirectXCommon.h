@@ -7,7 +7,7 @@
 #include"EngineSource/Common/LogManager.h"
 #include"externals/DirectXTex/d3dx12.h"
 
-#include"PSO/CopyPSO.h"
+#include"PSO/PostProcess/CopyPSO.h"
 
 #include"EngineSource/Core/PostProcess/PostEffectManager.h"
 #include"EngineSource/Core/ResourceCounter.h"
