@@ -41,10 +41,6 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	axisIndicator_ = std::make_unique<AxisIndicator>();
 	axisIndicator_->Initialize();
 
-	// fps計測器の初期化
-	fpsCounter_ = std::make_unique<FpsCounter>();
-	fpsCounter_->Initialize();
-
 	// white4x4テクスチャをロード
 	whiteGH_ = textureManager->Load("Resources/Textures/white4x4.png");
 
@@ -75,9 +71,6 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 
 void GameScene::Update(GameEngine::Input* input){
 
-	// Fps計測器の更新処理
-	fpsCounter_->Update();
-
 	// 地面の更新処理
 	terrainWorldTransform_.UpdateTransformMatrix();
 
@@ -99,7 +92,7 @@ void GameScene::Update(GameEngine::Input* input){
 	lightManager_->Update();
 
 	// グリッドの更新処理
-	gridWorldTransform_.SetTranslate(Vector3(debugCamera_->GetTargetPosition().x,-0.1f, debugCamera_->GetTargetPosition().z));
+	gridWorldTransform_.transform_.translate = Vector3(debugCamera_->GetTargetPosition().x,-0.1f, debugCamera_->GetTargetPosition().z);
 	gridWorldTransform_.UpdateTransformMatrix();
 
 	// 光源をデバック
@@ -119,13 +112,10 @@ void GameScene::Update(GameEngine::Input* input){
 	ImGui::Begin("AudioManager");
 	// ボタンを押したらseを再生
 	if(ImGui::Button("PlaySound")) {
-		audioManager_->Play(seHandle_);
+		audioManager_->Play(seHandle_, 1.0f, false);
 	}
 
 	ImGui::End();
-
-	// Fps計測器の描画
-	fpsCounter_->DrawImGui();
 
 	ImGui::Begin("Gizmo Example");
 

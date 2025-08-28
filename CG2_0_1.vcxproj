@@ -123,6 +123,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\WorldTransform.cpp" />
     <ClCompile Include="EngineSource\3D\WorldTransforms.cpp" />
     <ClCompile Include="EngineSource\Audio\AudioManager.cpp" />
+    <ClCompile Include="EngineSource\Collision\CollisionUtils.cpp" />
     <ClCompile Include="EngineSource\Common\LogManager.cpp" />
     <ClCompile Include="EngineSource\Core\ComputePSO\ParticleCSPSO.cpp" />
     <ClCompile Include="EngineSource\Core\DirectXCommon.cpp" />
@@ -177,6 +178,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\WorldTransform.h" />
     <ClInclude Include="EngineSource\3D\WorldTransforms.h" />
     <ClInclude Include="EngineSource\Audio\AudioManager.h" />
+    <ClInclude Include="EngineSource\Collision\CollisionUtils.h" />
     <ClInclude Include="EngineSource\Common\ConvertString.h" />
     <ClInclude Include="EngineSource\Common\CrashHandle.h" />
     <ClInclude Include="EngineSource\Common\CreateBufferResource.h" />
@@ -210,6 +212,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Math\Geometry.h" />
     <ClInclude Include="EngineSource\Math\Matrix4x4.h" />
     <ClInclude Include="EngineSource\Math\MyMath.h" />
+    <ClInclude Include="EngineSource\Math\Quaternion.h" />
     <ClInclude Include="EngineSource\Math\Transform.h" />
     <ClInclude Include="EngineSource\Math\TransformationMatrix.h" />
     <ClInclude Include="EngineSource\Math\Vector2.h" />

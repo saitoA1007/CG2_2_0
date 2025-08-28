@@ -3,6 +3,7 @@
 #include<fstream>
 #include <wrl.h>
 #include<vector>
+#include <unordered_map>
 
 #include <mfapi.h>
 #include <mfidl.h>
@@ -75,14 +76,31 @@ namespace GameEngine {
 		/// 音声を再生
 		/// </summary>
 		/// <param name="soundHandle"></param>
-		void Play(uint32_t soundHandle);
+		void Play(uint32_t soundHandle,float volume,bool isloop);
+
+		/// <summary>
+		/// 音声を止める
+		/// </summary>
+		/// <param name="soundHandle"></param>
+		void Stop(const uint32_t& soundHandle);
+
+		/// <summary>
+		/// 再生中か
+		/// </summary>
+		/// <param name="soundHandle"></param>
+		/// <returns></returns>
+		bool IsPlay(const uint32_t& soundHandle);
 
 	private:
 
 		Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
 		IXAudio2MasteringVoice* masterVoice_;
 
+		// s
 		std::vector<SoundData> soundData_;
+
+		// 再生中の音声を保存
+		std::unordered_map<uint32_t, IXAudio2SourceVoice*> activeVoices_;
 
 	private:
 		/// <summary>
@@ -90,13 +108,13 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="xAudio2"></param>
 		/// <param name="soundData"></param>
-		void SoundPlayWave(const SoundData& soundData);
+		void SoundPlayWave(const uint32_t& soundHandle,bool isloop);
 
 		/// <summary>
 		/// .mp3音声を再生
 		/// </summary>
 		/// <param name="soundData"></param>
-		void SoundPlayMp3(const SoundData& soundData);
+		void SoundPlayMp3(const uint32_t& soundHandle,bool isloop);
 
 		/// <summary>
 		/// .wavファイルの読み込み
