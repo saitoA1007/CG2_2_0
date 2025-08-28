@@ -6,11 +6,13 @@
 #include"EngineSource/Core/PSO/LinePSO.h"
 #include"EngineSource/Core/PSO/TrianglePSO.h"
 #include"EngineSource/Core/PSO/ParticlePSO.h"
-#include"EngineSource/Core/PSO/PostProcessPSO.h"
-#include"EngineSource/Core/PSO/BloomPSO.h"
-#include"EngineSource/Core/PSO/CopyPSO.h"
 #include"EngineSource/Core/PSO/SpritePSO.h"
 #include"EngineSource/Core/PSO/GridPSO.h"
+#include"EngineSource/Core/PSO/PostProcess/CopyPSO.h"
+#include"EngineSource/Core/PSO/PostProcess/BloomPSO.h"
+#include"EngineSource/Core/PSO/PostProcess/ScanLinePSO.h"
+#include"EngineSource/Core/PSO/PostProcess/VignettingPSO.h"
+#include"EngineSource/Core/PSO/PostProcess/RadialBlurPSO.h"
 
 #include"EngineSource/Core/PostProcess/PostEffectManager.h"
 
@@ -137,6 +139,15 @@ namespace GameEngine {
 
 		// ブルーム用のPSO設定
 		std::unique_ptr<BloomPSO> bloomPSO_;
+
+		// ScanLine用のPSO設定
+		std::unique_ptr<ScanLinePSO> scanLinePSO_;
+
+		// ヴィネット用のPSO設定
+		std::unique_ptr<VignettingPSO> vignettingPSO_;
+
+		// ラジアルブルー用のPSO設定
+		std::unique_ptr<RadialBlurPSO> radialBlurPSO_;
 
 		/// Input =============================
 

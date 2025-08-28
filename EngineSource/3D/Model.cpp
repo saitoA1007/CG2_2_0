@@ -2,10 +2,9 @@
 #include<fstream>
 #include<sstream>
 #include<cassert>
-#include"EngineSource/Core/TextureManager.h"
+
 #include"EngineSource/Common/CreateBufferResource.h"
 #include"EngineSource/Math/MyMath.h"
-#include"WorldTransform.h"
 
 #include<assimp/Importer.hpp>
 #include<assimp/scene.h>

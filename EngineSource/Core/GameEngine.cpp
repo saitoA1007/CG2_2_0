@@ -54,7 +54,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	//=====================================================================================
 
 	// ポストエフェクトの初期化
-	PostEffectManager::StaticInitialize(bloomPSO_.get(), logManager_.get());
+	PostEffectManager::StaticInitialize(bloomPSO_.get(), scanLinePSO_.get(), vignettingPSO_.get(), radialBlurPSO_.get(), logManager_.get());
 
 	// 画像の初期化
 	Sprite::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), spritePSO_.get(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
@@ -123,14 +123,6 @@ void Engine::CreatePSO() {
 	linePSO_ = std::make_unique<LinePSO>();
 	linePSO_->Initialize(L"Resources/Shaders/Primitive.VS.hlsl", L"Resources/Shaders/Primitive.PS.hlsl", dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
 
-	// BloomPSOの初期化
-	bloomPSO_ = std::make_unique<BloomPSO>();
-	bloomPSO_->Initialize(dxCommon_->GetDevice(), L"Resources/Shaders/PostEffect/Bloom.VS.hlsl", dxc_.get(), logManager_.get(),
-		L"Resources/Shaders/PostEffect/HighLumMask.PS.hlsl",
-		L"Resources/Shaders/PostEffect/Bloom.PS.hlsl",
-		L"Resources/Shaders/PostEffect/BloomResult.PS.hlsl",
-		L"Resources/Shaders/PostEffect/BloomComposite.hlsl");
-
 	// グリッド用の初期化
 	gridPSO_ = std::make_unique<GridPSO>();
 	gridPSO_->Initialize(L"Resources/Shaders/Grid.VS.hlsl", L"Resources/Shaders/Grid.PS.hlsl", dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
@@ -143,4 +135,26 @@ void Engine::CreatePSO() {
 	// スプライトのPSOを初期化
 	spritePSO_ = std::make_unique<SpritePSO>();
 	spritePSO_->Initialize(L"Resources/Shaders/Sprite.VS.hlsl", L"Resources/Shaders/Sprite.PS.hlsl", dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+
+	/// PostProcessのPSOを初期化
+
+	// BloomPSOの初期化
+	bloomPSO_ = std::make_unique<BloomPSO>();
+	bloomPSO_->Initialize(dxCommon_->GetDevice(), L"Resources/Shaders/PostEffect/Bloom.VS.hlsl", dxc_.get(), logManager_.get(),
+		L"Resources/Shaders/PostEffect/HighLumMask.PS.hlsl",
+		L"Resources/Shaders/PostEffect/Bloom.PS.hlsl",
+		L"Resources/Shaders/PostEffect/BloomResult.PS.hlsl",
+		L"Resources/Shaders/PostEffect/BloomComposite.hlsl");
+
+	// scanLinePSOの初期化
+	scanLinePSO_ = std::make_unique<ScanLinePSO>();
+	scanLinePSO_->Initialize(dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+
+	// ヴィネットPSOの初期化
+	vignettingPSO_ = std::make_unique<VignettingPSO>();
+	vignettingPSO_->Initialize(dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+
+	// ラジアルブルーPSOの初期化
+	radialBlurPSO_ = std::make_unique<RadialBlurPSO>();
+	radialBlurPSO_->Initialize(dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
 }

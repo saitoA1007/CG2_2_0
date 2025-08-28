@@ -58,6 +58,18 @@
     <Filter Include="EngineSource\Collision">
       <UniqueIdentifier>{f4e70713-21f2-4a1b-9cab-82a194d6f91c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineSource\Core\PSO\PostProcess">
+      <UniqueIdentifier>{f36c0d30-6aad-4ff2-af50-a00b6f5b37ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PostEffect\Vignetting">
+      <UniqueIdentifier>{2a858b64-1e1b-4651-a056-c09b1c83ff71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PostEffect\ScanLine">
+      <UniqueIdentifier>{9ac5efe5-e614-4f14-aa8c-2ebd3e26280c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PostEffect\RadialBlur">
+      <UniqueIdentifier>{687a2c9d-54c8-4a7d-870d-8904ff628fde}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -165,15 +177,6 @@
     <ClCompile Include="EngineSource\3D\Light\LightManager.cpp">
       <Filter>EngineSource\3D\Light</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\PostProcessPSO.cpp">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\BloomPSO.cpp">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\CopyPSO.cpp">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClCompile>
     <ClCompile Include="GameSource\ColorEditor.cpp">
       <Filter>GameSource</Filter>
     </ClCompile>
@@ -212,6 +215,21 @@
     </ClCompile>
     <ClCompile Include="EngineSource\Collision\CollisionUtils.cpp">
       <Filter>EngineSource\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.cpp">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.cpp">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.cpp">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\BloomPSO.cpp">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\CopyPSO.cpp">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -362,20 +380,11 @@
     <ClInclude Include="EngineSource\3D\Light\LightManager.h">
       <Filter>EngineSource\3D\Light</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\PostProcessPSO.h">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\BloomPSO.h">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Core\PSO\TrianglePSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Camera\DebugCamera.h">
       <Filter>EngineSource\3D\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\CopyPSO.h">
-      <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
     <ClInclude Include="GameSource\ColorEditor.h">
       <Filter>GameSource</Filter>
@@ -428,6 +437,21 @@
     <ClInclude Include="EngineSource\Math\Quaternion.h">
       <Filter>EngineSource\Math</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.h">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.h">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.h">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\BloomPSO.h">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\CopyPSO.h">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -443,9 +467,6 @@
     </None>
     <None Include="Resources\Shaders\Particle.hlsli">
       <Filter>Shaders</Filter>
-    </None>
-    <None Include="Resources\Shaders\PostEffect\PostProcessGrayScale.hlsli">
-      <Filter>Shaders\PostEffect</Filter>
     </None>
     <None Include="Resources\Shaders\PostEffect\GaussianBlur.hlsli">
       <Filter>Shaders\PostEffect</Filter>
@@ -464,6 +485,18 @@
     </None>
     <None Include="Resources\Shaders\CS\ParticleCS.hlsli">
       <Filter>Shaders\CS</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\PostProcessGrayScale.hlsli">
+      <Filter>Shaders\PostEffect</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.hlsli">
+      <Filter>Shaders\PostEffect\RadialBlur</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.hlsli">
+      <Filter>Shaders\PostEffect\ScanLine</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.hlsli">
+      <Filter>Shaders\PostEffect\Vignetting</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -484,12 +517,6 @@
     </FxCompile>
     <FxCompile Include="Resources\Shaders\Particle.PS.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\PostProcessGrayScale.PS.hlsl">
-      <Filter>Shaders\PostEffect</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\PostProcessGrayScale.VS.hlsl">
-      <Filter>Shaders\PostEffect</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\Bloom.VS.hlsl">
       <Filter>Shaders\PostEffect</Filter>
@@ -538,6 +565,24 @@
     </FxCompile>
     <FxCompile Include="Resources\Shaders\CS\ParticleC.PS.hlsl">
       <Filter>Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.PS.hlsl">
+      <Filter>Shaders\PostEffect\RadialBlur</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.VS.hlsl">
+      <Filter>Shaders\PostEffect\RadialBlur</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.PS.hlsl">
+      <Filter>Shaders\PostEffect\ScanLine</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.VS.hlsl">
+      <Filter>Shaders\PostEffect\ScanLine</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.PS.hlsl">
+      <Filter>Shaders\PostEffect\Vignetting</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.VS.hlsl">
+      <Filter>Shaders\PostEffect\Vignetting</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
