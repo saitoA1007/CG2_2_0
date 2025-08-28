@@ -27,7 +27,6 @@ void WorldTransform::Initialize(const Transform& transform) {
 }
 
 void WorldTransform::UpdateTransformMatrix() {
-	//worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	worldMatrix_ = MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
 	transformationMatrixData_->World = worldMatrix_;
 	transformationMatrixData_->worldInverseTranspose = InverseTranspose(worldMatrix_);

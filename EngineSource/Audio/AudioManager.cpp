@@ -37,8 +37,10 @@ void AudioManager::Initialize() {
 	assert(SUCCEEDED(result));
 }
 
-void AudioManager::SoundPlayWave(const SoundData& soundData) {
+void AudioManager::SoundPlayWave(const uint32_t& soundHandle, bool isloop) {
 	HRESULT result;
+
+	const SoundData& soundData = soundData_[soundHandle];
 
 	// 波形フォーマットを元にSourceVoiceの生成
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
@@ -50,6 +52,7 @@ void AudioManager::SoundPlayWave(const SoundData& soundData) {
 	buf.pAudioData = soundData.pBuffer;
 	buf.AudioBytes = soundData.bufferSize;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
+	buf.LoopCount = isloop ? XAUDIO2_LOOP_INFINITE : 0;
 
 	// 波形データの再生
 	result = pSourceVoice->SubmitSourceBuffer(&buf);
@@ -189,11 +192,11 @@ AudioManager::SoundData AudioManager::SoundLoadMp3(const std::wstring path) {
 	MFCreateMediaType(&pMFMediaType);
 	pMFMediaType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio);
 	pMFMediaType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);
-	pMFSourceReader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM, nullptr, pMFMediaType);
+	pMFSourceReader->SetCurrentMediaType(static_cast<DWORD>(MF_SOURCE_READER_FIRST_AUDIO_STREAM), nullptr, pMFMediaType);
 
 	pMFMediaType->Release();
 	pMFMediaType = nullptr;
-	pMFSourceReader->GetCurrentMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM, &pMFMediaType);
+	pMFSourceReader->GetCurrentMediaType(static_cast<DWORD>(MF_SOURCE_READER_FIRST_AUDIO_STREAM), &pMFMediaType);
 
 	WAVEFORMATEX* waveFormat{ nullptr };
 	MFCreateWaveFormatExFromMFMediaType(pMFMediaType, &waveFormat, nullptr);
@@ -203,7 +206,7 @@ AudioManager::SoundData AudioManager::SoundLoadMp3(const std::wstring path) {
 	while (true) {
 		IMFSample* pMFSample{ nullptr };
 		DWORD dwStreamFlags = 0;
-		pMFSourceReader->ReadSample(MF_SOURCE_READER_FIRST_AUDIO_STREAM, 0, nullptr, &dwStreamFlags, nullptr, &pMFSample);
+		pMFSourceReader->ReadSample(static_cast<DWORD>(MF_SOURCE_READER_FIRST_AUDIO_STREAM), 0, nullptr, &dwStreamFlags, nullptr, &pMFSample);
 
 		if (dwStreamFlags & MF_SOURCE_READERF_ENDOFSTREAM) {
 			break;
@@ -241,18 +244,40 @@ AudioManager::SoundData AudioManager::SoundLoadMp3(const std::wstring path) {
 	return soundData;
 }
 
-void AudioManager::Play(uint32_t soundHandle) {
+void AudioManager::Play(uint32_t soundHandle, float volume, bool isloop) {
 
 	// 音声を再生
 	if (soundData_[soundHandle].type == MP3) {
-		SoundPlayMp3(soundData_[soundHandle]);
+		SoundPlayMp3(soundHandle,isloop);
+
+		// 音量を設定
+		auto it = activeVoices_.find(soundHandle);
+		if (it != activeVoices_.end()) {
+			it->second->SetVolume(volume);
+		}
+
 	} else {
-		SoundPlayWave(soundData_[soundHandle]);
+		SoundPlayWave(soundHandle,isloop);
 	}
 }
 
-void AudioManager::SoundPlayMp3(const SoundData& soundData) {
+void AudioManager::Stop(const uint32_t& soundHandle) {
+	auto it = activeVoices_.find(soundHandle);
+	if (it != activeVoices_.end()) {
+		IXAudio2SourceVoice* pSourceVoice = it->second;
+		if (pSourceVoice) {
+			pSourceVoice->Stop(0);
+			pSourceVoice->FlushSourceBuffers();
+			pSourceVoice->DestroyVoice();
+		}
+		activeVoices_.erase(it); // 管理から削除
+	}
+}
+
+void AudioManager::SoundPlayMp3(const uint32_t& soundHandle, bool isloop) {
 	HRESULT result;
+
+	const SoundData& soundData = soundData_[soundHandle];
 
 	IXAudio2SourceVoice* pSourceVoice{ nullptr };
 	xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
@@ -261,8 +286,27 @@ void AudioManager::SoundPlayMp3(const SoundData& soundData) {
 	buffer.pAudioData = soundData.pBuffer;
 	buffer.Flags = XAUDIO2_END_OF_STREAM;
 	buffer.AudioBytes = sizeof(BYTE) * static_cast<UINT32>(soundData.bufferSize);
-	
+	buffer.LoopCount = isloop ? XAUDIO2_LOOP_INFINITE : 0;
+
 	// 再生する
 	result = pSourceVoice->SubmitSourceBuffer(&buffer);
 	result = pSourceVoice->Start();
+
+	// 管理テーブルに登録
+	activeVoices_[soundHandle] = pSourceVoice;
+}
+
+bool AudioManager::IsPlay(const uint32_t& soundHandle) {
+	// 再生中のボイスを探す
+	auto it = activeVoices_.find(soundHandle);
+	if (it == activeVoices_.end()) {
+		return false; // 登録なし → 再生していない
+	}
+
+	IXAudio2SourceVoice* pSourceVoice = it->second;
+	XAUDIO2_VOICE_STATE state{};
+	pSourceVoice->GetState(&state);
+
+	// state.BuffersQueued が 0 なら再生終了
+	return (state.BuffersQueued > 0);
 }

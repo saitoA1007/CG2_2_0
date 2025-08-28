@@ -37,18 +37,6 @@ namespace GameEngine {
 
 	public:
 
-		void SetScale(const Vector3& scale) { transform_.scale = scale; }
-
-		void SetRotateY(const float& rotateY) { transform_.rotate.y = rotateY; }
-		void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
-		Vector3 GetRotate() { return transform_.rotate; }
-
-		void SetTranslateY(const float& translateY) { transform_.translate.y = translateY; }
-		void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
-		Vector3 GetTranslate() const { return transform_.translate; }
-
-		void SetTransform(const Transform transform) { transform_ = transform; }
-
 		void SetWorldMatrix(const Matrix4x4 worldMatrix) { worldMatrix_ = worldMatrix; }
 		Matrix4x4 GetWorldMatrix() const { return worldMatrix_; }
 
@@ -60,6 +48,9 @@ namespace GameEngine {
 
 		void SetWVPMatrix(const Matrix4x4& VPMatrix);
 
+	public:
+
+		// SRT要素
 		Transform transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
 	private:

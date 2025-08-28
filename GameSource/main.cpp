@@ -3,13 +3,20 @@
 
 #include"GameScene.h"
 
+#include"EngineSource/Core/FPSCounter.h"
+
 using namespace GameEngine;
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
 	// エンジン部分の初期化処理
 	std::unique_ptr<Engine> engine = std::make_unique<Engine>();
 	engine->Initialize(L"CG2_LE2A_05_サイトウ_アオイ", 1280, 720, hInstance);
+
+	// fpsを計測する
+	std::unique_ptr<FpsCounter> fpsCounter = std::make_unique<FpsCounter>();
+	fpsCounter->Initialize();
 
 	//=================================================================
 	// 宣言と初期化
@@ -37,6 +44,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		// 更新処理
 		//==================================================================
 
+		// fpsを計測する
+		fpsCounter->Update();
+
 		// 更新前処理
 		engine->PreUpdate();
 
@@ -52,6 +62,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		ImGui::SliderFloat("Intensity", &intensity, 0.0f, 10.0f);
 		engine->bloomPSO_->constBuffer_->intensity = intensity;
 		ImGui::End();
+
+#ifdef _DEBUG
+		// Fps計測器の描画
+		fpsCounter->DrawImGui();
+#endif
 
 		// 更新後処理
 		engine->PostUpdate();

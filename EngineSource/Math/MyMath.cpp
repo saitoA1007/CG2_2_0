@@ -1,6 +1,7 @@
 #include"MyMath.h"
 #include<cassert>
 #include<cmath>
+#include <algorithm> 
 
 Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs) {
 
@@ -181,6 +182,35 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 	return Vector3(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
 }
 
+Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
+	Vector3 result{
+		v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0],
+		v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1],
+		v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2]
+	};
+
+	return result;
+}
+
+Vector3 Project(const Vector3& worldPosition, const Vector2& viewport, const float& viewportWidth, const float& viewportHeight, const Matrix4x4& viewProjection) {
+
+	// ビューポート行列
+	Matrix4x4 viewportMatrix = MakeViewportMatrix(viewport.x, viewport.y, viewportWidth, viewportHeight, 0, 1);
+	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+	Matrix4x4 viewProjectionViewportMatrix = viewProjection * viewportMatrix;
+	// ワールド->スクリーン座標変換(3Dから2Dへ)
+	Vector3 screenPos = Transforms(worldPosition, viewProjectionViewportMatrix);
+	return  screenPos;
+}
+
+Vector3 Max(Vector3 pos1, Vector3 pos2) {
+	return Vector3(std::max(pos1.x, pos2.x), std::max(pos1.y, pos2.y), std::max(pos1.z, pos2.z));
+}
+
+Vector3 Min(Vector3 pos1, Vector3 pos2) {
+	return Vector3(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), std::min(pos1.z, pos2.z));
+}
+
 Matrix4x4 MakeIdentity4x4() {
 	Matrix4x4 identity = {};
 	for (int i = 0; i < 4; ++i) {
@@ -359,4 +389,29 @@ Vector3 Transforms(const Vector3& vector, const Matrix4x4& matrix) {
 	result.y /= w;
 	result.z /= w;
 	return result;
+}
+
+Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minD, float maxD) {
+	Matrix4x4 result = {
+		width / 2, 0, 0, 0,
+		0, -height / 2, 0, 0,
+		0, 0, maxD - minD, 0,
+		left + width / 2, top + height / 2, minD, 1
+	};
+	return result;
+}
+
+Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix) {
+
+	// ビルボードの回転行列を作成
+	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(0.0f);
+	Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, cameraMatrix);
+	billboardMatrix.m[3][0] = 0.0f;
+	billboardMatrix.m[3][1] = 0.0f;
+	billboardMatrix.m[3][2] = 0.0f;
+	// ST行列を作成
+	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
+	Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
+	// 行列の更新
+	return scaleMatrix * billboardMatrix * translateMatrix;
 }
