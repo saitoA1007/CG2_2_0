@@ -87,11 +87,4 @@ private:
 
 	// テクスチャの管理
 	GameEngine::TextureManager* textureManager_;
-
-private:
-
-	/// <summary>
-	/// パッドの入力状態を確認する
-	/// </summary>
-	void CheckControllPadState(GameEngine::Input* input);
 };
