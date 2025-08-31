@@ -39,12 +39,6 @@ public:
 	/// <param name="groupName"></param>
 	void CreateGroup(const std::string& groupName);
 
-	void SetValue(const std::string& groupName, const std::string& key, int32_t value);
-
-	void SetValue(const std::string& groupName, const std::string& key, float value);
-
-	void SetValue(const std::string& groupName, const std::string& key, const Vector3& value);
-
 	/// <summary>
 	/// ディレクトリの全ファイル読み込み
 	/// </summary>
@@ -88,4 +82,10 @@ private:
 	/// </summary>
 	/// <param name="groupName"></param>
 	void SaveFile(const std::string& groupName);
+
+	void SetValue(const std::string& groupName, const std::string& key, int32_t value);
+
+	void SetValue(const std::string& groupName, const std::string& key, float value);
+
+	void SetValue(const std::string& groupName, const std::string& key, const Vector3& value);
 };
