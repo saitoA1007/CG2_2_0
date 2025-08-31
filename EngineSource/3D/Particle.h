@@ -5,11 +5,10 @@
 
 #include"VertexData.h"
 #include"Mesh.h"
-#include"Material.h"
-#include"WorldTransforms.h"
 
 #include"EngineSource/Core/ComputePSO/ParticleCSPSO.h"
-
+#include"EngineSource/Core/DirectXCommon.h"
+#include"EngineSource/Core/TextureManager.h"
 #include <d3d12.h>
 
 namespace GameEngine {
@@ -32,24 +31,48 @@ namespace GameEngine {
 
 	public:
 
+		static DirectXCommon* dxCommon_;
+
 		void Initialize();
 
 		void Update();
 
-		void Draw();
+		void Draw(const Matrix4x4& VPMatrix,const uint32_t& textureHandle);
 
 	private:
 
 		static ID3D12Device* device_;
 		static ID3D12GraphicsCommandList* commandList_;
+		// テクスチャ
+		static TextureManager* textureManager_;
 
 		// PSO設定
 		static ParticleCSPSO* particleCSPSO_;
 
+		// リソースをカウント
+		static uint32_t StaticSrvIndex_;
+
 		// 複数メッシュに対応
 		std::unique_ptr<Mesh> mesh_;
 
-		// 複数マテリアルに対応
-		std::unique_ptr<Material> material_;
+		// パーティクル用
+		Microsoft::WRL::ComPtr<ID3D12Resource> computeResource_;
+
+		ParticleCS* particleData_ = nullptr;
+
+		// シェーダリソースビューのハンドル(CPU)
+		CD3DX12_CPU_DESCRIPTOR_HANDLE uavHandleCPU_;
+		// シェーダリソースビューのハンドル(CPU)
+		CD3DX12_GPU_DESCRIPTOR_HANDLE uavHandleGPU_;
+
+		// シェーダリソースビューのハンドル(CPU)
+		CD3DX12_CPU_DESCRIPTOR_HANDLE srvHandleCPU_;
+		// シェーダリソースビューのハンドル(CPU)
+		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandleGPU_;
+
+		// カメラ用
+		Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
+
+		PerView* PerViewData_ = nullptr;
 	};
 }

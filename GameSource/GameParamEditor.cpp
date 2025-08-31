@@ -16,61 +16,72 @@ void GameParamEditor::CreateGroup(const std::string& groupName) {
 }
 
 void GameParamEditor::Update() {
-	if (!ImGui::Begin("GameParamater", nullptr, ImGuiWindowFlags_MenuBar)) {
+	if (!ImGui::Begin("GameParamater", nullptr)) {
 		ImGui::End();
 		return;
 	}
-	if (!ImGui::BeginMenuBar()) { return; }
 
 	// 各グループについて
-	for (std::map<std::string, Group>::iterator itGroup = datas_.begin(); itGroup != datas_.end(); ++itGroup) {
+	for (std::map<std::string, Group>::iterator itGroup = datas_.begin();
+		itGroup != datas_.end(); ++itGroup) {
+
 		// グループ名を取得
 		const std::string& groupName = itGroup->first;
 		// グループの参照を取得
 		Group& group = itGroup->second;
 
-		if (!ImGui::BeginMenu(groupName.c_str())){ continue; }	
+		// コラプシングヘッダーでグループを表示（デフォルトで開いた状態も可能、ImGuiTreeNodeFlags_DefaultOpen)
+		if (ImGui::CollapsingHeader(groupName.c_str())) {
 
-		// 各項目について
-		for (std::map<std::string, Item>::iterator itItem = group.items.begin(); itItem != group.items.end(); ++itItem) {
-			// 項目名を取得
-			const std::string& itemName = itItem->first;
-			// 項目の参照を取得
-			Item& item = itItem->second;
+			// インデントを追加して階層感を出す
+			ImGui::Indent();
 
-			// 各型の項目を表示
-			if (std::holds_alternative<int32_t>(item.value)) {
-				// int32_t型の値を保持していれば
-				int32_t* ptr = std::get_if<int32_t>(&item.value);
-				ImGui::DragInt(itemName.c_str(), ptr, 1);
+			// 各項目について
+			for (std::map<std::string, Item>::iterator itItem = group.items.begin();
+				itItem != group.items.end(); ++itItem) {
 
-			} else if (std::holds_alternative<float>(item.value)) {
-				// float型の値を保持していれば
-				float* ptr = std::get_if<float>(&item.value);
-				ImGui::DragFloat(itemName.c_str(), ptr, 0.01f);
+				// 項目名を取得
+				const std::string& itemName = itItem->first;
+				// 項目の参照を取得
+				Item& item = itItem->second;
 
-			}else if (std::holds_alternative<Vector3>(item.value)) {
-				// Vector3型の値を保持していれば
-				Vector3* ptr = std::get_if<Vector3>(&item.value);
-				ImGui::DragFloat3(itemName.c_str(), reinterpret_cast<float*>(ptr), 0.01f);
+				// 各型の項目を表示
+				if (std::holds_alternative<int32_t>(item.value)) {
+					// int32_t型の値を保持していれば
+					int32_t* ptr = std::get_if<int32_t>(&item.value);
+					ImGui::DragInt(itemName.c_str(), ptr, 1);
+
+				} else if (std::holds_alternative<float>(item.value)) {
+					// float型の値を保持していれば
+					float* ptr = std::get_if<float>(&item.value);
+					ImGui::DragFloat(itemName.c_str(), ptr, 0.01f);
+
+				} else if (std::holds_alternative<Vector3>(item.value)) {
+					// Vector3型の値を保持していれば
+					Vector3* ptr = std::get_if<Vector3>(&item.value);
+					ImGui::DragFloat3(itemName.c_str(), reinterpret_cast<float*>(ptr), 0.01f);
+				}
 			}
+
+			// 少しスペースを空ける
+			ImGui::Spacing();
+
+			// 保存ボタン
+			if (ImGui::Button(("Save " + groupName).c_str())) {
+				SaveFile(groupName);
+				std::string message = std::format("{}.json saved.", groupName);
+				MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
+			}
+
+			// インデントを戻す
+			ImGui::Unindent();
+
+			// グループ間にセパレータを追加（見やすさのため）
+			ImGui::Separator();
 		}
-
-		// 改行
-		ImGui::Text("\n");
-
-		if (ImGui::Button("Save")) {
-			SaveFile(groupName);
-			std::string message = std::format("{}.json saved.", groupName);
-			MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
-		}
-
-		ImGui::EndMenu();
 	}
 
-	ImGui::EndMenuBar();
 	ImGui::End();
-
 }
 
 void GameParamEditor::SetValue(const std::string& groupName, const std::string& key, int32_t value) {

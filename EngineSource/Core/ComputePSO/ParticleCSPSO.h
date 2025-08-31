@@ -16,13 +16,11 @@ namespace GameEngine {
         ~ParticleCSPSO() = default;
 
         void Initialize(ID3D12Device* device, DXC* dxc, LogManager* logManager);
-        void Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE inputSRV);
 
         ID3D12RootSignature* GetComputeRootSignature() const { return computeRootSignature_.Get(); }
         ID3D12PipelineState* GetComputePipelineState() const { return computePipelineState_.Get(); }
 
         ID3D12RootSignature* GetRootSignature() const { return computeRootSignature_.Get(); }
-
         ID3D12PipelineState* GetPipelineState() const { return computePipelineState_.Get(); }
 
     private:

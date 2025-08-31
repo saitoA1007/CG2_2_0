@@ -83,4 +83,14 @@ private:
 
 	// テクスチャの管理
 	GameEngine::TextureManager* textureManager_;
+
+	float testNumber = 0;
+
+	Vector3 testVector{};
+
+private:
+
+	void RegisterBebugParam();
+
+	void ApplyDebugParam();
 };

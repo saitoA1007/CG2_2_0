@@ -24,7 +24,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	//=================================================================
 
 	// 全てのデバック用ファイルを読み込み
-	//GameParamEditor::GetInstance()->LoadFiles();
+	GameParamEditor::GetInstance()->LoadFiles();
 
 	// ゲームシーンのインスタンスを生成
 	std::unique_ptr<GameScene> gameScene = std::make_unique<GameScene>();
@@ -54,9 +54,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		// 更新前処理
 		engine->PreUpdate();
 
-		// パラメーターの更新処理
-		GameParamEditor::GetInstance()->Update();
-
 		// ゲームシーンの更新処理
 		gameScene->Update(engine->input_.get());
 
@@ -71,6 +68,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		ImGui::End();
 
 #ifdef _DEBUG
+
+		// パラメーターの更新処理
+		GameParamEditor::GetInstance()->Update();
+
 		// Fps計測器の描画
 		fpsCounter->DrawImGui();
 #endif

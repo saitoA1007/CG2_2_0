@@ -26,20 +26,13 @@ void ParticleCSPSO::Initialize(ID3D12Device* device, DXC* dxc, LogManager* logMa
 
 }
 
-void ParticleCSPSO::Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE inputSRV) {
-    commandList->SetGraphicsRootSignature(computeRootSignature_.Get());
-    commandList->SetPipelineState(computePipelineState_.Get());
-    commandList->SetGraphicsRootDescriptorTable(0, inputSRV);
-    commandList->DrawInstanced(3, 1, 0, 0);
-}
-
 void ParticleCSPSO::CreateCS(ID3D12Device* device, DXC* dxc, LogManager* logManager) {
     // RootSignature作成
     D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
     descriptionRootSignature.Flags =
         D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-    // RootSignature: SRV(テクスチャ)のみ
+    // RootSignature
     D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
     descriptorRange[0].BaseShaderRegister = 0; // 0から始まる
     descriptorRange[0].NumDescriptors = 1; // 数は1つ
@@ -73,7 +66,7 @@ void ParticleCSPSO::CreateCS(ID3D12Device* device, DXC* dxc, LogManager* logMana
     // シェーダ読み込み
     Microsoft::WRL::ComPtr<IDxcBlob> computeShaderBlob;
     computeShaderBlob = dxc->CompileShader(L"Resources/CS/Particle.CS.hlsl",
-        L"vs_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
+        L"cs_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
     assert(computeShaderBlob != nullptr);
 
     // コンピュートパイプラインを設定
@@ -84,19 +77,6 @@ void ParticleCSPSO::CreateCS(ID3D12Device* device, DXC* dxc, LogManager* logMana
     };
     computePipelineStateDesc.pRootSignature = computeRootSignature_.Get();
     hr = device->CreateComputePipelineState(&computePipelineStateDesc, IID_PPV_ARGS(&computePipelineState_));
-
-
-
-    D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
-    uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-    uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-    uavDesc.Buffer.FirstElement = 0;
-    uavDesc.Buffer.NumElements = 1024;
-    uavDesc.Buffer.CounterOffsetInBytes = 0;
-    uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-    uavDesc.Buffer.StructureByteStride = sizeof(uint32_t);
-
-    //device->CreateUnorderedAccessView();
 }
 
 void ParticleCSPSO::CreateVSPS(ID3D12Device* device, DXC* dxc, LogManager* logManager) {
@@ -105,21 +85,31 @@ void ParticleCSPSO::CreateVSPS(ID3D12Device* device, DXC* dxc, LogManager* logMa
 	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
+	// テクスチャデータ用
 	D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing[1] = {};
 	descriptorRangeForInstancing[0].BaseShaderRegister = 0; // 0から始まる
 	descriptorRangeForInstancing[0].NumDescriptors = 1; // 数は1つ
 	descriptorRangeForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // SRVを使う
 	descriptorRangeForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // offsetを自動計算
 
+	// パーティクルデータ用
+	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+	descriptorRange[0].BaseShaderRegister = 0; // 0から始まる
+	descriptorRange[0].NumDescriptors = 1; // 数は1つ
+	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV; // UAVを使う
+	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // offsetを自動計算
+
 	// RootParameter作成。PixelShaderのMaterialとVertexShaderのTransform
 	D3D12_ROOT_PARAMETER rootParameters[3] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;  // CBVを使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;  // PixelShaderで使う
 	rootParameters[0].Descriptor.ShaderRegister = 0;  // レジスタ番号0
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE; // DescriptorTable
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;  // VertexShaderで使う
-	rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;  // Tableの中身の配列を指定
-	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing); // Tableで利用する数
+	
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE; // DescriptorTableを使う
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX; // VertexShaderで使う
+	rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRange; // Tableの中身の配列を指定
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange); // Tableで利用する数
+
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE; // DescriptorTableを使う
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing; // Tableの中身の配列を指定
@@ -138,7 +128,6 @@ void ParticleCSPSO::CreateVSPS(ID3D12Device* device, DXC* dxc, LogManager* logMa
 	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う 
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
-
 
 	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob, errorBlob;
 	// シリアライズしてバイナリにする

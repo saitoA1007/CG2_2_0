@@ -4,6 +4,8 @@
 #include"EngineSource/3D/PrimitiveRenderer.h"
 #include"EngineSource/Math/MyMath.h"
 
+#include"GameParamEditor.h"
+
 #include"ColorEditor.h"
 
 using namespace GameEngine;
@@ -67,9 +69,14 @@ void GameScene::Initialize(GameEngine::TextureManager* textureManager, GameEngin
 	planeModel_ = Model::CreateModel("plane.obj", "Plane");
 	planeModel_->SetDefaultIsEnableLight(true);
 	uvCheckerGH_ = textureManager->Load("Resources/Textures/uvChecker.png");
+
+	RegisterBebugParam();
+	ApplyDebugParam();
 }
 
 void GameScene::Update(GameEngine::Input* input){
+
+	ApplyDebugParam();
 
 	// 地面の更新処理
 	terrainWorldTransform_.UpdateTransformMatrix();
@@ -117,28 +124,6 @@ void GameScene::Update(GameEngine::Input* input){
 
 	ImGui::End();
 
-	ImGui::Begin("Gizmo Example");
-
-	// 3. ImGuizmo 設定（画像の上に描く！）
-	//ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
-	ImGuizmo::SetDrawlist();
-	ImGuizmo::SetOrthographic(false);
-	ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
-
-	// 4. ギズモ表示（カメラ行列と一致させる）
-	float view[16];       // → GPUと同じビュー行列
-	float proj[16]; // → GPUと同じプロジェクション行列
-	float model[16];      // → オブジェクトの現在の行列
-
-	// コピー
-	std::memcpy(view, camera_->GetViewMatrix().m, sizeof(float) * 16);
-	std::memcpy(proj, camera_->GetProjectionMatrix().m, sizeof(float) * 16);
-	std::memcpy(model, terrainWorldTransform_.GetWorldMatrix().m, sizeof(float) * 16);
-
-	ImGuizmo::Manipulate(view, proj, ImGuizmo::TRANSLATE, ImGuizmo::LOCAL, model);
-
-	ImGui::End();
-
 	// カメラの切り替え処理
 	if (input->TriggerKey(DIK_SPACE)) {
 		if (isDebugCameraActive_) {
@@ -166,4 +151,15 @@ void GameScene::Draw() {
 
 	// 軸を描画
 	//axisIndicator_->);
+}
+
+void GameScene::RegisterBebugParam() {
+
+	 GameParamEditor::GetInstance()->AddItem("Test1", "testNum", testNumber);
+	 GameParamEditor::GetInstance()->AddItem("Test2", "testVec", testVector);
+}
+
+void GameScene::ApplyDebugParam() {
+	testNumber = GameParamEditor::GetInstance()->GetFloatValue("Test1", "testNum");
+	testVector = GameParamEditor::GetInstance()->GetVector3Value("Test2", "testVec");
 }

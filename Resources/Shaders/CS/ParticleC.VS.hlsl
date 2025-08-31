@@ -13,7 +13,7 @@ struct VertexShaderInput
 VertexShaderOutput main(VertexShaderInput input, uint32_t instanceId : SV_InstanceID)
 {
     VertexShaderOutput output;
-    Particle particle = gParticle[instanceId];
+    Particle particle = gParticles[instanceId];
     float32_t4x4 worldMatrix = gParticles[instanceId]; // worldMatrixを作る
     worldMatrix[0] *= particle.scale.x;
     worldMatrix[1] *= particle.scale.y;
