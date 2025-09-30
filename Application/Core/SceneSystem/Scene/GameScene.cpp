@@ -1,7 +1,7 @@
 #include"GameScene.h"
 #include"ImguiManager.h"
 
-#include"GameSource/GameParamEditor.h"
+#include"Application/GameParamEditor.h"
 
 using namespace GameEngine;
 
