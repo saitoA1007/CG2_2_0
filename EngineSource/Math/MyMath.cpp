@@ -75,23 +75,6 @@ float Dot(const Quaternion& a, const Quaternion& b) {
 	return  a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
 
-Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
-	Quaternion q1Copy = q1;
-	float dot = Dot(q0, q1);
-	// 四元数の符号が逆だと最短経路で補間されないので反転
-	if (dot < 0.0f) {
-		dot = -dot;
-		q1Copy = -q1;
-	}
-	// なす角
-	float theta = std::acosf(dot);
-	float sinTheta = std::sinf(theta);
-	// 補間係数を求める
-	float scale0 = std::sinf((1.0f - t) * theta) / sinTheta;
-	float scale1 = std::sinf(t * theta) / sinTheta;
-	return scale0 * q0 + scale1 * q1Copy;
-}
-
 Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
 
 	float cos = std::cosf(angle);
@@ -293,6 +276,32 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 	result.m[3][2] = translate.z;
 	result.m[3][3] = 1;
 	return result;
+}
+
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& quaternion, const Vector3 translate) {
+
+	// 回転行列
+	Matrix4x4 rotateMatrix = MakeRotateMatrix(quaternion);
+
+	// 拡縮行列
+	Matrix4x4 scaleMatrix = {
+		scale.x, 0.0f,   0.0f,   0.0f,
+		0.0f,   scale.y, 0.0f,   0.0f,
+		0.0f,   0.0f,   scale.z, 0.0f,
+		0.0f,   0.0f,   0.0f,    1.0f
+	};
+
+	// 平行移動行列
+	Matrix4x4 translateMatrix = {
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		translate.x, translate.y, translate.z, 1.0f
+	};
+
+	// SRT行列
+	Matrix4x4 worldMatrix = Multiply(Multiply(scaleMatrix, rotateMatrix), translateMatrix);
+	return worldMatrix;
 }
 
 Matrix4x4 InverseMatrix(const Matrix4x4& matrix) {

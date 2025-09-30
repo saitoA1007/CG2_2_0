@@ -43,6 +43,20 @@ Sprite* Sprite::Create(const Vector2& position,const Vector2& size,const Vector2
 	return sprite;
 }
 
+void Sprite::Update() {
+
+	// 位置の更新
+	SetPosition(position_);
+
+	// 大きさの更新
+	SetSize(size_);
+
+	// 座標を元にワールド行列の生成
+	worldMatrix_ = MakeAffineMatrix(Vector3(scale_.x, scale_.y, 0.0f), Vector3(0.0f,0.0f,rotate_), Vector3(position_.x, position_.y, 0.0f));
+	// 座標を適用 
+	constBufferData_->WVP = Multiply(worldMatrix_, orthoMatrix_);
+}
+
 void Sprite::Draw(const uint32_t& textureHandle) {
 	// Spriteの描画。
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);

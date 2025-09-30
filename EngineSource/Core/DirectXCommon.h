@@ -125,5 +125,8 @@ namespace GameEngine {
 
         // ポストエフェクト
         std::unique_ptr<PostEffectManager> postEffectManager_;
+
+        // 深度値を取得するためのSRVハンドル
+        CD3DX12_GPU_DESCRIPTOR_HANDLE depthSRVHandle_;
     };
 }

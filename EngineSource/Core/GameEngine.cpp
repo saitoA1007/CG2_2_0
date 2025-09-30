@@ -54,7 +54,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	//=====================================================================================
 
 	// ポストエフェクトの初期化
-	PostEffectManager::StaticInitialize(bloomPSO_.get(), scanLinePSO_.get(), vignettingPSO_.get(), radialBlurPSO_.get(), logManager_.get());
+	PostEffectManager::StaticInitialize(bloomPSO_.get(), scanLinePSO_.get(), vignettingPSO_.get(), radialBlurPSO_.get(), outLinePSO_.get(), logManager_.get());
 
 	// 画像の初期化
 	Sprite::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), spritePSO_.get(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
@@ -157,4 +157,8 @@ void Engine::CreatePSO() {
 	// ラジアルブルーPSOの初期化
 	radialBlurPSO_ = std::make_unique<RadialBlurPSO>();
 	radialBlurPSO_->Initialize(dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+
+	// アウトラインPSOの初期化
+	outLinePSO_ = std::make_unique<OutLinePSO>();
+	outLinePSO_->Initialize(dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
 }

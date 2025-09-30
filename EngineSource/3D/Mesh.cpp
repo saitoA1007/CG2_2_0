@@ -43,7 +43,7 @@ void Mesh::CreateTrianglePlaneMesh(ID3D12Device* device) {
 	vertexData[2].normal = { vertexData[2].position.x, vertexData[2].position.y, vertexData[2].position.z };
 }
 
-void Mesh::CreatePlaneMesh(ID3D12Device* device, const Vector2& size) {
+void Mesh::CreateGridPlaneMesh(ID3D12Device* device, const Vector2& size) {
 	// 頂点数とインデックス数を計算
 	totalVertices_ = 4;
 	totalIndices_ = 6;
@@ -77,6 +77,69 @@ void Mesh::CreatePlaneMesh(ID3D12Device* device, const Vector2& size) {
 	vertexData[2].position = { left,0.0f,bottom,1.0f }; // 右下
 	// 右下
 	vertexData[3].position = { right,0.0f,bottom,1.0f }; // 左上
+
+	// インデックスバッファを作成
+	// 球用の頂点インデックスのリソースを作る
+	indexResource_ = CreateBufferResource(device, sizeof(uint32_t) * totalIndices_);
+	// リソースの先頭のアドレスから使う
+	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	// 使用するリソースのサイズはインデックス6つ分のサイズ
+	indexBufferView_.SizeInBytes = sizeof(uint32_t) * totalIndices_;
+	// インデックスはuint32_tとする
+	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+
+	// インデックスデータを生成
+	// インデックスリソースにデータを書き込む
+	uint32_t* indexData = nullptr;
+	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	// 三角形
+	indexData[0] = 0;  indexData[1] = 1;  indexData[2] = 2;
+	// 三角形2
+	indexData[3] = 1;  indexData[4] = 3;  indexData[5] = 2;
+}
+
+void Mesh::CreatePlaneMesh(ID3D12Device* device, const Vector2& size) {
+	// 頂点数とインデックス数を計算
+	totalVertices_ = 4;
+	totalIndices_ = 6;
+
+	// 頂点バッファを作成
+	// vertexResourceを作成
+	vertexResource_ = CreateBufferResource(device, sizeof(VertexData) * totalVertices_);
+	// リソースの先頭のアドレスから使う
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	// 使用するリソースのサイズは頂点3つ分のサイズ
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * totalVertices_;
+	// 1頂点あたりのサイズ
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+
+	// 頂点データを生成
+	// 頂点リソースにデータを書き込む
+	VertexData* vertexData = nullptr;
+	// 書き込むためのアドレスを取得
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+
+	float left = -size.x / 2.0f;
+	float right = size.x / 2.0f;
+	float top = size.y / 2.0f;
+	float bottom = -size.y / 2.0f;
+
+	// 左上
+	vertexData[0].position = { left,top,0.0f,1.0f };
+	vertexData[0].texcoord = { 0.0f,0.0f };
+	vertexData[0].normal = { 0.0f,0.0f,-1.0f };
+	// 右上
+	vertexData[1].position = { right,top,0.0f,1.0f };
+	vertexData[1].texcoord = { 0.0f,0.0f };
+	vertexData[1].normal = { 0.0f,0.0f,-1.0f };
+	// 左下
+	vertexData[2].position = { left,bottom,0.0f,1.0f };
+	vertexData[2].texcoord = { 0.0f,0.0f };
+	vertexData[2].normal = { 0.0f,0.0f,-1.0f };
+	// 右下
+	vertexData[3].position = { right,bottom,0.0f,1.0f };
+	vertexData[3].texcoord = { 0.0f,0.0f };
+	vertexData[3].normal = { 0.0f,0.0f,-1.0f };
 
 	// インデックスバッファを作成
 	// 球用の頂点インデックスのリソースを作る
@@ -185,8 +248,8 @@ void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData, const uint3
 	// 要素が無ければエラー
 	assert(modelData.meshes.size() > index);
 
-	// メッシュに対応するマテリアル番号
-	materialIndex_ = modelData.meshes[index].materialIndex;
+	// メッシュに対応するマテリアル
+	materialName_ = modelData.meshes[index].materialName;
 
 	// 描画する時に利用する頂点数
 	totalVertices_ = static_cast<UINT>(modelData.meshes[index].vertices.size());

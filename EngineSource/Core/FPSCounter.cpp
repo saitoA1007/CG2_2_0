@@ -2,6 +2,9 @@
 #include"EngineSource/2D/ImGuiManager.h"
 using namespace GameEngine;
 
+float FpsCounter::maxFrameCount = 1;
+float FpsCounter::deltaTime = 1.0f / 60.0f;
+
 void FpsCounter::Initialize() {
 	preTime_ = std::chrono::high_resolution_clock::now();
 }
@@ -23,6 +26,11 @@ void FpsCounter::Update() {
 		maxFrameCount_ = frameCount_;
 		elapsedTime_ = 0.0f;
 		frameCount_ = 0;
+
+		// 最大FPSを保存
+		maxFrameCount = static_cast<float>(maxFrameCount_);
+		// Δ時間を求める
+		deltaTime = 1.0f / static_cast<float>(maxFrameCount_);
 	}
 }
 

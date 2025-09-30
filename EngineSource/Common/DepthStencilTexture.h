@@ -11,7 +11,7 @@ inline Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(
 	resourceDesc.Height = height; // Textureの高さ
 	resourceDesc.MipLevels = 1; // mipmapの数
 	resourceDesc.DepthOrArraySize = 1; // 奥行 or 配列Textureの配列数
-	resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // DepthStencilとして利用可能なフォーマット
+	resourceDesc.Format = DXGI_FORMAT_R24G8_TYPELESS; // DepthStencilとして利用可能なフォーマット
 	resourceDesc.SampleDesc.Count = 1; // サンプリングカウント。1固定
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D; // 2次元
 	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL; // DepthStencilとして使う通知
@@ -31,9 +31,9 @@ inline Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(
 		&heapProperties, // Heapの設定
 		D3D12_HEAP_FLAG_NONE, // Heapの特殊な設定。特になし
 		&resourceDesc, // Resourceの設定
-		D3D12_RESOURCE_STATE_DEPTH_WRITE, // 深度値を書き込む状態にしておく
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, // 深度値を書き込む状態にしておく
 		&depthClearValue, // Clear最適値
-		IID_PPV_ARGS(&resource)); // 作成するResourceポインタへのポインタ
+		IID_PPV_ARGS(&resource)); // 作成するResourceポインタへのポインタD3D12_RESOURCE_STATE_DEPTH_WRITE
 	assert(SUCCEEDED(hr));
 	return resource;
 }

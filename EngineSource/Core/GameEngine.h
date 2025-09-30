@@ -13,6 +13,7 @@
 #include"EngineSource/Core/PSO/PostProcess/ScanLinePSO.h"
 #include"EngineSource/Core/PSO/PostProcess/VignettingPSO.h"
 #include"EngineSource/Core/PSO/PostProcess/RadialBlurPSO.h"
+#include"EngineSource/Core/PSO/PostProcess/OutLinePSO.h"
 
 #include"EngineSource/Core/PostProcess/PostEffectManager.h"
 
@@ -148,6 +149,9 @@ namespace GameEngine {
 
 		// ラジアルブルー用のPSO設定
 		std::unique_ptr<RadialBlurPSO> radialBlurPSO_;
+
+		// アウトライン用のPSO設定
+		std::unique_ptr<OutLinePSO> outLinePSO_;
 
 		/// Input =============================
 
