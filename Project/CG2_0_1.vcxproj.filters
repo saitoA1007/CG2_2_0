@@ -1,0 +1,648 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{ded00ed1-52f5-4147-b1c7-e5c341ad4b70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{9794a682-327a-487f-ab03-84f4d9947480}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource">
+      <UniqueIdentifier>{14eb70a3-3d64-46d5-952b-572c1ac6b1b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSource">
+      <UniqueIdentifier>{53a9898d-4ad7-4b92-a096-db1c8abd766b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\2D">
+      <UniqueIdentifier>{da0c5c3e-deba-4833-949d-87d49681af41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\3D">
+      <UniqueIdentifier>{2dedea14-5ebb-4d91-a5f0-182e99b31713}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\Audio">
+      <UniqueIdentifier>{12493ded-5d28-45f7-b758-8e9812222ac4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\Common">
+      <UniqueIdentifier>{0b7c93b5-6657-4719-8dec-d1843a134ecb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\Core">
+      <UniqueIdentifier>{1f51a672-b3f2-4eb4-8e24-6e8f92975a0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\Input">
+      <UniqueIdentifier>{23929b20-53fc-4a4f-a070-a44fcd9dd50c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\Math">
+      <UniqueIdentifier>{53076df4-0593-46f7-96b6-296c827f0576}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\Core\PSO">
+      <UniqueIdentifier>{67eacddd-dd6e-45d8-bc08-d15d07162064}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\3D\Camera">
+      <UniqueIdentifier>{163284e5-fe77-4f64-ac62-0c3b142a3e65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\3D\Light">
+      <UniqueIdentifier>{d484e87e-774c-416b-80ea-d4d107ff2219}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PostEffect">
+      <UniqueIdentifier>{9aaebbf4-668b-4853-a5f6-7f7e94f8b607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\Core\PostProcess">
+      <UniqueIdentifier>{8171682b-3501-4f1d-a5c2-9f1c26ee4526}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\Core\ComputePSO">
+      <UniqueIdentifier>{a95699a8-7684-43b6-bb86-b9ce27351bd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\CS">
+      <UniqueIdentifier>{01452b33-ca37-47b9-8958-22bed032796c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\Collision">
+      <UniqueIdentifier>{f4e70713-21f2-4a1b-9cab-82a194d6f91c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSource\Core\PSO\PostProcess">
+      <UniqueIdentifier>{f36c0d30-6aad-4ff2-af50-a00b6f5b37ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PostEffect\Vignetting">
+      <UniqueIdentifier>{2a858b64-1e1b-4651-a056-c09b1c83ff71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PostEffect\ScanLine">
+      <UniqueIdentifier>{9ac5efe5-e614-4f14-aa8c-2ebd3e26280c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PostEffect\RadialBlur">
+      <UniqueIdentifier>{687a2c9d-54c8-4a7d-870d-8904ff628fde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PostEffect\OutLine">
+      <UniqueIdentifier>{3b25cc23-b5c0-4f67-b55f-b20b1e9a324c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSource\Core">
+      <UniqueIdentifier>{11a52917-6d84-43a8-b95c-370d29cef491}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSource\Core\SceneSystem">
+      <UniqueIdentifier>{f23e1e3a-7234-4894-ab88-89b41bb223c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSource\Core\SceneSystem\Scene">
+      <UniqueIdentifier>{b3335c69-a271-4753-bdff-17a035774a13}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Externals\imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\imgui\imgui_impl_dx12.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\imgui\imgui_impl_win32.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\imgui\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\imgui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\2D\ImGuiManager.cpp">
+      <Filter>EngineSource\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\2D\Sprite.cpp">
+      <Filter>EngineSource\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\AxisIndicator.cpp">
+      <Filter>EngineSource\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\LineMesh.cpp">
+      <Filter>EngineSource\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Material.cpp">
+      <Filter>EngineSource\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Model.cpp">
+      <Filter>EngineSource\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\PrimitiveRenderer.cpp">
+      <Filter>EngineSource\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\WorldTransform.cpp">
+      <Filter>EngineSource\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Common\LogManager.cpp">
+      <Filter>EngineSource\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\LinePSO.cpp">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\TrianglePSO.cpp">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\DirectXCommon.cpp">
+      <Filter>EngineSource\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\DXC.cpp">
+      <Filter>EngineSource\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\TextureManager.cpp">
+      <Filter>EngineSource\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\WindowsApp.cpp">
+      <Filter>EngineSource\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Input\InPut.cpp">
+      <Filter>EngineSource\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Math\EasingManager.cpp">
+      <Filter>EngineSource\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Math\MyMath.cpp">
+      <Filter>EngineSource\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\main.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\ParticlePSO.cpp">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\WorldTransforms.cpp">
+      <Filter>EngineSource\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Camera\Camera.cpp">
+      <Filter>EngineSource\3D\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Camera\DebugCamera.cpp">
+      <Filter>EngineSource\3D\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Light\DirectionalLight.cpp">
+      <Filter>EngineSource\3D\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Light\PointLight.cpp">
+      <Filter>EngineSource\3D\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Light\SpotLight.cpp">
+      <Filter>EngineSource\3D\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Light\LightManager.cpp">
+      <Filter>EngineSource\3D\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\ColorEditor.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PostProcess\PostEffectManager.cpp">
+      <Filter>EngineSource\Core\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\GaussianBlurPSO.cpp">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\GridPSO.cpp">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Mesh.cpp">
+      <Filter>EngineSource\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\FPSCounter.cpp">
+      <Filter>EngineSource\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\SpritePSO.cpp">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\GameEngine.cpp">
+      <Filter>EngineSource\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\imgui\ImGuizmo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\ComputePSO\ParticleCSPSO.cpp">
+      <Filter>EngineSource\Core\ComputePSO</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Particle.cpp">
+      <Filter>EngineSource\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Audio\AudioManager.cpp">
+      <Filter>EngineSource\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Collision\CollisionUtils.cpp">
+      <Filter>EngineSource\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.cpp">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.cpp">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.cpp">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\BloomPSO.cpp">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\CopyPSO.cpp">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\GameParamEditor.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.cpp">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\RandomGenerator.cpp">
+      <Filter>EngineSource\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Core\SceneSystem\SceneManager.cpp">
+      <Filter>GameSource\Core\SceneSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Core\SceneSystem\Scene\TitleScene.cpp">
+      <Filter>GameSource\Core\SceneSystem\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Core\SceneSystem\Scene\GameScene.cpp">
+      <Filter>GameSource\Core\SceneSystem\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\AnimationData.cpp" />
+    <ClCompile Include="EngineSource\3D\Animation.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Externals\imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\imgui_impl_dx12.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\imgui_impl_win32.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\imstb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\2D\ImGuiManager.h">
+      <Filter>EngineSource\2D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\2D\Sprite.h">
+      <Filter>EngineSource\2D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\AxisIndicator.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\LineMesh.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Material.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Model.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\PrimitiveRenderer.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\VertexData.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Common\ConvertString.h">
+      <Filter>EngineSource\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Common\CrashHandle.h">
+      <Filter>EngineSource\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Common\CreateBufferResource.h">
+      <Filter>EngineSource\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Common\DepthStencilTexture.h">
+      <Filter>EngineSource\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Common\DescriptorHandle.h">
+      <Filter>EngineSource\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Common\DescriptorHeap.h">
+      <Filter>EngineSource\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Common\LogManager.h">
+      <Filter>EngineSource\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Common\ResourceLeakChecker.h">
+      <Filter>EngineSource\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\LinePSO.h">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\DirectXCommon.h">
+      <Filter>EngineSource\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\DXC.h">
+      <Filter>EngineSource\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\TextureManager.h">
+      <Filter>EngineSource\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\WindowsApp.h">
+      <Filter>EngineSource\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Input\InPut.h">
+      <Filter>EngineSource\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Math\EasingManager.h">
+      <Filter>EngineSource\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Math\Matrix4x4.h">
+      <Filter>EngineSource\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Math\MyMath.h">
+      <Filter>EngineSource\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Math\Transform.h">
+      <Filter>EngineSource\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Math\TransformationMatrix.h">
+      <Filter>EngineSource\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Math\Vector2.h">
+      <Filter>EngineSource\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Math\Vector3.h">
+      <Filter>EngineSource\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Math\Vector4.h">
+      <Filter>EngineSource\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\ParticlePSO.h">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\WorldTransform.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\BlendMode.h">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\WorldTransforms.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Camera\Camera.h">
+      <Filter>EngineSource\3D\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Light\DirectionalLight.h">
+      <Filter>EngineSource\3D\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Math\Geometry.h">
+      <Filter>EngineSource\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Light\PointLight.h">
+      <Filter>EngineSource\3D\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Light\SpotLight.h">
+      <Filter>EngineSource\3D\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Light\LightManager.h">
+      <Filter>EngineSource\3D\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\TrianglePSO.h">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Camera\DebugCamera.h">
+      <Filter>EngineSource\3D\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\ColorEditor.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PostProcess\BasePostEffect.h">
+      <Filter>EngineSource\Core\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PostProcess\PostEffectManager.h">
+      <Filter>EngineSource\Core\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\GaussianBlurPSO.h">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\GridPSO.h">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Mesh.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\FPSCounter.h">
+      <Filter>EngineSource\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\ResourceCounter.h">
+      <Filter>EngineSource\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\SpritePSO.h">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\GameEngine.h">
+      <Filter>EngineSource\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\ImGuizmo.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\AnimationData.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\ComputePSO\ParticleCSPSO.h">
+      <Filter>EngineSource\Core\ComputePSO</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Particle.h">
+      <Filter>EngineSource\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Audio\AudioManager.h">
+      <Filter>EngineSource\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Collision\CollisionUtils.h">
+      <Filter>EngineSource\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Math\Quaternion.h">
+      <Filter>EngineSource\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.h">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.h">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.h">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\BloomPSO.h">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\CopyPSO.h">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\BasePSO.h">
+      <Filter>EngineSource\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\GameParamEditor.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.h">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\RandomGenerator.h">
+      <Filter>EngineSource\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Core\SceneSystem\SceneManager.h">
+      <Filter>GameSource\Core\SceneSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Core\SceneSystem\Scene\BaseScene.h">
+      <Filter>GameSource\Core\SceneSystem\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Core\SceneSystem\Scene\TitleScene.h">
+      <Filter>GameSource\Core\SceneSystem\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Core\SceneSystem\Scene\GameScene.h">
+      <Filter>GameSource\Core\SceneSystem\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Animation.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Externals\imgui\LICENSE.txt">
+      <Filter>imgui</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Shaders\Object3d.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\Primitive.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\Particle.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\GaussianBlur.hlsli">
+      <Filter>Shaders\PostEffect</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\CopyImage.hlsli">
+      <Filter>Shaders\PostEffect</Filter>
+    </None>
+    <None Include="Resources\Shaders\Grid.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\ColorConvert.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\Sprite.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\CS\ParticleCS.hlsli">
+      <Filter>Shaders\CS</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\PostProcessGrayScale.hlsli">
+      <Filter>Shaders\PostEffect</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.hlsli">
+      <Filter>Shaders\PostEffect\RadialBlur</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.hlsli">
+      <Filter>Shaders\PostEffect\ScanLine</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.hlsli">
+      <Filter>Shaders\PostEffect\Vignetting</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\FullScreen.hlsli">
+      <Filter>Shaders\PostEffect</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Resources\Shaders\Object3d.PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Object3d.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Primitive.PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Primitive.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Particle.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Particle.PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\Bloom.VS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\Bloom.PS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\BloomResult.PS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\BloomComposite.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\HighLumMask.PS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\Copy.VS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\Copy.PS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Grid.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Grid.PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\GaussianBlur.VS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\GaussianBlur.PS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Sprite.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Sprite.PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\CS\Particle.CS.hlsl">
+      <Filter>Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\CS\ParticleC.VS.hlsl">
+      <Filter>Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\CS\ParticleC.PS.hlsl">
+      <Filter>Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.PS.hlsl">
+      <Filter>Shaders\PostEffect\RadialBlur</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.VS.hlsl">
+      <Filter>Shaders\PostEffect\RadialBlur</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.PS.hlsl">
+      <Filter>Shaders\PostEffect\ScanLine</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.VS.hlsl">
+      <Filter>Shaders\PostEffect\ScanLine</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.PS.hlsl">
+      <Filter>Shaders\PostEffect\Vignetting</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.VS.hlsl">
+      <Filter>Shaders\PostEffect\Vignetting</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\OutLine\OutLine.PS.hlsl">
+      <Filter>Shaders\PostEffect\OutLine</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\FullScreen.VS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
