@@ -159,7 +159,7 @@
     <ClCompile Include="EngineSource\Math\MyMath.cpp">
       <Filter>EngineSource\Math</Filter>
     </ClCompile>
-    <ClCompile Include="GameSource\main.cpp">
+    <ClCompile Include="Application\main.cpp">
       <Filter>GameSource</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Core\PSO\ParticlePSO.cpp">
@@ -186,7 +186,7 @@
     <ClCompile Include="EngineSource\3D\Light\LightManager.cpp">
       <Filter>EngineSource\3D\Light</Filter>
     </ClCompile>
-    <ClCompile Include="GameSource\ColorEditor.cpp">
+    <ClCompile Include="Application\ColorEditor.cpp">
       <Filter>GameSource</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Core\PostProcess\PostEffectManager.cpp">
@@ -240,7 +240,7 @@
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\CopyPSO.cpp">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClCompile>
-    <ClCompile Include="GameSource\GameParamEditor.cpp">
+    <ClCompile Include="Application\GameParamEditor.cpp">
       <Filter>GameSource</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.cpp">
@@ -249,13 +249,13 @@
     <ClCompile Include="EngineSource\Core\RandomGenerator.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
-    <ClCompile Include="GameSource\Core\SceneSystem\SceneManager.cpp">
+    <ClCompile Include="Application\Core\SceneSystem\SceneManager.cpp">
       <Filter>GameSource\Core\SceneSystem</Filter>
     </ClCompile>
-    <ClCompile Include="GameSource\Core\SceneSystem\Scene\TitleScene.cpp">
+    <ClCompile Include="Application\Core\SceneSystem\Scene\TitleScene.cpp">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="GameSource\Core\SceneSystem\Scene\GameScene.cpp">
+    <ClCompile Include="Application\Core\SceneSystem\Scene\GameScene.cpp">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\3D\AnimationData.cpp" />
@@ -412,7 +412,7 @@
     <ClInclude Include="EngineSource\3D\Camera\DebugCamera.h">
       <Filter>EngineSource\3D\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="GameSource\ColorEditor.h">
+    <ClInclude Include="Application\ColorEditor.h">
       <Filter>GameSource</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Core\PostProcess\BasePostEffect.h">
@@ -481,7 +481,7 @@
     <ClInclude Include="EngineSource\Core\PSO\BasePSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
-    <ClInclude Include="GameSource\GameParamEditor.h">
+    <ClInclude Include="Application\GameParamEditor.h">
       <Filter>GameSource</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.h">
@@ -490,16 +490,16 @@
     <ClInclude Include="EngineSource\Core\RandomGenerator.h">
       <Filter>EngineSource\Core</Filter>
     </ClInclude>
-    <ClInclude Include="GameSource\Core\SceneSystem\SceneManager.h">
+    <ClInclude Include="Application\Core\SceneSystem\SceneManager.h">
       <Filter>GameSource\Core\SceneSystem</Filter>
     </ClInclude>
-    <ClInclude Include="GameSource\Core\SceneSystem\Scene\BaseScene.h">
+    <ClInclude Include="Application\Core\SceneSystem\Scene\BaseScene.h">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="GameSource\Core\SceneSystem\Scene\TitleScene.h">
+    <ClInclude Include="Application\Core\SceneSystem\Scene\TitleScene.h">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="GameSource\Core\SceneSystem\Scene\GameScene.h">
+    <ClInclude Include="Application\Core\SceneSystem\Scene\GameScene.h">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Animation.h" />

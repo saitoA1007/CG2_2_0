@@ -216,12 +216,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="Externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="Externals\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="GameSource\ColorEditor.cpp" />
-    <ClCompile Include="GameSource\Core\SceneSystem\SceneManager.cpp" />
-    <ClCompile Include="GameSource\Core\SceneSystem\Scene\GameScene.cpp" />
-    <ClCompile Include="GameSource\Core\SceneSystem\Scene\TitleScene.cpp" />
-    <ClCompile Include="GameSource\GameParamEditor.cpp" />
-    <ClCompile Include="GameSource\main.cpp">
+    <ClCompile Include="Application\ColorEditor.cpp" />
+    <ClCompile Include="Application\Core\SceneSystem\SceneManager.cpp" />
+    <ClCompile Include="Application\Core\SceneSystem\Scene\GameScene.cpp" />
+    <ClCompile Include="Application\Core\SceneSystem\Scene\TitleScene.cpp" />
+    <ClCompile Include="Application\GameParamEditor.cpp" />
+    <ClCompile Include="Application\main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
     </ClCompile>
@@ -302,12 +302,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="Externals\imgui\imstb_textedit.h" />
     <ClInclude Include="Externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="GameSource\ColorEditor.h" />
-    <ClInclude Include="GameSource\Core\SceneSystem\SceneManager.h" />
-    <ClInclude Include="GameSource\Core\SceneSystem\Scene\BaseScene.h" />
-    <ClInclude Include="GameSource\Core\SceneSystem\Scene\GameScene.h" />
-    <ClInclude Include="GameSource\Core\SceneSystem\Scene\TitleScene.h" />
-    <ClInclude Include="GameSource\GameParamEditor.h" />
+    <ClInclude Include="Application\ColorEditor.h" />
+    <ClInclude Include="Application\Core\SceneSystem\SceneManager.h" />
+    <ClInclude Include="Application\Core\SceneSystem\Scene\BaseScene.h" />
+    <ClInclude Include="Application\Core\SceneSystem\Scene\GameScene.h" />
+    <ClInclude Include="Application\Core\SceneSystem\Scene\TitleScene.h" />
+    <ClInclude Include="Application\GameParamEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />
