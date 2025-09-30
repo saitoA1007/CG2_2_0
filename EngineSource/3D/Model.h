@@ -12,18 +12,18 @@
 #include"AnimationData.h"
 #include"Animation.h"
 
-#include"EngineSource/Common/LogManager.h"
+#include"LogManager.h"
 
-#include"EngineSource/Core/TextureManager.h"
-#include"EngineSource/Core/PSO/TrianglePSO.h"
-#include"EngineSource/Core/PSO/ParticlePSO.h"
-#include"EngineSource/Core/PSO/GridPSO.h"
-#include"EngineSource/Core/PSO/BasePSO.h"
+#include"TextureManager.h"
+#include"TrianglePSO.h"
+#include"ParticlePSO.h"
+#include"GridPSO.h"
+#include"BasePSO.h"
 
-#include"EngineSource/3D/Light/LightManager.h"
-#include"EngineSource/3D/Camera/Camera.h"
+#include"LightManager.h"
+#include"Camera.h"
 
-#include"EngineSource/Math/TransformationMatrix.h"
+#include"TransformationMatrix.h"
 
 #include<assimp/Importer.hpp>
 #include<assimp/scene.h>

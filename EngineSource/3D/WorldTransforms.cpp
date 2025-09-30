@@ -1,7 +1,7 @@
 #include"WorldTransforms.h"
-#include"EngineSource/Math/MyMath.h"
-#include"EngineSource/Common/CreateBufferResource.h"
-#include"EngineSource/Common/DescriptorHandle.h"
+#include"MyMath.h"
+#include"CreateBufferResource.h"
+#include"DescriptorHandle.h"
 using namespace GameEngine;
 
 DirectXCommon* WorldTransforms::dxCommon_ = nullptr;

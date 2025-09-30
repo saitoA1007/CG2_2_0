@@ -1,17 +1,17 @@
 #pragma once
 #pragma once
-#include"EngineSource/Math/Matrix4x4.h"
-#include"EngineSource/Math/Transform.h"
-#include"EngineSource/Math/TransformationMatrix.h"
+#include"Matrix4x4.h"
+#include"Transform.h"
+#include"TransformationMatrix.h"
 #include <d3d12.h>
 #include <wrl.h>
 #include <queue>
 #include <unordered_set>
 
-#include"externals/DirectXTex/d3dx12.h"
+#include"Externals/DirectXTex/d3dx12.h"
 
-#include"EngineSource/Core/DirectXCommon.h"
-#include"EngineSource/Core/ResourceCounter.h"
+#include"DirectXCommon.h"
+#include"ResourceCounter.h"
 
 namespace GameEngine {
 

@@ -2,12 +2,12 @@
 #include <d3d12.h>
 #include<iostream>
 #include <wrl.h>
-#include"EngineSource/Math/Matrix4x4.h"
-#include"EngineSource/Math/Vector2.h"
-#include"EngineSource/Math/Vector4.h"
-#include"EngineSource/Math/Transform.h"
+#include"Matrix4x4.h"
+#include"Vector2.h"
+#include"Vector4.h"
+#include"Transform.h"
 
-#include"EngineSource/Core/PSO/SpritePSO.h"
+#include"SpritePSO.h"
 
 namespace GameEngine {
 

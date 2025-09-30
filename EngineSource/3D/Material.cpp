@@ -1,6 +1,6 @@
 #include"Material.h"
-#include"EngineSource/Math/MyMath.h"
-#include"EngineSource/Common/CreateBufferResource.h"
+#include"MyMath.h"
+#include"CreateBufferResource.h"
 using namespace GameEngine;
 
 ID3D12Device* Material::device_ = nullptr;

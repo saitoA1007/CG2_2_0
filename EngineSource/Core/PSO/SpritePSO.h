@@ -4,8 +4,8 @@
 #include<iostream>
 #include<array>
 #include <wrl.h>
-#include"EngineSource/Common/LogManager.h"
-#include"EngineSource/Core/DXC.h"
+#include"LogManager.h"
+#include"DXC.h"
 
 #include"BlendMode.h"
 

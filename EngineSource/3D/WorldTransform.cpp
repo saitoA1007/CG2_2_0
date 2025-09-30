@@ -1,7 +1,7 @@
 #include"WorldTransform.h"
-#include"EngineSource/Math/MyMath.h"
-#include"EngineSource/Common/CreateBufferResource.h"
-#include"EngineSource/Core/FPSCounter.h"
+#include"MyMath.h"
+#include"CreateBufferResource.h"
+#include"FPSCounter.h"
 using namespace GameEngine;
 
 ID3D12Device* WorldTransform::device_ = nullptr;

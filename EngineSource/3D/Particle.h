@@ -1,14 +1,14 @@
 #pragma once
-#include"EngineSource/Math/Matrix4x4.h"
-#include"EngineSource/Math/Transform.h"
-#include"EngineSource/Math/TransformationMatrix.h"
+#include"Matrix4x4.h"
+#include"Transform.h"
+#include"TransformationMatrix.h"
 
 #include"VertexData.h"
 #include"Mesh.h"
 
-#include"EngineSource/Core/ComputePSO/ParticleCSPSO.h"
-#include"EngineSource/Core/DirectXCommon.h"
-#include"EngineSource/Core/TextureManager.h"
+#include"ComputePSO/ParticleCSPSO.h"
+#include"DirectXCommon.h"
+#include"TextureManager.h"
 #include <d3d12.h>
 
 namespace GameEngine {

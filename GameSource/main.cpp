@@ -1,8 +1,8 @@
-#include"EngineSource/Core/GameEngine.h"
+#include"GameEngine.h"
 #include<iostream>
 
-#include"EngineSource/Core/FPSCounter.h"
-#include"EngineSource/Core/RandomGenerator.h"
+#include"FPSCounter.h"
+#include"RandomGenerator.h"
 #include"GameParamEditor.h"
 
 #include"Core/SceneSystem/SceneManager.h"

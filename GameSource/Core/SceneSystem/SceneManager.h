@@ -1,9 +1,9 @@
 #pragma once
-#include"EngineSource/Input/Input.h"
-#include"EngineSource/Core/TextureManager.h"
-#include"EngineSource/Audio/AudioManager.h"
+#include"Input.h"
+#include"TextureManager.h"
+#include"AudioManager.h"
 
-#include"EngineSource/3D/Camera/Camera.h"
+#include"Camera.h"
 
 #include"Scene/BaseScene.h"
 

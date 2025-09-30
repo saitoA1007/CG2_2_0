@@ -84,25 +84,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="externals\imgui\imgui.cpp">
+    <ClCompile Include="Externals\imgui\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_demo.cpp">
+    <ClCompile Include="Externals\imgui\imgui_demo.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_draw.cpp">
+    <ClCompile Include="Externals\imgui\imgui_draw.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
+    <ClCompile Include="Externals\imgui\imgui_impl_dx12.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
+    <ClCompile Include="Externals\imgui\imgui_impl_win32.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_tables.cpp">
+    <ClCompile Include="Externals\imgui\imgui_tables.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_widgets.cpp">
+    <ClCompile Include="Externals\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp">
@@ -210,7 +210,7 @@
     <ClCompile Include="EngineSource\Core\GameEngine.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
-    <ClCompile Include="externals\imgui\ImGuizmo.cpp">
+    <ClCompile Include="Externals\imgui\ImGuizmo.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Core\ComputePSO\ParticleCSPSO.cpp">
@@ -262,28 +262,28 @@
     <ClCompile Include="EngineSource\3D\Animation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="externals\imgui\imconfig.h">
+    <ClInclude Include="Externals\imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="externals\imgui\imgui.h">
+    <ClInclude Include="Externals\imgui\imgui.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_dx12.h">
+    <ClInclude Include="Externals\imgui\imgui_impl_dx12.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_win32.h">
+    <ClInclude Include="Externals\imgui\imgui_impl_win32.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_internal.h">
+    <ClInclude Include="Externals\imgui\imgui_internal.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_rectpack.h">
+    <ClInclude Include="Externals\imgui\imstb_rectpack.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_textedit.h">
+    <ClInclude Include="Externals\imgui\imstb_textedit.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_truetype.h">
+    <ClInclude Include="Externals\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\2D\ImGuiManager.h">
@@ -442,7 +442,7 @@
     <ClInclude Include="EngineSource\Core\GameEngine.h">
       <Filter>EngineSource\Core</Filter>
     </ClInclude>
-    <ClInclude Include="externals\imgui\ImGuizmo.h">
+    <ClInclude Include="Externals\imgui\ImGuizmo.h">
       <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\AnimationData.h">
@@ -505,7 +505,7 @@
     <ClInclude Include="EngineSource\3D\Animation.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="externals\imgui\LICENSE.txt">
+    <Text Include="Externals\imgui\LICENSE.txt">
       <Filter>imgui</Filter>
     </Text>
   </ItemGroup>

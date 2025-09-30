@@ -4,13 +4,13 @@
 #include <wrl.h>
 #include <array>
 #include <fstream>
-#include"EngineSource/Common/LogManager.h"
-#include"externals/DirectXTex/d3dx12.h"
+#include"LogManager.h"
+#include"Externals/DirectXTex/d3dx12.h"
 
-#include"PSO/PostProcess/CopyPSO.h"
+#include"PostProcess/CopyPSO.h"
 
-#include"EngineSource/Core/PostProcess/PostEffectManager.h"
-#include"EngineSource/Core/ResourceCounter.h"
+#include"PostProcess/PostEffectManager.h"
+#include"ResourceCounter.h"
 
 namespace GameEngine {
 

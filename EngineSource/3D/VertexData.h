@@ -1,9 +1,9 @@
 #pragma once
-#include"EngineSource/Math/Vector4.h"
-#include"EngineSource/Math/Vector3.h"
-#include"EngineSource/Math/Vector2.h"
-#include"EngineSource/Math/Matrix4x4.h"
-#include"EngineSource/Math/Transform.h"
+#include"Vector4.h"
+#include"Vector3.h"
+#include"Vector2.h"
+#include"Matrix4x4.h"
+#include"Transform.h"
 
 #include<iostream>
 #include<vector>

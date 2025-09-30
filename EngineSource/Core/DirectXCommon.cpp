@@ -2,7 +2,7 @@
 #include <cassert>
 #include <string>
 #include <format>
-#include"externals/DirectXTex/d3dx12.h"
+#include"Externals/DirectXTex/d3dx12.h"
 
 #include"EngineSource/Common/ConvertString.h"
 #include"EngineSource/Common/DescriptorHeap.h"

@@ -1,11 +1,11 @@
 #pragma once
 #include <d3d12.h>
 
-#include"EngineSource/Math/Vector3.h"
-#include"EngineSource/Math/Vector4.h"
-#include"EngineSource/Math/Matrix4x4.h"
-#include"EngineSource/Common/LogManager.h"
-#include"EngineSource/Core/PSO/LinePSO.h"
+#include"Vector3.h"
+#include"Vector4.h"
+#include"Matrix4x4.h"
+#include"LogManager.h"
+#include"LinePSO.h"
 
 #include"LineMesh.h"
 

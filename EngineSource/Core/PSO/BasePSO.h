@@ -1,11 +1,11 @@
 #pragma once
 #include <d3d12.h>
 #include <wrl.h>
-#include"EngineSource/Core/DXC.h"
-#include"EngineSource/Math/Vector4.h"
-#include"EngineSource/Math/Vector2.h"
+#include"DXC.h"
+#include"Vector4.h"
+#include"Vector2.h"
 
-#include"EngineSource/Common/LogManager.h"
+#include"LogManager.h"
 
 class BasePSO {
 public:

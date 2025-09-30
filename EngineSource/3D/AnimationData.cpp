@@ -1,6 +1,6 @@
 #include"AnimationData.h"
 #include<cassert>
-#include"EngineSource/Math/EasingManager.h"
+#include"EasingManager.h"
 
 Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time) {
 

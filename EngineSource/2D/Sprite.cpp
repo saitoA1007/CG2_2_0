@@ -1,7 +1,7 @@
 #include"Sprite.h"
-#include"EngineSource/Common/CreateBufferResource.h"
-#include"EngineSource/Math/MyMath.h"
-#include"EngineSource/Core/TextureManager.h"
+#include"CreateBufferResource.h"
+#include"MyMath.h"
+#include"TextureManager.h"
 using namespace GameEngine;
 
 ID3D12Device* Sprite::device_ = nullptr;
