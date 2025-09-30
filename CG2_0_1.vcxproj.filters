@@ -70,6 +70,18 @@
     <Filter Include="Shaders\PostEffect\RadialBlur">
       <UniqueIdentifier>{687a2c9d-54c8-4a7d-870d-8904ff628fde}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\PostEffect\OutLine">
+      <UniqueIdentifier>{3b25cc23-b5c0-4f67-b55f-b20b1e9a324c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSource\Core">
+      <UniqueIdentifier>{11a52917-6d84-43a8-b95c-370d29cef491}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSource\Core\SceneSystem">
+      <UniqueIdentifier>{f23e1e3a-7234-4894-ab88-89b41bb223c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSource\Core\SceneSystem\Scene">
+      <UniqueIdentifier>{b3335c69-a271-4753-bdff-17a035774a13}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -146,9 +158,6 @@
     </ClCompile>
     <ClCompile Include="EngineSource\Math\MyMath.cpp">
       <Filter>EngineSource\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="GameSource\GameScene.cpp">
-      <Filter>GameSource</Filter>
     </ClCompile>
     <ClCompile Include="GameSource\main.cpp">
       <Filter>GameSource</Filter>
@@ -234,6 +243,23 @@
     <ClCompile Include="GameSource\GameParamEditor.cpp">
       <Filter>GameSource</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.cpp">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\RandomGenerator.cpp">
+      <Filter>EngineSource\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSource\Core\SceneSystem\SceneManager.cpp">
+      <Filter>GameSource\Core\SceneSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSource\Core\SceneSystem\Scene\TitleScene.cpp">
+      <Filter>GameSource\Core\SceneSystem\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSource\Core\SceneSystem\Scene\GameScene.cpp">
+      <Filter>GameSource\Core\SceneSystem\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\AnimationData.cpp" />
+    <ClCompile Include="EngineSource\3D\Animation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -350,9 +376,6 @@
     <ClInclude Include="EngineSource\Math\Vector4.h">
       <Filter>EngineSource\Math</Filter>
     </ClInclude>
-    <ClInclude Include="GameSource\GameScene.h">
-      <Filter>GameSource</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Core\PSO\ParticlePSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
@@ -461,6 +484,25 @@
     <ClInclude Include="GameSource\GameParamEditor.h">
       <Filter>GameSource</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.h">
+      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\RandomGenerator.h">
+      <Filter>EngineSource\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSource\Core\SceneSystem\SceneManager.h">
+      <Filter>GameSource\Core\SceneSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSource\Core\SceneSystem\Scene\BaseScene.h">
+      <Filter>GameSource\Core\SceneSystem\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSource\Core\SceneSystem\Scene\TitleScene.h">
+      <Filter>GameSource\Core\SceneSystem\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSource\Core\SceneSystem\Scene\GameScene.h">
+      <Filter>GameSource\Core\SceneSystem\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Animation.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -506,6 +548,9 @@
     </None>
     <None Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.hlsli">
       <Filter>Shaders\PostEffect\Vignetting</Filter>
+    </None>
+    <None Include="Resources\Shaders\PostEffect\FullScreen.hlsli">
+      <Filter>Shaders\PostEffect</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -592,6 +637,12 @@
     </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.VS.hlsl">
       <Filter>Shaders\PostEffect\Vignetting</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\OutLine\OutLine.PS.hlsl">
+      <Filter>Shaders\PostEffect\OutLine</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\FullScreen.VS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

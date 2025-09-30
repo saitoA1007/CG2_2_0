@@ -16,10 +16,17 @@ namespace GameEngine {
 		void CreateTrianglePlaneMesh(ID3D12Device* device);
 
 		/// <summary>
-		/// 平面のメッシュを作成
+		/// グリッド平面のメッシュを作成
 		/// </summary>
 		/// <param name="device">デバイス</param>
 		/// <param name="size">x:横幅,y:縦幅</param>
+		void CreateGridPlaneMesh(ID3D12Device* device, const Vector2& size);
+
+		/// <summary>
+		/// 平面のメッシュを作成
+		/// </summary>
+		/// <param name="device"></param>
+		/// <param name="size"></param>
 		void CreatePlaneMesh(ID3D12Device* device, const Vector2& size);
 
 		/// <summary>
@@ -82,10 +89,10 @@ namespace GameEngine {
 		const uint32_t GetTotalIndices()const { return totalIndices_; }
 
 		/// <summary>
-		/// メッシュに対応するマテリアル番号を取得
+		/// メッシュに対応するマテリアル名を取得
 		/// </summary>
 		/// <returns></returns>
-		const uint32_t GetMaterialIndex() const { return materialIndex_; }
+		const std::string GetMaterialName() const { return materialName_; }
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
@@ -97,7 +104,7 @@ namespace GameEngine {
 		uint32_t totalVertices_ = 0;
 		uint32_t totalIndices_ = 0;
 
-		// メッシュに対応するマテリアル番号
-		uint32_t materialIndex_ = 0;
+		// マテリアル名
+		std::string materialName_ = "default";
 	};
 }

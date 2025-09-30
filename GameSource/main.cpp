@@ -1,13 +1,13 @@
 #include"EngineSource/Core/GameEngine.h"
 #include<iostream>
 
-#include"GameScene.h"
-
 #include"EngineSource/Core/FPSCounter.h"
+#include"EngineSource/Core/RandomGenerator.h"
 #include"GameParamEditor.h"
 
-using namespace GameEngine;
+#include"Core/SceneSystem/SceneManager.h"
 
+using namespace GameEngine;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
@@ -19,6 +19,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	std::unique_ptr<FpsCounter> fpsCounter = std::make_unique<FpsCounter>();
 	fpsCounter->Initialize();
 
+	// ランダム生成器を初期化
+	RandomGenerator::Initialize();
+
 	//=================================================================
 	// 宣言と初期化
 	//=================================================================
@@ -26,9 +29,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	// 全てのデバック用ファイルを読み込み
 	GameParamEditor::GetInstance()->LoadFiles();
 
-	// ゲームシーンのインスタンスを生成
-	std::unique_ptr<GameScene> gameScene = std::make_unique<GameScene>();
-	gameScene->Initialize(engine->textureManager_.get(), engine->dxCommon_.get(),engine->audioManager_.get());
+	// シーンの初期化
+	std::unique_ptr<SceneManager> sceneManager = std::make_unique<SceneManager>();
+	sceneManager->Initialize(engine->input_.get(), engine->textureManager_.get(), engine->audioManager_.get(), engine->dxc_.get(), engine->dxCommon_.get());
 
 	int iteration = 1;
 	float highLumMask = 0.8f;
@@ -54,8 +57,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		// 更新前処理
 		engine->PreUpdate();
 
-		// ゲームシーンの更新処理
-		gameScene->Update(engine->input_.get());
+		// シーンの更新処理
+		sceneManager->Update();
 
 		// 取り敢えず仮置き
 		ImGui::Begin("Bloom");
@@ -86,8 +89,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		// 描画前処理
 		engine->PreDraw();
 		
-		// ゲームシーンの描画処理
-		gameScene->Draw();
+		// シーンの描画処理
+		sceneManager->Draw();
 
 		// 描画後処理
 		engine->PostDraw();

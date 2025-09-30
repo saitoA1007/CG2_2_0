@@ -86,7 +86,7 @@ namespace GameEngine {
 
 		void SetTextureHandle(const uint32_t& tex) { textureHandle_ = tex; }
 
-		const uint32_t& GetTextureHandle() { return textureHandle_; }
+		const uint32_t& GetTextureHandle() const { return textureHandle_; }
 
 	private:
 

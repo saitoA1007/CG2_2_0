@@ -64,12 +64,30 @@ void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, LogMa
 
 void DirectXCommon::PreDraw()
 {
+    D3D12_RESOURCE_BARRIER barrier{};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier.Transition.pResource = depthStencilResource_.Get();
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE; // SRV として使った後
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;           // 深度書き込みに戻す
+    commandList_->ResourceBarrier(1, &barrier);
+
     postEffectManager_->PreDraw(commandList_.Get(), viewport_, scissorRect_, clearColor_, dsvHeap_.Get());
 }
 
 void DirectXCommon::PostDraw(ImGuiManager* imGuiManager)
 {
-    postEffectManager_->PostDraw(commandList_.Get(), viewport_, scissorRect_);
+    D3D12_RESOURCE_BARRIER barrier{};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier.Transition.pResource = depthStencilResource_.Get();
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    commandList_->ResourceBarrier(1, &barrier);
+
+    postEffectManager_->PostDraw(commandList_.Get(), viewport_, scissorRect_, depthSRVHandle_);
 
     // バリア: バックバッファをレンダーターゲットに
     backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
@@ -286,7 +304,7 @@ void DirectXCommon::CreateDepthStencilView(uint32_t width, uint32_t height)
         logManager_->Log("Start　Create DepthStencilView\n");
     }
 
-    // DepthStencilTextureをウィンドウのサイズで作成
+    // DepthStencilTextureをウィンドウのサイズで作成DXGI_FORMAT_D24_UNORM_S8_UINT
     depthStencilResource_ = CreateDepthStencilTextureResource(device_.Get(), width, height);
 
     // DSVの設定
@@ -296,6 +314,18 @@ void DirectXCommon::CreateDepthStencilView(uint32_t width, uint32_t height)
 
     // DSVHeapの先頭にDSVを作る
     device_->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc, dsvHeap_->GetCPUDescriptorHandleForHeapStart());
+
+    // 深度値を読み込めるようにSRVを作成
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;// 2Dテクスチャ
+    srvDesc.Texture2D.MipLevels = 1;
+
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = GetCPUDescriptorHandle(srvHeap_.Get(), descriptorSizeSRV_, 1);
+    depthSRVHandle_ = GetGPUDescriptorHandle(srvHeap_.Get(), descriptorSizeSRV_, 1);
+    // オブジェクト描画用SRV
+    device_->CreateShaderResourceView(depthStencilResource_.Get(), &srvDesc, srvCPUHandle);
 
     // ステンシル情報の作成を開始するログ
     if (logManager_) {

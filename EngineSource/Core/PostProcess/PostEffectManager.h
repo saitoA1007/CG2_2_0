@@ -10,6 +10,7 @@
 #include"EngineSource/Core/PSO/PostProcess/ScanLinePSO.h"
 #include"EngineSource/Core/PSO/PostProcess/VignettingPSO.h"
 #include"EngineSource/Core/PSO/PostProcess/RadialBlurPSO.h"
+#include"EngineSource/Core/PSO/PostProcess/OutLinePSO.h"
 #include"EngineSource/Core/ResourceCounter.h"
 
 namespace GameEngine {
@@ -31,7 +32,7 @@ namespace GameEngine {
         /// </summary>
         /// <param name="bloomPSO"></param>
         /// <param name="logManager"></param>
-        static void StaticInitialize(BloomPSO* bloomPSO,ScanLinePSO* scanLinePSO, VignettingPSO* vignettingPSO, RadialBlurPSO* radialBlurPSO, LogManager* logManager);
+        static void StaticInitialize(BloomPSO* bloomPSO,ScanLinePSO* scanLinePSO, VignettingPSO* vignettingPSO, RadialBlurPSO* radialBlurPSO, OutLinePSO* outLinePSO, LogManager* logManager);
 
         /// <summary>
         /// 初期化
@@ -62,7 +63,7 @@ namespace GameEngine {
         /// <param name="commandList"></param>
         /// <param name="viewport"></param>
         /// <param name="scissorRect"></param>
-        void PostDraw(ID3D12GraphicsCommandList* commandList, const D3D12_VIEWPORT& viewport, const D3D12_RECT& scissorRect);
+        void PostDraw(ID3D12GraphicsCommandList* commandList, const D3D12_VIEWPORT& viewport, const D3D12_RECT& scissorRect, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV);
 
         /// <summary>
         /// SRVを取得
@@ -95,6 +96,9 @@ namespace GameEngine {
 
         // ライン用のPSO;
         static ScanLinePSO* scanLinePSO_;
+
+        // アウトライン用のPSO
+        static OutLinePSO* outLinePSO_;
 
     private:
 
@@ -178,6 +182,18 @@ namespace GameEngine {
 
         // ラジアルブラーを描画するためのリソース
         Microsoft::WRL::ComPtr<ID3D12Resource> radialBlurResource_;
+
+    private:
+
+        // ラジアルブラー用のRTVハンドル
+        D3D12_CPU_DESCRIPTOR_HANDLE outLineRTVHandle_{};
+
+        // SRVハンドル
+        CD3DX12_GPU_DESCRIPTOR_HANDLE outLineSRVHandle_;
+
+        // ラジアルブラーを描画するためのリソース
+        Microsoft::WRL::ComPtr<ID3D12Resource> outLineResource_;
+
     private:
 
         /// <summary>
@@ -241,5 +257,21 @@ namespace GameEngine {
         /// </summary>
         /// <param name="commandList"></param>
         void DrawRadialBlur(ID3D12GraphicsCommandList* commandList);
+
+        /// <summary>
+        /// アウトラインの描画するためのRTVを設定
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="descriptorSizeSRV"></param>
+        /// <param name="descriptorSizeRTV"></param>
+        void InitializeOutLine(uint32_t width, uint32_t height, uint32_t descriptorSizeSRV, uint32_t descriptorSizeRTV);
+
+        /// <summary>
+        /// アウトラインの描画
+        /// </summary>
+        /// <param name="commandList"></param>
+        /// <param name="depthSRV"></param>
+        void DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV);
     };
 }

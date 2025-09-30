@@ -94,8 +94,7 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
     // ブレンドモード
     D3D12_BLEND_DESC blendDesc{};
     // すべての色要素を書き込む
-    blendDesc.RenderTarget[0].RenderTargetWriteMask =
-        D3D12_COLOR_WRITE_ENABLE_ALL;
+    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
     // RasiterzerStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};

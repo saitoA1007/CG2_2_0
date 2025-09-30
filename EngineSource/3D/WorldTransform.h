@@ -2,6 +2,7 @@
 #include"EngineSource/Math/Matrix4x4.h"
 #include"EngineSource/Math/Transform.h"
 #include"EngineSource/Math/TransformationMatrix.h"
+#include"AnimationData.h"
 #include <d3d12.h>
 #include <wrl.h>
 
@@ -32,6 +33,13 @@ namespace GameEngine {
 		/// </summary>
 		void UpdateTransformMatrix();
 
+		/// <summary>
+		/// アニメーションがある場合の更新処理
+		/// </summary>
+		/// <param name="animation">アニメーションデータ</param>
+		/// <param name="modelName">モデル名</param>
+		void UpdateAnimation(AnimationData& animation,const std::string& modelName);
+
 		// トラスフォームリソースのゲッター
 		const Microsoft::WRL::ComPtr<ID3D12Resource>& GetTransformResource() const { return transformationMatrixResource_; }
 
@@ -48,6 +56,18 @@ namespace GameEngine {
 
 		void SetWVPMatrix(const Matrix4x4& VPMatrix);
 
+		/// <summary>
+		/// 親を設定
+		/// </summary>
+		/// <param name="parent"></param>
+		void SetParent(const WorldTransform* parent){ parent_ = const_cast<WorldTransform*>(parent); }
+
+		/// <summary>
+		/// 親を取得
+		/// </summary>
+		/// <returns></returns>
+		WorldTransform* GetParent() { return parent_; }
+
 	public:
 
 		// SRT要素
@@ -62,7 +82,11 @@ namespace GameEngine {
 
 		Matrix4x4 worldMatrix_;
 
+		// リソース
 		Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 		TransformationMatrix* transformationMatrixData_ = nullptr;
+
+		// 親
+		WorldTransform* parent_ = nullptr;
 	};
 }

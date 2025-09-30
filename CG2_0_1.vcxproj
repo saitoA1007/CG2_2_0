@@ -113,6 +113,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
+    <ClCompile Include="EngineSource\3D\Animation.cpp" />
+    <ClCompile Include="EngineSource\3D\AnimationData.cpp" />
     <ClCompile Include="EngineSource\3D\AxisIndicator.cpp" />
     <ClCompile Include="EngineSource\3D\Camera\Camera.cpp" />
     <ClCompile Include="EngineSource\3D\Camera\DebugCamera.cpp" />
@@ -143,11 +145,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\PSO\ParticlePSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\BloomPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\CopyPSO.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\SpritePSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\TrianglePSO.cpp" />
+    <ClCompile Include="EngineSource\Core\RandomGenerator.cpp" />
     <ClCompile Include="EngineSource\Core\TextureManager.cpp" />
     <ClCompile Include="EngineSource\Core\WindowsApp.cpp" />
     <ClCompile Include="EngineSource\Input\InPut.cpp" />
@@ -162,13 +166,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="GameSource\ColorEditor.cpp" />
+    <ClCompile Include="GameSource\Core\SceneSystem\SceneManager.cpp" />
+    <ClCompile Include="GameSource\Core\SceneSystem\Scene\GameScene.cpp" />
+    <ClCompile Include="GameSource\Core\SceneSystem\Scene\TitleScene.cpp" />
     <ClCompile Include="GameSource\GameParamEditor.cpp" />
-    <ClCompile Include="GameSource\GameScene.cpp" />
     <ClCompile Include="GameSource\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
+    <ClInclude Include="EngineSource\3D\Animation.h" />
     <ClInclude Include="EngineSource\3D\AnimationData.h" />
     <ClInclude Include="EngineSource\3D\AxisIndicator.h" />
     <ClInclude Include="EngineSource\3D\Camera\Camera.h" />
@@ -211,11 +218,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\PSO\ParticlePSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\BloomPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\CopyPSO.h" />
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\SpritePSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\TrianglePSO.h" />
+    <ClInclude Include="EngineSource\Core\RandomGenerator.h" />
     <ClInclude Include="EngineSource\Core\ResourceCounter.h" />
     <ClInclude Include="EngineSource\Core\TextureManager.h" />
     <ClInclude Include="EngineSource\Core\WindowsApp.h" />
@@ -240,8 +249,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="GameSource\ColorEditor.h" />
+    <ClInclude Include="GameSource\Core\SceneSystem\SceneManager.h" />
+    <ClInclude Include="GameSource\Core\SceneSystem\Scene\BaseScene.h" />
+    <ClInclude Include="GameSource\Core\SceneSystem\Scene\GameScene.h" />
+    <ClInclude Include="GameSource\Core\SceneSystem\Scene\TitleScene.h" />
     <ClInclude Include="GameSource\GameParamEditor.h" />
-    <ClInclude Include="GameSource\GameScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -261,6 +273,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <None Include="Resources\Shaders\Object3d.hlsli" />
     <None Include="Resources\Shaders\Particle.hlsli" />
     <None Include="Resources\Shaders\PostEffect\CopyImage.hlsli" />
+    <None Include="Resources\Shaders\PostEffect\FullScreen.hlsli" />
     <None Include="Resources\Shaders\PostEffect\GaussianBlur.hlsli" />
     <None Include="Resources\Shaders\PostEffect\PostProcessGrayScale.hlsli" />
     <None Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.hlsli" />
@@ -358,6 +371,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\FullScreen.VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\GaussianBlur.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -371,6 +390,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\HighLumMask.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\OutLine\OutLine.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

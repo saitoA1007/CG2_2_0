@@ -1,6 +1,7 @@
 #include"WorldTransform.h"
 #include"EngineSource/Math/MyMath.h"
 #include"EngineSource/Common/CreateBufferResource.h"
+#include"EngineSource/Core/FPSCounter.h"
 using namespace GameEngine;
 
 ID3D12Device* WorldTransform::device_ = nullptr;
@@ -11,7 +12,6 @@ void WorldTransform::StaticInitialize(ID3D12Device* device) {
 
 void WorldTransform::Initialize(const Transform& transform) {
 	transform_ = transform;
-	//worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	worldMatrix_ = MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
 
 	// トランスフォーメーション行列リソースを作成
@@ -28,8 +28,32 @@ void WorldTransform::Initialize(const Transform& transform) {
 
 void WorldTransform::UpdateTransformMatrix() {
 	worldMatrix_ = MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
+	// 親があれば親のワールド行列を掛ける
+	if (parent_) {
+		worldMatrix_ *= parent_->GetWorldMatrix();
+	}
 	transformationMatrixData_->World = worldMatrix_;
 	transformationMatrixData_->worldInverseTranspose = InverseTranspose(worldMatrix_);
+}
+
+void WorldTransform::UpdateAnimation(AnimationData& animation, const std::string& modelName) {
+
+	animation.timer += FpsCounter::deltaTime;
+	animation.timer = std::fmodf(animation.timer, animation.duration);
+	NodeAnimation& rootNodeAnimation = animation.nodeAnimations[modelName];
+	
+	Vector3 translate = CalculateValue(rootNodeAnimation.translate, animation.timer);
+	Quaternion rotate = CalculateValue(rootNodeAnimation.rotate, animation.timer);
+	Vector3 scale = CalculateValue(rootNodeAnimation.scale, animation.timer);
+	// 行列を作成
+	Matrix4x4 localMatrix = MakeAffineMatrix(scale, rotate, translate);
+
+	worldMatrix_ = MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
+	// 親があれば親のワールド行列を掛ける
+	if (parent_) {
+		worldMatrix_ *= parent_->GetWorldMatrix();
+	}
+	worldMatrix_ = localMatrix * worldMatrix_;
 }
 
 void WorldTransform::SetWVPMatrix(const Matrix4x4& localMatrix,const Matrix4x4& VPMatrix) {

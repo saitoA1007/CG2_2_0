@@ -7,7 +7,7 @@ namespace GameEngine {
 	enum class ResourceCount {
 		// ImGuiのSRVの総数
 		kMaxImGuiCount,
-
+		kDepthCount,
 		// ポストエフェクト用のSRVの総数
 		kStartOffScreenCount,
 		kMaxOffScreenCount = 16,

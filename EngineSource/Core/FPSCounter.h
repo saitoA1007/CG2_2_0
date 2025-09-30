@@ -34,6 +34,12 @@ namespace GameEngine {
 		/// <returns></returns>
 		int GetMaxFrameCount() { return maxFrameCount_; }
 
+		// 最大フレーム
+		static float maxFrameCount;
+
+		// デルタ時間
+		static float deltaTime;
+
 	private:
 		// 現在の時間を保持
 		std::chrono::time_point<std::chrono::high_resolution_clock> currentTime_;

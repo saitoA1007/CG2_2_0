@@ -58,6 +58,11 @@ namespace GameEngine {
 	public:
 
 		/// <summary>
+		/// 更新処理
+		/// </summary>
+		void Update();
+
+		/// <summary>
 		/// 描画
 		/// </summary>
 		void Draw(const uint32_t& textureHandle = 1024);
@@ -110,6 +115,17 @@ namespace GameEngine {
 		/// <param name="transform"></param>
 		void SetUvMatrix(const Transform& transform);
 
+	public: // 変数
+
+		// 座標
+		Vector2 position_{};
+		// 回転
+		float rotate_ = 0.0f;
+		// スケール
+		Vector2 scale_ = { 1.0f,1.0f };
+		// スプライト幅、高さ
+		Vector2 size_ = { 100.0f, 100.0f };
+
 	private:
 
 		// デバイス
@@ -123,10 +139,6 @@ namespace GameEngine {
 		// スプライトのPSO
 		static SpritePSO* spritePSO_;
 
-		// 座標
-		Vector2 position_{};
-		// スプライト幅、高さ
-		Vector2 size_ = { 100.0f, 100.0f };
 		// アンカーポイント
 		Vector2 anchorPoint_{};
 		// ワールド行列
