@@ -109,17 +109,14 @@ void DirectXCommon::PostDraw(ImGuiManager* imGuiManager)
     commandList_->RSSetViewports(1, &viewport_);
     commandList_->RSSetScissorRects(1, &scissorRect_);
 
-//#ifdef _DEBUG
-//
-//    
-//#else
-//    // ポストプロセスを行った最終結果を描画する
-//    copyPSO_->Draw(commandList_.Get(), postEffectManager_->GetSRVHandle());
-//
-//#endif
-
+#ifdef _DEBUG
     // ImGuiを描画
     imGuiManager->Draw();
+#else
+    // ポストプロセスを行った最終結果を描画する
+    copyPSO_->Draw(commandList_.Get(), postEffectManager_->GetSRVHandle());
+
+#endif
 
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
     // バリア: バックバッファをPresentに
