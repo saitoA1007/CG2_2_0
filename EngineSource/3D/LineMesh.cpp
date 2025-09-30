@@ -1,5 +1,5 @@
 #include"LineMesh.h"
-#include"EngineSource/Common/CreateBufferResource.h"
+#include"CreateBufferResource.h"
 using namespace GameEngine;
 
 ID3D12Device* LineMesh::device_ = nullptr;

@@ -1,8 +1,7 @@
 #pragma once
-#include"EngineSource/3D/Camera/Camera.h"
+#include"Camera.h"
 #include"WorldTransform.h"
 #include"Model.h"
-
 
 namespace GameEngine {
 

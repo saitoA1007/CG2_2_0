@@ -1,7 +1,7 @@
 #include"TextureManager.h"
-#include"EngineSource/Common/ConvertString.h"
-#include"EngineSource/Common/CreateBufferResource.h"
-#include"EngineSource/Common/DescriptorHandle.h"
+#include"ConvertString.h"
+#include"CreateBufferResource.h"
+#include"DescriptorHandle.h"
 #include<format>
 #include <filesystem>
 #include"ResourceCounter.h"

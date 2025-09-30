@@ -3,12 +3,12 @@
 #include<iostream>
 #include<array>
 #include <wrl.h>
-#include"externals/DirectXTex/DirectXTex.h"
-#include"externals/DirectXTex/d3dx12.h"
+#include"Externals/DirectXTex/DirectXTex.h"
+#include"Externals/DirectXTex/d3dx12.h"
 
 #include"DirectXCommon.h"
 #include<format>
-#include"EngineSource/Common/LogManager.h"
+#include"LogManager.h"
 
 namespace GameEngine {
 

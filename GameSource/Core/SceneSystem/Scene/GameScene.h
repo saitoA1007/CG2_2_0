@@ -2,12 +2,12 @@
 #include"BaseScene.h"
 
 // エンジン機能をインクルード
-#include"EngineSource/3D/Camera/Camera.h"
-#include"EngineSource/3D/Camera/DebugCamera.h"
-#include"EngineSource/3D/Model.h"
-#include"EngineSource/3D/WorldTransform.h"
-#include"EngineSource/3D/Light/LightManager.h"
-#include"EngineSource/3D/Light/DirectionalLight.h"
+#include"Camera.h"
+#include"DebugCamera.h"
+#include"Model.h"
+#include"WorldTransform.h"
+#include"LightManager.h"
+#include"DirectionalLight.h"
 
 class GameScene : public BaseScene {
 public:
@@ -80,9 +80,9 @@ private: // シーン機能
 	// 平行光源
 	GameEngine::DirectionalLight::DirectionalLightData directionalData_;
 	// 点光源
-	GameEngine::PointLight::PointLightData pointLightData_;
+	//GameEngine::PointLight::PointLightData pointLightData_;
 	// スポットライト
-	GameEngine::SpotLight::SpotLightData spotLightData_;
+	//GameEngine::SpotLight::SpotLightData spotLightData_;
 
 	// 地面モデル
 	std::unique_ptr<GameEngine::Model> terrainModel_;

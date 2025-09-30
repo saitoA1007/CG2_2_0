@@ -1,6 +1,6 @@
 #include"GaussianBlurPSO.h"
-#include "EngineSource/Common/ConvertString.h"
-#include"EngineSource/Common/CreateBufferResource.h"
+#include"ConvertString.h"
+#include"CreateBufferResource.h"
 #include <d3dcompiler.h>
 #include <cassert>
 
@@ -165,10 +165,6 @@ void GaussianBlurPSO::Initialize(ID3D12Device* device, DXC* dxc, LogManager* log
     // 書き込むためのアドレスを取得
     blurParameterResource_->Map(0, nullptr, reinterpret_cast<void**>(&constBuffer_));
     constBuffer_->sigma = 2.0f;
-}
-
-void GaussianBlurPSO::Set(ID3D12GraphicsCommandList* commandList) {
-   
 }
 
 void GaussianBlurPSO::Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE inputSRV) {

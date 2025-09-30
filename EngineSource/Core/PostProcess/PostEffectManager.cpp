@@ -1,6 +1,6 @@
 #include"PostEffectManager.h"
-#include"EngineSource/Common/DescriptorHeap.h"
-#include"EngineSource/Common/DescriptorHandle.h"
+#include"DescriptorHeap.h"
+#include"DescriptorHandle.h"
 
 using namespace GameEngine;
 

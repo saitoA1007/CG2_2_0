@@ -1,7 +1,7 @@
 #include"Particle.h"
 
-#include"EngineSource/Common/CreateBufferResource.h"
-#include"EngineSource/Common/DescriptorHandle.h"
+#include"CreateBufferResource.h"
+#include"DescriptorHandle.h"
 
 #include"EngineSource/Math/MyMath.h"
 

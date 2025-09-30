@@ -2,10 +2,10 @@
 #include"BaseScene.h"
 
 // エンジン機能をインクルード
-#include"EngineSource/3D/Camera/Camera.h"
-#include"EngineSource/3D/Camera/DebugCamera.h"
-#include"EngineSource/3D/Model.h"
-#include"EngineSource/3D/WorldTransform.h"
+#include"Camera.h"
+#include"DebugCamera.h"
+#include"Model.h"
+#include"WorldTransform.h"
 
 class TitleScene : public BaseScene {
 public:

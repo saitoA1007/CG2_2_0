@@ -1,6 +1,6 @@
 #include"OutLinePSO.h"
-#include "EngineSource/Common/ConvertString.h"
-#include"EngineSource/Common/CreateBufferResource.h"
+#include"ConvertString.h"
+#include"CreateBufferResource.h"
 #include <d3dcompiler.h>
 #include <cassert>
 

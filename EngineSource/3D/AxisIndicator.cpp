@@ -1,5 +1,5 @@
 #include"AxisIndicator.h"
-#include"EngineSource/Math/MyMath.h"
+#include"MyMath.h"
 using namespace GameEngine;
 
 ID3D12GraphicsCommandList* AxisIndicator::commandList_ = nullptr;

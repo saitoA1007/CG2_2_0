@@ -3,8 +3,8 @@
 #include<dxcapi.h>
 #include<iostream>
 #include <wrl.h>
-#include"EngineSource/Common/LogManager.h"
-#include"EngineSource/Core/DXC.h"
+#include"LogManager.h"
+#include"DXC.h"
 
 namespace GameEngine {
 

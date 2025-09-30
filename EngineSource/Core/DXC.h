@@ -2,7 +2,7 @@
 #include <d3d12.h>
 #include<dxcapi.h>
 #include <wrl.h>
-#include"EngineSource/Common/LogManager.h"
+#include"LogManager.h"
 
 namespace GameEngine {
 

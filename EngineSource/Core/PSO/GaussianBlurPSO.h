@@ -2,11 +2,11 @@
 #include <d3d12.h>
 #include <wrl.h>
 #include <string>
-#include"EngineSource/Core/DXC.h"
-#include"EngineSource/Math/Vector4.h"
-#include"EngineSource/Math/Vector2.h"
+#include"DXC.h"
+#include"Vector4.h"
+#include"Vector2.h"
 
-#include"EngineSource/Common/LogManager.h"
+#include"LogManager.h"
 
 namespace GameEngine {
 
@@ -28,7 +28,6 @@ namespace GameEngine {
         ~GaussianBlurPSO() = default;
 
         void Initialize(ID3D12Device* device, DXC* dxc, LogManager* logManager);
-        void Set(ID3D12GraphicsCommandList* commandList);
         void Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE inputSRV);
 
         ID3D12RootSignature* GetRootSignature() const { return rootSignature_.Get(); }

@@ -6,7 +6,7 @@
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib, "xinput.lib")
 
-#include"EngineSource/Math/MyMath.h"
+#include"MyMath.h"
 
 using namespace GameEngine;
 

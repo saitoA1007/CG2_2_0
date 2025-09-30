@@ -1,7 +1,7 @@
 #include"GameParamEditor.h"
 #include<cassert>
 
-#include"EngineSource/2D/ImguiManager.h"
+#include"ImguiManager.h"
 
 using namespace GameEngine;
 

@@ -5,13 +5,13 @@
 
 #include"externals/DirectXTex/d3dx12.h"
 
-#include"EngineSource/Common/LogManager.h"
-#include"EngineSource/Core/PSO/PostProcess/BloomPSO.h"
-#include"EngineSource/Core/PSO/PostProcess/ScanLinePSO.h"
-#include"EngineSource/Core/PSO/PostProcess/VignettingPSO.h"
-#include"EngineSource/Core/PSO/PostProcess/RadialBlurPSO.h"
-#include"EngineSource/Core/PSO/PostProcess/OutLinePSO.h"
-#include"EngineSource/Core/ResourceCounter.h"
+#include"LogManager.h"
+#include"PostProcess/BloomPSO.h"
+#include"PostProcess/ScanLinePSO.h"
+#include"PostProcess/VignettingPSO.h"
+#include"PostProcess/RadialBlurPSO.h"
+#include"PostProcess/OutLinePSO.h"
+#include"ResourceCounter.h"
 
 namespace GameEngine {
 

@@ -60,10 +60,10 @@ namespace ImGuizmo
      return static_cast<int>(lhs) != rhs;
    }
 
-   static bool operator==(OPERATION lhs, int rhs)
-   {
-     return static_cast<int>(lhs) == rhs;
-   }
+   //static bool operator==(OPERATION lhs, int rhs)
+   //{
+   //  return static_cast<int>(lhs) == rhs;
+   //}
 
    static bool Intersects(OPERATION lhs, OPERATION rhs)
    {

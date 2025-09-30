@@ -1,7 +1,7 @@
 #pragma once
-#include"EngineSource/Math/Matrix4x4.h"
-#include"EngineSource/Math/Transform.h"
-#include"EngineSource/Math/TransformationMatrix.h"
+#include"Matrix4x4.h"
+#include"Transform.h"
+#include"TransformationMatrix.h"
 #include"AnimationData.h"
 #include <d3d12.h>
 #include <wrl.h>

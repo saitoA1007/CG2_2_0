@@ -1,6 +1,6 @@
 #pragma once
 #pragma once
-#include"EngineSource/Math/Vector2.h"
+#include"Vector2.h"
 #include<iostream>
 #define DIRECTINPUT_VERSION 0x0800 // DirectInputのバージョン指定
 #include <dinput.h>
