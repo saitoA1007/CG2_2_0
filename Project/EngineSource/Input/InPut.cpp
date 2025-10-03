@@ -95,7 +95,7 @@ bool Input::TriggerKey(BYTE keyNumber) const {
 	}
 }
 
-bool Input::IsPressMouse(int32_t mouseNumber) const {
+bool Input::PushMouse(int32_t mouseNumber) const {
 	if (mouse_.rgbButtons[mouseNumber] == 0x80) {
 		return true;
 	} else {
@@ -103,7 +103,7 @@ bool Input::IsPressMouse(int32_t mouseNumber) const {
 	}
 }
 
-bool Input::IsTriggerMouse(int32_t buttonNumber) const {
+bool Input::TriggerMouse(int32_t buttonNumber) const {
 	if (mouse_.rgbButtons[buttonNumber] == 0x80 && preMouse_.rgbButtons[buttonNumber] == 0x00) {
 		return true;
 	} else {
@@ -128,7 +128,7 @@ int32_t Input::GetWheel() const {
 	return static_cast<int32_t>(mouse_.lZ);
 }
 
-bool Input::IsPushPad(WORD button) const {
+bool Input::PushPad(WORD button) const {
 	if ((controllerState_.Gamepad.wButtons & button) != 0) {
 		return true;
 	} else {
@@ -136,7 +136,7 @@ bool Input::IsPushPad(WORD button) const {
 	}
 }
 
-bool Input::IsTriggerPad(WORD button) const {
+bool Input::TriggerPad(WORD button) const {
 	if ((controllerState_.Gamepad.wButtons & button) != 0 &&
 		(preControllerState_.Gamepad.wButtons & button) == 0) {
 		return true;

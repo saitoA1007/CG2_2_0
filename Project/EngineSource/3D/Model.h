@@ -19,6 +19,7 @@
 #include"ParticlePSO.h"
 #include"GridPSO.h"
 #include"BasePSO.h"
+#include"AnimationPSO.h"
 
 #include"LightManager.h"
 #include"Camera.h"
@@ -47,7 +48,8 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="device"></param>
 		/// <param name="commandList"></param>
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,TrianglePSO* trianglePSO, ParticlePSO* particlePSO, GridPSO* gridPSO, LogManager* logManager);
+		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,
+			TrianglePSO* trianglePSO, ParticlePSO* particlePSO,AnimationPSO* animationPSO, GridPSO* gridPSO, LogManager* logManager);
 
 		/// <summary>
 		/// 描画前処理
@@ -244,6 +246,7 @@ namespace GameEngine {
 		static TrianglePSO* trianglePSO_;
 		static ParticlePSO* particlePSO_;
 		static GridPSO* gridPSO_;
+		static AnimationPSO* animationPSO_;
 
 		// テクスチャ
 		static TextureManager* textureManager_;

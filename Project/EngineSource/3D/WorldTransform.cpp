@@ -2,6 +2,7 @@
 #include"MyMath.h"
 #include"CreateBufferResource.h"
 #include"FPSCounter.h"
+#include"Animation.h"
 using namespace GameEngine;
 
 ID3D12Device* WorldTransform::device_ = nullptr;
@@ -42,9 +43,9 @@ void WorldTransform::UpdateAnimation(AnimationData& animation, const std::string
 	animation.timer = std::fmodf(animation.timer, animation.duration);
 	NodeAnimation& rootNodeAnimation = animation.nodeAnimations[modelName];
 	
-	Vector3 translate = CalculateValue(rootNodeAnimation.translate, animation.timer);
-	Quaternion rotate = CalculateValue(rootNodeAnimation.rotate, animation.timer);
-	Vector3 scale = CalculateValue(rootNodeAnimation.scale, animation.timer);
+	Vector3 translate = Animation::CalculateValue(rootNodeAnimation.translate, animation.timer);
+	Quaternion rotate = Animation::CalculateValue(rootNodeAnimation.rotate, animation.timer);
+	Vector3 scale = Animation::CalculateValue(rootNodeAnimation.scale, animation.timer);
 	// 行列を作成
 	Matrix4x4 localMatrix = MakeAffineMatrix(scale, rotate, translate);
 

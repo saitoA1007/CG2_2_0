@@ -6,6 +6,7 @@
 #include"LinePSO.h"
 #include"TrianglePSO.h"
 #include"ParticlePSO.h"
+#include"AnimationPSO.h"
 #include"SpritePSO.h"
 #include"GridPSO.h"
 #include"PostProcess/CopyPSO.h"
@@ -123,6 +124,9 @@ namespace GameEngine {
 
 		// パーティクル(複数描画)のPSO設定
 		std::unique_ptr<ParticlePSO> particlePSO_;
+
+		// アニメーション用のPSO設定
+		std::unique_ptr<AnimationPSO> animationPSO_;
 
 		// 線のPSO設定
 		std::unique_ptr<LinePSO> linePSO_;

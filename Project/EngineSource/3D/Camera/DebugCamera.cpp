@@ -40,7 +40,7 @@ void DebugCamera::Initialize(const Vector3& translate,int width, int height, ID3
 void DebugCamera::Update(Input* input) {
 
 	// 中クリックで移動
-	if (input->IsPressMouse(2)) {
+	if (input->PushMouse(2)) {
 
 		// ターゲットの移動量
 		Vector3 targetMove{0.0f,0.0f,0.0f};
@@ -69,7 +69,7 @@ void DebugCamera::Update(Input* input) {
 		distance_ = std::clamp(distance_, 2.0f, 100.0f);
 
 		// 右クリックで回転する処理
-		if (input->IsPressMouse(1)) {
+		if (input->PushMouse(1)) {
 			mouseMove_ += input->GetMouseDelta() * 0.05f;
 		}
 	}

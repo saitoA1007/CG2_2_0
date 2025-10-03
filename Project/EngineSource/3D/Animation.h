@@ -3,6 +3,7 @@
 #include <wrl.h>
 
 #include"VertexData.h"
+#include"AnimationData.h"
 
 // 影響を受けるJointの数
 const uint32_t kNumMaxInfluence = 4;
@@ -40,8 +41,28 @@ namespace GameEngine {
 		/// </summary>
 		static void StaticInitialize(ID3D12Device* device, ID3D12DescriptorHeap* srvHeap,const uint32_t& descriptorSizeSRV);
 
+		static SkinCluster CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData);
 
+		static void SkeletonUpdate(Skeleton& skeleton);
 
+		static void SkinClusterUpdate(SkinCluster skinCluster, const Skeleton& skeleton);
+
+		/// <summary>
+		/// skeletonに対してアニメーションを適応する
+		/// </summary>
+		/// <param name="skeleton"></param>
+		/// <param name="animation"></param>
+		/// <param name="animationTime"></param>
+		static void ApplyAnimation(Skeleton& skeleton, const AnimationData& animation, float animationTime);
+
+		/// <summary>
+		/// アニメーション用の値を取得
+		/// </summary>
+		/// <param name="keyframes"></param>
+		/// <param name="time"></param>
+		/// <returns></returns>
+		static Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
+		static Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
 	private:
 
 		// デバイス
