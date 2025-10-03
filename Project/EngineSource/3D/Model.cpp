@@ -3,14 +3,13 @@
 #include<sstream>
 #include<cassert>
 
-#include"EngineSource/Common/CreateBufferResource.h"
-#include"EngineSource/Math/MyMath.h"
+#include"CreateBufferResource.h"
+#include"MyMath.h"
+#include"EasingManager.h"
 
 #include<assimp/Importer.hpp>
 #include<assimp/scene.h>
 #include<assimp/postprocess.h>
-
-#include"EngineSource/Math/EasingManager.h"
 
 using namespace GameEngine;
 
@@ -22,8 +21,9 @@ LogManager* Model::logManager_ = nullptr;
 TextureManager* Model::textureManager_ = nullptr;
 
 GridPSO* Model::gridPSO_ = nullptr;
+AnimationPSO* Model::animationPSO_ = nullptr;
 
-void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, TrianglePSO* trianglePSO, ParticlePSO* particlePSO, GridPSO* gridPSO, LogManager* logManager) {
+void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, TrianglePSO* trianglePSO, ParticlePSO* particlePSO, AnimationPSO* animationPSO, GridPSO* gridPSO, LogManager* logManager) {
 	device_ = device;
 	commandList_ = commandList;
 	logManager_ = logManager;
@@ -31,6 +31,7 @@ void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* co
 	trianglePSO_ = trianglePSO;
 	particlePSO_ = particlePSO;
 	gridPSO_ = gridPSO;
+	animationPSO_ = animationPSO;
 }
 
 void Model::PreDraw(PSOMode psoMode, BlendMode blendMode) {

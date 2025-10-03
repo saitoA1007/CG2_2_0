@@ -258,8 +258,8 @@
     <ClCompile Include="Application\Core\SceneSystem\Scene\GameScene.cpp">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\3D\AnimationData.cpp" />
     <ClCompile Include="EngineSource\3D\Animation.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\AnimationPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -503,6 +503,7 @@
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Animation.h" />
+    <ClInclude Include="EngineSource\Core\PSO\AnimationPSO.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
@@ -644,5 +645,6 @@
     <FxCompile Include="Resources\Shaders\PostEffect\FullScreen.VS.hlsl">
       <Filter>Shaders\PostEffect</Filter>
     </FxCompile>
+    <FxCompile Include="Resources\Shaders\SkinningObject3d.VS.hlsl" />
   </ItemGroup>
 </Project>

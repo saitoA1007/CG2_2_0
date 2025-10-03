@@ -44,14 +44,14 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="buttonNumber">マウスボタン番号(左:0,右:1,中:2,拡張マウスボタン:3~7)</param>
 		/// <returns>押されているか</returns>
-		bool IsPressMouse(int32_t mouseNumber) const;
+		bool PushMouse(int32_t mouseNumber) const;
 
 		/// <summary>
 		/// マウスのトリガーをチェック
 		/// </summary>
 		/// <param name="buttonNumber">マウスボタン番号(左:0,右:1,中:2,拡張マウスボタン:3~7)</param>
 		/// <returns>トリガーか</returns>
-		bool IsTriggerMouse(int32_t buttonNumber) const;
+		bool TriggerMouse(int32_t buttonNumber) const;
 
 		/// <summary>
 		/// マウスの位置を取得する（ウィンドウ座標系）
@@ -76,14 +76,14 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="button"></param>
 		/// <returns></returns>
-		bool IsPushPad(WORD button) const;
+		bool PushPad(WORD button) const;
 
 		/// <summary>
 		/// パッドのトリガーをチェック
 		/// </summary>
 		/// <param name="button"></param>
 		/// <returns></returns>
-		bool IsTriggerPad(WORD button) const;
+		bool TriggerPad(WORD button) const;
 
 		/// <summary>
 		/// パッドの左スティック座標を取得

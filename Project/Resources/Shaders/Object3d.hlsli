@@ -37,3 +37,9 @@ struct SpotLight
     float32_t cosFalloffStart; // 
     int32_t active; // 有効化
 };
+
+struct Skinned
+{
+    float32_t4 position;
+    float32_t3 normal;
+};

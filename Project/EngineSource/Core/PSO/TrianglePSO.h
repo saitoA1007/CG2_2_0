@@ -38,13 +38,6 @@ namespace GameEngine {
 
         Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
 
-        Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob_;
-        Microsoft::WRL::ComPtr<ID3DBlob> errorBlob_;
-
-        // Shaderをコンパイルする
-        Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
-        Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
-
         // ログ
         LogManager* logManager_;
 
