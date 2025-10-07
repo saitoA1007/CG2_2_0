@@ -43,17 +43,14 @@ namespace GameEngine {
 
 		static SkinCluster CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData);
 
-		static void SkeletonUpdate(Skeleton& skeleton);
-
-		static void SkinClusterUpdate(SkinCluster skinCluster, const Skeleton& skeleton);
-
 		/// <summary>
-		/// skeletonに対してアニメーションを適応する
+		/// 更新処理
 		/// </summary>
+		/// <param name="skinCluster"></param>
 		/// <param name="skeleton"></param>
 		/// <param name="animation"></param>
 		/// <param name="animationTime"></param>
-		static void ApplyAnimation(Skeleton& skeleton, const AnimationData& animation, float animationTime);
+		static void Update(SkinCluster& skinCluster, Skeleton& skeleton, const AnimationData& animation, float animationTime);
 
 		/// <summary>
 		/// アニメーション用の値を取得
@@ -63,12 +60,29 @@ namespace GameEngine {
 		/// <returns></returns>
 		static Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
 		static Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
+
 	private:
+
+		static void SkeletonUpdate(Skeleton& skeleton);
+
+		static void SkinClusterUpdate(SkinCluster& skinCluster, const Skeleton& skeleton);
+
+		/// <summary>
+		/// skeletonに対してアニメーションを適応する
+		/// </summary>
+		/// <param name="skeleton"></param>
+		/// <param name="animation"></param>
+		/// <param name="animationTime"></param>
+		static void ApplyAnimation(Skeleton& skeleton, const AnimationData& animation, float animationTime);
+
+	private:
+		// コピー禁止
+		Animation(const Animation&) = delete;
+		Animation& operator=(const Animation&) = delete;
 
 		// デバイス
 		static ID3D12Device* device_;
 		static ID3D12DescriptorHeap* srvHeap_;
 		static uint32_t descriptorSizeSRV_;
-
 	};
 }

@@ -70,6 +70,8 @@ namespace GameEngine {
 		/// <param name="pso">psoを設定</param>
 		static void PreDraw(BasePSO* pso);
 
+		static void PreDrawAnimation();
+
 		/// <summary>
 		/// OBJファイルからメッシュ生成
 		/// </summary>
@@ -185,6 +187,14 @@ namespace GameEngine {
 		/// <param name="directionalLightResource"></param>
 		void DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource);
 
+		/// <summary>
+		/// アニメーションのあるモデルを描画
+		/// </summary>
+		/// <param name="worldTransform"></param>
+		/// <param name="VPMatrix"></param>
+		/// <param name="material"></param>
+		void DrawAnimation(WorldTransform& worldTransform, const Matrix4x4& VPMatrix,const SkinCluster& skinCluster, const Material* material = nullptr);
+
 	public:
 
 		/// <summary>
@@ -229,6 +239,9 @@ namespace GameEngine {
 		/// </summary>
 		/// <returns></returns>
 		const std::string GetModelName() const { return modelName_; }
+
+		ModelData modelData_;
+		Node node_;
 
 	private:
 		Model(Model&) = delete;
@@ -296,6 +309,6 @@ namespace GameEngine {
 		/// <param name="joints"></param>
 		/// <returns></returns>
 		[[nodiscard]]
-		static int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint> joints);
+		static int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
 	};
 }
