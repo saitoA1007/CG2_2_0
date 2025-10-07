@@ -56,6 +56,9 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// ポストエフェクトの初期化
 	PostEffectManager::StaticInitialize(bloomPSO_.get(), scanLinePSO_.get(), vignettingPSO_.get(), radialBlurPSO_.get(), outLinePSO_.get(), logManager_.get());
 
+	// アニメーションの初期化
+	Animation::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize());
+
 	// 画像の初期化
 	Sprite::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), spritePSO_.get(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 	// 3dを描画する処理の初期化

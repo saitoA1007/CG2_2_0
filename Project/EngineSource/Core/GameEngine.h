@@ -32,6 +32,8 @@
 #include"PrimitiveRenderer.h"
 #include"LineMesh.h"
 
+#include"Animation.h"
+
 #include"ImGuiManager.h"
 #include"Sprite.h"
 

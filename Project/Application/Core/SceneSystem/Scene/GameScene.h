@@ -103,6 +103,14 @@ private: // シーン機能
 	GameEngine::WorldTransform boxAnimationWorldTransform_;
 	AnimationData boxAnimation_;
 
+	// アニメーションモデル
+	std::unique_ptr<GameEngine::Model> bronAnimationModel_;
+	GameEngine::WorldTransform bronAnimationWorldTransform_;
+	AnimationData bronAnimation_;
+	Skeleton skeletonBron_;
+	SkinCluster skinClusterBron_;
+	float timer_ = 0.0f;
+
 private:
 
 	/// <summary>

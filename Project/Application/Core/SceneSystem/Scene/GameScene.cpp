@@ -2,6 +2,7 @@
 #include"ImguiManager.h"
 
 #include"Application/GameParamEditor.h"
+#include"FPSCounter.h"
 
 using namespace GameEngine;
 
@@ -60,6 +61,15 @@ void GameScene::Initialize(GameEngine::Input* input, GameEngine::TextureManager*
 	// 矩形のアニメーションデータを取得
 	boxAnimation_ = Model::LoadAnimationFile("boxAnimation.gltf", "BoxAnimation");
 
+	// ボーンアニメーションを生成する
+	bronAnimationModel_ = Model::CreateModel("bronAnimation.gltf", "BronAnimation");
+	bronAnimationWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	// ボーンアニメーションデータを取得する
+	bronAnimation_ = Model::LoadAnimationFile("bronAnimation.gltf", "BronAnimation");
+	skeletonBron_ = Model::CreateSkeleton(bronAnimationModel_->modelData_.rootNode);
+	skinClusterBron_ = Animation::CreateSkinCluster(skeletonBron_, bronAnimationModel_->modelData_);
+	timer_ = 0.0f;
+
 	RegisterBebugParam();
 	ApplyDebugParam();
 }
@@ -76,6 +86,9 @@ void GameScene::Update() {
 
 	// アニメーションする矩形行列の更新処理
 	boxAnimationWorldTransform_.UpdateAnimation(boxAnimation_, boxAnimationModel_->GetModelName());
+
+	timer_ += FpsCounter::deltaTime;
+	Animation::Update(skinClusterBron_, skeletonBron_, bronAnimation_, timer_);
 
 	// カメラ処理
 #pragma region Camera
@@ -146,10 +159,16 @@ void GameScene::Draw() {
 	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
 
 	// アニメーションする矩形を描画
-	boxAnimationModel_->Draw(boxAnimationWorldTransform_, camera_->GetVPMatrix());
+	//boxAnimationModel_->Draw(boxAnimationWorldTransform_, camera_->GetVPMatrix());
 
 	// 平面描画
 	//planeModel_->Draw(planeWorldTransform_, uvCheckerGH_, camera_->GetVPMatrix());
+
+	// アニメーションの描画前処理
+	Model::PreDrawAnimation();
+
+	// アニメーション
+	bronAnimationModel_->DrawAnimation(bronAnimationWorldTransform_, camera_->GetVPMatrix(), skinClusterBron_);
 
 #ifdef _DEBUG
 	// モデルの単体描画前処理

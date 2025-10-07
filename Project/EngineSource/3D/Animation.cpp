@@ -20,6 +20,10 @@ void Animation::StaticInitialize(ID3D12Device* device, ID3D12DescriptorHeap* srv
 
 SkinCluster Animation::CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData) {
 
+	assert(!skeleton.joints.empty() && "Skeleton joints are empty!");
+	assert(!modelData.meshes.empty() && "Model has no meshes!");
+	assert(!modelData.meshes[0].vertices.empty() && "Model mesh[0] has no vertices!");
+
 	SkinCluster skinCluster;
 
 	// palette用のResourceを確保
@@ -27,8 +31,8 @@ SkinCluster Animation::CreateSkinCluster(const Skeleton& skeleton, const ModelDa
 	WellForGPU* mappedPalette = nullptr;
 	skinCluster.paletteResource->Map(0,nullptr,reinterpret_cast<void**>(&mappedPalette));
 	skinCluster.mappedPalette = { mappedPalette,skeleton.joints.size() }; // spanを使ってアクセスするようにする
-	skinCluster.paletteSrvHandle.first = GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, 0);
-	skinCluster.paletteSrvHandle.second = GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, 0);
+	skinCluster.paletteSrvHandle.first = GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, 180);
+	skinCluster.paletteSrvHandle.second = GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, 180);
 
 	// palette用のsrvを作成。StructuredBufferでアクセス出来るようにする。
 	D3D12_SHADER_RESOURCE_VIEW_DESC paletteSrvDesc{};
@@ -80,7 +84,19 @@ SkinCluster Animation::CreateSkinCluster(const Skeleton& skeleton, const ModelDa
 	return skinCluster;
 }
 
-void Animation::SkinClusterUpdate(SkinCluster skinCluster, const Skeleton& skeleton) {
+void Animation::Update(SkinCluster& skinCluster, Skeleton& skeleton, const AnimationData& animation, float animationTime) {
+
+	// アニメーションの更新をおこない、骨ごとのLocal情報を更新する
+	ApplyAnimation(skeleton, animation, animationTime);
+
+	// 現在の骨ごとのLocal情報を基にSkeletonSpaceの情報を更新する
+	SkeletonUpdate(skeleton);
+
+	// SkeletonSpaceの情報を基に、SkinClusterのMatrixPaletteを更新する
+	SkinClusterUpdate(skinCluster, skeleton);
+}
+
+void Animation::SkinClusterUpdate(SkinCluster& skinCluster, const Skeleton& skeleton) {
 	for (size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex) {
 		assert(jointIndex < skinCluster.inverseBindPoseMatrices.size());
 		skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix = skinCluster.inverseBindPoseMatrices[jointIndex] * skeleton.joints[jointIndex].skeletonSpaceMatrix;
@@ -102,7 +118,7 @@ Vector3 Animation::CalculateValue(const std::vector<KeyframeVector3>& keyframes,
 		// indexとnextIndexの2つのkeyframeを取得して範囲内に時刻があるかを判定
 		if (keyframes[index].time <= time && time <= keyframes[nextIndex].time) {
 			// 範囲内を補間する
-			float t = (time - keyframes[index].time / (keyframes[nextIndex].time - keyframes[index].time));
+			float t = ((time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time));
 			return Lerp(keyframes[index].value, keyframes[nextIndex].value, t);
 		}
 	}
@@ -125,7 +141,7 @@ Quaternion Animation::CalculateValue(const std::vector<KeyframeQuaternion>& keyf
 		// indexとnextIndexの2つのkeyframeを取得して範囲内に時刻があるかを判定
 		if (keyframes[index].time <= time && time <= keyframes[nextIndex].time) {
 			// 範囲内を補間する
-			float t = (time - keyframes[index].time / (keyframes[nextIndex].time - keyframes[index].time));
+			float t = ((time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time));
 			return Slerp(keyframes[index].value, keyframes[nextIndex].value, t);
 		}
 	}

@@ -68,6 +68,11 @@ void Model::PreDraw(BasePSO* pso) {
 	commandList_->SetPipelineState(pso->GetPipelineState()); // 指定したPSOを設定
 }
 
+void Model::PreDrawAnimation() {
+	commandList_->SetGraphicsRootSignature(animationPSO_->GetRootSignature());  // RootSignatureを設定。
+	commandList_->SetPipelineState(animationPSO_->GetPipelineState()); // 指定したPSOを設定
+}
+
 [[nodiscard]]
 std::unique_ptr<Model> Model::CreateSphere(uint32_t subdivision) {
 
@@ -254,11 +259,11 @@ void Model::Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, cons
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
 			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 
 		if (meshes_[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
@@ -289,11 +294,11 @@ void Model::Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
 			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
 		if (meshes_[i]->GetTotalIndices() != 0) {
@@ -360,11 +365,11 @@ void Model::Draw(const uint32_t& numInstance, WorldTransforms& worldTransforms, 
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
 			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
 		}
 		commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
+		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 
 		if (meshes_[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), numInstance, 0, 0, 0);
@@ -377,6 +382,49 @@ void Model::Draw(const uint32_t& numInstance, WorldTransforms& worldTransforms, 
 void Model::DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource) {
 	commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+}
+
+void Model::DrawAnimation(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, const SkinCluster& skinCluster, const Material* material) {
+	// カメラ座標に変換
+	if (isLoad_) {
+		worldTransform.SetWVPMatrix(localMatrix_, VPMatrix);
+	} else {
+		worldTransform.SetWVPMatrix(VPMatrix);
+	}
+
+	for (uint32_t i = 0; i < meshes_.size(); ++i) {
+
+		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
+			meshes_[i]->GetVertexBufferView(),
+			skinCluster.influenceBufferView
+		};
+
+		commandList_->IASetVertexBuffers(0, 2, vbvs);
+		commandList_->IASetIndexBuffer(&meshes_[i]->GetIndexBufferView());
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		// マテリアルを設定
+		auto it = materials_.find(meshes_[i]->GetMaterialName());
+		assert(it != materials_.end() && "Material not found");
+		const Material* drawMaterial = it->second.get();
+
+		// マテリアルが設定されていなければデフォルトのマテリアルを使う
+		if (material == nullptr) {
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
+		} else {
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+		}
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
+
+		commandList_->SetGraphicsRootDescriptorTable(3, skinCluster.paletteSrvHandle.second);
+
+		if (meshes_[i]->GetTotalIndices() != 0) {
+			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
+		} else {
+			commandList_->DrawInstanced(meshes_[i]->GetTotalVertices(), 1, 0, 0);
+		}
+	}
 }
 
 void Model::DrawGrid(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* cameraResource) {
@@ -525,6 +573,8 @@ ModelData Model::LoadModelFile(const std::string& directoryPath, const std::stri
 	// シーン全体の階層構造を作る
 	modelData.rootNode = ReadNode(scene->mRootNode);
 
+	modelData_ = modelData;
+
 	return modelData;
 }
 
@@ -617,7 +667,7 @@ Skeleton Model::CreateSkeleton(const Node& rootNode) {
 }
 
 [[nodiscard]]
-int32_t Model::CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint> joints) {
+int32_t Model::CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints) {
 
 	Joint joint;
 	joint.name = node.name;
