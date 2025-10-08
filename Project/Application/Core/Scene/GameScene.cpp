@@ -12,7 +12,7 @@ GameScene::~GameScene() {
 
 void GameScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
 	// ゲームシーンに必要な低レイヤー機能
-#pragma region SceneSystem 
+#pragma region SceneSystem
 	// 入力を取得
 	input_ = input;
 	// テクスチャ機能を取得
@@ -57,17 +57,11 @@ void GameScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* i
 	uvCheckerGH_ = textureManager->Load("Resources/Textures/uvChecker.png");
 	planeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,0.0f} });
 
-	// 矩形のアニメーションモデルを生成
-	boxAnimationModel_ = Model::CreateModel("boxAnimation.gltf", "BoxAnimation");
-	boxAnimationWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
-	// 矩形のアニメーションデータを取得
-	boxAnimation_ = Model::LoadAnimationFile("boxAnimation.gltf", "BoxAnimation");
-
 	// ボーンアニメーションを生成する
-	bronAnimationModel_ = Model::CreateModel("bronAnimation.gltf", "BronAnimation");
+	bronAnimationModel_ = Model::CreateModel("walk.gltf", "Walk");
 	bronAnimationWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 	// ボーンアニメーションデータを取得する
-	bronAnimation_ = Model::LoadAnimationFile("bronAnimation.gltf", "BronAnimation");
+	bronAnimation_ = Model::LoadAnimationFile("walk.gltf", "Walk");
 	skeletonBron_ = Model::CreateSkeleton(bronAnimationModel_->modelData_.rootNode);
 	skinClusterBron_ = Animation::CreateSkinCluster(skeletonBron_, bronAnimationModel_->modelData_);
 	timer_ = 0.0f;
@@ -86,11 +80,9 @@ void GameScene::Update() {
 	// ライトの更新
 	lightManager_->Update();
 
-	// アニメーションする矩形行列の更新処理
-	boxAnimationWorldTransform_.UpdateAnimation(boxAnimation_, boxAnimationModel_->GetModelName());
-
 	timer_ += FpsCounter::deltaTime;
-	Animation::Update(skinClusterBron_, skeletonBron_, bronAnimation_, timer_);
+	float animationTime = fmodf(timer_, bronAnimation_.duration);
+	Animation::Update(skinClusterBron_, skeletonBron_, bronAnimation_, animationTime);
 
 	// カメラ処理
 #pragma region Camera
@@ -159,9 +151,6 @@ void GameScene::Draw() {
 	// 地面を描画
 	terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
 	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
-
-	// アニメーションする矩形を描画
-	//boxAnimationModel_->Draw(boxAnimationWorldTransform_, camera_->GetVPMatrix());
 
 	// 平面描画
 	//planeModel_->Draw(planeWorldTransform_, uvCheckerGH_, camera_->GetVPMatrix());

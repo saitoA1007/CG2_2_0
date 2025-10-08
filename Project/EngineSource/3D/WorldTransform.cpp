@@ -37,26 +37,6 @@ void WorldTransform::UpdateTransformMatrix() {
 	transformationMatrixData_->worldInverseTranspose = InverseTranspose(worldMatrix_);
 }
 
-void WorldTransform::UpdateAnimation(AnimationData& animation, const std::string& modelName) {
-
-	animation.timer += FpsCounter::deltaTime;
-	animation.timer = std::fmodf(animation.timer, animation.duration);
-	NodeAnimation& rootNodeAnimation = animation.nodeAnimations[modelName];
-	
-	Vector3 translate = Animation::CalculateValue(rootNodeAnimation.translate, animation.timer);
-	Quaternion rotate = Animation::CalculateValue(rootNodeAnimation.rotate, animation.timer);
-	Vector3 scale = Animation::CalculateValue(rootNodeAnimation.scale, animation.timer);
-	// 行列を作成
-	Matrix4x4 localMatrix = MakeAffineMatrix(scale, rotate, translate);
-
-	worldMatrix_ = MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
-	// 親があれば親のワールド行列を掛ける
-	if (parent_) {
-		worldMatrix_ *= parent_->GetWorldMatrix();
-	}
-	worldMatrix_ = localMatrix * worldMatrix_;
-}
-
 void WorldTransform::SetWVPMatrix(const Matrix4x4& localMatrix,const Matrix4x4& VPMatrix) {
 	transformationMatrixData_->WVP = Multiply(localMatrix ,Multiply(worldMatrix_, VPMatrix));
 	transformationMatrixData_->World = Multiply(localMatrix,worldMatrix_);
