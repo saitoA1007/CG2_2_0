@@ -102,11 +102,6 @@ private: // シーン機能
 	Vector3 testVector{};
 
 	// アニメーションモデル
-	std::unique_ptr<GameEngine::Model> boxAnimationModel_;
-	GameEngine::WorldTransform boxAnimationWorldTransform_;
-	AnimationData boxAnimation_;
-
-	// アニメーションモデル
 	std::unique_ptr<GameEngine::Model> bronAnimationModel_;
 	GameEngine::WorldTransform bronAnimationWorldTransform_;
 	AnimationData bronAnimation_;

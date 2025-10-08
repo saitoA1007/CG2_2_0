@@ -33,13 +33,6 @@ namespace GameEngine {
 		/// </summary>
 		void UpdateTransformMatrix();
 
-		/// <summary>
-		/// アニメーションがある場合の更新処理
-		/// </summary>
-		/// <param name="animation">アニメーションデータ</param>
-		/// <param name="modelName">モデル名</param>
-		void UpdateAnimation(AnimationData& animation,const std::string& modelName);
-
 		// トラスフォームリソースのゲッター
 		const Microsoft::WRL::ComPtr<ID3D12Resource>& GetTransformResource() const { return transformationMatrixResource_; }
 

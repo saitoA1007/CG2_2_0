@@ -386,11 +386,7 @@ void Model::DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* camera
 
 void Model::DrawAnimation(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, const SkinCluster& skinCluster, const Material* material) {
 	// カメラ座標に変換
-	if (isLoad_) {
-		worldTransform.SetWVPMatrix(localMatrix_, VPMatrix);
-	} else {
-		worldTransform.SetWVPMatrix(VPMatrix);
-	}
+	worldTransform.SetWVPMatrix(VPMatrix);
 
 	for (uint32_t i = 0; i < meshes_.size(); ++i) {
 

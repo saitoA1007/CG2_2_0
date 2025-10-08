@@ -33,7 +33,7 @@ void SceneManager::Initialize(GameEngine::Input* input, GameEngine::TextureManag
 	whiteGH_ = textureManager_->Load("Resources/Textures/white2x2.png");
 	
 	// シーンの初期化。最初はタイトルシーンに設定
-	ChangeScene(SceneState::Title);
+	ChangeScene(SceneState::Game);
 }
 
 void SceneManager::Update() {
