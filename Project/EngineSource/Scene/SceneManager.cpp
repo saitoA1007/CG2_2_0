@@ -1,8 +1,8 @@
 #include"SceneManager.h"
 
 // 各シーン
-#include"Scene/TitleScene.h"
-#include"Scene/GameScene.h"
+#include"Application/Core/Scene/TitleScene.h"
+#include"Application/Core/Scene/GameScene.h"
 
 #include"ImguiManager.h"
 
@@ -26,14 +26,20 @@ void SceneManager::Initialize(GameEngine::Input* input, GameEngine::TextureManag
 	// DirectXの機能を取得
 	dxCommon_ = dxCommon;
 
+	// 入力処理のコマンドシステムを生成
+	inputCommand_ = std::make_unique<InputCommand>(input_);
+
 	// white2x2の画像をロード
 	whiteGH_ = textureManager_->Load("Resources/Textures/white2x2.png");
 	
 	// シーンの初期化。最初はタイトルシーンに設定
-	ChangeScene(SceneState::Game);
+	ChangeScene(SceneState::Title);
 }
 
 void SceneManager::Update() {
+
+	// 入力処理のコマンドシステムを更新処理
+	inputCommand_->Update();
 
 	// 終了したらシーンの切り替え処理を有効
 	if (currentScene_->IsFinished() && !isChangeScene_) {
@@ -81,7 +87,7 @@ void SceneManager::ChangeScene(SceneState nextSceneState) {
 
 		// タイトルシーンを挿入
 		currentScene_ = std::make_unique<TitleScene>();
-		currentScene_->Initialize(input_, textureManager_, audioManager_, dxCommon_);
+		currentScene_->Initialize(input_, inputCommand_.get(), textureManager_, audioManager_, dxCommon_);
 		break;
 
 	case SceneState::Game: {
@@ -91,7 +97,7 @@ void SceneManager::ChangeScene(SceneState nextSceneState) {
 
 		// ゲームシーンを挿入
 		std::unique_ptr<GameScene> gameScene = std::make_unique<GameScene>();
-		gameScene->Initialize(input_, textureManager_, audioManager_, dxCommon_);
+		gameScene->Initialize(input_, inputCommand_.get(), textureManager_, audioManager_, dxCommon_);
 		currentScene_ = std::move(gameScene);
 		break;
 	}

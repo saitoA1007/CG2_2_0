@@ -5,7 +5,7 @@
 #include"RandomGenerator.h"
 #include"GameParamEditor.h"
 
-#include"Core/SceneSystem/SceneManager.h"
+#include"SceneManager.h"
 
 using namespace GameEngine;
 

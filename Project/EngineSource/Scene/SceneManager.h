@@ -2,10 +2,11 @@
 #include"Input.h"
 #include"TextureManager.h"
 #include"AudioManager.h"
+#include"InputCommand.h"
 
 #include"Camera.h"
 
-#include"Scene/BaseScene.h"
+#include"BaseScene.h"
 
 /// <summary>
 /// シーンの管理
@@ -51,6 +52,9 @@ private: // エンジン機能
 
 	// 音声機能を取得
 	GameEngine::AudioManager* audioManager_ = nullptr;
+
+	// 入力処理のコマンドシステム
+	std::unique_ptr<GameEngine::InputCommand> inputCommand_;
 
 private: // シーン機能
 

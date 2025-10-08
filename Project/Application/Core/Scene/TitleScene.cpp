@@ -6,7 +6,7 @@ using namespace GameEngine;
 TitleScene::~TitleScene() {
 }
 
-void TitleScene::Initialize(GameEngine::Input* input, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
+void TitleScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem 
 	// 入力を取得
@@ -17,6 +17,8 @@ void TitleScene::Initialize(GameEngine::Input* input, GameEngine::TextureManager
 	audioManager_ = audioManager;
 	// DirectX機能を取得
 	dxCommon_ = dxCommon;
+	// 入力処理のコマンドシステムを取得
+	inputCommand_ = inputCommand;
 
 	// カメラの初期化
 	camera_ = std::make_unique<Camera>();
@@ -30,7 +32,8 @@ void TitleScene::Initialize(GameEngine::Input* input, GameEngine::TextureManager
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 #pragma endregion
 
-
+	// 入力コマンドを登録する
+	inputCommand_->RegisterCommand("CameraChange", {{InputState::KeyTrigger, DIK_F },{ InputState::KeyTrigger, DIK_G }});
 }
 
 void TitleScene::Update() {
@@ -61,7 +64,7 @@ void TitleScene::Update() {
 
 	// カメラの切り替え処理
 #pragma region CameraTransition
-	if (input_->TriggerKey(DIK_F)) {
+	if (inputCommand_->IsCommandAcitve("CameraChange")) {
 		if (isDebugCameraActive_) {
 			isDebugCameraActive_ = false;
 		} else {
