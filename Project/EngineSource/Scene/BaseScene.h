@@ -1,8 +1,9 @@
 #pragma once
-#include"EngineSource/Input/Input.h"
-#include"EngineSource/Core/TextureManager.h"
+#include"Input.h"
+#include"TextureManager.h"
+#include"AudioManager.h"
 
-#include"EngineSource/Audio/AudioManager.h"
+#include"InputCommand.h"
 
 // 各シーン
 enum class SceneState {
@@ -27,7 +28,7 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	virtual void Initialize(GameEngine::Input* input, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) = 0;
+	virtual void Initialize(GameEngine::Input* input,GameEngine::InputCommand* inputCommand,GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) = 0;
 
 	/// <summary>
 	/// 更新処理

@@ -10,7 +10,7 @@ GameScene::~GameScene() {
 
 }
 
-void GameScene::Initialize(GameEngine::Input* input, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
+void GameScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem 
 	// 入力を取得
@@ -21,6 +21,8 @@ void GameScene::Initialize(GameEngine::Input* input, GameEngine::TextureManager*
 	audioManager_ = audioManager;
 	// DirectX機能を取得
 	dxCommon_ = dxCommon;
+	// 入力処理のコマンドシステムを取得
+	inputCommand_ = inputCommand;
 
 	// カメラの初期化
 	camera_ = std::make_unique<Camera>();

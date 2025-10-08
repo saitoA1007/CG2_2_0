@@ -249,17 +249,18 @@
     <ClCompile Include="EngineSource\Core\RandomGenerator.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Core\SceneSystem\SceneManager.cpp">
+    <ClCompile Include="EngineSource\Scene\SceneManager.cpp">
       <Filter>GameSource\Core\SceneSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Core\SceneSystem\Scene\TitleScene.cpp">
+    <ClCompile Include="Application\Core\Scene\TitleScene.cpp">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Core\SceneSystem\Scene\GameScene.cpp">
+    <ClCompile Include="Application\Core\Scene\GameScene.cpp">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\3D\Animation.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\AnimationPSO.cpp" />
+    <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -490,20 +491,21 @@
     <ClInclude Include="EngineSource\Core\RandomGenerator.h">
       <Filter>EngineSource\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Core\SceneSystem\SceneManager.h">
+    <ClInclude Include="EngineSource\Scene\SceneManager.h">
       <Filter>GameSource\Core\SceneSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Core\SceneSystem\Scene\BaseScene.h">
+    <ClInclude Include="EngineSource\Scene\BaseScene.h">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Core\SceneSystem\Scene\TitleScene.h">
+    <ClInclude Include="Application\Core\Scene\TitleScene.h">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Core\SceneSystem\Scene\GameScene.h">
+    <ClInclude Include="Application\Core\Scene\GameScene.h">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Animation.h" />
     <ClInclude Include="EngineSource\Core\PSO\AnimationPSO.h" />
+    <ClInclude Include="EngineSource\Input\InputCommand.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

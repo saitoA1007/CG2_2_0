@@ -18,7 +18,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="input"></param>
-	void Initialize(GameEngine::Input* input, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) override;
+	void Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) override;
 
 	/// <summary>
 	/// 更新処理
@@ -55,6 +55,9 @@ private: // エンジンの低レイヤー機能を取得
 
 	// DirectXの機能を取得
 	GameEngine::DirectXCommon* dxCommon_;
+
+	// 入力処理のコマンドシステム
+	GameEngine::InputCommand* inputCommand_ = nullptr;
 
 private: // シーン機能
 
