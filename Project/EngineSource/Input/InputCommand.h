@@ -16,12 +16,16 @@ namespace GameEngine {
 		MouseTrigger,
 		PadPush,
 		PadTrigger,
+		PadLeftStick,  // パッドの左スティック
+		PadRightStick, // パッドの右スティック
 	};
 
 	// コマンドを入力する状態
 	struct InputCondition {
 		InputState inputState; // どのデバイスでどのように入力するか
 		int32_t code; // 押すボタンの種類
+		Vector2 direction = { 0.0f,0.0f }; // 方向
+		float threshold = 0.2f; // スティックのしきい値
 	};
 
 	class InputCommand {

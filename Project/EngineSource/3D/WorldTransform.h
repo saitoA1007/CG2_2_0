@@ -61,6 +61,12 @@ namespace GameEngine {
 		/// <returns></returns>
 		WorldTransform* GetParent() { return parent_; }
 
+		/// <summary>
+		/// ワールド座標を取得
+		/// </summary>
+		/// <returns></returns>
+		Vector3 GetWorldPosition() const;
+
 	public:
 
 		// SRT要素

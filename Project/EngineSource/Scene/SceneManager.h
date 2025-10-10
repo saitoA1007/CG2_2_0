@@ -71,7 +71,7 @@ private: // シーン機能
 	SceneState currentSceneState_ = SceneState::Unknown;
 
 	// デバック用に各シーンの名前を保存している
-	static inline const char* sceneNames[] = { "Title","Game"};
+	static inline const char* sceneNames[] = { "Title","Game","GE"};
 
 private:
 

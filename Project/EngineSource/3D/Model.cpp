@@ -259,11 +259,11 @@ void Model::Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, cons
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
 			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 
 		if (meshes_[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
@@ -294,11 +294,11 @@ void Model::Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
 			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
 		if (meshes_[i]->GetTotalIndices() != 0) {
@@ -365,11 +365,11 @@ void Model::Draw(const uint32_t& numInstance, WorldTransforms& worldTransforms, 
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
 			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
 		}
 		commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
-		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 
 		if (meshes_[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), numInstance, 0, 0, 0);
@@ -407,11 +407,11 @@ void Model::DrawAnimation(WorldTransform& worldTransform, const Matrix4x4& VPMat
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
 			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 
 		commandList_->SetGraphicsRootDescriptorTable(3, skinCluster.paletteSrvHandle.second);
 

@@ -48,3 +48,7 @@ void WorldTransform::SetWVPMatrix(const Matrix4x4& VPMatrix) {
 	transformationMatrixData_->World = worldMatrix_;
 	transformationMatrixData_->worldInverseTranspose = InverseTranspose(worldMatrix_);
 }
+
+Vector3 WorldTransform::GetWorldPosition() const {
+	return Vector3(worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]);
+}
