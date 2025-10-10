@@ -32,8 +32,8 @@ void TitleScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* 
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 #pragma endregion
 
-	// 入力コマンドを登録する
-	inputCommand_->RegisterCommand("CameraChange", {{InputState::KeyTrigger, DIK_F },{ InputState::KeyTrigger, DIK_G }});
+	
+	inputCommand_->RegisterCommand("CameraChange", {{InputState::KeyTrigger, DIK_F }});
 }
 
 void TitleScene::Update() {

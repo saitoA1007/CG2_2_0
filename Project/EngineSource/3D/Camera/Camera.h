@@ -32,6 +32,8 @@ namespace GameEngine {
 		/// <param name="transform"></param>
 		void SetCameraPosition(const Transform& transform);
 
+		void SetCameraWorldMatrix(const Matrix4x4& worldMatrix);
+
 	public:
 
 		/// <summary>

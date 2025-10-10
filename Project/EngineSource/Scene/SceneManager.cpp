@@ -3,6 +3,7 @@
 // 各シーン
 #include"Application/Core/Scene/TitleScene.h"
 #include"Application/Core/Scene/GameScene.h"
+#include"Application/Core/Scene/GEScene.h"
 
 #include"ImguiManager.h"
 
@@ -33,7 +34,7 @@ void SceneManager::Initialize(GameEngine::Input* input, GameEngine::TextureManag
 	whiteGH_ = textureManager_->Load("Resources/Textures/white2x2.png");
 	
 	// シーンの初期化。最初はタイトルシーンに設定
-	ChangeScene(SceneState::Game);
+	ChangeScene(SceneState::GE);
 }
 
 void SceneManager::Update() {
@@ -101,6 +102,15 @@ void SceneManager::ChangeScene(SceneState nextSceneState) {
 		currentScene_ = std::move(gameScene);
 		break;
 	}
+
+	case SceneState::GE:
+		// 前の要素を削除
+		currentScene_.reset();
+
+		// GEシーンを挿入
+		currentScene_ = std::make_unique<GEScene>();
+		currentScene_->Initialize(input_, inputCommand_.get(), textureManager_, audioManager_, dxCommon_);
+		break;
 	}
 }
 

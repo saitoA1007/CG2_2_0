@@ -89,6 +89,20 @@ bool InputCommand::CheckCondition(const InputCondition& condition) {
 		return input_->TriggerPad(static_cast<WORD>(condition.code));
 		break;
 
+	case GameEngine::InputState::PadLeftStick: {
+		Vector2 stick = input_->GetLeftStick();
+		float dot = stick.x * condition.direction.x + stick.y * condition.direction.y;
+		return dot > condition.threshold;
+		break;
+	}
+
+	case GameEngine::InputState::PadRightStick: {
+		Vector2 stick = input_->GetRightStick();
+		float dot = stick.x * condition.direction.x + stick.y * condition.direction.y;
+		return dot > condition.threshold;
+		break;
+	}
+
 	default:
 		return false;
 		break;

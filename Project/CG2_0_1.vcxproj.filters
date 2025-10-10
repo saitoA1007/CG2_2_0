@@ -261,6 +261,9 @@
     <ClCompile Include="EngineSource\3D\Animation.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\AnimationPSO.cpp" />
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
+    <ClCompile Include="Application\Core\Scene\GEScene.cpp" />
+    <ClCompile Include="Application\Player.cpp" />
+    <ClCompile Include="Application\CameraController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -506,6 +509,9 @@
     <ClInclude Include="EngineSource\3D\Animation.h" />
     <ClInclude Include="EngineSource\Core\PSO\AnimationPSO.h" />
     <ClInclude Include="EngineSource\Input\InputCommand.h" />
+    <ClInclude Include="Application\Core\Scene\GEScene.h" />
+    <ClInclude Include="Application\Player.h" />
+    <ClInclude Include="Application\CameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
