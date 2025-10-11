@@ -49,6 +49,7 @@ void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inp
 
 	// 入力コマンドを設定する
 	InputRegisterCommand();
+
 }
 
 void GEScene::Update() {
