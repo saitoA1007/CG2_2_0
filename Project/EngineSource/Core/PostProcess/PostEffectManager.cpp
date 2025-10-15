@@ -22,13 +22,12 @@ void PostEffectManager::StaticInitialize(BloomPSO* bloomPSO, ScanLinePSO* scanLi
     logManager_ = logManager;
 }
 
-void PostEffectManager::Initialize(ID3D12Device* device, float clearColor_[4], uint32_t width, uint32_t height, uint32_t descriptorSizeRTV, uint32_t descriptorSizeSRV, ID3D12DescriptorHeap* srvHeap) {
-
-    // SRVヒープを取得
-    srvHeap_ = srvHeap;
+void PostEffectManager::Initialize(ID3D12Device* device, float clearColor_[4], uint32_t width, uint32_t height, uint32_t descriptorSizeRTV, SrvManager* srvManager) {
 
     // デバイスを取得
     device_ = device;
+
+    srvManager_ = srvManager;
 
     // ポストエフェクトのRTV用ヒープ作成
     postProcessRTVHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kRTVNum, false);
@@ -81,25 +80,27 @@ void PostEffectManager::Initialize(ID3D12Device* device, float clearColor_[4], u
     srvDesc.Texture2D.MipLevels = 1;
 
     // SRVハンドル取得
-    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV, srvIndex_);
-    drawObjectSRVHandle_ = GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV, srvIndex_);
+    uint32_t index = srvManager_->AllocateSrvIndex();
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(index);
+    drawObjectSRVHandle_ = srvManager_->GetGPUHandle(index);
+
     // オブジェクト描画用SRV
     device_->CreateShaderResourceView(DrawObjectResource_.Get(), &srvDesc, srvCPUHandle);
 
     // ブルームの初期化
-    InitializeBloom(width, height, descriptorSizeSRV, descriptorSizeRTV);
+    InitializeBloom(width, height, descriptorSizeRTV);
 
     // ヴィネットの初期化
-    InitializeVignetting(width, height, descriptorSizeSRV, descriptorSizeRTV);
+    InitializeVignetting(width, height, descriptorSizeRTV);
 
     // scanLineの初期化
-    InitializeScanLine(width, height, descriptorSizeSRV, descriptorSizeRTV);
+    InitializeScanLine(width, height, descriptorSizeRTV);
 
     // ラジアルブルーの初期化
-    InitializeRadialBlur(width, height, descriptorSizeSRV, descriptorSizeRTV);
+    InitializeRadialBlur(width, height, descriptorSizeRTV);
 
     // アウトラインの初期化
-    InitializeOutLine(width, height, descriptorSizeSRV, descriptorSizeRTV);
+    InitializeOutLine(width, height, descriptorSizeRTV);
 }
 
 void PostEffectManager::PreDraw(ID3D12GraphicsCommandList* commandList,const D3D12_VIEWPORT& viewport, const D3D12_RECT& scissorRect, float clearColor[4], ID3D12DescriptorHeap* dsvHeap) {
@@ -185,7 +186,7 @@ CD3DX12_GPU_DESCRIPTOR_HANDLE& PostEffectManager::GetSRVHandle() {
     return vignettingSRVHandle_;
 }
 
-void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_t descriptorSizeSRV, uint32_t descriptorSizeRTV) {
+void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
     if (logManager_) {
         logManager_->Log("Start Create BloomRenderTargets\n");
     }
@@ -263,26 +264,32 @@ void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.Texture2D.MipLevels = 1;
+     
+    uint32_t index[4] = {};
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle[4];
 
-    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV, ++srvIndex_);
-
-    bloomSRVHandle_[0] = GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV, srvIndex_);
-    device_->CreateShaderResourceView(bloomBrightResource_.Get(), &srvDesc, srvCPUHandle);
+    index[0] = srvManager_->AllocateSrvIndex();
+    srvCPUHandle[0] = srvManager_->GetCPUHandle(index[0]);
+    bloomSRVHandle_[0] = srvManager_->GetGPUHandle(index[0]);
+    device_->CreateShaderResourceView(bloomBrightResource_.Get(), &srvDesc, srvCPUHandle[0]);
 
     // ブラー2回目用SRV
-    srvCPUHandle.ptr += descriptorSizeSRV;
-    bloomSRVHandle_[1] = GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV, ++srvIndex_);
-    device_->CreateShaderResourceView(bloomBlurShrinkResource_.Get(), &srvDesc, srvCPUHandle);
+    index[1] = srvManager_->AllocateSrvIndex();
+    srvCPUHandle[1] = srvManager_->GetCPUHandle(index[1]);
+    bloomSRVHandle_[1] = srvManager_->GetGPUHandle(index[1]);
+    device_->CreateShaderResourceView(bloomBlurShrinkResource_.Get(), &srvDesc, srvCPUHandle[1]);
 
     // ブラー3回目用SRV
-    srvCPUHandle.ptr += descriptorSizeSRV;
-    bloomSRVHandle_[2] = GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV, ++srvIndex_);
-    device_->CreateShaderResourceView(bloomResultResource_.Get(), &srvDesc, srvCPUHandle);
+    index[2] = srvManager_->AllocateSrvIndex();
+    srvCPUHandle[2] = srvManager_->GetCPUHandle(index[2]);
+    bloomSRVHandle_[2] = srvManager_->GetGPUHandle(index[2]);
+    device_->CreateShaderResourceView(bloomResultResource_.Get(), &srvDesc, srvCPUHandle[2]);
 
     // ブラー4回目用SRV
-    srvCPUHandle.ptr += descriptorSizeSRV;
-    bloomSRVHandle_[3] = GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV, ++srvIndex_);
-    device_->CreateShaderResourceView(bloomCompositeResource_.Get(), &srvDesc, srvCPUHandle);
+    index[3] = srvManager_->AllocateSrvIndex();
+    srvCPUHandle[3] = srvManager_->GetCPUHandle(index[3]);
+    bloomSRVHandle_[3] = srvManager_->GetGPUHandle(index[3]);
+    device_->CreateShaderResourceView(bloomCompositeResource_.Get(), &srvDesc, srvCPUHandle[3]);
 
     if (logManager_) {
         logManager_->Log("End Create BloomRenderTargets\n");
@@ -291,7 +298,7 @@ void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_
 
 void PostEffectManager::DrawBloom(ID3D12GraphicsCommandList* commandList, const D3D12_VIEWPORT& baseViewport, const D3D12_RECT& baseScissorRect) {
     // SRVヒープをセット
-    ID3D12DescriptorHeap* heaps[] = { srvHeap_ };
+    ID3D12DescriptorHeap* heaps[] = { srvManager_->GetSRVHeap()};
     commandList->SetDescriptorHeaps(1, heaps);
 
     // ルート
@@ -424,7 +431,7 @@ void PostEffectManager::DrawBloom(ID3D12GraphicsCommandList* commandList, const 
     commandList->ResourceBarrier(1, &barrier);
 }
 
-void PostEffectManager::InitializeScanLine(uint32_t width, uint32_t height, uint32_t descriptorSizeSRV, uint32_t descriptorSizeRTV) {
+void PostEffectManager::InitializeScanLine(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
     // テクスチャリソース作成
     D3D12_RESOURCE_DESC desc{};
     desc.Width = width;   // テクスチャの幅
@@ -469,8 +476,10 @@ void PostEffectManager::InitializeScanLine(uint32_t width, uint32_t height, uint
     srvDesc.Texture2D.MipLevels = 1;
 
     // SRVハンドル取得
-    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV, ++srvIndex_);
-    scanLineSRVHandle_ = GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV, srvIndex_);
+    uint32_t index = srvManager_->AllocateSrvIndex();
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(index);
+    scanLineSRVHandle_ = srvManager_->GetGPUHandle(index);
+
     // オブジェクト描画用SRV
     device_->CreateShaderResourceView(scanLineResource_.Get(), &srvDesc, srvCPUHandle);
 }
@@ -501,7 +510,7 @@ void PostEffectManager::DrawScanLine(ID3D12GraphicsCommandList* commandList) {
     commandList->ResourceBarrier(1, &barrier);
 }
 
-void PostEffectManager::InitializeVignetting(uint32_t width, uint32_t height, uint32_t descriptorSizeSRV, uint32_t descriptorSizeRTV) {
+void PostEffectManager::InitializeVignetting(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
     // テクスチャリソース作成
     D3D12_RESOURCE_DESC desc{};
     desc.Width = width;   // テクスチャの幅
@@ -546,8 +555,10 @@ void PostEffectManager::InitializeVignetting(uint32_t width, uint32_t height, ui
     srvDesc.Texture2D.MipLevels = 1;
 
     // SRVハンドル取得
-    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV, ++srvIndex_);
-    vignettingSRVHandle_ = GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV, srvIndex_);
+    uint32_t index = srvManager_->AllocateSrvIndex();
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(index);
+    vignettingSRVHandle_ = srvManager_->GetGPUHandle(index);
+
     // オブジェクト描画用SRV
     device_->CreateShaderResourceView(vignettingResource_.Get(), &srvDesc, srvCPUHandle);
 }
@@ -577,7 +588,7 @@ void PostEffectManager::DrawVignetting(ID3D12GraphicsCommandList* commandList) {
     commandList->ResourceBarrier(1, &barrier);
 }
 
-void PostEffectManager::InitializeRadialBlur(uint32_t width, uint32_t height, uint32_t descriptorSizeSRV, uint32_t descriptorSizeRTV) {
+void PostEffectManager::InitializeRadialBlur(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
     // テクスチャリソース作成
     D3D12_RESOURCE_DESC desc{};
     desc.Width = width;   // テクスチャの幅
@@ -622,8 +633,10 @@ void PostEffectManager::InitializeRadialBlur(uint32_t width, uint32_t height, ui
     srvDesc.Texture2D.MipLevels = 1;
 
     // SRVハンドル取得
-    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV, ++srvIndex_);
-    radialBlurSRVHandle_ = GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV, srvIndex_);
+    uint32_t index = srvManager_->AllocateSrvIndex();
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(index);
+    radialBlurSRVHandle_ = srvManager_->GetGPUHandle(index);
+
     // オブジェクト描画用SRV
     device_->CreateShaderResourceView(radialBlurResource_.Get(), &srvDesc, srvCPUHandle);
 }
@@ -653,7 +666,7 @@ void PostEffectManager::DrawRadialBlur(ID3D12GraphicsCommandList* commandList) {
     commandList->ResourceBarrier(1, &barrier);
 }
 
-void  PostEffectManager::InitializeOutLine(uint32_t width, uint32_t height, uint32_t descriptorSizeSRV, uint32_t descriptorSizeRTV) {
+void  PostEffectManager::InitializeOutLine(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
 
     // テクスチャリソース作成
     D3D12_RESOURCE_DESC desc{};
@@ -699,8 +712,10 @@ void  PostEffectManager::InitializeOutLine(uint32_t width, uint32_t height, uint
     srvDesc.Texture2D.MipLevels = 1;
 
     // SRVハンドル取得
-    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV, ++srvIndex_);
-    outLineSRVHandle_ = GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV, srvIndex_);
+    uint32_t index = srvManager_->AllocateSrvIndex();
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(index);
+    outLineSRVHandle_ = srvManager_->GetGPUHandle(index);
+
     // オブジェクト描画用SRV
     device_->CreateShaderResourceView(outLineResource_.Get(), &srvDesc, srvCPUHandle);
 }

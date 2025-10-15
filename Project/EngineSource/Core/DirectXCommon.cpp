@@ -13,7 +13,7 @@
 using namespace Microsoft::WRL;
 using namespace GameEngine;
 
-void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, LogManager* logManager)
+void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, LogManager* logManager, SrvManager* srvManager)
 {
     // ログを所得
     logManager_ = logManager;
@@ -31,14 +31,16 @@ void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, LogMa
     CreateCommandObjects();
     // スワップチェーンの作成
     CreateSwapChain(hwnd, width, height);
-    // RTV、DSV、SRVの生成
+    // SRVを生成する
+    srvManager->Initialize(device_.Get());
+    // RTV、DSVの生成
     CreateRenderTargetViews();
 
     // ポストエフェクトの初期化
     postEffectManager_ = std::make_unique<PostEffectManager>();
-    postEffectManager_->Initialize(device_.Get(), clearColor_, width, height, descriptorSizeRTV_, descriptorSizeSRV_, srvHeap_.Get());
+    postEffectManager_->Initialize(device_.Get(), clearColor_, width, height, descriptorSizeRTV_, srvManager);
 
-    CreateDepthStencilView(width, height);
+    CreateDepthStencilView(width, height,srvManager);
     // フェンスの生成
     CreateFence();
 
@@ -269,13 +271,10 @@ void DirectXCommon::CreateRenderTargetViews()
 
     // RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないので、ShaderVisibleはfalse
     rtvHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
-    // SRV用のヒープでディスクリプタの数は128。SRVはShader内で触るものなので、ShaderVisibleはtrue
-    srvHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, static_cast<uint32_t>(ResourceCount::kMaxResourceCount), true);
     // DSV用のヒープでディスクリプタの数は1。DSVはShader内で触るものではないので、ShaderVisibleはfalse
     dsvHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
     // DescriptorSizeを取得しておく
-    descriptorSizeSRV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     descriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
@@ -294,7 +293,7 @@ void DirectXCommon::CreateRenderTargetViews()
     }
 }
 
-void DirectXCommon::CreateDepthStencilView(uint32_t width, uint32_t height)
+void DirectXCommon::CreateDepthStencilView(uint32_t width, uint32_t height, SrvManager* srvManager)
 {
     // ステンシル情報の作成を開始するログ
     if (logManager_) {
@@ -319,8 +318,10 @@ void DirectXCommon::CreateDepthStencilView(uint32_t width, uint32_t height)
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;// 2Dテクスチャ
     srvDesc.Texture2D.MipLevels = 1;
 
-    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = GetCPUDescriptorHandle(srvHeap_.Get(), descriptorSizeSRV_, 1);
-    depthSRVHandle_ = GetGPUDescriptorHandle(srvHeap_.Get(), descriptorSizeSRV_, 1);
+    uint32_t index = srvManager->AllocateSrvIndex();
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager->GetCPUHandle(index);
+    depthSRVHandle_ = srvManager->GetGPUHandle(index);
+
     // オブジェクト描画用SRV
     device_->CreateShaderResourceView(depthStencilResource_.Get(), &srvDesc, srvCPUHandle);
 

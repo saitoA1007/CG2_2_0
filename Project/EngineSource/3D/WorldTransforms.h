@@ -11,7 +11,8 @@
 #include"Externals/DirectXTex/d3dx12.h"
 
 #include"DirectXCommon.h"
-#include"ResourceCounter.h"
+
+#include"SrvManager.h"
 
 namespace GameEngine {
 
@@ -35,7 +36,7 @@ namespace GameEngine {
 		/// 静的初期化
 		/// </summary>
 		/// <param name="device"></param>
-		static void StaticInitialize(DirectXCommon* dxCommon);
+		static void StaticInitialize(DirectXCommon* dxCommon,SrvManager* srvManager);
 
 		/// <summary>
 		/// 初期化
@@ -74,13 +75,7 @@ namespace GameEngine {
 		WorldTransforms& operator=(const WorldTransforms&) = delete;
 
 		static DirectXCommon* dxCommon_;
-
-		// srvの管理に使用する変数
-		static uint32_t StaticSrvIndex_;
-		static std::queue<uint32_t> availableIndices_;  // 利用出来るインデックス
-		static std::unordered_set<uint32_t> usedIndices_; // 利用しているインデックスを保持
-		static uint32_t nextNewIndex_; // 次のsrvインデックス
-		static const uint32_t kMaxSrvIndex_; // 最大のsrvインデックス
+		static SrvManager* srvManager_;
 
 		// インスタンスが持つsrvインデックス
 		uint32_t srvIndex_ = 0;
@@ -96,20 +91,6 @@ namespace GameEngine {
 		CD3DX12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU_;
 		// シェーダリソースビューのハンドル(CPU)
 		CD3DX12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;
-
-	private:
-
-		/// <summary>
-		/// srvインデックスを取得
-		/// </summary>
-		/// <returns></returns>
-		uint32_t AddSrvIndex();
-
-		/// <summary>
-		/// srvインデックスを解放
-		/// </summary>
-		/// <param name="index"></param>
-		void ReleaseSrvIndex(const uint32_t& index);
 	};
 }
 

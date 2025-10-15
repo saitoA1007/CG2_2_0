@@ -1,7 +1,7 @@
 #pragma once
 #include <d3d12.h>
 #include<iostream>
-#include<array>
+#include<vector>
 #include <wrl.h>
 #include"Externals/DirectXTex/DirectXTex.h"
 #include"Externals/DirectXTex/d3dx12.h"
@@ -9,6 +9,8 @@
 #include"DirectXCommon.h"
 #include<format>
 #include"LogManager.h"
+
+#include"SrvManager.h"
 
 namespace GameEngine {
 
@@ -18,6 +20,8 @@ namespace GameEngine {
 		struct Texture {
 			// テクスチャリソース
 			Microsoft::WRL::ComPtr<ID3D12Resource> textureResource;
+			// テクスチャアップロードするための変数
+			Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResources_;
 
 			DirectX::ScratchImage mipImage{};
 			// シェーダリソースビューのハンドル(CPU)
@@ -36,7 +40,7 @@ namespace GameEngine {
 		/// 初期化
 		/// </summary>
 		/// <param name="dxCommon"></param>
-		void Initialize(DirectXCommon* dxCommon, LogManager* logManager);
+		void Initialize(DirectXCommon* dxCommon, LogManager* logManager,SrvManager* srvManager);
 
 		// 解放処理
 		void Finalize();
@@ -58,31 +62,24 @@ namespace GameEngine {
 		TextureManager(const TextureManager&) = delete;
 		TextureManager& operator=(const TextureManager&) = delete;
 
-		// テクスチャの数
-		static const int kTextureNum_ = 128;
-
 		// DirectXCommon
 		DirectXCommon* dxCommon_ = nullptr;
 
 		// テクスチャデータを管理する変数
-		std::array<Texture, kTextureNum_> textures_;
+		std::vector<Texture> textures_;
 
 		const DirectX::TexMetadata* metadata_{};
 
 		// metaDataを基にSRVの設定の変数
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc_{};
 
-		// テクスチャアップロードするための変数
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> intermediateResources_;
-
 		// テクスチャパス
 		std::string texturePath_;
 
-		// 配列の管理
-		int32_t index_ = -1;
-
 		// ログ
 		LogManager* logManager_;
+
+		SrvManager* srvManager_ = nullptr;
 
 	private:
 
