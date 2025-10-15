@@ -12,6 +12,8 @@
 #include"PostProcess/PostEffectManager.h"
 #include"ResourceCounter.h"
 
+#include"SrvManager.h"
+
 namespace GameEngine {
 
     // 前方宣言
@@ -23,7 +25,7 @@ namespace GameEngine {
         ~DirectXCommon() = default;
 
         // 初期化
-        void Initialize(HWND hwnd, uint32_t width, uint32_t height, LogManager* logManager);
+        void Initialize(HWND hwnd, uint32_t width, uint32_t height, LogManager* logManager,SrvManager* srvManager);
         // 描画前処理
         void PreDraw();
         // 描画後処理
@@ -35,12 +37,10 @@ namespace GameEngine {
         IDXGISwapChain4* GetSwapChain() const { return swapChain_.Get(); }
 
         ID3D12DescriptorHeap* GetRTVHeap() const { return rtvHeap_.Get(); }
-        ID3D12DescriptorHeap* GetSRVHeap() const { return srvHeap_.Get(); }
         ID3D12DescriptorHeap* GetDSVHeap() const { return dsvHeap_.Get(); }
 
         uint32_t GetBackBufferIndex() const { return backBufferIndex_; }
 
-        uint32_t GetSRVDescriptorSize() const { return descriptorSizeSRV_; }
         uint32_t GetRTVDescriptorSize() const { return descriptorSizeRTV_; }
         uint32_t GetDSVDescriptorSize() const { return descriptorSizeDSV_; }
 
@@ -69,7 +69,7 @@ namespace GameEngine {
         // バックバッファ（SwapChain のリソース）に対して描画可能にするビューを作成
         void CreateRenderTargetViews();
         // Z値（深さ）やステンシル情報を書き込むためのバッファとビューを作成
-        void CreateDepthStencilView(uint32_t width, uint32_t height);
+        void CreateDepthStencilView(uint32_t width, uint32_t height, SrvManager* srvManager);
         // CPU と GPU 間の同期を取るための Fence オブジェクトを作成
         void CreateFence();
         // GPUを待つ処理 
@@ -91,7 +91,6 @@ namespace GameEngine {
         Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
         std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, kSwapChainBufferCount> swapChainResources_;
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_;
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_;
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;
         Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
 
@@ -101,7 +100,6 @@ namespace GameEngine {
 
         uint32_t backBufferIndex_ = 0;
         uint32_t descriptorSizeRTV_ = 0;
-        uint32_t descriptorSizeSRV_ = 0;
         uint32_t descriptorSizeDSV_ = 0;
 
         D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2] = {};

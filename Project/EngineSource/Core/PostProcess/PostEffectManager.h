@@ -13,6 +13,8 @@
 #include"PostProcess/OutLinePSO.h"
 #include"ResourceCounter.h"
 
+#include"SrvManager.h"
+
 namespace GameEngine {
 
     class PostEffectManager {
@@ -45,7 +47,7 @@ namespace GameEngine {
         /// <param name="descriptorSizeSRV"></param>
         /// <param name="srvHeap_"></param>
         void Initialize(ID3D12Device* device, float clearColor_[4], uint32_t width, uint32_t height,
-            uint32_t descriptorSizeRTV, uint32_t descriptorSizeSRV, ID3D12DescriptorHeap* srvHeap_);
+            uint32_t descriptorSizeRTV, SrvManager* srvManager);
 
         /// <summary>
         /// 描画前処理
@@ -108,9 +110,6 @@ namespace GameEngine {
         // デバイス
         ID3D12Device* device_ = nullptr;
 
-        // srvヒープ
-        ID3D12DescriptorHeap* srvHeap_ = nullptr;
-
         // ポストエフェクト用RTVの総数
         static inline const uint32_t kRTVNum = 16;
 
@@ -119,8 +118,6 @@ namespace GameEngine {
 
         // ポストエフェクトのためのRTVを計測
         uint32_t rtvIndex_ = 0;
-        // ポストエフェクトのためのSRVを計測
-        uint32_t srvIndex_ = static_cast<uint32_t>(ResourceCount::kStartOffScreenCount);
 
         // コピー描画用リソース
         Microsoft::WRL::ComPtr<ID3D12Resource> DrawObjectResource_;
@@ -136,6 +133,9 @@ namespace GameEngine {
 
         // 描画するモード
         DrawMode drawMode_ = DrawMode::Default;
+
+        // srvを管理する
+        SrvManager* srvManager_;
 
     private:
 
@@ -203,7 +203,7 @@ namespace GameEngine {
         /// <param name="height"></param>
         /// <param name="descriptorSizeSRV"></param>
         /// <param name="descriptorSizeRTV"></param>
-        void InitializeBloom(uint32_t width, uint32_t height, uint32_t descriptorSizeSRV, uint32_t descriptorSizeRTV);
+        void InitializeBloom(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV);
 
         /// <summary>
         /// ブルームの描画処理
@@ -220,7 +220,7 @@ namespace GameEngine {
         /// <param name="height"></param>
         /// <param name="descriptorSizeSRV"></param>
         /// <param name="descriptorSizeRTV"></param>
-        void InitializeScanLine(uint32_t width, uint32_t height, uint32_t descriptorSizeSRV, uint32_t descriptorSizeRTV);
+        void InitializeScanLine(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV);
 
         /// <summary>
         /// ラインの描画処理
@@ -235,7 +235,7 @@ namespace GameEngine {
         /// <param name="height"></param>
         /// <param name="descriptorSizeSRV"></param>
         /// <param name="descriptorSizeRTV"></param>
-        void InitializeVignetting(uint32_t width, uint32_t height, uint32_t descriptorSizeSRV, uint32_t descriptorSizeRTV);
+        void InitializeVignetting(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV);
 
         /// <summary>
         /// ヴィネットの描画処理
@@ -250,7 +250,7 @@ namespace GameEngine {
         /// <param name="height"></param>
         /// <param name="descriptorSizeSRV"></param>
         /// <param name="descriptorSizeRTV"></param>
-        void InitializeRadialBlur(uint32_t width, uint32_t height, uint32_t descriptorSizeSRV, uint32_t descriptorSizeRTV);
+        void InitializeRadialBlur(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV);
 
         /// <summary>
         /// ラジアルブルーの描画処理
@@ -265,7 +265,7 @@ namespace GameEngine {
         /// <param name="height"></param>
         /// <param name="descriptorSizeSRV"></param>
         /// <param name="descriptorSizeRTV"></param>
-        void InitializeOutLine(uint32_t width, uint32_t height, uint32_t descriptorSizeSRV, uint32_t descriptorSizeRTV);
+        void InitializeOutLine(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV);
 
         /// <summary>
         /// アウトラインの描画

@@ -1,10 +1,11 @@
 #include"ImGuiManager.h"
 using namespace GameEngine;
 
-void ImGuiManager::Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon) {
+void ImGuiManager::Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon, SrvManager* srvManager) {
 
 	windowsApp_ = windowsApp;
 	dxCommon_ = dxCommon;
+	srvManager_ = srvManager;
 
 	// ImGuiの初期化。
 	IMGUI_CHECKVERSION();
@@ -18,9 +19,9 @@ void ImGuiManager::Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon) {
 	ImGui_ImplDX12_Init(dxCommon_->GetDevice(),
 		dxCommon_->GetSwapChainDesc().BufferCount,
 		dxCommon_->GetRTVDesc().Format,
-		dxCommon_->GetSRVHeap(),
-		dxCommon_->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(),
-		dxCommon_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+		srvManager_->GetSRVHeap(),
+		srvManager_->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(),
+		srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 }
 
 void ImGuiManager::BeginFrame() {
@@ -61,7 +62,7 @@ void ImGuiManager::EndFrame() {
 	// ImGuiの内部コマンドを生成する
 	ImGui::Render();
 	//// Imguiの描画用のDescriptorHeapの設定
-	ID3D12DescriptorHeap* descriptorHeaps[] = { dxCommon_->GetSRVHeap() };
+	ID3D12DescriptorHeap* descriptorHeaps[] = { srvManager_->GetSRVHeap() };
 	dxCommon_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 }
 

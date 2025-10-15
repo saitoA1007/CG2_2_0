@@ -9,13 +9,11 @@
 using namespace GameEngine;
 
 ID3D12Device* Animation::device_ = nullptr;
-ID3D12DescriptorHeap* Animation::srvHeap_ = nullptr;
-uint32_t Animation::descriptorSizeSRV_ = 0;
+SrvManager* Animation::srvManager_ = nullptr;
 
-void Animation::StaticInitialize(ID3D12Device* device, ID3D12DescriptorHeap* srvHeap, const uint32_t& descriptorSizeSRV) {
+void Animation::StaticInitialize(ID3D12Device* device, SrvManager* srvManager) {
 	device_ = device;
-	srvHeap_ = srvHeap;
-	descriptorSizeSRV_ = descriptorSizeSRV;
+	srvManager_ = srvManager;
 }
 
 SkinCluster Animation::CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData) {
@@ -24,15 +22,16 @@ SkinCluster Animation::CreateSkinCluster(const Skeleton& skeleton, const ModelDa
 	assert(!modelData.meshes.empty() && "Model has no meshes!");
 	assert(!modelData.meshes[0].vertices.empty() && "Model mesh[0] has no vertices!");
 
-	SkinCluster skinCluster;
+	uint32_t srvIndex = srvManager_->AllocateSrvIndex();
 
+	SkinCluster skinCluster;
 	// palette用のResourceを確保
 	skinCluster.paletteResource = CreateBufferResource(device_, sizeof(WellForGPU) * skeleton.joints.size());
 	WellForGPU* mappedPalette = nullptr;
 	skinCluster.paletteResource->Map(0,nullptr,reinterpret_cast<void**>(&mappedPalette));
 	skinCluster.mappedPalette = { mappedPalette,skeleton.joints.size() }; // spanを使ってアクセスするようにする
-	skinCluster.paletteSrvHandle.first = GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, 180);
-	skinCluster.paletteSrvHandle.second = GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, 180);
+	skinCluster.paletteSrvHandle.first = srvManager_->GetCPUHandle(srvIndex);
+	skinCluster.paletteSrvHandle.second = srvManager_->GetGPUHandle(srvIndex);
 
 	// palette用のsrvを作成。StructuredBufferでアクセス出来るようにする。
 	D3D12_SHADER_RESOURCE_VIEW_DESC paletteSrvDesc{};

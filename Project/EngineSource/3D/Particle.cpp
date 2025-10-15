@@ -44,8 +44,8 @@ void Particles::Initialize() {
 	uavDesc.Buffer.StructureByteStride = sizeof(ParticleCS);
 	uavDesc.Buffer.CounterOffsetInBytes = 0;
 	uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-	uavHandleCPU_ = GetCPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), StaticSrvIndex_ + static_cast<uint32_t>(ResourceCount::kStartModelCount));
-	uavHandleGPU_ = GetGPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), StaticSrvIndex_ + static_cast<uint32_t>(ResourceCount::kStartModelCount));
+	//uavHandleCPU_ = GetCPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), StaticSrvIndex_ + static_cast<uint32_t>(ResourceCount::kStartModelCount));
+	//uavHandleGPU_ = GetGPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), StaticSrvIndex_ + static_cast<uint32_t>(ResourceCount::kStartModelCount));
 	dxCommon_->GetDevice()->CreateUnorderedAccessView(computeResource_.Get(), nullptr, &uavDesc, uavHandleCPU_);
 
 	// srvを更新

@@ -5,15 +5,13 @@
 using namespace GameEngine;
 
 DirectXCommon* WorldTransforms::dxCommon_ = nullptr;
-uint32_t WorldTransforms::StaticSrvIndex_ = 0;
-std::queue<uint32_t> WorldTransforms::availableIndices_;
-std::unordered_set<uint32_t> WorldTransforms::usedIndices_;
-uint32_t WorldTransforms::nextNewIndex_ = 0;
-const uint32_t WorldTransforms::kMaxSrvIndex_ = static_cast<uint32_t>(ResourceCount::kMaxModelCount) - static_cast<uint32_t>(ResourceCount::kStartModelCount);
+SrvManager* WorldTransforms::srvManager_ = nullptr;
 
 WorldTransforms::~WorldTransforms() {
+	
+	// srvIndexを解放
+	srvManager_->ReleseIndex(srvIndex_);
 
-	// リソースの解放
 	if (instancingResource_) {
 		if (instancingData_) {
 			instancingResource_->Unmap(0, nullptr);
@@ -22,15 +20,12 @@ WorldTransforms::~WorldTransforms() {
 		instancingResource_.Reset();
 	}
 
-	// SRVインデックスを解放
-	ReleaseSrvIndex(srvIndex_);
 	transformDatas_.clear();
 }
 
-void WorldTransforms::StaticInitialize(DirectXCommon* dxCommon) {
+void WorldTransforms::StaticInitialize(DirectXCommon* dxCommon, SrvManager* srvManager) {
 	dxCommon_ = dxCommon; 
-
-	nextNewIndex_ = 0;
+	srvManager_ = srvManager;
 }
 
 void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& transform) {
@@ -58,9 +53,7 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& 
 	}
 
 	// SRVのインデックスを取得
-	srvIndex_ = AddSrvIndex();
-	// 指定のリソースの総数を超えたらエラーを発生
-	assert(static_cast<uint32_t>(ResourceCount::kMaxModelCount) > srvIndex_ + static_cast<uint32_t>(ResourceCount::kStartModelCount));
+	srvIndex_ = srvManager_->AllocateSrvIndex();
 	// SRVの作成
 	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
 	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -70,8 +63,8 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& 
 	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 	instancingSrvDesc.Buffer.NumElements = numInstance_;
 	instancingSrvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
-	instancingSrvHandleCPU_ = GetCPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), srvIndex_ + static_cast<uint32_t>(ResourceCount::kStartModelCount));
-	instancingSrvHandleGPU_ = GetGPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), srvIndex_ + static_cast<uint32_t>(ResourceCount::kStartModelCount));
+	instancingSrvHandleCPU_ = srvManager_->GetCPUHandle(srvIndex_);
+	instancingSrvHandleGPU_ = srvManager_->GetGPUHandle(srvIndex_);
 	dxCommon_->GetDevice()->CreateShaderResourceView(instancingResource_.Get(), &instancingSrvDesc, instancingSrvHandleCPU_);
 }
 
@@ -98,37 +91,5 @@ void WorldTransforms::SetWVPMatrix(const uint32_t& numInstance, const Matrix4x4&
 		instancingData_[i].WVP = Multiply(localMatrix, Multiply(transformDatas_[i].worldMatrix, VPMatrix));
 		instancingData_[i].World = transformDatas_[i].worldMatrix;
 		instancingData_[i].color = transformDatas_[i].color;
-	}
-}
-
-uint32_t WorldTransforms::AddSrvIndex() {
-
-	uint32_t index = 0;
-
-	// 利用可能であれば使用する
-	if (!availableIndices_.empty()) {
-		index = availableIndices_.front();
-		availableIndices_.pop();
-	} else if (nextNewIndex_ < kMaxSrvIndex_) {
-		index = nextNewIndex_++;
-	} else {
-		assert(0);
-		return kMaxSrvIndex_;
-	}
-
-	// 使用中のインデックスをセット
-	usedIndices_.insert(index);
-	return index;
-}
-
-void WorldTransforms::ReleaseSrvIndex(const uint32_t& index) {
-
-	// 使用中のインデックスを削除
-	std::unordered_set<uint32_t>::iterator usedIndex = usedIndices_.find(index);
-	// 要素が見つかれば削除
-	if (usedIndex != usedIndices_.end()) {
-		usedIndices_.erase(usedIndex);
-		// 再利用を可能にする
-		availableIndices_.push(index);
 	}
 }

@@ -212,6 +212,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\PSO\SpritePSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\TrianglePSO.cpp" />
     <ClCompile Include="EngineSource\Core\RandomGenerator.cpp" />
+    <ClCompile Include="EngineSource\Core\SrvManager.cpp" />
     <ClCompile Include="EngineSource\Core\TextureManager.cpp" />
     <ClCompile Include="EngineSource\Core\WindowsApp.cpp" />
     <ClCompile Include="EngineSource\Input\InPut.cpp" />
@@ -294,6 +295,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\PSO\TrianglePSO.h" />
     <ClInclude Include="EngineSource\Core\RandomGenerator.h" />
     <ClInclude Include="EngineSource\Core\ResourceCounter.h" />
+    <ClInclude Include="EngineSource\Core\SrvManager.h" />
     <ClInclude Include="EngineSource\Core\TextureManager.h" />
     <ClInclude Include="EngineSource\Core\WindowsApp.h" />
     <ClInclude Include="EngineSource\Input\InPut.h" />

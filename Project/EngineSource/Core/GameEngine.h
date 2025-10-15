@@ -1,8 +1,11 @@
 #pragma once
+// Core
 #include"WindowsApp.h"
 #include"DirectXCommon.h"
 #include"TextureManager.h"
+#include"SrvManager.h"
 
+// Core/PSO
 #include"LinePSO.h"
 #include"TrianglePSO.h"
 #include"ParticlePSO.h"
@@ -22,6 +25,7 @@
 #include"ResourceLeakChecker.h"
 #include"CrashHandle.h"
 
+// 3D
 #include"Camera.h"
 #include"DebugCamera.h"
 #include"LightManager.h"
@@ -34,13 +38,16 @@
 
 #include"Animation.h"
 
+// 2D
 #include"ImGuiManager.h"
 #include"Sprite.h"
 
 #include"TransformationMatrix.h"
 
+// Input
 #include"InPut.h"
 
+// Audio
 #include"AudioManager.h"
 
 namespace GameEngine {
@@ -118,6 +125,9 @@ namespace GameEngine {
 
 		// テクスチャの機能
 		std::shared_ptr<TextureManager> textureManager_;
+
+		// srvメモリを管理する機能
+		std::unique_ptr<SrvManager> srvManager_;
 
 		/// PSO ======================================
 

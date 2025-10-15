@@ -7,6 +7,7 @@
 
 #include"WindowsApp.h"
 #include"DirectXCommon.h"
+#include"SrvManager.h"
 
 namespace GameEngine {
 
@@ -20,7 +21,7 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="windowsApp"></param>
 		/// <param name="dxCommon"></param>
-		void Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon);
+		void Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon,SrvManager* srvManager);
 
 		/// <summary>
 		/// 更新前処理
@@ -48,5 +49,6 @@ namespace GameEngine {
 
 		WindowsApp* windowsApp_ = nullptr;
 		DirectXCommon* dxCommon_ = nullptr;
+		SrvManager* srvManager_ = nullptr;
 	};
 }

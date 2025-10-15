@@ -4,26 +4,22 @@
 #include"DescriptorHandle.h"
 #include<format>
 #include <filesystem>
-#include"ResourceCounter.h"
 
 using namespace GameEngine;
 
-void TextureManager::Initialize(DirectXCommon* dxCommon, LogManager* logManager) {
+void TextureManager::Initialize(DirectXCommon* dxCommon, LogManager* logManager, SrvManager* srvManager) {
 	dxCommon_ = dxCommon;
 	logManager_ = logManager;
+	srvManager_ = srvManager;
 }
 
 void TextureManager::Finalize() {
 
 	for (auto& tex : textures_) {
 		tex.textureResource.Reset();
+		tex.intermediateResources_.Reset();
 	}
-
-	for (auto& inter : intermediateResources_) {
-		inter.Reset();
-	}
-
-	intermediateResources_.clear();	
+	textures_.clear();
 }
 
 uint32_t TextureManager::Load(const std::string& fileName) {
@@ -44,40 +40,32 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 		}
 	}
 
-	// テクスチャ読み込みの最大数より小さければ追加する処理
-	if (index_ < kTextureNum_) {
-		index_++;
-	} else {
-		// テクスチャーを読み込む最大数を超えていることを伝えるログ
-		if (logManager_) {
-			logManager_->Log("Too many textures loaded. ");
-			logManager_->Log(std::format("Exceeded texture load limit: {}, now : {}", kTextureNum_, textures_.size()));
-		}
-		// 即座に終了
-		std::abort();
-	}
+	Texture texture;
 	// テクスチャ名を記録
-	textures_.at(index_).fileName = GetFileName(fileName);
+	texture.fileName = GetFileName(fileName);
 
-		// テクスチャを読み込む
-	textures_.at(index_).mipImage = LoadTexture(fileName);
-	if (!textures_.at(index_).mipImage.GetImages()) {
+	// テクスチャを読み込む
+	texture.mipImage = LoadTexture(fileName);
+	if (!texture.mipImage.GetImages()) {
 		logManager_->Log("Failed to load texture: " + fileName);
 		assert(false);
 	}
-	metadata_ = &textures_.at(index_).mipImage.GetMetadata();
+	metadata_ = &texture.mipImage.GetMetadata();
 	// テクスチャリソースを作成
-	textures_.at(index_).textureResource = CreateTextureResource(dxCommon_->GetDevice(), *metadata_);
-	if (!textures_.at(index_).textureResource) {
+	texture.textureResource = CreateTextureResource(dxCommon_->GetDevice(), *metadata_);
+	if (!texture.textureResource) {
 		logManager_->Log("Failed to create textureResource for: " + fileName);
 		assert(false);
 	}
 	// テクスチャデータをアップロード
-	intermediateResources_.push_back(UploadTextureData(textures_.at(index_).textureResource.Get(), textures_.at(index_).mipImage, dxCommon_->GetDevice(), dxCommon_->GetCommandList()));
-	if (!intermediateResources_.at(index_)) {
+	texture.intermediateResources_ = UploadTextureData(texture.textureResource.Get(), texture.mipImage, dxCommon_->GetDevice(), dxCommon_->GetCommandList());
+	if (!texture.intermediateResources_) {
 		logManager_->Log("Failed to upload texture data for: " + fileName);
 		assert(false);
 	}
+
+	// srvインデックスを取得
+	uint32_t index = srvManager_->AllocateSrvIndex();
 
 	// metaDataを基にSRVの設定
 	srvDesc_.Format = metadata_->format;
@@ -85,14 +73,15 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 	srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;// 2Dテクスチャ
 	srvDesc_.Texture2D.MipLevels = UINT(metadata_->mipLevels);
 
-	// 指定した数よりリソースが多ければエラーを発生
-	assert(static_cast<uint32_t>(ResourceCount::kMaxTextureCount) > index_ + static_cast<uint32_t>(ResourceCount::kStartTextureCount));
 	// SRVを作成するDescriptorHeapの場所を決める。先頭はImGuiが使っているのでその次を使う
-	textures_.at(index_).textureSrvHandleCPU = GetCPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), index_ + static_cast<uint32_t>(ResourceCount::kStartTextureCount));
-	textures_.at(index_).textureSrvHandleGPU = GetGPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), index_ + static_cast<uint32_t>(ResourceCount::kStartTextureCount));
-	logManager_->Log(std::format("CPU Handle: {}, GPU Handle: {}", textures_.at(index_).textureSrvHandleCPU.ptr, textures_.at(index_).textureSrvHandleGPU.ptr));
+	texture.textureSrvHandleCPU = srvManager_->GetCPUHandle(index);
+	texture.textureSrvHandleGPU = srvManager_->GetGPUHandle(index);
+	logManager_->Log(std::format("CPU Handle: {}, GPU Handle: {}", texture.textureSrvHandleCPU.ptr, texture.textureSrvHandleGPU.ptr));
 	// SRVを作成
-	dxCommon_->GetDevice()->CreateShaderResourceView(textures_.at(index_).textureResource.Get(), &srvDesc_, textures_.at(index_).textureSrvHandleCPU);
+	dxCommon_->GetDevice()->CreateShaderResourceView(texture.textureResource.Get(), &srvDesc_, texture.textureSrvHandleCPU);
+
+	// 登録
+	textures_.push_back(std::move(texture));
 
 	// テクスチャーの読み込みを完了するログ
 	if (logManager_) {
@@ -100,7 +89,7 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 	}
 
 	// 読み込んだ画像が格納されている配列番号を返す
-	return index_;
+	return static_cast<uint32_t>(textures_.size() - 1);
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE& TextureManager::GetTextureSrvHandlesGPU(const uint32_t& textureHandle) {

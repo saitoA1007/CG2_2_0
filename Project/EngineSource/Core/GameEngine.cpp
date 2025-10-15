@@ -22,9 +22,12 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// リソースチェックのデバック
 	D3DResourceLeakChecker leakCheck;
 
+	// srvManagerを生成
+	srvManager_ = std::make_unique<SrvManager>();
+
 	// DirectXCommonの初期化
 	dxCommon_ = std::make_unique<DirectXCommon>();
-	dxCommon_->Initialize(windowsApp_->GetHwnd(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight, logManager_.get());
+	dxCommon_->Initialize(windowsApp_->GetHwnd(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight, logManager_.get(),srvManager_.get());
 
 	// dxcCompilerの初期化
 	dxc_ = std::make_unique<DXC>();
@@ -35,7 +38,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// ImGuiの初期化
 	imGuiManager_ = std::make_unique<ImGuiManager>();
-	imGuiManager_->Initialize(windowsApp_.get(), dxCommon_.get());
+	imGuiManager_->Initialize(windowsApp_.get(), dxCommon_.get(),srvManager_.get());
 
 	// 入力処理を初期化
 	input_ = std::make_unique<Input>();
@@ -47,7 +50,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// テクスチャの初期化
 	textureManager_ = std::make_shared<TextureManager>();
-	textureManager_->Initialize(dxCommon_.get(), logManager_.get());
+	textureManager_->Initialize(dxCommon_.get(), logManager_.get(),srvManager_.get());
 
 	//=====================================================================================
 	// 静的初期化
@@ -57,7 +60,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	PostEffectManager::StaticInitialize(bloomPSO_.get(), scanLinePSO_.get(), vignettingPSO_.get(), radialBlurPSO_.get(), outLinePSO_.get(), logManager_.get());
 
 	// アニメーションの初期化
-	Animation::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize());
+	Animation::StaticInitialize(dxCommon_->GetDevice(), srvManager_.get());
 
 	// 画像の初期化
 	Sprite::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), spritePSO_.get(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
@@ -67,7 +70,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	PrimitiveRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), linePSO_.get(), logManager_.get());
 	// ワールドトランスフォームの初期化
 	WorldTransform::StaticInitialize(dxCommon_->GetDevice());
-	WorldTransforms::StaticInitialize(dxCommon_.get());
+	WorldTransforms::StaticInitialize(dxCommon_.get(),srvManager_.get());
 	// マテリアルの初期化
 	Material::StaticInitialize(dxCommon_->GetDevice());
 	// 線を描画する為のメッシュの初期化

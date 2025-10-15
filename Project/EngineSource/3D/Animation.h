@@ -5,6 +5,8 @@
 #include"VertexData.h"
 #include"AnimationData.h"
 
+#include"SrvManager.h"
+
 // 影響を受けるJointの数
 const uint32_t kNumMaxInfluence = 4;
 struct VertexInfluence {
@@ -39,7 +41,7 @@ namespace GameEngine {
 		/// <summary>
 		/// 静的初期化
 		/// </summary>
-		static void StaticInitialize(ID3D12Device* device, ID3D12DescriptorHeap* srvHeap,const uint32_t& descriptorSizeSRV);
+		static void StaticInitialize(ID3D12Device* device, SrvManager* srvManager);
 
 		static SkinCluster CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData);
 
@@ -82,7 +84,6 @@ namespace GameEngine {
 
 		// デバイス
 		static ID3D12Device* device_;
-		static ID3D12DescriptorHeap* srvHeap_;
-		static uint32_t descriptorSizeSRV_;
+		static SrvManager* srvManager_;
 	};
 }
