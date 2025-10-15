@@ -84,7 +84,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Core\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Core\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene;$(ProjectDir)EngineSource\3D\Model</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -115,7 +115,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Core\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Core\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene;$(ProjectDir)EngineSource\3D\Model</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -146,7 +146,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Core\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Core\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene;$(ProjectDir)EngineSource\3D\Model</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
@@ -173,22 +173,22 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Player.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
-    <ClCompile Include="EngineSource\3D\Animation.cpp" />
-    <ClCompile Include="EngineSource\3D\AxisIndicator.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\Animation.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\AxisIndicator.cpp" />
     <ClCompile Include="EngineSource\3D\Camera\Camera.cpp" />
     <ClCompile Include="EngineSource\3D\Camera\DebugCamera.cpp" />
     <ClCompile Include="EngineSource\3D\Light\DirectionalLight.cpp" />
     <ClCompile Include="EngineSource\3D\Light\LightManager.cpp" />
     <ClCompile Include="EngineSource\3D\Light\PointLight.cpp" />
     <ClCompile Include="EngineSource\3D\Light\SpotLight.cpp" />
-    <ClCompile Include="EngineSource\3D\LineMesh.cpp" />
-    <ClCompile Include="EngineSource\3D\Material.cpp" />
-    <ClCompile Include="EngineSource\3D\Mesh.cpp" />
-    <ClCompile Include="EngineSource\3D\Model.cpp" />
-    <ClCompile Include="EngineSource\3D\Particle.cpp" />
-    <ClCompile Include="EngineSource\3D\PrimitiveRenderer.cpp" />
-    <ClCompile Include="EngineSource\3D\WorldTransform.cpp" />
-    <ClCompile Include="EngineSource\3D\WorldTransforms.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\LineMesh.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\Material.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\Mesh.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\Model.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\Particle.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\PrimitiveRenderer.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\WorldTransform.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\WorldTransforms.cpp" />
     <ClCompile Include="EngineSource\Audio\AudioManager.cpp" />
     <ClCompile Include="EngineSource\Collision\CollisionUtils.cpp" />
     <ClCompile Include="EngineSource\Common\LogManager.cpp" />
@@ -243,24 +243,24 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Player.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
-    <ClInclude Include="EngineSource\3D\Animation.h" />
-    <ClInclude Include="EngineSource\3D\AnimationData.h" />
-    <ClInclude Include="EngineSource\3D\AxisIndicator.h" />
+    <ClInclude Include="EngineSource\3D\Model\Animation.h" />
+    <ClInclude Include="EngineSource\3D\Model\AnimationData.h" />
+    <ClInclude Include="EngineSource\3D\Model\AxisIndicator.h" />
     <ClInclude Include="EngineSource\3D\Camera\Camera.h" />
     <ClInclude Include="EngineSource\3D\Camera\DebugCamera.h" />
     <ClInclude Include="EngineSource\3D\Light\DirectionalLight.h" />
     <ClInclude Include="EngineSource\3D\Light\LightManager.h" />
     <ClInclude Include="EngineSource\3D\Light\PointLight.h" />
     <ClInclude Include="EngineSource\3D\Light\SpotLight.h" />
-    <ClInclude Include="EngineSource\3D\LineMesh.h" />
-    <ClInclude Include="EngineSource\3D\Material.h" />
-    <ClInclude Include="EngineSource\3D\Mesh.h" />
-    <ClInclude Include="EngineSource\3D\Model.h" />
-    <ClInclude Include="EngineSource\3D\Particle.h" />
-    <ClInclude Include="EngineSource\3D\PrimitiveRenderer.h" />
-    <ClInclude Include="EngineSource\3D\VertexData.h" />
-    <ClInclude Include="EngineSource\3D\WorldTransform.h" />
-    <ClInclude Include="EngineSource\3D\WorldTransforms.h" />
+    <ClInclude Include="EngineSource\3D\Model\LineMesh.h" />
+    <ClInclude Include="EngineSource\3D\Model\Material.h" />
+    <ClInclude Include="EngineSource\3D\Model\Mesh.h" />
+    <ClInclude Include="EngineSource\3D\Model\Model.h" />
+    <ClInclude Include="EngineSource\3D\Model\Particle.h" />
+    <ClInclude Include="EngineSource\3D\Model\PrimitiveRenderer.h" />
+    <ClInclude Include="EngineSource\3D\Model\VertexData.h" />
+    <ClInclude Include="EngineSource\3D\Model\WorldTransform.h" />
+    <ClInclude Include="EngineSource\3D\Model\WorldTransforms.h" />
     <ClInclude Include="EngineSource\Audio\AudioManager.h" />
     <ClInclude Include="EngineSource\Collision\CollisionUtils.h" />
     <ClInclude Include="EngineSource\Common\ConvertString.h" />
