@@ -1,12 +1,13 @@
 #include"GEScene.h"
 #include"ImguiManager.h"
+#include"ModelRenderer.h"
 #include<numbers>
 using namespace GameEngine;
 
 GEScene::~GEScene() {
 }
 
-void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
+void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem 
 	// 入力を取得
@@ -28,20 +29,15 @@ void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inp
 	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, dxCommon->GetDevice());
 
 	// グリッドの初期化
-	gridModel_ = Model::CreateGridPlane({ 200.0f,200.0f });
+	gridModel_ = modelManager->GetNameByModel("Grid");
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 #pragma endregion
 
 	// プレイヤーモデルを生成
-	playerModel_ = Model::CreateModel("cube.obj", "Cube");
+	playerModel_ = modelManager->GetNameByModel("cube.obj");
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();
-	player_->Initialize(playerModel_.get());
-
-	// 地面モデルを生成
-	terrainModel_ = Model::CreatePlane({ 20.0f,20.0f });
-	terrainModel_->SetDefaultColor({ 0.4f,0.4f,0.4f,1.0f });
-	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{std::numbers::pi_v<float> / 2.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	player_->Initialize();
 
 	// カメラをコントロールするクラスを初期化
 	cameraController_ = std::make_unique<CameraController>();
@@ -49,7 +45,6 @@ void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inp
 
 	// 入力コマンドを設定する
 	InputRegisterCommand();
-
 }
 
 void GEScene::Update() {
@@ -105,20 +100,17 @@ void GEScene::Draw() {
 	//===========================================================
 
 	// 3Dモデルの描画前処理
-	Model::PreDraw(PSOMode::Triangle, BlendMode::kBlendModeNormal);
+	ModelRenderer::PreDraw(RenderMode::DefaultModel, BlendMode::kBlendModeNormal);
 
 	// プレイヤーを描画
-	player_->Draw(camera_->GetVPMatrix());
-
-	// 地面を描画
-	terrainModel_->Draw(terrainWorldTransform_, 0, camera_->GetVPMatrix());
+	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform(),0, camera_->GetVPMatrix());
 
 #ifdef _DEBUG
 	// モデルの単体描画前処理
-	Model::PreDraw(PSOMode::Grid, BlendMode::kBlendModeNormal);
+	ModelRenderer::PreDraw(RenderMode::Grid, BlendMode::kBlendModeNone);
 
 	// グリッドを描画
-	gridModel_->DrawGrid(gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
+	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
 #endif
 }
 

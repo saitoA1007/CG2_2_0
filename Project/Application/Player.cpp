@@ -7,10 +7,8 @@
 
 using namespace GameEngine;
 
-void Player::Initialize(GameEngine::Model* model) {
+void Player::Initialize() {
 
-	// モデルを取得
-	playerModel_ = model;
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,0.0f} });
 }
@@ -29,11 +27,6 @@ void Player::Update(GameEngine::InputCommand* inputCommand) {
 
 	// 行列の更新
 	worldTransform_.UpdateTransformMatrix();
-}
-
-void Player::Draw(const Matrix4x4& VPMatrix) {
-	// プレイヤーの描画
-	playerModel_->Draw(worldTransform_, VPMatrix);
 }
 
 void Player::ProcessMoveInput(GameEngine::InputCommand* inputCommand) {

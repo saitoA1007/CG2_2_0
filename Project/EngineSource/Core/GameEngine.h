@@ -35,8 +35,8 @@
 #include"AxisIndicator.h"
 #include"PrimitiveRenderer.h"
 #include"LineMesh.h"
-
 #include"Animation.h"
+#include"ModelRenderer.h"
 
 // 2D
 #include"ImGuiManager.h"

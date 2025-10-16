@@ -15,62 +15,14 @@ using namespace GameEngine;
 
 ID3D12Device* Model::device_ = nullptr;
 ID3D12GraphicsCommandList* Model::commandList_ = nullptr;
-TrianglePSO* Model::trianglePSO_ = nullptr;
-ParticlePSO* Model::particlePSO_ = nullptr;
 LogManager* Model::logManager_ = nullptr;
 TextureManager* Model::textureManager_ = nullptr;
 
-GridPSO* Model::gridPSO_ = nullptr;
-AnimationPSO* Model::animationPSO_ = nullptr;
-
-void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, TrianglePSO* trianglePSO, ParticlePSO* particlePSO, AnimationPSO* animationPSO, GridPSO* gridPSO, LogManager* logManager) {
+void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, LogManager* logManager) {
 	device_ = device;
 	commandList_ = commandList;
 	logManager_ = logManager;
 	textureManager_ = textureManager;
-	trianglePSO_ = trianglePSO;
-	particlePSO_ = particlePSO;
-	gridPSO_ = gridPSO;
-	animationPSO_ = animationPSO;
-}
-
-void Model::PreDraw(PSOMode psoMode, BlendMode blendMode) {
-	
-	switch (psoMode) {
-
-		// 単体描画設定
-	case PSOMode::Triangle:
-		commandList_->SetGraphicsRootSignature(trianglePSO_->GetRootSignature());  // RootSignatureを設定。
-		commandList_->SetPipelineState(trianglePSO_->GetPipelineState(blendMode)); // trianglePSOを設定
-		break;
-
-		// 複数描画設定
-	case PSOMode::Partilce:
-		commandList_->SetGraphicsRootSignature(particlePSO_->GetRootSignature());  // RootSignatureを設定。
-		commandList_->SetPipelineState(particlePSO_->GetPipelineState(blendMode)); // particlePSOを設定
-		break;
-
-		// グリッド描画設定
-	case PSOMode::Grid:
-		commandList_->SetGraphicsRootSignature(gridPSO_->GetRootSignature());  // RootSignatureを設定。
-		commandList_->SetPipelineState(gridPSO_->GetPipelineState()); // trianglePSOを設定
-		break;
-	}
-}
-
-void Model::PreDraw(DrawModel drowMode) {
-	commandList_->SetGraphicsRootSignature(trianglePSO_->GetRootSignature());  // RootSignatureを設定。
-	commandList_->SetPipelineState(trianglePSO_->GetDrawModePipelineState(drowMode)); // trianglePSOを設定
-}
-
-void Model::PreDraw(BasePSO* pso) {
-	commandList_->SetGraphicsRootSignature(pso->GetRootSignature());  // RootSignatureを設定。
-	commandList_->SetPipelineState(pso->GetPipelineState()); // 指定したPSOを設定
-}
-
-void Model::PreDrawAnimation() {
-	commandList_->SetGraphicsRootSignature(animationPSO_->GetRootSignature());  // RootSignatureを設定。
-	commandList_->SetPipelineState(animationPSO_->GetPipelineState()); // 指定したPSOを設定
 }
 
 [[nodiscard]]
@@ -199,240 +151,6 @@ std::unique_ptr<Model> Model::CreateModel(const std::string& objFilename, const 
 	model->isLoad_ = true;
 
 	return model;
-}
-
-// 描画
-void Model::Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material) {
-
-	// カメラ座標に変換
-	if (isLoad_) {
-		worldTransform.SetWVPMatrix(localMatrix_, VPMatrix);
-	} else {
-		worldTransform.SetWVPMatrix(VPMatrix);
-	}
-
-	for (uint32_t i = 0; i < meshes_.size(); ++i) {
-		commandList_->IASetVertexBuffers(0, 1, &meshes_[i]->GetVertexBufferView());
-		commandList_->IASetIndexBuffer(&meshes_[i]->GetIndexBufferView());
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// マテリアルを設定
-		auto it = materials_.find(meshes_[i]->GetMaterialName());
-		assert(it != materials_.end() && "Material not found");
-		const Material* drawMaterial = it->second.get();
-
-		// マテリアルが設定されていなければデフォルトのマテリアルを使う
-		if (material == nullptr) {
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
-
-		if (meshes_[i]->GetTotalIndices() != 0) {
-			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
-		} else {
-			commandList_->DrawInstanced(meshes_[i]->GetTotalVertices(), 1, 0, 0);
-		}
-	}
-}
-
-void Model::Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, const Material* material) {
-	// カメラ座標に変換
-	if (isLoad_) {
-		worldTransform.SetWVPMatrix(localMatrix_, VPMatrix);
-	} else {
-		worldTransform.SetWVPMatrix(VPMatrix);
-	}
-
-	for (uint32_t i = 0; i < meshes_.size(); ++i) {
-		commandList_->IASetVertexBuffers(0, 1, &meshes_[i]->GetVertexBufferView());
-		commandList_->IASetIndexBuffer(&meshes_[i]->GetIndexBufferView());
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// マテリアルを設定
-		auto it = materials_.find(meshes_[i]->GetMaterialName());
-		assert(it != materials_.end() && "Material not found");
-		const Material* drawMaterial = it->second.get();
-
-		// マテリアルが設定されていなければデフォルトのマテリアルを使う
-		if (material == nullptr) {
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
-		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
-
-		if (meshes_[i]->GetTotalIndices() != 0) {
-			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
-		} else {
-			commandList_->DrawInstanced(meshes_[i]->GetTotalVertices(), 1, 0, 0);
-		}
-	}
-}
-
-void Model::Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource, const Material* material) {
-	// カメラ座標に変換
-	if (isLoad_) {
-		worldTransform.SetWVPMatrix(localMatrix_, VPMatrix);
-	} else {
-		worldTransform.SetWVPMatrix(VPMatrix);
-	}
-
-	for (uint32_t i = 0; i < meshes_.size(); ++i) {
-		commandList_->IASetVertexBuffers(0, 1, &meshes_[i]->GetVertexBufferView());
-		commandList_->IASetIndexBuffer(&meshes_[i]->GetIndexBufferView());
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// マテリアルを設定
-		auto it = materials_.find(meshes_[i]->GetMaterialName());
-		assert(it != materials_.end() && "Material not found");
-		const Material* drawMaterial = it->second.get();
-
-		// マテリアルが設定されていなければデフォルトのマテリアルを使う
-		if (material == nullptr) {
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
-		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
-		if (meshes_[i]->GetTotalIndices() != 0) {
-			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
-		} else {
-			commandList_->DrawInstanced(meshes_[i]->GetTotalVertices(), 1, 0, 0);
-		}
-	}
-}
-
-void Model::Draw(const uint32_t& numInstance,WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material) {
-	// カメラ座標に変換
-	if (isLoad_) {
-		worldTransforms.SetWVPMatrix(numInstance, localMatrix_, VPMatrix);
-	} else {
-		worldTransforms.SetWVPMatrix(numInstance, VPMatrix);
-	}
-
-	for (uint32_t i = 0; i < meshes_.size(); ++i) {
-		commandList_->IASetVertexBuffers(0, 1, &meshes_[i]->GetVertexBufferView());
-		commandList_->IASetIndexBuffer(&meshes_[i]->GetIndexBufferView());
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// マテリアルを設定
-		auto it = materials_.find(meshes_[i]->GetMaterialName());
-		assert(it != materials_.end() && "Material not found");
-		const Material* drawMaterial = it->second.get();
-
-		// マテリアルが設定されていなければデフォルトのマテリアルを使う
-		if (material == nullptr) {
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-		}
-		commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
-		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
-
-		if (meshes_[i]->GetTotalIndices() != 0) {
-			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
-		} else {
-			commandList_->DrawInstanced(meshes_[i]->GetTotalVertices(), 1, 0, 0);
-		}
-	}
-}
-
-void Model::Draw(const uint32_t& numInstance, WorldTransforms& worldTransforms, const Matrix4x4& VPMatrix, const Material* material) {
-	// カメラ座標に変換
-	if (isLoad_) {
-		worldTransforms.SetWVPMatrix(numInstance, localMatrix_, VPMatrix);
-	} else {
-		worldTransforms.SetWVPMatrix(numInstance, VPMatrix);
-	}
-
-	for (uint32_t i = 0; i < meshes_.size(); ++i) {
-		commandList_->IASetVertexBuffers(0, 1, &meshes_[i]->GetVertexBufferView());
-		commandList_->IASetIndexBuffer(&meshes_[i]->GetIndexBufferView());
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// マテリアルを設定
-		auto it = materials_.find(meshes_[i]->GetMaterialName());
-		assert(it != materials_.end() && "Material not found");
-		const Material* drawMaterial = it->second.get();
-
-		// マテリアルが設定されていなければデフォルトのマテリアルを使う
-		if (material == nullptr) {
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
-		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-		}
-		commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
-
-		if (meshes_[i]->GetTotalIndices() != 0) {
-			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), numInstance, 0, 0, 0);
-		} else {
-			commandList_->DrawInstanced(meshes_[i]->GetTotalVertices(), numInstance, 0, 0);
-		}
-	}
-}
-
-void Model::DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource) {
-	commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
-}
-
-void Model::DrawAnimation(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, const SkinCluster& skinCluster, const Material* material) {
-	// カメラ座標に変換
-	worldTransform.SetWVPMatrix(VPMatrix);
-
-	for (uint32_t i = 0; i < meshes_.size(); ++i) {
-
-		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
-			meshes_[i]->GetVertexBufferView(),
-			skinCluster.influenceBufferView
-		};
-
-		commandList_->IASetVertexBuffers(0, 2, vbvs);
-		commandList_->IASetIndexBuffer(&meshes_[i]->GetIndexBufferView());
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// マテリアルを設定
-		auto it = materials_.find(meshes_[i]->GetMaterialName());
-		assert(it != materials_.end() && "Material not found");
-		const Material* drawMaterial = it->second.get();
-
-		// マテリアルが設定されていなければデフォルトのマテリアルを使う
-		if (material == nullptr) {
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
-		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
-
-		commandList_->SetGraphicsRootDescriptorTable(3, skinCluster.paletteSrvHandle.second);
-
-		if (meshes_[i]->GetTotalIndices() != 0) {
-			commandList_->DrawIndexedInstanced(meshes_[i]->GetTotalIndices(), 1, 0, 0, 0);
-		} else {
-			commandList_->DrawInstanced(meshes_[i]->GetTotalVertices(), 1, 0, 0);
-		}
-	}
-}
-
-void Model::DrawGrid(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* cameraResource) {
-
-	worldTransform.SetWVPMatrix(VPMatrix);
-
-	commandList_->IASetVertexBuffers(0, 1, &meshes_[0]->GetVertexBufferView());
-	commandList_->IASetIndexBuffer(&meshes_[0]->GetIndexBufferView());
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, cameraResource->GetGPUVirtualAddress());
-	commandList_->DrawIndexedInstanced(meshes_[0]->GetTotalIndices(), 1, 0, 0, 0);
 }
 
 [[nodiscard]]
@@ -735,4 +453,14 @@ AnimationData Model::LoadAnimationFile(const std::string& objFilename, const std
 
 	// 解析結果を返す
 	return animation;
+}
+
+Material* Model::GetMaterial(const std::string& name) const {
+	auto it = materials_.find(name);
+	if (it != materials_.end()) {
+		return it->second.get();
+	}
+	
+	assert(it != materials_.end() && "Material not found");
+	return nullptr;
 }

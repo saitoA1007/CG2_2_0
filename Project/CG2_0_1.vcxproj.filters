@@ -265,6 +265,8 @@
     <ClCompile Include="Application\Player.cpp" />
     <ClCompile Include="Application\CameraController.cpp" />
     <ClCompile Include="EngineSource\Core\SrvManager.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\ModelRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -514,6 +516,8 @@
     <ClInclude Include="Application\Player.h" />
     <ClInclude Include="Application\CameraController.h" />
     <ClInclude Include="EngineSource\Core\SrvManager.h" />
+    <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
+    <ClInclude Include="EngineSource\3D\Model\ModelRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

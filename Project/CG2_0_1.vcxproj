@@ -173,6 +173,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Player.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\ModelRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Animation.cpp" />
     <ClCompile Include="EngineSource\3D\Model\AxisIndicator.cpp" />
     <ClCompile Include="EngineSource\3D\Camera\Camera.cpp" />
@@ -185,6 +186,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Model\Material.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Mesh.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Model.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Particle.cpp" />
     <ClCompile Include="EngineSource\3D\Model\PrimitiveRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Model\WorldTransform.cpp" />
@@ -243,6 +245,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Player.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
+    <ClInclude Include="EngineSource\3D\Model\ModelRenderer.h" />
     <ClInclude Include="EngineSource\3D\Model\Animation.h" />
     <ClInclude Include="EngineSource\3D\Model\AnimationData.h" />
     <ClInclude Include="EngineSource\3D\Model\AxisIndicator.h" />
@@ -256,6 +259,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Model\Material.h" />
     <ClInclude Include="EngineSource\3D\Model\Mesh.h" />
     <ClInclude Include="EngineSource\3D\Model\Model.h" />
+    <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
     <ClInclude Include="EngineSource\3D\Model\Particle.h" />
     <ClInclude Include="EngineSource\3D\Model\PrimitiveRenderer.h" />
     <ClInclude Include="EngineSource\3D\Model\VertexData.h" />

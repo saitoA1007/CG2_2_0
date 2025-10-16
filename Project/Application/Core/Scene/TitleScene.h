@@ -16,7 +16,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="input"></param>
-	void Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) override;
+	void Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) override;
 
 	/// <summary>
 	/// 更新処理
@@ -72,6 +72,6 @@ private: // シーン機能
 	Transform cameraTransform_ = { {1.0f,1.0f,1.0f},{-0.720f,0.0f,0.0f},{0.19f,-9.55f,-10.89f} };
 
 	// グリッドを描画するためのモデル
-	std::unique_ptr<GameEngine::Model> gridModel_;
+	GameEngine::Model* gridModel_;
 	GameEngine::WorldTransform gridWorldTransform_;
 };

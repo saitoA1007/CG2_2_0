@@ -4,6 +4,7 @@
 #include"AudioManager.h"
 
 #include"InputCommand.h"
+#include"ModelManager.h"
 
 // 各シーン
 enum class SceneState {
@@ -29,7 +30,7 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	virtual void Initialize(GameEngine::Input* input,GameEngine::InputCommand* inputCommand,GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) = 0;
+	virtual void Initialize(GameEngine::Input* input,GameEngine::InputCommand* inputCommand,GameEngine::ModelManager* modelManager,GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) = 0;
 
 	/// <summary>
 	/// 更新処理

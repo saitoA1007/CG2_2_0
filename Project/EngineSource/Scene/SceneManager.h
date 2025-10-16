@@ -3,6 +3,7 @@
 #include"TextureManager.h"
 #include"AudioManager.h"
 #include"InputCommand.h"
+#include"ModelManager.h"
 
 #include"Camera.h"
 
@@ -56,6 +57,9 @@ private: // エンジン機能
 	// 入力処理のコマンドシステム
 	std::unique_ptr<GameEngine::InputCommand> inputCommand_;
 
+	// モデルのリソースを管理
+	std::unique_ptr<GameEngine::ModelManager> modelManager_;
+
 private: // シーン機能
 
 	// 現在のシーン
@@ -85,4 +89,9 @@ private:
 	/// デバックする時のシーン切り替え処理
 	/// </summary>
 	void DebugChangeScene();
+
+	/// <summary>
+	/// 使用するモデルデータを読み取る
+	/// </summary>
+	void LoadModelData();
 };

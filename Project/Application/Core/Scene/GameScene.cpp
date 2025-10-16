@@ -1,5 +1,6 @@
 #include"GameScene.h"
 #include"ImguiManager.h"
+#include"ModelRenderer.h"
 
 #include"Application/GameParamEditor.h"
 #include"FPSCounter.h"
@@ -10,7 +11,7 @@ GameScene::~GameScene() {
 
 }
 
-void GameScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
+void GameScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem
 	// 入力を取得
@@ -32,7 +33,7 @@ void GameScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* i
 	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, dxCommon_->GetDevice());
 
 	// グリッドの初期化
-	gridModel_ = Model::CreateGridPlane({ 200.0f,200.0f });
+	gridModel_ = modelManager->GetNameByModel("Grid");
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 #pragma endregion
 
@@ -46,19 +47,19 @@ void GameScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* i
 	lightManager_->SetDirectionalData(directionalData_);
 
 	// 地面モデルを生成
-	terrainModel_ = Model::CreateModel("terrain.obj", "Terrain");
+	terrainModel_ = modelManager->GetNameByModel("terrain.obj");
 	terrainModel_->SetDefaultIsEnableLight(true);
 	grassGH_ = textureManager->Load("Resources/Models/Terrain/grass.png");
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 平面モデルを生成
-	planeModel_ = Model::CreateModel("plane.obj", "Plane");
+	planeModel_ = modelManager->GetNameByModel("plane.obj");
 	planeModel_->SetDefaultIsEnableLight(true);
 	uvCheckerGH_ = textureManager->Load("Resources/Textures/uvChecker.png");
 	planeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,0.0f} });
 
 	// ボーンアニメーションを生成する
-	bronAnimationModel_ = Model::CreateModel("walk.gltf", "Walk");
+	bronAnimationModel_ = modelManager->GetNameByModel("walk.gltf");
 	bronAnimationWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 	// ボーンアニメーションデータを取得する
 	bronAnimation_ = Model::LoadAnimationFile("walk.gltf", "Walk");
@@ -146,27 +147,27 @@ void GameScene::Draw() {
 	//===========================================================
 
 	// 3Dモデルの描画前処理
-	Model::PreDraw(PSOMode::Triangle, BlendMode::kBlendModeNormal);
+	ModelRenderer::PreDraw(RenderMode::DefaultModel, BlendMode::kBlendModeNormal);
 
 	// 地面を描画
-	terrainModel_->DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
-	terrainModel_->Draw(terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
+	ModelRenderer::DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
+	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
 
 	// 平面描画
 	//planeModel_->Draw(planeWorldTransform_, uvCheckerGH_, camera_->GetVPMatrix());
 
 	// アニメーションの描画前処理
-	Model::PreDrawAnimation();
+	ModelRenderer::PreDraw(RenderMode::AnimationModel, BlendMode::kBlendModeNone);
 
-	// アニメーション
-	bronAnimationModel_->DrawAnimation(bronAnimationWorldTransform_, camera_->GetVPMatrix(), skinClusterBron_);
+	// アニメーションしているモデルを描画
+	ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_, camera_->GetVPMatrix(), skinClusterBron_);
 
 #ifdef _DEBUG
 	// モデルの単体描画前処理
-	Model::PreDraw(PSOMode::Grid, BlendMode::kBlendModeNormal);
+	ModelRenderer::PreDraw(RenderMode::Grid, BlendMode::kBlendModeNone);
 
 	// グリッドを描画
-	gridModel_->DrawGrid(gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
+	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
 #endif
 }
 

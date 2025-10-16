@@ -1,5 +1,4 @@
 #pragma once
-#include"Model.h"
 #include"WorldTransform.h"
 #include"InputCommand.h"
 
@@ -10,7 +9,7 @@ public:
 	/// 初期化処理
 	/// </summary>
 	/// <param name="model"></param>
-	void Initialize(GameEngine::Model* model);
+	void Initialize();
 
 	/// <summary>
 	/// 更新処理
@@ -18,11 +17,7 @@ public:
 	/// <param name="inputCommand"></param>
 	void Update(GameEngine::InputCommand* inputCommand);
 
-	/// <summary>
-	/// 描画処理
-	/// </summary>
-	/// <param name="VPMatrix"></param>
-	void Draw(const Matrix4x4& VPMatrix);
+	GameEngine::WorldTransform& GetWorldTransform() { return worldTransform_; }
 
 	/// <summary>
 	/// プレイヤーの位置を取得
@@ -31,9 +26,6 @@ public:
 	Vector3 GetPlayerPos() { return worldTransform_.GetWorldPosition(); }
 
 private:
-
-	// 自キャラモデル
-	GameEngine::Model* playerModel_ = nullptr;
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
