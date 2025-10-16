@@ -10,7 +10,6 @@
 #include"PostProcess/CopyPSO.h"
 
 #include"PostProcess/PostEffectManager.h"
-#include"ResourceCounter.h"
 
 #include"SrvManager.h"
 
