@@ -51,5 +51,5 @@ void AxisIndicator::Draw() {
 	commandList_->RSSetViewports(1, &viewport_); // Viewportを設定
 	commandList_->RSSetScissorRects(1, &scissorRect_); // Scirssorを設定
 	// 軸を表示するモデルを描画
-	model_->Draw(worldTransform_, camera_.GetVPMatrix());
+	//model_->Draw(worldTransform_, camera_.GetVPMatrix());
 }

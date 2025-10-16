@@ -1,12 +1,12 @@
 #include"TitleScene.h"
 #include"ImguiManager.h"
-
+#include"ModelRenderer.h"
 using namespace GameEngine;
 
 TitleScene::~TitleScene() {
 }
 
-void TitleScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
+void TitleScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem 
 	// 入力を取得
@@ -28,10 +28,9 @@ void TitleScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* 
 	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, dxCommon->GetDevice());
 
 	// グリッドの初期化
-	gridModel_ = Model::CreateGridPlane({ 200.0f,200.0f });
+	gridModel_ = modelManager->GetNameByModel("Grid");
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 #pragma endregion
-
 	
 	inputCommand_->RegisterCommand("CameraChange", {{InputState::KeyTrigger, DIK_F }});
 }
@@ -82,14 +81,14 @@ void TitleScene::Draw() {
 	//===========================================================
 
 	// 3Dモデルの描画前処理
-	//Model::PreDraw(PSOMode::Triangle, BlendMode::kBlendModeNormal);
+	//ModelRenderer::PreDraw(RenderMode::DefaultModel, BlendMode::kBlendModeNormal);
 
 
 #ifdef _DEBUG
 	// モデルの単体描画前処理
-	Model::PreDraw(PSOMode::Grid, BlendMode::kBlendModeNormal);
+	ModelRenderer::PreDraw(RenderMode::Grid, BlendMode::kBlendModeNone);
 
 	// グリッドを描画
-	gridModel_->DrawGrid(gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
+	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
 #endif
 }

@@ -30,8 +30,14 @@ void SceneManager::Initialize(GameEngine::Input* input, GameEngine::TextureManag
 	// 入力処理のコマンドシステムを生成
 	inputCommand_ = std::make_unique<InputCommand>(input_);
 
+	// モデルを管理するクラスを生成
+	modelManager_ = std::make_unique<ModelManager>();
+
 	// white2x2の画像をロード
 	whiteGH_ = textureManager_->Load("Resources/Textures/white2x2.png");
+
+	// モデルを読み込む
+	LoadModelData();
 	
 	// シーンの初期化。最初はタイトルシーンに設定
 	ChangeScene(SceneState::GE);
@@ -88,7 +94,7 @@ void SceneManager::ChangeScene(SceneState nextSceneState) {
 
 		// タイトルシーンを挿入
 		currentScene_ = std::make_unique<TitleScene>();
-		currentScene_->Initialize(input_, inputCommand_.get(), textureManager_, audioManager_, dxCommon_);
+		currentScene_->Initialize(input_, inputCommand_.get(), modelManager_.get(), textureManager_, audioManager_, dxCommon_);
 		break;
 
 	case SceneState::Game: {
@@ -98,7 +104,7 @@ void SceneManager::ChangeScene(SceneState nextSceneState) {
 
 		// ゲームシーンを挿入
 		std::unique_ptr<GameScene> gameScene = std::make_unique<GameScene>();
-		gameScene->Initialize(input_, inputCommand_.get(), textureManager_, audioManager_, dxCommon_);
+		gameScene->Initialize(input_, inputCommand_.get(), modelManager_.get(), textureManager_, audioManager_, dxCommon_);
 		currentScene_ = std::move(gameScene);
 		break;
 	}
@@ -109,7 +115,7 @@ void SceneManager::ChangeScene(SceneState nextSceneState) {
 
 		// GEシーンを挿入
 		currentScene_ = std::make_unique<GEScene>();
-		currentScene_->Initialize(input_, inputCommand_.get(), textureManager_, audioManager_, dxCommon_);
+		currentScene_->Initialize(input_, inputCommand_.get(), modelManager_.get(), textureManager_, audioManager_, dxCommon_);
 		break;
 	}
 }
@@ -127,4 +133,20 @@ void SceneManager::DebugChangeScene() {
 	}
 
 	ImGui::End();
+}
+
+void SceneManager::LoadModelData() {
+
+	// グリッドモデルをロードと登録
+	modelManager_->RegisterMode("Grid", Model::CreateGridPlane({ 200.0f,200.0f }));
+
+	// 平面モデルをロードと登録
+	modelManager_->RegisterMode("plane.obj", "Plane");
+	// 箱モデルをロードと登録
+	modelManager_->RegisterMode("cube.obj", "Cube");
+
+	// 地面モデルをロードと登録
+	modelManager_->RegisterMode("terrain.obj", "Terrain");
+	// 歩く人型モデルをロードと登録
+	modelManager_->RegisterMode("walk.gltf", "Walk");
 }

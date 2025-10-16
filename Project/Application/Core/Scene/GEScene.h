@@ -19,7 +19,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="input"></param>
-	void Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) override;
+	void Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) override;
 
 	/// <summary>
 	/// 更新処理
@@ -74,17 +74,13 @@ private: // シーン機能
 	bool isDebugCameraActive_ = false;
 
 	// グリッドを描画するためのモデル
-	std::unique_ptr<GameEngine::Model> gridModel_;
+	GameEngine::Model* gridModel_;
 	GameEngine::WorldTransform gridWorldTransform_;
 
 	// 自キャラのモデル
-	std::unique_ptr<GameEngine::Model> playerModel_;
+	GameEngine::Model* playerModel_;
 	// プレイヤー
 	std::unique_ptr<Player> player_;
-
-	// 地面モデル
-	std::unique_ptr<GameEngine::Model> terrainModel_;
-	GameEngine::WorldTransform terrainWorldTransform_;
 
 	// カメラコントローラークラス
 	std::unique_ptr<CameraController> cameraController_;

@@ -15,11 +15,6 @@
 #include"LogManager.h"
 
 #include"TextureManager.h"
-#include"TrianglePSO.h"
-#include"ParticlePSO.h"
-#include"GridPSO.h"
-#include"BasePSO.h"
-#include"AnimationPSO.h"
 
 #include"LightManager.h"
 #include"Camera.h"
@@ -31,12 +26,6 @@
 #include<assimp/postprocess.h>
 
 namespace GameEngine {
-
-	enum class PSOMode {
-		Triangle, // 単体描画用
-		Partilce, // 複数描画用
-		Grid,  // グリッド描画用
-	};
 	
 	class Model final {
 	public:
@@ -48,29 +37,7 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="device"></param>
 		/// <param name="commandList"></param>
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,
-			TrianglePSO* trianglePSO, ParticlePSO* particlePSO,AnimationPSO* animationPSO, GridPSO* gridPSO, LogManager* logManager);
-
-		/// <summary>
-		/// 描画前処理
-		/// </summary>
-		/// <param name="psoMode">描画モードを設定</param>
-		/// <param name="blendMode">ブレンドモードを設定</param>
-		static void PreDraw(PSOMode psoMode,BlendMode blendMode);
-
-		/// <summary>
-		/// 描画前処理
-		/// </summary>
-		/// <param name="drawMode">描画状態を設定</param>
-		static void PreDraw(DrawModel drawMode);
-
-		/// <summary>
-		/// 描画前処理
-		/// </summary>
-		/// <param name="pso">psoを設定</param>
-		static void PreDraw(BasePSO* pso);
-
-		static void PreDrawAnimation();
+		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,LogManager* logManager);
 
 		/// <summary>
 		/// OBJファイルからメッシュ生成
@@ -132,72 +99,6 @@ namespace GameEngine {
 	public:
 
 		/// <summary>
-		/// 生成したモデルを描画(画像差し替え用)
-		/// </summary>
-		/// <param name="worldMatrix">ワールド行列</param>
-		/// <param name="directionalLightResource">光源</param>
-		/// <param name="textureHandle">テクスチャハンドル</param>
-		/// <param name="material">マテリアル : 何の書かなければデフォルトのマテリアルを適応</param>
-		void Draw(WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material = nullptr);
-
-		/// <summary>
-		/// 生成したモデルを描画(元のテクスチャを使用)
-		/// </summary>
-		/// <param name="worldMatrix">ワールド行列</param>
-		/// <param name="directionalLightResource">光源</param>
-		/// <param name="material">マテリアル : 何の書かなければデフォルトのマテリアルを適応</param>
-		void Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, const Material* material = nullptr);
-
-		/// <summary>
-		/// 生成したモデルの描画(ライト適応、複数マテリアル対応)
-		/// </summary>
-		/// <param name="worldTransform"></param>
-		/// <param name="VPMatrix"></param>
-		/// <param name="lightGroupResource"></param>
-		/// <param name="cameraResource"></param>
-		/// <param name="material"></param>
-		void Draw(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource, const Material* material = nullptr);
-
-		/// <summary>
-		/// 生成したモデルの複数描画
-		/// </summary>
-		/// <param name="worldTransforms"></param>
-		/// <param name="textureHandle"></param>
-		/// <param name="VPMatrix"></param>
-		/// <param name="material"></param>
-		void Draw(const uint32_t& numInstance,WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material = nullptr);
-
-		/// <summary>
-		/// 生成したモデルの複数描画
-		/// </summary>
-		/// <param name="worldTransforms"></param>
-		/// <param name="textureHandle"></param>
-		/// <param name="VPMatrix"></param>
-		/// <param name="material"></param>
-		void Draw(const uint32_t& numInstance, WorldTransforms& worldTransforms, const Matrix4x4& VPMatrix, const Material* material = nullptr);
-
-		/// <summary>
-		/// グリッドを描画
-		/// </summary>
-		void DrawGrid(WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* cameraResource);
-
-		/// <summary>
-		/// モデルに光源を適応させる
-		/// </summary>
-		/// <param name="directionalLightResource"></param>
-		void DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource);
-
-		/// <summary>
-		/// アニメーションのあるモデルを描画
-		/// </summary>
-		/// <param name="worldTransform"></param>
-		/// <param name="VPMatrix"></param>
-		/// <param name="material"></param>
-		void DrawAnimation(WorldTransform& worldTransform, const Matrix4x4& VPMatrix,const SkinCluster& skinCluster, const Material* material = nullptr);
-
-	public:
-
-		/// <summary>
 		/// デフォルトの色を設定
 		/// </summary>
 		/// <param name="color"></param>
@@ -240,6 +141,15 @@ namespace GameEngine {
 		/// <returns></returns>
 		const std::string GetModelName() const { return modelName_; }
 
+		const std::vector<std::unique_ptr<Mesh>>& GetMeshes() const { return meshes_; }
+		Material* GetMaterial(const std::string& name) const;
+
+		// ローカル行列
+		Matrix4x4 GetLocalMatrix() const {return localMatrix_;}
+
+		// ロードしているか
+		const bool IsLoad() const { return isLoad_; }
+
 		ModelData modelData_;
 		Node node_;
 
@@ -252,17 +162,11 @@ namespace GameEngine {
 		// コマンドリスト
 		static ID3D12GraphicsCommandList* commandList_;
 
-		// ログ
-		static LogManager* logManager_;
-
-		// PSO設定
-		static TrianglePSO* trianglePSO_;
-		static ParticlePSO* particlePSO_;
-		static GridPSO* gridPSO_;
-		static AnimationPSO* animationPSO_;
-
 		// テクスチャ
 		static TextureManager* textureManager_;
+
+		// ログ
+		static LogManager* logManager_;
 
 		// ファイル名
 		static inline const std::string kDirectoryPath_ = "Resources/Models";

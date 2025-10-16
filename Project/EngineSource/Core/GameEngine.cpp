@@ -65,7 +65,8 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// 画像の初期化
 	Sprite::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), spritePSO_.get(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 	// 3dを描画する処理の初期化
-	Model::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), trianglePSO_.get(), particlePSO_.get(), animationPSO_.get(), gridPSO_.get(), logManager_.get());
+	Model::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), logManager_.get());
+	ModelRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), trianglePSO_.get(), particlePSO_.get(), animationPSO_.get(), gridPSO_.get());
 	// 線を描画する処理の初期化
 	PrimitiveRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), linePSO_.get(), logManager_.get());
 	// ワールドトランスフォームの初期化

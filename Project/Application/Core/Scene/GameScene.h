@@ -18,7 +18,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="input"></param>
-	void Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) override;
+	void Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) override;
 
 	/// <summary>
 	/// 更新処理
@@ -74,7 +74,7 @@ private: // シーン機能
 	Transform cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 
 	// グリッドを描画するためのモデル
-	std::unique_ptr<GameEngine::Model> gridModel_;
+	GameEngine::Model* gridModel_;
 	GameEngine::WorldTransform gridWorldTransform_;
 
 
@@ -88,12 +88,12 @@ private: // シーン機能
 	//GameEngine::SpotLight::SpotLightData spotLightData_;
 
 	// 地面モデル
-	std::unique_ptr<GameEngine::Model> terrainModel_;
+	GameEngine::Model* terrainModel_;
 	uint32_t grassGH_ = 0u;
 	GameEngine::WorldTransform terrainWorldTransform_;
 
 	// 平面モデル
-	std::unique_ptr<GameEngine::Model> planeModel_;
+	GameEngine::Model* planeModel_;
 	uint32_t uvCheckerGH_ = 0u;
 	GameEngine::WorldTransform planeWorldTransform_;
 
@@ -102,7 +102,7 @@ private: // シーン機能
 	Vector3 testVector{};
 
 	// アニメーションモデル
-	std::unique_ptr<GameEngine::Model> bronAnimationModel_;
+	GameEngine::Model* bronAnimationModel_;
 	GameEngine::WorldTransform bronAnimationWorldTransform_;
 	AnimationData bronAnimation_;
 	Skeleton skeletonBron_;
