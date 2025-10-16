@@ -298,7 +298,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\PSO\SpritePSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\TrianglePSO.h" />
     <ClInclude Include="EngineSource\Core\RandomGenerator.h" />
-    <ClInclude Include="EngineSource\Core\ResourceCounter.h" />
     <ClInclude Include="EngineSource\Core\SrvManager.h" />
     <ClInclude Include="EngineSource\Core\TextureManager.h" />
     <ClInclude Include="EngineSource\Core\WindowsApp.h" />

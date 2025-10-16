@@ -440,9 +440,6 @@
     <ClInclude Include="EngineSource\Core\FPSCounter.h">
       <Filter>EngineSource\Core</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\ResourceCounter.h">
-      <Filter>EngineSource\Core</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Core\PSO\SpritePSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>

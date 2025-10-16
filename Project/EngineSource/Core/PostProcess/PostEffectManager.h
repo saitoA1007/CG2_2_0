@@ -11,7 +11,6 @@
 #include"PostProcess/VignettingPSO.h"
 #include"PostProcess/RadialBlurPSO.h"
 #include"PostProcess/OutLinePSO.h"
-#include"ResourceCounter.h"
 
 #include"SrvManager.h"
 
