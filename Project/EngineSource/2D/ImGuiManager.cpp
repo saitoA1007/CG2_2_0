@@ -14,11 +14,15 @@ void ImGuiManager::Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon, S
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.Fonts->Build();
 
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_ = {};
+	rtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	rtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(windowsApp_->GetHwnd());
 	ImGui_ImplDX12_Init(dxCommon_->GetDevice(),
 		dxCommon_->GetSwapChainDesc().BufferCount,
-		dxCommon_->GetRTVDesc().Format,
+		rtvDesc_.Format,
 		srvManager_->GetSRVHeap(),
 		srvManager_->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(),
 		srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
