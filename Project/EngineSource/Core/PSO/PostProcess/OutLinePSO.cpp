@@ -3,15 +3,13 @@
 #include"CreateBufferResource.h"
 #include <d3dcompiler.h>
 #include <cassert>
-
+#include"LogManager.h"
 using namespace GameEngine;
 
-void OutLinePSO::Initialize(ID3D12Device* device, DXC* dxc, LogManager* logManager) {
+void OutLinePSO::Initialize(ID3D12Device* device, DXC* dxc) {
 
     // 初期化を開始するログ
-    if (logManager) {
-        logManager->Log("OutLinePSOPSO Class start Initialize\n");
-    }
+    LogManager::GetInstance().Log("OutLinePSOPSO Class start Initialize");
 
     // RootSignature作成
     D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -67,7 +65,7 @@ void OutLinePSO::Initialize(ID3D12Device* device, DXC* dxc, LogManager* logManag
     HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
         D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr)) {
-        logManager->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        LogManager::GetInstance().Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
 
@@ -137,9 +135,7 @@ void OutLinePSO::Initialize(ID3D12Device* device, DXC* dxc, LogManager* logManag
     assert(SUCCEEDED(hr));
 
     // 初期化を終了するログ
-    if (logManager) {
-        logManager->Log("OutLinePSO Class End Initialize\n");
-    }
+    LogManager::GetInstance().Log("OutLinePSO Class End Initialize\n");
 
     // パラメーター調整用
     parameterResource_ = CreateBufferResource(device, sizeof(OutLineData));

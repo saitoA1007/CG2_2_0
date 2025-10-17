@@ -1,16 +1,12 @@
 #include"LinePSO.h"
 #include<cassert>
+#include"LogManager.h"
 using namespace GameEngine;
 
-void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath, ID3D12Device* device, DXC* dxc, LogManager* logManager) {
-
-	// ログを取得
-	logManager_ = logManager;
+void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath, ID3D12Device* device, DXC* dxc) {
 
 	// 初期化を開始するログ
-	if (logManager_) {
-		logManager_->Log("LinePSO Class start Initialize\n");
-	}
+	LogManager::GetInstance().Log("LinePSO Class start Initialize");
 
 	// RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -34,7 +30,7 @@ void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath,
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
-		logManager_->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		LogManager::GetInstance().Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	// バイナリを元に生成
@@ -129,7 +125,5 @@ void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath,
 	assert(SUCCEEDED(hr));
 
 	// 初期化を終了するログ
-	if (logManager_) {
-		logManager_->Log("LinePSO Class End Initialize\n");
-	}
+	LogManager::GetInstance().Log("LinePSO Class End Initialize\n");
 }

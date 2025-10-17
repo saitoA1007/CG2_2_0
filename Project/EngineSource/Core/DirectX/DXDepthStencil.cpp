@@ -6,7 +6,7 @@ using namespace GameEngine;
 
 void DXDepthStencil::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* dsvHeap, uint32_t width, uint32_t height, SrvManager* srvManager) {
 
-	LogManager::GetInstance().Log("Start　Create DepthStencil\n");
+	LogManager::GetInstance().Log("Start　Create DepthStencil");
 
 	// DepthStencilTextureをウィンドウのサイズで作成DXGI_FORMAT_D24_UNORM_S8_UINT
 	depthStencilResource_ = CreateDepthStencilTextureResource(device, width, height);
@@ -33,6 +33,6 @@ void DXDepthStencil::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* dsvH
 	// オブジェクト描画用SRV
 	device->CreateShaderResourceView(depthStencilResource_.Get(), &srvDesc, srvCPUHandle);
 
-	LogManager::GetInstance().Log("End　Create DepthStencil\n");
+	LogManager::GetInstance().Log("End　Create DepthStencil");
 }
 

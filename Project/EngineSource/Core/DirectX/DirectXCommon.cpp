@@ -9,11 +9,10 @@
 using namespace Microsoft::WRL;
 using namespace GameEngine;
 
-void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, SrvManager* srvManager)
-{
+void DirectXCommon::Initialize(HWND hwnd, uint32_t width, uint32_t height, SrvManager* srvManager) {
 
     // 初期化を開始するログ
-    LogManager::GetInstance().Log("DirectXCommon Class start Initialize\n");
+    LogManager::GetInstance().Log("DirectXCommon Class start Initialize");
     
     // デバイスを生成
     device_ = std::make_unique<DXDevice>();

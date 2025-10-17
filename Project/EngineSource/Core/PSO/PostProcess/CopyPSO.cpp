@@ -3,15 +3,13 @@
 #include"CreateBufferResource.h"
 #include <d3dcompiler.h>
 #include <cassert>
-
+#include"LogManager.h"
 using namespace GameEngine;
 
-void CopyPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, const std::wstring psPath, DXC* dxc, LogManager* logManager) {
+void CopyPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, const std::wstring psPath, DXC* dxc) {
 
     // 初期化を開始するログ
-    if (logManager) {
-        logManager->Log("CopyPSO Class start Initialize\n");
-    }
+    LogManager::GetInstance().Log("CopyPSO Class start Initialize");
 
     // RootSignature作成
     D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -51,7 +49,7 @@ void CopyPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, const
     HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
         D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr)) {
-        logManager->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        LogManager::GetInstance().Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
 
@@ -121,9 +119,7 @@ void CopyPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, const
     assert(SUCCEEDED(hr));
 
     // 初期化を終了するログ
-    if (logManager) {
-        logManager->Log("CopyPSO Class End Initialize\n");
-    }
+    LogManager::GetInstance().Log("CopyPSO Class End Initialize\n");
 }
 
 void CopyPSO::Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE inputSRV) {

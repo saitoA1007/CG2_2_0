@@ -12,8 +12,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	SetUnhandledExceptionFilter(ExportDump);
 
 	// ログの初期化
-	LogManager::Create();
-	logManager_ = std::make_unique<LogManager>();
+	LogManager::GetInstance().Create();
 
 	// ウィンドウの作成
 	windowsApp_ = std::make_unique<WindowsApp>();
@@ -31,7 +30,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// dxcCompilerの初期化
 	dxc_ = std::make_unique<DXC>();
-	dxc_->Initialize(logManager_.get());
+	dxc_->Initialize();
 
 	// PSOを作成
 	CreatePSO();
@@ -50,14 +49,14 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// テクスチャの初期化
 	textureManager_ = std::make_shared<TextureManager>();
-	textureManager_->Initialize(dxCommon_.get(), logManager_.get(),srvManager_.get());
+	textureManager_->Initialize(dxCommon_.get(),srvManager_.get());
 
 	//=====================================================================================
 	// 静的初期化
 	//=====================================================================================
 
 	// ポストエフェクトの初期化
-	PostEffectManager::StaticInitialize(bloomPSO_.get(), scanLinePSO_.get(), vignettingPSO_.get(), radialBlurPSO_.get(), outLinePSO_.get(), logManager_.get());
+	PostEffectManager::StaticInitialize(bloomPSO_.get(), scanLinePSO_.get(), vignettingPSO_.get(), radialBlurPSO_.get(), outLinePSO_.get());
 
 	// アニメーションの初期化
 	Animation::StaticInitialize(dxCommon_->GetDevice(), srvManager_.get());
@@ -65,10 +64,10 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// 画像の初期化
 	Sprite::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), spritePSO_.get(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 	// 3dを描画する処理の初期化
-	Model::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), logManager_.get());
+	Model::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get());
 	ModelRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), trianglePSO_.get(), particlePSO_.get(), animationPSO_.get(), gridPSO_.get());
 	// 線を描画する処理の初期化
-	PrimitiveRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), linePSO_.get(), logManager_.get());
+	PrimitiveRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), linePSO_.get());
 	// ワールドトランスフォームの初期化
 	WorldTransform::StaticInitialize(dxCommon_->GetDevice());
 	WorldTransforms::StaticInitialize(dxCommon_.get(),srvManager_.get());
@@ -120,38 +119,38 @@ void Engine::CreatePSO() {
 
 	// 三角形のPSO設定の初期化
 	trianglePSO_ = std::make_unique<TrianglePSO>();
-	trianglePSO_->Initialize(L"Resources/Shaders/Object3d.VS.hlsl", L"Resources/Shaders/Object3d.PS.hlsl", dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+	trianglePSO_->Initialize(L"Resources/Shaders/Object3d.VS.hlsl", L"Resources/Shaders/Object3d.PS.hlsl", dxCommon_->GetDevice(), dxc_.get());
 
 	// パーティクル(複数描画用)のPSO設定を初期化
 	particlePSO_ = std::make_unique<ParticlePSO>();
-	particlePSO_->Initialize(L"Resources/Shaders/Particle.VS.hlsl", L"Resources/Shaders/particle.PS.hlsl", dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+	particlePSO_->Initialize(L"Resources/Shaders/Particle.VS.hlsl", L"Resources/Shaders/particle.PS.hlsl", dxCommon_->GetDevice(), dxc_.get());
 
 	// アニメーション用のPSO設定を初期化
 	animationPSO_ = std::make_unique<AnimationPSO>();
-	animationPSO_->Initialize(dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+	animationPSO_->Initialize(dxCommon_->GetDevice(), dxc_.get());
 
 	// 線のPSO設定の初期化
 	linePSO_ = std::make_unique<LinePSO>();
-	linePSO_->Initialize(L"Resources/Shaders/Primitive.VS.hlsl", L"Resources/Shaders/Primitive.PS.hlsl", dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+	linePSO_->Initialize(L"Resources/Shaders/Primitive.VS.hlsl", L"Resources/Shaders/Primitive.PS.hlsl", dxCommon_->GetDevice(), dxc_.get());
 
 	// グリッド用の初期化
 	gridPSO_ = std::make_unique<GridPSO>();
-	gridPSO_->Initialize(L"Resources/Shaders/Grid.VS.hlsl", L"Resources/Shaders/Grid.PS.hlsl", dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+	gridPSO_->Initialize(L"Resources/Shaders/Grid.VS.hlsl", L"Resources/Shaders/Grid.PS.hlsl", dxCommon_->GetDevice(), dxc_.get());
 
 	// CopyPSOの初期化
 	copyPSO_ = std::make_unique<CopyPSO>();
-	copyPSO_->Initialize(dxCommon_->GetDevice(), L"Resources/Shaders/PostEffect/Copy.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc_.get(), logManager_.get());
+	copyPSO_->Initialize(dxCommon_->GetDevice(), L"Resources/Shaders/PostEffect/Copy.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc_.get());
 	dxCommon_->SetCopyPSO(copyPSO_.get());
 
 	// スプライトのPSOを初期化
 	spritePSO_ = std::make_unique<SpritePSO>();
-	spritePSO_->Initialize(L"Resources/Shaders/Sprite.VS.hlsl", L"Resources/Shaders/Sprite.PS.hlsl", dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+	spritePSO_->Initialize(L"Resources/Shaders/Sprite.VS.hlsl", L"Resources/Shaders/Sprite.PS.hlsl", dxCommon_->GetDevice(), dxc_.get());
 
 	/// PostProcessのPSOを初期化
 
 	// BloomPSOの初期化
 	bloomPSO_ = std::make_unique<BloomPSO>();
-	bloomPSO_->Initialize(dxCommon_->GetDevice(), L"Resources/Shaders/PostEffect/Bloom.VS.hlsl", dxc_.get(), logManager_.get(),
+	bloomPSO_->Initialize(dxCommon_->GetDevice(), L"Resources/Shaders/PostEffect/Bloom.VS.hlsl", dxc_.get(),
 		L"Resources/Shaders/PostEffect/HighLumMask.PS.hlsl",
 		L"Resources/Shaders/PostEffect/Bloom.PS.hlsl",
 		L"Resources/Shaders/PostEffect/BloomResult.PS.hlsl",
@@ -159,17 +158,17 @@ void Engine::CreatePSO() {
 
 	// scanLinePSOの初期化
 	scanLinePSO_ = std::make_unique<ScanLinePSO>();
-	scanLinePSO_->Initialize(dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+	scanLinePSO_->Initialize(dxCommon_->GetDevice(), dxc_.get());
 
 	// ヴィネットPSOの初期化
 	vignettingPSO_ = std::make_unique<VignettingPSO>();
-	vignettingPSO_->Initialize(dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+	vignettingPSO_->Initialize(dxCommon_->GetDevice(), dxc_.get());
 
 	// ラジアルブルーPSOの初期化
 	radialBlurPSO_ = std::make_unique<RadialBlurPSO>();
-	radialBlurPSO_->Initialize(dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+	radialBlurPSO_->Initialize(dxCommon_->GetDevice(), dxc_.get());
 
 	// アウトラインPSOの初期化
 	outLinePSO_ = std::make_unique<OutLinePSO>();
-	outLinePSO_->Initialize(dxCommon_->GetDevice(), dxc_.get(), logManager_.get());
+	outLinePSO_->Initialize(dxCommon_->GetDevice(), dxc_.get());
 }

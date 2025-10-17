@@ -8,7 +8,6 @@
 
 #include"DirectXCommon.h"
 #include<format>
-#include"LogManager.h"
 
 #include"SrvManager.h"
 
@@ -40,7 +39,7 @@ namespace GameEngine {
 		/// 初期化
 		/// </summary>
 		/// <param name="dxCommon"></param>
-		void Initialize(DirectXCommon* dxCommon, LogManager* logManager,SrvManager* srvManager);
+		void Initialize(DirectXCommon* dxCommon,SrvManager* srvManager);
 
 		// 解放処理
 		void Finalize();
@@ -57,8 +56,6 @@ namespace GameEngine {
 		D3D12_GPU_DESCRIPTOR_HANDLE& GetTextureSrvHandlesGPU(const uint32_t& textureHandle);
 
 	private:
-		//TextureManager() = default;
-		//~TextureManager() = default;
 		TextureManager(const TextureManager&) = delete;
 		TextureManager& operator=(const TextureManager&) = delete;
 
@@ -75,9 +72,6 @@ namespace GameEngine {
 
 		// テクスチャパス
 		std::string texturePath_;
-
-		// ログ
-		LogManager* logManager_;
 
 		SrvManager* srvManager_ = nullptr;
 

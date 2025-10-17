@@ -2,15 +2,12 @@
 #include<cassert>
 #include"ConvertString.h"
 #include<format>
-
+#include"LogManager.h"
 #pragma comment(lib,"dxcompiler.lib")
 
 using namespace GameEngine;
 
-void DXC::Initialize(LogManager* logManager) {
-	// ログの取得
-	logManager_ = logManager;
-
+void DXC::Initialize() {
 	// dxcCompilerを初期化
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
 	assert(SUCCEEDED(hr));
@@ -33,7 +30,7 @@ Microsoft::WRL::ComPtr<IDxcBlob>  DXC::CompileShader(
 	IDxcIncludeHandler* includeHandler)
 {
 	// これからシェーダーをコンパイルする旨をログに出す
-	logManager_->Log(ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
+	LogManager::GetInstance().Log(ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
 	// hlslファイルを読む
 	IDxcBlobEncoding* shaderSource = nullptr;
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
@@ -69,7 +66,7 @@ Microsoft::WRL::ComPtr<IDxcBlob>  DXC::CompileShader(
 	IDxcBlobUtf8* shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		logManager_->Log(shaderError->GetStringPointer());
+		LogManager::GetInstance().Log(shaderError->GetStringPointer());
 		// 警告・エラーダメゼッタイ
 		assert(false);
 	}
@@ -79,7 +76,7 @@ Microsoft::WRL::ComPtr<IDxcBlob>  DXC::CompileShader(
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
 	// 成功したログを出す
-	logManager_->Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+	LogManager::GetInstance().Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
 	// もう使わないリソースを解放
 	shaderSource->Release();
 	shaderResult->Release();

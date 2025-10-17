@@ -4,7 +4,6 @@
 #include"Vector3.h"
 #include"Vector4.h"
 #include"Matrix4x4.h"
-#include"LogManager.h"
 #include"LinePSO.h"
 
 #include"LineMesh.h"
@@ -30,7 +29,7 @@ namespace GameEngine {
 		/// <param name="commandList"></param>
 		/// <param name="linePSO"></param>
 		/// <param name="logManager"></param>
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, LinePSO* linePSO, LogManager* logManager);
+		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, LinePSO* linePSO);
 
 		/// <summary>
 		/// 描画前処理
@@ -61,9 +60,6 @@ namespace GameEngine {
 
 		// PSO設定
 		static LinePSO* linePSO_;
-
-		// ログ
-		static LogManager* logManager_;
 
 		uint32_t totalVertices_ = 0;
 

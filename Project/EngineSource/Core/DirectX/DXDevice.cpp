@@ -21,7 +21,7 @@ void DXDevice::Initialize() {
 
 void DXDevice::CreateFactory() {
 
-    LogManager::GetInstance().Log("Start　Create Factory\n");
+    LogManager::GetInstance().Log("Start　Create Factory");
 
     // DXGIファクトリーの生成
     // HRESULTはWindow系のエラーコードであり、
@@ -29,12 +29,12 @@ void DXDevice::CreateFactory() {
     HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory_));
     assert(SUCCEEDED(hr));
 
-    LogManager::GetInstance().Log("End　Create Factory\n");
+    LogManager::GetInstance().Log("End　Create Factory");
 }
 
 void DXDevice::CreateDevice() {
 
-	LogManager::GetInstance().Log("Start　Create Device\n");
+	LogManager::GetInstance().Log("Start　Create Device");
 
     HRESULT hr;
 
@@ -51,7 +51,7 @@ void DXDevice::CreateDevice() {
         // ソフトウェアアダプタでなければ採用
         if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
             // 採用したアダプタの情報をログに出力。wstringの方なので注意
-            LogManager::GetInstance().Log(ConvertString(std::format(L"Use Adapater:{}\n", adapterDesc.Description)));
+            LogManager::GetInstance().Log(ConvertString(std::format(L"Use Adapater:{}", adapterDesc.Description)));
             break;
         }
         useAdapter = nullptr; // ソフトウェアアダプタの場合は見なかったことにする
@@ -70,14 +70,14 @@ void DXDevice::CreateDevice() {
         // 指定した機能レベルでデバイスが生成できたかを確認
         if (SUCCEEDED(hr)) {
             // 生成できたログを出力を行ってループを抜ける
-            LogManager::GetInstance().Log(std::format("FeatureLevel : {}\n", featureLevelString[i]));
+            LogManager::GetInstance().Log(std::format("FeatureLevel : {}", featureLevelString[i]));
             break;
         }
     }
     // デバイスの生成がうまくいかなかったので軌道できない
     assert(device_ != nullptr);
 
-    LogManager::GetInstance().Log("End　Create Device\n");
+    LogManager::GetInstance().Log("End　Create Device");
 }
 
 #ifdef _DEBUG

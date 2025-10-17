@@ -20,7 +20,7 @@ public:
 	/// <summary>
 	/// ログを書き込むため準備
 	/// </summary>
-	static void Create();
+	void Create();
 
 	/// <summary>
 	/// ログを出力

@@ -4,7 +4,6 @@
 #include<iostream>
 #include<array>
 #include <wrl.h>
-#include"LogManager.h"
 #include"DXC.h"
 
 #include"BlendMode.h"
@@ -18,7 +17,7 @@ namespace GameEngine {
         ~SpritePSO() = default;
 
         // 初期化
-        void Initialize(const std::wstring& vsPath, const std::wstring& psPath, ID3D12Device* device, DXC* dxc, LogManager* logManager);
+        void Initialize(const std::wstring& vsPath, const std::wstring& psPath, ID3D12Device* device, DXC* dxc);
 
         ID3D12RootSignature* GetRootSignature() { return rootSignature_.Get(); }
 
@@ -32,9 +31,6 @@ namespace GameEngine {
 
         std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, BlendMode::kCountOfBlendMode> graphicsPipelineState_;
         Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-
-        // ログ
-        LogManager* logManager_;
 
         D3D12_BLEND_DESC blendDesc_[BlendMode::kCountOfBlendMode];
     };

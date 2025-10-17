@@ -4,12 +4,11 @@
 #include"DescriptorHandle.h"
 #include<format>
 #include <filesystem>
-
+#include"LogManager.h"
 using namespace GameEngine;
 
-void TextureManager::Initialize(DirectXCommon* dxCommon, LogManager* logManager, SrvManager* srvManager) {
+void TextureManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager) {
 	dxCommon_ = dxCommon;
-	logManager_ = logManager;
 	srvManager_ = srvManager;
 }
 
@@ -25,17 +24,13 @@ void TextureManager::Finalize() {
 uint32_t TextureManager::Load(const std::string& fileName) {
 
 	// テクスチャーの読み込みを開始するログ
-	if (logManager_) {
-		logManager_->Log("Start LoadTexture : " + fileName);
-	}
+	LogManager::GetInstance().Log("Start LoadTexture : " + fileName);
 
 	// もし同じテクスチャを読み込んだのであれば、すでに格納されている配列番号を返す。
 	for (int i = 0; i < textures_.size(); ++i) {
 		if (textures_.at(i).fileName == GetFileName(fileName)) {
 			// 終了したこと、同じテクスチャを読み込んでいることを伝える
-			if (logManager_) {
-				logManager_->Log("End LoadTexture : " + fileName + ". This texture data already loaded");
-			}
+			LogManager::GetInstance().Log("End LoadTexture : " + fileName + ". This texture data already loaded");
 			return i;
 		}
 	}
@@ -47,20 +42,20 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 	// テクスチャを読み込む
 	texture.mipImage = LoadTexture(fileName);
 	if (!texture.mipImage.GetImages()) {
-		logManager_->Log("Failed to load texture: " + fileName);
+		LogManager::GetInstance().Log("Failed to load texture: " + fileName);
 		assert(false);
 	}
 	metadata_ = &texture.mipImage.GetMetadata();
 	// テクスチャリソースを作成
 	texture.textureResource = CreateTextureResource(dxCommon_->GetDevice(), *metadata_);
 	if (!texture.textureResource) {
-		logManager_->Log("Failed to create textureResource for: " + fileName);
+		LogManager::GetInstance().Log("Failed to create textureResource for: " + fileName);
 		assert(false);
 	}
 	// テクスチャデータをアップロード
 	texture.intermediateResources_ = UploadTextureData(texture.textureResource.Get(), texture.mipImage, dxCommon_->GetDevice(), dxCommon_->GetCommandList());
 	if (!texture.intermediateResources_) {
-		logManager_->Log("Failed to upload texture data for: " + fileName);
+		LogManager::GetInstance().Log("Failed to upload texture data for: " + fileName);
 		assert(false);
 	}
 
@@ -76,7 +71,7 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 	// SRVを作成するDescriptorHeapの場所を決める。先頭はImGuiが使っているのでその次を使う
 	texture.textureSrvHandleCPU = srvManager_->GetCPUHandle(index);
 	texture.textureSrvHandleGPU = srvManager_->GetGPUHandle(index);
-	logManager_->Log(std::format("CPU Handle: {}, GPU Handle: {}", texture.textureSrvHandleCPU.ptr, texture.textureSrvHandleGPU.ptr));
+	LogManager::GetInstance().Log(std::format("CPU Handle: {}, GPU Handle: {}", texture.textureSrvHandleCPU.ptr, texture.textureSrvHandleGPU.ptr));
 	// SRVを作成
 	dxCommon_->GetDevice()->CreateShaderResourceView(texture.textureResource.Get(), &srvDesc_, texture.textureSrvHandleCPU);
 
@@ -84,9 +79,7 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 	textures_.push_back(std::move(texture));
 
 	// テクスチャーの読み込みを完了するログ
-	if (logManager_) {
-		logManager_->Log("End LoadTexture : " + fileName + "\n");
-	}
+	LogManager::GetInstance().Log("End LoadTexture : " + fileName + "\n");
 
 	// 読み込んだ画像が格納されている配列番号を返す
 	return static_cast<uint32_t>(textures_.size() - 1);

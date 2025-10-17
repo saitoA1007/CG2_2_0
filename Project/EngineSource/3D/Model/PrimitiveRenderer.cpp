@@ -1,17 +1,16 @@
 #include"PrimitiveRenderer.h"
 #include"EngineSource/Common/CreateBufferResource.h"
 #include"EngineSource/Math/MyMath.h"
+#include"LogManager.h"
 using namespace GameEngine;
 
 ID3D12Device* PrimitiveRenderer::device_ = nullptr;
 ID3D12GraphicsCommandList* PrimitiveRenderer::commandList_ = nullptr;
 LinePSO* PrimitiveRenderer::linePSO_ = nullptr;
-LogManager* PrimitiveRenderer::logManager_ = nullptr;
 
-void PrimitiveRenderer::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, LinePSO* linePSO, LogManager* logManager) {
+void PrimitiveRenderer::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, LinePSO* linePSO) {
 	device_ = device;
 	commandList_ = commandList;
-	logManager_ = logManager;
 	linePSO_ = linePSO;
 }
 
@@ -24,10 +23,8 @@ void PrimitiveRenderer::PreDraw() {
 PrimitiveRenderer* PrimitiveRenderer::Create() {
 
 	// 線の作成を開始
-	if (logManager_) {
-		logManager_->Log("\nCreatePrimitiveModel");
-	}
-
+	LogManager::GetInstance().Log("\nCreatePrimitiveModel");
+	
 	PrimitiveRenderer* Renderer = new PrimitiveRenderer();
 
 	Renderer->totalVertices_ = 2;
@@ -42,9 +39,7 @@ PrimitiveRenderer* PrimitiveRenderer::Create() {
 	Renderer->transformMatrixData_->VP = MakeIdentity4x4();
 
 	// 無事に作成出来たことを伝える
-	if (logManager_) {
-		logManager_->Log("SuccessCreatedPrimitiveModel");
-	}
+	LogManager::GetInstance().Log("SuccessCreatedPrimitiveModel");
 
 	return Renderer;
 }

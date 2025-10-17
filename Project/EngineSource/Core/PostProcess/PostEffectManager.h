@@ -5,7 +5,6 @@
 
 #include"externals/DirectXTex/d3dx12.h"
 
-#include"LogManager.h"
 #include"PostProcess/BloomPSO.h"
 #include"PostProcess/ScanLinePSO.h"
 #include"PostProcess/VignettingPSO.h"
@@ -33,7 +32,7 @@ namespace GameEngine {
         /// </summary>
         /// <param name="bloomPSO"></param>
         /// <param name="logManager"></param>
-        static void StaticInitialize(BloomPSO* bloomPSO,ScanLinePSO* scanLinePSO, VignettingPSO* vignettingPSO, RadialBlurPSO* radialBlurPSO, OutLinePSO* outLinePSO, LogManager* logManager);
+        static void StaticInitialize(BloomPSO* bloomPSO,ScanLinePSO* scanLinePSO, VignettingPSO* vignettingPSO, RadialBlurPSO* radialBlurPSO, OutLinePSO* outLinePSO);
 
         /// <summary>
         /// 初期化
@@ -102,9 +101,6 @@ namespace GameEngine {
         static OutLinePSO* outLinePSO_;
 
     private:
-
-        // ログ
-        static LogManager* logManager_;
 
         // デバイス
         ID3D12Device* device_ = nullptr;
