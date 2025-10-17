@@ -206,7 +206,7 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
     constBuffer_->bloomIteration = 1;
     constBuffer_->highLumMask = 0.8f;
     constBuffer_->sigma = 1.0f;
-    constBuffer_->intensity = 1.0f;
+    constBuffer_->intensity = 0.0f;
 }
 
 void BloomPSO::Set(ID3D12GraphicsCommandList* commandList) {

@@ -6,6 +6,18 @@
 
 using namespace GameEngine;
 
+void Engine::RunEngine(HINSTANCE& hInstance) {
+
+	// 初期化
+	Initialize(L"CG2_LE2A_05_サイトウ_アオイ", 1280, 720, hInstance);
+
+	// 更新処理
+	Update();
+
+	// 終了処理
+	Finalize();
+}
+
 void Engine::Initialize(const std::wstring& title, const uint32_t& width, const uint32_t& height, HINSTANCE hInstance) {
 
 	// 誰も補足しなかった場合に(Unhandled)、補足する関数を登録
@@ -51,10 +63,6 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	textureManager_ = std::make_shared<TextureManager>();
 	textureManager_->Initialize(dxCommon_.get(),srvManager_.get());
 
-	//=====================================================================================
-	// 静的初期化
-	//=====================================================================================
-
 	// ポストエフェクトの初期化
 	PostEffectManager::StaticInitialize(bloomPSO_.get(), scanLinePSO_.get(), vignettingPSO_.get(), radialBlurPSO_.get(), outLinePSO_.get());
 
@@ -78,6 +86,67 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// 軸方向表示の初期化
 	AxisIndicator::StaticInitialize(dxCommon_->GetCommandList());
+
+	// fpsを計測する
+	fpsCounter_ = std::make_unique<FpsCounter>();
+	fpsCounter_->Initialize();
+
+	// ランダム生成器を初期化
+	RandomGenerator::Initialize();
+
+	// 全てのデバック用ファイルを読み込み
+	GameParamEditor::GetInstance()->LoadFiles();
+
+	// シーンの初期化
+	sceneManager_ = std::make_unique<SceneManager>();
+	sceneManager_->Initialize(input_.get(), textureManager_.get(), audioManager_.get(), dxc_.get(), dxCommon_.get());
+}
+
+void Engine::Update() {
+	// ウィンドウのxボタンが押されるまでループ
+	while (true) {
+		if (IsWindowOpen()) {
+			break;
+		}
+
+		//==================================================================
+		// 更新処理
+		//==================================================================
+
+		// fpsを計測する
+		fpsCounter_->Update();
+
+		// 更新前処理
+		PreUpdate();
+
+		// シーンの更新処理
+		sceneManager_->Update();
+
+#ifdef _DEBUG
+
+		// パラメーターの更新処理
+		GameParamEditor::GetInstance()->Update();
+
+		// Fps計測器の描画
+		fpsCounter_->DrawImGui();
+#endif
+
+		// 更新後処理
+		PostUpdate();
+
+		//====================================================================
+		// 描画処理
+		//====================================================================
+
+		// 描画前処理
+		PreDraw();
+
+		// シーンの描画処理
+		sceneManager_->Draw();
+
+		// 描画後処理
+		PostDraw();
+	}
 }
 
 void Engine::PreUpdate() {

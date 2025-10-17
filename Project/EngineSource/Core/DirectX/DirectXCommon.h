@@ -79,6 +79,7 @@ namespace GameEngine {
 
         // 画面クリアの色
         float clearColor_[4] = { 0.2f,0.2f,0.2f,1.0f };
+        //float clearColor_[4] = { 1.0f,0.0f,1.0f,1.0f };
 
         // ポストエフェクト
         std::unique_ptr<PostEffectManager> postEffectManager_;

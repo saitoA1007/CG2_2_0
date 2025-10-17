@@ -50,51 +50,24 @@
 // Audio
 #include"AudioManager.h"
 
+#include"FPSCounter.h"
+#include"RandomGenerator.h"
+#include"Application/GameParamEditor.h"
+
+#include"SceneManager.h"
+
 namespace GameEngine {
 
 	class Engine final {
 	public:
 
 		/// <summary>
-		/// エンジンの初期化
+		/// エンジンを実行する
 		/// </summary>
-		/// <param name="title">タイトルバーの名前</param>
-		/// <param name="width">画面の横幅</param>
-		/// <param name="height">画面の縦幅</param>
-		void Initialize(const std::wstring& title, const uint32_t& width, const uint32_t& height, HINSTANCE hInstance);
+		/// <param name="hInstance"></param>
+		void RunEngine(HINSTANCE& hInstance);
 
-		/// <summary>
-		/// 更新前処理
-		/// </summary>
-		void PreUpdate();
-
-		/// <summary>
-		/// 更新後処理
-		/// </summary>
-		void PostUpdate();
-
-		/// <summary>
-		/// 描画前処理
-		/// </summary>
-		void PreDraw();
-
-		/// <summary>
-		/// 描画後処理
-		/// </summary>
-		void PostDraw();
-
-		/// <summary>
-		/// エンジンの終了処理
-		/// </summary>
-		void Finalize();
-
-		/// <summary>
-		/// ウィンドウが開いているかを判断する
-		/// </summary>
-		/// <returns></returns>
-		bool IsWindowOpen();
-
-	public:
+	private:
 
 		/// 2D ===========================================
 
@@ -169,7 +142,55 @@ namespace GameEngine {
 		// 入力処理
 		std::unique_ptr<Input> input_;
 
+		// 雑種
+		std::unique_ptr<FpsCounter> fpsCounter_;
+		std::unique_ptr<SceneManager> sceneManager_;
+
 	private:
+
+		/// <summary>
+		/// エンジン機能の初期化
+		/// </summary>
+		/// <param name="title">タイトルバーの名前</param>
+		/// <param name="width">画面の横幅</param>
+		/// <param name="height">画面の縦幅</param>
+		void Initialize(const std::wstring& title, const uint32_t& width, const uint32_t& height, HINSTANCE hInstance);
+
+		/// <summary>
+		/// 更新処理
+		/// </summary>
+		void Update();
+
+		/// <summary>
+		/// 更新前処理
+		/// </summary>
+		void PreUpdate();
+
+		/// <summary>
+		/// 更新後処理
+		/// </summary>
+		void PostUpdate();
+
+		/// <summary>
+		/// 描画前処理
+		/// </summary>
+		void PreDraw();
+
+		/// <summary>
+		/// 描画後処理
+		/// </summary>
+		void PostDraw();
+
+		/// <summary>
+		/// エンジンの終了処理
+		/// </summary>
+		void Finalize();
+
+		/// <summary>
+		/// ウィンドウが開いているかを判断する
+		/// </summary>
+		/// <returns></returns>
+		bool IsWindowOpen();
 
 		/// <summary>
 		/// PSOを作成
