@@ -3,6 +3,7 @@
 #include<sstream>
 #include<cassert>
 
+#include"LogManager.h"
 #include"CreateBufferResource.h"
 #include"MyMath.h"
 #include"EasingManager.h"
@@ -15,13 +16,11 @@ using namespace GameEngine;
 
 ID3D12Device* Model::device_ = nullptr;
 ID3D12GraphicsCommandList* Model::commandList_ = nullptr;
-LogManager* Model::logManager_ = nullptr;
 TextureManager* Model::textureManager_ = nullptr;
 
-void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, LogManager* logManager) {
+void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager) {
 	device_ = device;
 	commandList_ = commandList;
-	logManager_ = logManager;
 	textureManager_ = textureManager;
 }
 
@@ -99,24 +98,21 @@ std::unique_ptr<Model> Model::CreateGridPlane(const Vector2& size) {
 [[nodiscard]]
 std::unique_ptr<Model> Model::CreateModel(const std::string& objFilename, const std::string& filename) {
 
+	LogManager::GetInstance().Log("Start create model");
+
 	// インスタンスを生成
 	std::unique_ptr<Model> model = std::make_unique<Model>();
 
 	// Assimpを使ったモデルの生成するログを出す
-	if (logManager_) {
-		logManager_->Log("\nCreate From Assimp : Start loading Model file: " + filename + objFilename);
-	}
-
+	LogManager::GetInstance().Log("Create From Assimp : Start loading Model file: " + filename + objFilename);
+	
 	// データを読み込む処理
-	if (logManager_) {
-		logManager_->Log("Create From Assimp : Loading Model file data");
-	}
+	LogManager::GetInstance().Log("Create From Assimp : Loading Model file data");
+
 	ModelData modelData = model->LoadModelFile(kDirectoryPath_, objFilename, filename);
 
 	// モデルが無事に作成されたログを出す
-	if (logManager_) {
-		logManager_->Log("Create From Assimp : Success loaded Model file: " + filename + objFilename);
-	}
+	LogManager::GetInstance().Log("Create From Assimp : Success loaded Model file: " + filename + objFilename);
 
 	// メッシュを作成
 	for (uint32_t index = 0; index < modelData.meshes.size(); ++index) {
@@ -149,6 +145,8 @@ std::unique_ptr<Model> Model::CreateModel(const std::string& objFilename, const 
 
 	// モデルのロード
 	model->isLoad_ = true;
+
+	LogManager::GetInstance().Log("End create model\n");
 
 	return model;
 }
@@ -403,9 +401,7 @@ int32_t Model::CreateJoint(const Node& node, const std::optional<int32_t>& paren
 AnimationData Model::LoadAnimationFile(const std::string& objFilename, const std::string& filename) {
 
 	// Assimpを使ったモデルの生成するログを出す
-	if (logManager_) {
-		logManager_->Log("Load AnimationData From Assimp : Start loading Model file: " + filename + objFilename);
-	}
+	LogManager::GetInstance().Log("Load AnimationData From Assimp : Start loading Model file: " + filename + objFilename);
 
 	AnimationData animation;
 	Assimp::Importer importer;
@@ -447,9 +443,7 @@ AnimationData Model::LoadAnimationFile(const std::string& objFilename, const std
 	}
 
 	// モデルが無事に作成されたログを出す
-	if (logManager_) {
-		logManager_->Log("Load AnimationData From Assimp : Success loaded Model file: " + filename + objFilename);
-	}
+	LogManager::GetInstance().Log("Load AnimationData From Assimp : Success loaded Model file: " + filename + objFilename);
 
 	// 解析結果を返す
 	return animation;

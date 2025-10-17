@@ -1,16 +1,12 @@
 #include"SpritePSO.h"
 #include<cassert>
+#include"LogManager.h"
 using namespace GameEngine;
 
-void SpritePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath, ID3D12Device* device, DXC* dxc, LogManager* logManager) {
-
-	// ログを取得
-	logManager_ = logManager;
+void SpritePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath, ID3D12Device* device, DXC* dxc) {
 
 	// 初期化を開始するログ
-	if (logManager_) {
-		logManager_->Log("SpritePSO Class start Initialize\n");
-	}
+	LogManager::GetInstance().Log("SpritePSO Class start Initialize");
 
 	// RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -53,7 +49,7 @@ void SpritePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPat
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
-		logManager_->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		LogManager::GetInstance().Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	// バイナリを元に生成
@@ -182,7 +178,5 @@ void SpritePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPat
 	}
 
 	// 初期化を終了するログ
-	if (logManager_) {
-		logManager_->Log("SpritePSO Class End Initialize\n");
-	}
+	LogManager::GetInstance().Log("SpritePSO Class End Initialize\n");
 }

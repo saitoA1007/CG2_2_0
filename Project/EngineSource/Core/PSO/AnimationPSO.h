@@ -4,7 +4,6 @@
 #include<iostream>
 #include<array>
 #include <wrl.h>
-#include"LogManager.h"
 #include"DXC.h"
 
 #include"BlendMode.h"
@@ -18,7 +17,7 @@ namespace GameEngine {
         ~AnimationPSO() = default;
 
         // 初期化
-        void Initialize(ID3D12Device* device, DXC* dxc, LogManager* logManager);
+        void Initialize(ID3D12Device* device, DXC* dxc);
 
         ID3D12PipelineState* GetPipelineState() { return graphicsPipelineState_.Get(); }
         ID3D12RootSignature* GetRootSignature() { return rootSignature_.Get(); }
@@ -31,8 +30,5 @@ namespace GameEngine {
 
         Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
         Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-
-        // ログ
-        LogManager* logManager_;
     };
 }

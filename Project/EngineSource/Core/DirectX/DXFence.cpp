@@ -6,7 +6,7 @@ using namespace GameEngine;
 
 void DXFence::Initialize(ID3D12Device* device) {
 
-    LogManager::GetInstance().Log("Start　Create Fence\n");
+    LogManager::GetInstance().Log("Start　Create Fence");
 
     // 初期値0でFenceを作る
     HRESULT hr = device->CreateFence(fenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
@@ -16,7 +16,7 @@ void DXFence::Initialize(ID3D12Device* device) {
     fenceEvent_ = CreateEvent(NULL, FALSE, FALSE, NULL);
     assert(fenceEvent_ != nullptr);
 
-    LogManager::GetInstance().Log("Start　Create Fence\n");
+    LogManager::GetInstance().Log("Start　Create Fence");
 }
 
 void DXFence::WaitForGPU(ID3D12CommandQueue* commandQueue) {

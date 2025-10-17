@@ -2,17 +2,13 @@
 #include"ConvertString.h"
 #include<format>
 #include <cassert>
+#include"LogManager.h"
 using namespace GameEngine;
 
-void AnimationPSO::Initialize(ID3D12Device* device, DXC* dxc, LogManager* logManager) {
-
-	// ログを取得
-	logManager_ = logManager;
+void AnimationPSO::Initialize(ID3D12Device* device, DXC* dxc) {
 
 	// 初期化を開始するログ
-	if (logManager_) {
-		logManager_->Log("AnimationPSO Class start Initialize\n");
-	}
+	LogManager::GetInstance().Log("AnimationPSO Class start Initialize");
 
 	// RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -68,7 +64,7 @@ void AnimationPSO::Initialize(ID3D12Device* device, DXC* dxc, LogManager* logMan
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
-		logManager_->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		LogManager::GetInstance().Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	// バイナリを元に生成
@@ -173,9 +169,7 @@ void AnimationPSO::Initialize(ID3D12Device* device, DXC* dxc, LogManager* logMan
 	assert(SUCCEEDED(hr));
 
 	// 初期化を終了するログ
-	if (logManager_) {
-		logManager_->Log("AnimationPSO Class End Initialize\n");
-	}
+	LogManager::GetInstance().Log("AnimationPSO Class End Initialize\n");
 }
 
 

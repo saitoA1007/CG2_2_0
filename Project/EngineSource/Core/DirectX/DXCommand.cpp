@@ -6,7 +6,7 @@ using namespace GameEngine;
 
 void DXCommand::Initialize(ID3D12Device* device) {
 
-    LogManager::GetInstance().Log("Start　Create CommandList\n");
+    LogManager::GetInstance().Log("Start　Create CommandList");
 
     // コマンドキューを生成する
     D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
@@ -24,7 +24,7 @@ void DXCommand::Initialize(ID3D12Device* device) {
     // コマンドリストを生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
 
-    LogManager::GetInstance().Log("End　Create CommandList\n");
+    LogManager::GetInstance().Log("End　Create CommandList");
 }
 
 void DXCommand::Close() {

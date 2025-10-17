@@ -6,8 +6,6 @@
 #include"Vector4.h"
 #include"Vector2.h"
 
-#include"LogManager.h"
-
 namespace GameEngine {
 
     class GaussianBlurPSO {
@@ -27,7 +25,7 @@ namespace GameEngine {
         GaussianBlurPSO() = default;
         ~GaussianBlurPSO() = default;
 
-        void Initialize(ID3D12Device* device, DXC* dxc, LogManager* logManager);
+        void Initialize(ID3D12Device* device, DXC* dxc);
         void Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE inputSRV);
 
         ID3D12RootSignature* GetRootSignature() const { return rootSignature_.Get(); }

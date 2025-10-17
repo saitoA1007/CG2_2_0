@@ -1,25 +1,21 @@
 #include"PostEffectManager.h"
 #include"DescriptorHeap.h"
 #include"DescriptorHandle.h"
-
+#include"LogManager.h"
 using namespace GameEngine;
 
 BloomPSO* PostEffectManager::bloomPSO_ = nullptr;
-LogManager* PostEffectManager::logManager_ = nullptr;
 ScanLinePSO* PostEffectManager::scanLinePSO_ = nullptr;
 VignettingPSO* PostEffectManager::vignettingPSO_ = nullptr;
 RadialBlurPSO* PostEffectManager::radialBlurPSO_ = nullptr;
 OutLinePSO* PostEffectManager::outLinePSO_ = nullptr;
 
-void PostEffectManager::StaticInitialize(BloomPSO* bloomPSO, ScanLinePSO* scanLinePSO, VignettingPSO* vignettingPSO, RadialBlurPSO* radialBlurPSO, OutLinePSO* outLinePSO, LogManager* logManager) {
+void PostEffectManager::StaticInitialize(BloomPSO* bloomPSO, ScanLinePSO* scanLinePSO, VignettingPSO* vignettingPSO, RadialBlurPSO* radialBlurPSO, OutLinePSO* outLinePSO) {
     bloomPSO_ = bloomPSO;
     scanLinePSO_ = scanLinePSO;
     vignettingPSO_ = vignettingPSO;
     radialBlurPSO_ = radialBlurPSO;
     outLinePSO_ = outLinePSO;
-
-    // ログを取得
-    logManager_ = logManager;
 }
 
 void PostEffectManager::Initialize(ID3D12Device* device, float clearColor_[4], uint32_t width, uint32_t height, uint32_t descriptorSizeRTV, SrvManager* srvManager) {
@@ -187,9 +183,8 @@ CD3DX12_GPU_DESCRIPTOR_HANDLE& PostEffectManager::GetSRVHandle() {
 }
 
 void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
-    if (logManager_) {
-        logManager_->Log("Start Create BloomRenderTargets\n");
-    }
+    // ブルームの生成
+    LogManager::GetInstance().Log("Start Create BloomRenderTargets");
 
     // テクスチャリソース作成
     D3D12_RESOURCE_DESC desc{};
@@ -291,9 +286,8 @@ void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_
     bloomSRVHandle_[3] = srvManager_->GetGPUHandle(index[3]);
     device_->CreateShaderResourceView(bloomCompositeResource_.Get(), &srvDesc, srvCPUHandle[3]);
 
-    if (logManager_) {
-        logManager_->Log("End Create BloomRenderTargets\n");
-    }
+    
+    LogManager::GetInstance().Log("End Create BloomRenderTargets\n");
 }
 
 void PostEffectManager::DrawBloom(ID3D12GraphicsCommandList* commandList, const D3D12_VIEWPORT& baseViewport, const D3D12_RECT& baseScissorRect) {
@@ -432,6 +426,10 @@ void PostEffectManager::DrawBloom(ID3D12GraphicsCommandList* commandList, const 
 }
 
 void PostEffectManager::InitializeScanLine(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
+
+    // スキャンラインの生成
+    LogManager::GetInstance().Log("Start Create ScanLineRenderTargets");
+
     // テクスチャリソース作成
     D3D12_RESOURCE_DESC desc{};
     desc.Width = width;   // テクスチャの幅
@@ -482,6 +480,8 @@ void PostEffectManager::InitializeScanLine(uint32_t width, uint32_t height, uint
 
     // オブジェクト描画用SRV
     device_->CreateShaderResourceView(scanLineResource_.Get(), &srvDesc, srvCPUHandle);
+
+    LogManager::GetInstance().Log("End Create ScanLineRenderTargets\n");
 }
 
 void PostEffectManager::DrawScanLine(ID3D12GraphicsCommandList* commandList) {
@@ -511,6 +511,10 @@ void PostEffectManager::DrawScanLine(ID3D12GraphicsCommandList* commandList) {
 }
 
 void PostEffectManager::InitializeVignetting(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
+
+    // ヴィネットの生成
+    LogManager::GetInstance().Log("Start Create VignettingRenderTargets");
+
     // テクスチャリソース作成
     D3D12_RESOURCE_DESC desc{};
     desc.Width = width;   // テクスチャの幅
@@ -561,6 +565,8 @@ void PostEffectManager::InitializeVignetting(uint32_t width, uint32_t height, ui
 
     // オブジェクト描画用SRV
     device_->CreateShaderResourceView(vignettingResource_.Get(), &srvDesc, srvCPUHandle);
+
+    LogManager::GetInstance().Log("End Create VignettingRenderTargets\n");
 }
 
 void PostEffectManager::DrawVignetting(ID3D12GraphicsCommandList* commandList) {
@@ -589,6 +595,10 @@ void PostEffectManager::DrawVignetting(ID3D12GraphicsCommandList* commandList) {
 }
 
 void PostEffectManager::InitializeRadialBlur(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
+
+    // ラジアルブラーの生成
+    LogManager::GetInstance().Log("Start Create RadialBlurRenderTargets");
+
     // テクスチャリソース作成
     D3D12_RESOURCE_DESC desc{};
     desc.Width = width;   // テクスチャの幅
@@ -639,6 +649,8 @@ void PostEffectManager::InitializeRadialBlur(uint32_t width, uint32_t height, ui
 
     // オブジェクト描画用SRV
     device_->CreateShaderResourceView(radialBlurResource_.Get(), &srvDesc, srvCPUHandle);
+
+    LogManager::GetInstance().Log("End Create RadialBlurRenderTargets");
 }
 
 void PostEffectManager::DrawRadialBlur(ID3D12GraphicsCommandList* commandList) {
@@ -667,6 +679,9 @@ void PostEffectManager::DrawRadialBlur(ID3D12GraphicsCommandList* commandList) {
 }
 
 void  PostEffectManager::InitializeOutLine(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
+
+    // アウトラインの生成
+    LogManager::GetInstance().Log("Start Create OutLineRenderTargets");
 
     // テクスチャリソース作成
     D3D12_RESOURCE_DESC desc{};
@@ -718,6 +733,8 @@ void  PostEffectManager::InitializeOutLine(uint32_t width, uint32_t height, uint
 
     // オブジェクト描画用SRV
     device_->CreateShaderResourceView(outLineResource_.Get(), &srvDesc, srvCPUHandle);
+
+    LogManager::GetInstance().Log("End Create OutLineRenderTargets");
 }
 
 void  PostEffectManager::DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV) {

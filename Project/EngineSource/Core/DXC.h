@@ -2,8 +2,7 @@
 #include <d3d12.h>
 #include<dxcapi.h>
 #include <wrl.h>
-#include"LogManager.h"
-
+#include<iostream>
 namespace GameEngine {
 
 	class DXC final {
@@ -12,7 +11,7 @@ namespace GameEngine {
 		/// <summary>
 		/// 初期化
 		/// </summary>
-		void Initialize(LogManager* logManager);
+		void Initialize();
 
 		Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
 			// CompilerするShaderファイルへのパス
@@ -27,9 +26,5 @@ namespace GameEngine {
 		Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
 		Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_;
 		Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
-	private:
-
-		// ログ
-		LogManager* logManager_;
 	};
 }

@@ -6,7 +6,7 @@ using namespace GameEngine;
 
 void DXRenderTarget::Initialize(ID3D12Device* device, IDXGISwapChain4* swapChain) {
 
-    LogManager::GetInstance().Log("Start　Create TargetView\n");
+    LogManager::GetInstance().Log("Start　Create TargetView");
 
     // RTVの設定
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_ = {};
@@ -37,5 +37,5 @@ void DXRenderTarget::Initialize(ID3D12Device* device, IDXGISwapChain4* swapChain
     // 2つ目を作る
     device->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
 
-    LogManager::GetInstance().Log("End　Create TargetView\n");
+    LogManager::GetInstance().Log("End　Create TargetView");
 }

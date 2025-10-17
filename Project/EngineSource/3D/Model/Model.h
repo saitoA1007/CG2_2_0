@@ -12,8 +12,6 @@
 #include"AnimationData.h"
 #include"Animation.h"
 
-#include"LogManager.h"
-
 #include"TextureManager.h"
 
 #include"LightManager.h"
@@ -37,7 +35,7 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="device"></param>
 		/// <param name="commandList"></param>
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,LogManager* logManager);
+		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager);
 
 		/// <summary>
 		/// OBJファイルからメッシュ生成
@@ -164,9 +162,6 @@ namespace GameEngine {
 
 		// テクスチャ
 		static TextureManager* textureManager_;
-
-		// ログ
-		static LogManager* logManager_;
 
 		// ファイル名
 		static inline const std::string kDirectoryPath_ = "Resources/Models";

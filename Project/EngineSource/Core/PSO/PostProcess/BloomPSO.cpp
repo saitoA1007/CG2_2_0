@@ -3,16 +3,14 @@
 #include"CreateBufferResource.h"
 #include <d3dcompiler.h>
 #include <cassert>
-
+#include"LogManager.h"
 using namespace GameEngine;
 
-void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC* dxc, LogManager* logManager,
+void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC* dxc,
     const std::wstring brightPsPath, const std::wstring blurPsPath, const std::wstring resultPsPath, const std::wstring compositePsPath) {
 
     // 初期化を開始するログ
-    if (logManager) {
-        logManager->Log("BloomPSO Class start Initialize\n");
-    }
+    LogManager::GetInstance().Log("BloomPSO Class start Initialize");
 
     // RootSignature作成
     D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -68,7 +66,7 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
     HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
         D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr)) {
-        logManager->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        LogManager::GetInstance().Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
 
@@ -177,9 +175,7 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
     assert(SUCCEEDED(hr));
 
     // 初期化を終了するログ
-    if (logManager) {
-        logManager->Log("BloomPSO Class End Initialize\n");
-    }
+    LogManager::GetInstance().Log("BloomPSO Class End Initialize\n");
 
     // Sprite用の頂点リソースを作る
     vertexResourceSprite_ = CreateBufferResource(device, sizeof(VertexData) * 4);

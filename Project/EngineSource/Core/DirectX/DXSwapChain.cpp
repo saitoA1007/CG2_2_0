@@ -6,7 +6,7 @@ using namespace GameEngine;
 
 void DXSwapChain::Initialize(HWND hwnd, uint32_t width, uint32_t height, IDXGIFactory7* dxgiFactory, ID3D12CommandQueue* commandQueue) {
 
-    LogManager::GetInstance().Log("Start　Create SwapChain\n");
+    LogManager::GetInstance().Log("Start　Create SwapChain");
 
     // スワップチェーンを生成する
     swapChainDesc.Width = width;                       // 画面の幅。ウィンドウのクライアント領域を同じものにしておく
@@ -21,7 +21,7 @@ void DXSwapChain::Initialize(HWND hwnd, uint32_t width, uint32_t height, IDXGIFa
     HRESULT hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain_.ReleaseAndGetAddressOf()));
     assert(SUCCEEDED(hr));
 
-    LogManager::GetInstance().Log("End　Create SwapChain\n");
+    LogManager::GetInstance().Log("End　Create SwapChain");
 }
 
 void DXSwapChain::Present() {

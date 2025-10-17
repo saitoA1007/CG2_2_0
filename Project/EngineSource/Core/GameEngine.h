@@ -107,11 +107,6 @@ namespace GameEngine {
 		// 音声機能
 		std::unique_ptr<AudioManager> audioManager_;
 
-		/// Common =======================================
-
-		// ログ
-		std::unique_ptr<LogManager> logManager_;
-
 		/// Core ========================================
 
 		// Windowsのアプリ機能
