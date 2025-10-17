@@ -118,7 +118,7 @@ void DirectXCommon::PostDraw(ImGuiManager* imGuiManager)
     imGuiManager->Draw();
 #else
     // ポストプロセスを行った最終結果を描画する
-    copyPSO_->Draw(commandList_.Get(), postEffectManager_->GetSRVHandle());
+    copyPSO_->Draw(command_->GetCommandList(), postEffectManager_->GetSRVHandle());
 
 #endif
 
