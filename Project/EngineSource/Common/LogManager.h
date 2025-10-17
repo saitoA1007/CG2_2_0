@@ -9,6 +9,15 @@ class LogManager {
 public:
 
 	/// <summary>
+	/// インスタンスを取得
+	/// </summary>
+	/// <returns></returns>
+	static LogManager& GetInstance() {
+		static LogManager instance;
+		return instance;
+	}
+
+	/// <summary>
 	/// ログを書き込むため準備
 	/// </summary>
 	static void Create();

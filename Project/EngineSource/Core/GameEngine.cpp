@@ -27,7 +27,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// DirectXCommonの初期化
 	dxCommon_ = std::make_unique<DirectXCommon>();
-	dxCommon_->Initialize(windowsApp_->GetHwnd(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight, logManager_.get(),srvManager_.get());
+	dxCommon_->Initialize(windowsApp_->GetHwnd(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight,srvManager_.get());
 
 	// dxcCompilerの初期化
 	dxc_ = std::make_unique<DXC>();

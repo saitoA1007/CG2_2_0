@@ -36,7 +36,7 @@ void FpsCounter::Update() {
 
 void FpsCounter::DrawImGui() {
 	ImGui::Begin("FpsCounter");
-	ImGui::DragInt("FpsCount", &frameCount_);
-	ImGui::DragInt("MaxFpsCount", &maxFrameCount_);
+	ImGui::Text("FpsCount : %d", frameCount_);
+	ImGui::Text("MaxFpsCount : %d", maxFrameCount_);
 	ImGui::End();
 }
