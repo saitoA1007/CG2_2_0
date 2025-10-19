@@ -1,5 +1,8 @@
 #include"WindowsApp.h"
 #include"ImGuiManager.h"
+
+#pragma comment(lib,"winmm.lib")
+
 using namespace GameEngine;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -62,6 +65,9 @@ void WindowsApp::CreateGameWindow(const std::wstring& title, int32_t kClientWidt
 
 	// ウィンドウを表示する
 	ShowWindow(hwnd_, SW_SHOW);
+
+	// システムタイマーの分解能を上げる
+	timeBeginPeriod(1);
 }
 
 bool WindowsApp::ProcessMessage() {

@@ -1,4 +1,6 @@
 #pragma once
+#include<chrono>
+#include<thread>
 #include "DXDevice.h"
 #include "DXCommand.h"
 #include "DXSwapChain.h"
@@ -83,5 +85,16 @@ namespace GameEngine {
 
         // ポストエフェクト
         std::unique_ptr<PostEffectManager> postEffectManager_;
+
+        // 記録時間(FPS固定用)
+        std::chrono::steady_clock::time_point reference_;
+
+    private:
+
+        // FPS固定初期化
+        void InitializeFixFPS();
+
+        // FPS固定更新
+        void UpdateFixFPS();
     };
 }
