@@ -207,6 +207,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\GameEngine.cpp" />
     <ClCompile Include="EngineSource\Core\PostProcess\PostEffectManager.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\AnimationPSO.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\BlendBuilder.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\PSOManager.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\RasterizerBuilder.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\ShaderCompiler.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\GaussianBlurPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\GridPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\LinePSO.cpp" />
@@ -297,6 +303,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\PSO\AnimationPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\BasePSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\BlendMode.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\BlendBuilder.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\PSOManager.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\RasterizerBuilder.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\ShaderCompiler.h" />
     <ClInclude Include="EngineSource\Core\PSO\GaussianBlurPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\GridPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\LinePSO.h" />

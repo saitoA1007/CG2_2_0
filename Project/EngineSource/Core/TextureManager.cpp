@@ -21,6 +21,28 @@ void TextureManager::Finalize() {
 	textures_.clear();
 }
 
+void TextureManager::RegisterTexture(const std::string& registerName, const std::string& fileName) {
+	// 同名のモデルが登録されている場合は早期リターン
+	auto getName = nameToHandles_.find(registerName);
+	if (getName != nameToHandles_.end()) {
+		return;
+	}
+
+	// ロードする
+	uint32_t handle = Load(fileName);
+
+	// 登録する
+	nameToHandles_[registerName] = handle;
+}
+
+uint32_t TextureManager::GetHandleByName(const std::string& name) const {
+	auto getHandle = nameToHandles_.find(name);
+	if (getHandle == nameToHandles_.end()) {
+		return 0;
+	}
+	return getHandle->second;
+}
+
 uint32_t TextureManager::Load(const std::string& fileName) {
 
 	// テクスチャーの読み込みを開始するログ

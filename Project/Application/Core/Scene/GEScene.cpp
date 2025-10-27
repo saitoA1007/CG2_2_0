@@ -43,6 +43,11 @@ void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inp
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
 
+	// 画像
+	sprite_ = Sprite::Create({0.0f,0.0f},{256.0f,256.0f},{0.0f,0.0f});
+	// uvCheckerの画像を取得
+	uvCheckerGH_ = textureManager->GetHandleByName("uvChecker");
+
 	// 入力コマンドを設定する
 	InputRegisterCommand();
 }
@@ -112,6 +117,16 @@ void GEScene::Draw() {
 	// グリッドを描画
 	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
 #endif
+
+	//========================================================================
+	// 2D描画
+	//========================================================================
+
+	// 画像の描画前処理
+	Sprite::PreDraw(BlendMode::kBlendModeNormal);
+
+	// 画像を描画
+	sprite_->Draw(uvCheckerGH_);
 }
 
 void GEScene::InputRegisterCommand() {

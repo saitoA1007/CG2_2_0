@@ -49,13 +49,13 @@ void GameScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* i
 	// 地面モデルを生成
 	terrainModel_ = modelManager->GetNameByModel("terrain.obj");
 	terrainModel_->SetDefaultIsEnableLight(true);
-	grassGH_ = textureManager->Load("Resources/Models/Terrain/grass.png");
+	grassGH_ = textureManager->GetHandleByName("grass");
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 平面モデルを生成
 	planeModel_ = modelManager->GetNameByModel("plane.obj");
 	planeModel_->SetDefaultIsEnableLight(true);
-	uvCheckerGH_ = textureManager->Load("Resources/Textures/uvChecker.png");
+	uvCheckerGH_ = textureManager->GetHandleByName("uvChecker");
 	planeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,0.0f} });
 
 	// ボーンアニメーションを生成する
