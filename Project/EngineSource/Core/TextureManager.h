@@ -2,6 +2,7 @@
 #include <d3d12.h>
 #include<iostream>
 #include<vector>
+#include <unordered_map>
 #include <wrl.h>
 #include"Externals/DirectXTex/DirectXTex.h"
 #include"Externals/DirectXTex/d3dx12.h"
@@ -45,6 +46,20 @@ namespace GameEngine {
 		void Finalize();
 
 		/// <summary>
+		/// 登録する関数
+		/// </summary>
+		/// <param name="registerName"></param>
+		/// <param name="fileName"></param>
+		void RegisterTexture(const std::string& registerName,const std::string& fileName);
+
+		/// <summary>
+		/// 名前からハンドルを取得
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		uint32_t GetHandleByName(const std::string& name) const;
+
+		/// <summary>
 		/// テクスチャを読み込んで転送する処理
 		/// </summary>
 		/// <param name="fileName">ファイル名</param>
@@ -74,6 +89,9 @@ namespace GameEngine {
 		std::string texturePath_;
 
 		SrvManager* srvManager_ = nullptr;
+
+		// テクスチャのハンドルを保存する
+		std::unordered_map<std::string, uint32_t> nameToHandles_;
 
 	private:
 

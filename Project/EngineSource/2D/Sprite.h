@@ -53,7 +53,8 @@ namespace GameEngine {
 		/// <param name="anchorPoint">アンカーポイント</param>
 		/// <param name="color">色</param>
 		/// <returns></returns>
-		static Sprite* Create(const Vector2& position,const Vector2& size,const Vector2& anchorPoint,const Vector4& color = { 1, 1, 1, 1 });
+		static std::unique_ptr<Sprite> Create(const Vector2& position,const Vector2& size,const Vector2& anchorPoint,const Vector4& color = { 1, 1, 1, 1 },
+			const Vector2& leftTop={0.0f,0.0f}, const Vector2& textureSize={1.0f,1.0f}, const Vector2& textureMaxSize={1.0f,1.0f});
 
 	public:
 
@@ -125,6 +126,10 @@ namespace GameEngine {
 		Vector2 scale_ = { 1.0f,1.0f };
 		// スプライト幅、高さ
 		Vector2 size_ = { 100.0f, 100.0f };
+
+		Vector2 textureLeftTop_ = { 0.0f,0.0f };
+		Vector2 textureSize_ = { 100.0f,100.0f };
+		Vector2 textureMaxeSize_ = {};
 
 	private:
 

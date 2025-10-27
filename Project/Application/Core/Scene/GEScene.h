@@ -6,6 +6,7 @@
 #include"DebugCamera.h"
 #include"Model.h"
 #include"WorldTransform.h"
+#include"Sprite.h"
 
 #include"Application/Player.h"
 #include"Application/CameraController.h"
@@ -84,6 +85,10 @@ private: // シーン機能
 
 	// カメラコントローラークラス
 	std::unique_ptr<CameraController> cameraController_;
+
+	// uvChecker
+	std::unique_ptr<GameEngine::Sprite> sprite_;
+	uint32_t uvCheckerGH_ = 0;
 
 private:
 

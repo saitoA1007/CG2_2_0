@@ -38,6 +38,9 @@ void SceneManager::Initialize(GameEngine::Input* input, GameEngine::TextureManag
 
 	// モデルを読み込む
 	LoadModelData();
+
+	// 画像を読み込む
+	LoadSpriteData();
 	
 	// シーンの初期化。最初はタイトルシーンに設定
 	ChangeScene(SceneState::GE);
@@ -149,4 +152,16 @@ void SceneManager::LoadModelData() {
 	modelManager_->RegisterMode("terrain.obj", "Terrain");
 	// 歩く人型モデルをロードと登録
 	modelManager_->RegisterMode("walk.gltf", "Walk");
+}
+
+void SceneManager::LoadSpriteData() {
+
+	// white2x2の画像を登録する
+	textureManager_->RegisterTexture("white", "Resources/Textures/white2x2.png");
+
+	// uvCheckerの画像を登録する
+	textureManager_->RegisterTexture("uvChecker", "Resources/Textures/uvChecker.png");
+
+	// 草原の画像を登録する
+	textureManager_->RegisterTexture("grass", "Resources/Models/Terrain/grass.png");
 }

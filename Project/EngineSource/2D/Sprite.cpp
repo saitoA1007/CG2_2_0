@@ -23,9 +23,11 @@ void Sprite::PreDraw(BlendMode blendMode) {
 	commandList_->SetPipelineState(spritePSO_->GetPipelineState(blendMode)); // spritePSOを設定
 }
 
-Sprite* Sprite::Create(const Vector2& position,const Vector2& size,const Vector2& anchorPoint,const Vector4& color) {
+std::unique_ptr<Sprite> Sprite::Create(const Vector2& position,const Vector2& size,const Vector2& anchorPoint,const Vector4& color,
+	const Vector2& leftTop, const Vector2& textureSize, const Vector2& textureMaxSize) {
 
-	Sprite* sprite = new Sprite();
+	// インスタンスを生成
+	std::unique_ptr<Sprite> sprite = std::make_unique<Sprite>();
 
 	// 座標と大きさを取得
 	sprite->position_ = position;
@@ -33,6 +35,11 @@ Sprite* Sprite::Create(const Vector2& position,const Vector2& size,const Vector2
 	sprite->anchorPoint_ = anchorPoint;
 	// 座標を元にワールド行列の生成
 	sprite->worldMatrix_ = MakeTranslateMatrix({ position.x,position.y,0.0f });
+
+	// テクスチャのサイズを取得
+	sprite->textureLeftTop_ = leftTop;
+	sprite->textureSize_ = textureSize;
+	sprite->textureMaxeSize_ = textureMaxSize;
 
 	// メッシュを作成
 	sprite->CreateMesh();
@@ -126,13 +133,20 @@ void Sprite::CreateMesh() {
 
 	// 頂点インデックス
 	vertexData_[0].position = { left,bottom,0.0f,1.0f }; // 左下
-	vertexData_[0].texcoord = { 0.0f,1.0f };
 	vertexData_[1].position = { left,top,0.0f,1.0f }; // 左上
-	vertexData_[1].texcoord = { 0.0f,0.0f };
 	vertexData_[2].position = { right,bottom,0.0f,1.0f }; // 右下
-	vertexData_[2].texcoord = { 1.0f,1.0f };
 	vertexData_[3].position = { right,top,0.0f,1.0f }; // 右上
-	vertexData_[3].texcoord = { 1.0f,0.0f };
+
+	// uv座標指定
+	float leftTex = textureLeftTop_.x / textureMaxeSize_.x;
+	float rightTex = (textureLeftTop_.x + textureSize_.x) / textureMaxeSize_.x;
+	float topTex = textureLeftTop_.y / textureMaxeSize_.y;
+	float bottomTex = (textureLeftTop_.y + textureSize_.y) / textureMaxeSize_.y;
+
+	vertexData_[0].texcoord = { leftTex,bottomTex };
+	vertexData_[1].texcoord = { leftTex,topTex };
+	vertexData_[2].texcoord = { rightTex,bottomTex };
+	vertexData_[3].texcoord = { rightTex,topTex };
 
 	// Sprite用の頂点インデックスのリソースを作る
 	indexResource_ = CreateBufferResource(device_, sizeof(uint32_t) * 6);

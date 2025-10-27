@@ -273,6 +273,12 @@
     <ClCompile Include="EngineSource\Core\DirectX\DXRenderTarget.cpp" />
     <ClCompile Include="EngineSource\Core\DirectX\DXDepthStencil.cpp" />
     <ClCompile Include="EngineSource\Core\DirectX\DXFence.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\PSOManager.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\ShaderCompiler.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\BlendBuilder.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\RasterizerBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -527,6 +533,12 @@
     <ClInclude Include="EngineSource\Core\DirectX\DXRenderTarget.h" />
     <ClInclude Include="EngineSource\Core\DirectX\DXDepthStencil.h" />
     <ClInclude Include="EngineSource\Core\DirectX\DXFence.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\PSOManager.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\ShaderCompiler.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\BlendBuilder.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\RasterizerBuilder.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

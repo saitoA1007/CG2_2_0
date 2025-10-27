@@ -1,0 +1,31 @@
+#include"PSOManager.h"
+#include "LogManager.h"
+#include <cassert>
+
+using namespace GameEngine;
+
+void PSOManager::Initialize(ID3D12Device* device, DXC* dxc) {
+	LogManager::GetInstance().Log("Initialize PSOManager Start");
+	device_ = device;
+	dxc_ = dxc;
+	LogManager::GetInstance().Log("Initialize PSOManager End");
+}
+
+void PSOManager::RegisterPSO(const std::string& name) {
+
+	
+
+	LogManager::GetInstance().Log("PSO registerd name : " + name);
+}
+
+void PSOManager::LoadFromJson(const std::string& filePath) {
+	LogManager::GetInstance().Log("PSO registerd name : " + filePath);
+}
+
+void PSOManager::DefaultLoadPSO() {
+
+}
+
+void PSOManager::CreatePSO(const std::string& name) {
+	LogManager::GetInstance().Log("PSO registerd name : " + name);
+}

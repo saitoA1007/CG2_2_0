@@ -91,7 +91,12 @@ private:
 	void DebugChangeScene();
 
 	/// <summary>
-	/// 使用するモデルデータを読み取る
+	/// 使用するモデルデータを読み込む
 	/// </summary>
 	void LoadModelData();
+
+	/// <summary>
+	/// 使用する画像データを読み込む
+	/// </summary>
+	void LoadSpriteData();
 };
