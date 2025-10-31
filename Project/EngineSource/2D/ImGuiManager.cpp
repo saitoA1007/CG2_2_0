@@ -26,6 +26,10 @@ void ImGuiManager::Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon, S
 		srvManager_->GetSRVHeap(),
 		srvManager_->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(),
 		srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+
+	ed::Config config;
+	config.SettingsFile = "node_editor_docked.json";
+	g_NodeContext = ed::CreateEditor(&config);
 }
 
 void ImGuiManager::BeginFrame() {
@@ -49,8 +53,37 @@ void ImGuiManager::BeginFrame() {
 	ImGui::PopStyleVar(2);
 	
 	ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
-	ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+	//ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+	ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+
+	if (ImGui::BeginMenuBar()) {
+		if (ImGui::BeginMenu("View")) {
+			ImGui::Text("NoneParameter");
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
 	
+	ImGui::End();
+
+	ImGui::Begin("NodeEditor");
+	ImGui::Separator();
+	ed::SetCurrentEditor(g_NodeContext);
+	ed::Begin("My Editor", ImVec2(0.0, 0.0f));
+	int uniqueId = 1;
+	// Start drawing nodes.
+	ed::BeginNode(uniqueId++);
+	ImGui::Text("Node A");
+	ed::BeginPin(uniqueId++, ed::PinKind::Input);
+	ImGui::Text("-> In");
+	ed::EndPin();
+	ImGui::SameLine();
+	ed::BeginPin(uniqueId++, ed::PinKind::Output);
+	ImGui::Text("Out ->");
+	ed::EndPin();
+	ed::EndNode();
+	ed::End();
+	ed::SetCurrentEditor(nullptr);
 	ImGui::End();
 }
 

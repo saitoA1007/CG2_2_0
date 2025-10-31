@@ -7,9 +7,28 @@
 
 #include"DXC.h"
 
+#include"ShaderCompiler.h"
+#include"RootSignatureBuilder.h"
+#include"InputLayoutBuilder.h"
+
+// 本来は外から持ってくるもの達
+#include"RasterizerBuilder.h"
+#include"BlendBuilder.h"
+
 namespace GameEngine {
 
 	class PSOManager {
+	public:
+
+		// PSOを作成するためのデータ
+		struct PSOData {
+			std::wstring vsPath = L"vsPath"; // 頂点シェーダーのパス
+			std::wstring psPath = L"psPath"; // ピクセルシェーダーのパス
+			DrawModel drawMode = DrawModel::FillFront; // 描画モード
+			BlendMode blendMode = BlendMode::kBlendModeNormal; // ブレンドモード
+			bool isDepthEnable = true; // 深度の使用
+		};
+
 	public:
 
 		// 初期化処理
@@ -32,10 +51,18 @@ namespace GameEngine {
 		// ルートシグネチャリスト
 		std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> rootSignatureList_;
 
+		// ラスタライザを作成
+		RasterizerBuilder rasterizerBuiler_;
+
+		// ブレンドモードの設定
+		BlendBuilder blendBuilder_;
 
 	private:
 
 		void CreatePSO(const std::string& name);
+
+		// PSOを作成する
+		void CreatePSO(const std::string& psoName, PSOData psoData);
 
 	};
 }

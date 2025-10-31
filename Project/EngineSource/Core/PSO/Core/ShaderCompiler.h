@@ -11,6 +11,9 @@ namespace GameEngine {
 		void CompileVsShader(const std::wstring& vsPath);
 		void CompilePsShader(const std::wstring& psPath);
 
+		IDxcBlob* GetVertexShaderBlob() const { return vertexShaderBlob_.Get(); }
+		IDxcBlob* GetPixelShaderBlob() const { return pixelShaderBlob_.Get(); }
+
 	private:
 
 		DXC* dxc_ = nullptr;

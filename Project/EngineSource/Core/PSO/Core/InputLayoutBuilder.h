@@ -3,6 +3,7 @@
 #include<dxcapi.h>
 #include<vector>
 #include<string>
+#include <wrl.h>
 
 namespace GameEngine {
 
@@ -36,9 +37,18 @@ namespace GameEngine {
 		// 通常のアニメーション用
 		void CreateDefaultAnimationElement();
 
+		/// <summary>
+		/// シェーダーリフレクションから入力レイアウトを自動生成する
+		/// </summary>
+		/// <param name="vsBlob"></param>
+		void CreateInputLayoutFromReflection(IDxcUtils* utils, IDxcBlob* vsBlob);
+
+		D3D12_INPUT_LAYOUT_DESC GetInputLayoutDesc() const { return inputLayoutDesc_; }
+
 	private:
 
 		std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs_;
+		std::vector<std::string> semanticNames_;
 		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_{};
 	};
 }

@@ -213,6 +213,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\PSO\Core\RasterizerBuilder.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\ShaderCompiler.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\test.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\GaussianBlurPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\GridPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\LinePSO.cpp" />
@@ -233,12 +234,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
     <ClCompile Include="EngineSource\Math\EasingManager.cpp" />
     <ClCompile Include="EngineSource\Math\MyMath.cpp" />
+    <ClCompile Include="Externals\imgui\crude_json.cpp" />
     <ClCompile Include="Externals\imgui\imgui.cpp" />
     <ClCompile Include="Externals\imgui\ImGuizmo.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_canvas.cpp" />
     <ClCompile Include="Externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="Externals\imgui\imgui_draw.cpp" />
     <ClCompile Include="Externals\imgui\imgui_impl_dx12.cpp" />
     <ClCompile Include="Externals\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_node_editor.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_node_editor_api.cpp" />
     <ClCompile Include="Externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="Externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Application\ColorEditor.cpp" />
@@ -309,6 +314,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\PSO\Core\RasterizerBuilder.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\ShaderCompiler.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\test.h" />
     <ClInclude Include="EngineSource\Core\PSO\GaussianBlurPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\GridPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\LinePSO.h" />
@@ -337,12 +343,18 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Math\Vector2.h" />
     <ClInclude Include="EngineSource\Math\Vector3.h" />
     <ClInclude Include="EngineSource\Math\Vector4.h" />
+    <ClInclude Include="Externals\imgui\crude_json.h" />
     <ClInclude Include="Externals\imgui\imconfig.h" />
     <ClInclude Include="Externals\imgui\imgui.h" />
     <ClInclude Include="Externals\imgui\ImGuizmo.h" />
+    <ClInclude Include="Externals\imgui\imgui_bezier_math.h" />
+    <ClInclude Include="Externals\imgui\imgui_canvas.h" />
+    <ClInclude Include="Externals\imgui\imgui_extra_math.h" />
     <ClInclude Include="Externals\imgui\imgui_impl_dx12.h" />
     <ClInclude Include="Externals\imgui\imgui_impl_win32.h" />
     <ClInclude Include="Externals\imgui\imgui_internal.h" />
+    <ClInclude Include="Externals\imgui\imgui_node_editor.h" />
+    <ClInclude Include="Externals\imgui\imgui_node_editor_internal.h" />
     <ClInclude Include="Externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="Externals\imgui\imstb_textedit.h" />
     <ClInclude Include="Externals\imgui\imstb_truetype.h" />
@@ -362,6 +374,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Externals\imgui\imgui_bezier_math.inl" />
+    <None Include="Externals\imgui\imgui_extra_math.inl" />
+    <None Include="Externals\imgui\imgui_node_editor_internal.inl" />
     <None Include="Resources\Shaders\ColorConvert.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
