@@ -9,6 +9,11 @@
 #include"DirectXCommon.h"
 #include"SrvManager.h"
 
+#include "Externals/imgui/imgui_node_editor.h"
+namespace ed = ax::NodeEditor;
+
+static ed::EditorContext* g_NodeContext = nullptr;
+
 namespace GameEngine {
 
 	class ImGuiManager final {

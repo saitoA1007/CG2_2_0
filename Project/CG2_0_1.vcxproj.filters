@@ -279,6 +279,11 @@
     <ClCompile Include="EngineSource\Core\PSO\Core\ShaderCompiler.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\BlendBuilder.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\RasterizerBuilder.cpp" />
+    <ClCompile Include="EngineSource\Core\PSO\Core\test.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_node_editor.cpp" />
+    <ClCompile Include="Externals\imgui\crude_json.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_canvas.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_node_editor_api.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -539,6 +544,13 @@
     <ClInclude Include="EngineSource\Core\PSO\Core\ShaderCompiler.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\BlendBuilder.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\RasterizerBuilder.h" />
+    <ClInclude Include="EngineSource\Core\PSO\Core\test.h" />
+    <ClInclude Include="Externals\imgui\imgui_node_editor.h" />
+    <ClInclude Include="Externals\imgui\imgui_node_editor_internal.h" />
+    <ClInclude Include="Externals\imgui\crude_json.h" />
+    <ClInclude Include="Externals\imgui\imgui_extra_math.h" />
+    <ClInclude Include="Externals\imgui\imgui_canvas.h" />
+    <ClInclude Include="Externals\imgui\imgui_bezier_math.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
@@ -588,6 +600,9 @@
     <None Include="Resources\Shaders\PostEffect\FullScreen.hlsli">
       <Filter>Shaders\PostEffect</Filter>
     </None>
+    <None Include="Externals\imgui\imgui_bezier_math.inl" />
+    <None Include="Externals\imgui\imgui_extra_math.inl" />
+    <None Include="Externals\imgui\imgui_node_editor_internal.inl" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Object3d.PS.hlsl">

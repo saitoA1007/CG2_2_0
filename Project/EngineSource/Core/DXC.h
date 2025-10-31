@@ -23,6 +23,8 @@ namespace GameEngine {
 			IDxcCompiler3* dxcCompiler,
 			IDxcIncludeHandler* includeHandler);
 
+		IDxcUtils* GetIDxcUtils() const { return dxcUtils_.Get(); }
+
 		Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
 		Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_;
 		Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
