@@ -1,12 +1,14 @@
 #include"InputLayoutBuilder.h"
 #include <d3d12shader.h>
 #include<cassert>
+#include "LogManager.h"
 using namespace GameEngine;
 
 void InputLayoutBuilder::CreateInputElement(const std::string& name, uint32_t index, uint32_t slotIndex, DXGI_FORMAT format) {
 	// InputLayout
+    semanticNames_.push_back(name);
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs = {};
-	inputElementDescs.SemanticName = name.c_str();
+	inputElementDescs.SemanticName = nullptr;
 	inputElementDescs.SemanticIndex = index;
 	inputElementDescs.InputSlot = slotIndex;
 	inputElementDescs.Format = format;
@@ -23,33 +25,42 @@ void InputLayoutBuilder::CreateInputLayoutDesc() {
 
 void InputLayoutBuilder::Reset() {
 	inputElementDescs_.clear();
+    semanticNames_.clear();
 }
 
 void InputLayoutBuilder::CreateDefaultObjElement() {
+    Reset();
 	CreateInputElement("POSITION", 0,0, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	CreateInputElement("TEXCOORD", 0, 0, DXGI_FORMAT_R32G32_FLOAT);
 	CreateInputElement("NORMAL", 0, 0, DXGI_FORMAT_R32G32B32_FLOAT);
+    SetSemanticName();
 	CreateInputLayoutDesc();
 }
 
 void InputLayoutBuilder::CreateDefaultSpriteElement() {
+    Reset();
 	CreateInputElement("POSITION", 0, 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	CreateInputElement("TEXCOORD", 0, 0, DXGI_FORMAT_R32G32_FLOAT);
+    SetSemanticName();
 	CreateInputLayoutDesc();
 }
 
 void InputLayoutBuilder::CreateDefaultLineElement() {
+    Reset();
 	CreateInputElement("POSITION", 0, 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	CreateInputElement("COLOR", 0, 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
+    SetSemanticName();
 	CreateInputLayoutDesc();
 }
 
 void InputLayoutBuilder::CreateDefaultAnimationElement() {
+    Reset();
 	CreateInputElement("POSITION", 0, 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	CreateInputElement("TEXCOORD", 0, 0, DXGI_FORMAT_R32G32_FLOAT);
 	CreateInputElement("NORMAL", 0, 0, DXGI_FORMAT_R32G32B32_FLOAT);
 	CreateInputElement("WEIGHT", 0, 1, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	CreateInputElement("INDEX", 0, 1, DXGI_FORMAT_R32G32B32A32_SINT);
+    SetSemanticName();
 	CreateInputLayoutDesc();
 }
 
@@ -68,6 +79,8 @@ void InputLayoutBuilder::CreateInputLayoutFromReflection(IDxcUtils* utils,IDxcBl
 
     inputElementDescs_.clear();
     semanticNames_.clear();
+    // メモリを事前に確保
+    semanticNames_.reserve(shaderDesc.InputParameters);
 
     // 入力パラメータを解析
     for (UINT i = 0; i < shaderDesc.InputParameters; ++i) {
@@ -78,7 +91,7 @@ void InputLayoutBuilder::CreateInputLayoutFromReflection(IDxcUtils* utils,IDxcBl
 
         // セマンティック名を保存
         semanticNames_.push_back(paramDesc.SemanticName);
-        elementDesc.SemanticName = semanticNames_.back().c_str();
+        elementDesc.SemanticName = semanticNames_.back().data();
         elementDesc.SemanticIndex = paramDesc.SemanticIndex;
         elementDesc.InputSlot = 0; // デフォルトはスロット0
         elementDesc.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
@@ -91,7 +104,7 @@ void InputLayoutBuilder::CreateInputLayoutFromReflection(IDxcUtils* utils,IDxcBl
                 elementDesc.Format = DXGI_FORMAT_R32_SINT;
             } else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
                 elementDesc.Format = DXGI_FORMAT_R32_FLOAT;
-            };
+            }
         } else if (paramDesc.Mask <= 3) {
             if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) { 
                 elementDesc.Format = DXGI_FORMAT_R32G32_UINT;
@@ -129,4 +142,13 @@ void InputLayoutBuilder::CreateInputLayoutFromReflection(IDxcUtils* utils,IDxcBl
 
     // 入力レイアウトDescを作成
     CreateInputLayoutDesc();
+}
+
+void InputLayoutBuilder::SetSemanticName() {
+    // 要素数が一致しているか確認
+    assert(inputElementDescs_.size() == semanticNames_.size());
+    // 名前を適応させる
+    for (size_t i = 0; i < inputElementDescs_.size(); ++i) {
+        inputElementDescs_[i].SemanticName = semanticNames_[i].c_str();
+    }
 }

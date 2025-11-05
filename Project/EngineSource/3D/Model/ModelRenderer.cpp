@@ -6,36 +6,55 @@ using namespace GameEngine;
 ID3D12Device* ModelRenderer::device_ = nullptr;
 ID3D12GraphicsCommandList* ModelRenderer::commandList_ = nullptr;
 TextureManager* ModelRenderer::textureManager_ = nullptr;
-TrianglePSO* ModelRenderer::trianglePSO_ = nullptr;
-ParticlePSO* ModelRenderer::particlePSO_ = nullptr;
 GridPSO* ModelRenderer::gridPSO_ = nullptr;
 AnimationPSO* ModelRenderer::animationPSO_ = nullptr;
+std::unordered_map<RenderMode, DrawPsoData> ModelRenderer::psoList_;
 
 void ModelRenderer::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,
-	TrianglePSO* trianglePSO, ParticlePSO* particlePSO, AnimationPSO* animationPSO, GridPSO* gridPSO) {
+	 AnimationPSO* animationPSO, GridPSO* gridPSO, PSOManager* psoManager) {
 	device_ = device;
 	commandList_ = commandList;
 	textureManager_ = textureManager;
-	trianglePSO_ = trianglePSO;
-	particlePSO_ = particlePSO;
 	gridPSO_ = gridPSO;
 	animationPSO_ = animationPSO;
+
+	// 通常描画のpsoデータを取得する
+	psoList_[RenderMode::DefaultModel] = psoManager->GetDrawPsoData("Default3D");
+	psoList_[RenderMode::Instancing] = psoManager->GetDrawPsoData("Instancing3D");
+
 }
 
 void ModelRenderer::PreDraw(RenderMode mode, BlendMode blendMode) {
 	switch (mode) {
 
 		// 単体描画設定
-	case RenderMode::DefaultModel:
-		commandList_->SetGraphicsRootSignature(trianglePSO_->GetRootSignature());  // RootSignatureを設定。
-		commandList_->SetPipelineState(trianglePSO_->GetPipelineState(blendMode)); // trianglePSOを設定
+	case RenderMode::DefaultModel: {
+
+		auto pso = psoList_.find(mode);
+		if (pso == psoList_.end()) {
+			assert(0);
+			return;
+			
+		} 
+
+		commandList_->SetGraphicsRootSignature(pso->second.rootSignature);
+		commandList_->SetPipelineState(pso->second.graphicsPipelineState);
 		break;
+	}
 
 		// 複数描画設定
-	case RenderMode::Instancing:
-		commandList_->SetGraphicsRootSignature(particlePSO_->GetRootSignature());  // RootSignatureを設定。
-		commandList_->SetPipelineState(particlePSO_->GetPipelineState(blendMode)); // particlePSOを設定
+	case RenderMode::Instancing: {
+		auto pso = psoList_.find(mode);
+		if (pso == psoList_.end()) {
+			assert(0);
+			return;
+			blendMode;
+		}
+
+		commandList_->SetGraphicsRootSignature(pso->second.rootSignature);
+		commandList_->SetPipelineState(pso->second.graphicsPipelineState);
 		break;
+	}
 
 		// グリッド描画設定
 	case RenderMode::Grid:
@@ -52,8 +71,7 @@ void ModelRenderer::PreDraw(RenderMode mode, BlendMode blendMode) {
 }
 
 void ModelRenderer::PreDraw(DrawModel drawMode) {
-	commandList_->SetGraphicsRootSignature(trianglePSO_->GetRootSignature());  // RootSignatureを設定。
-	commandList_->SetPipelineState(trianglePSO_->GetDrawModePipelineState(drawMode)); // trianglePSOを設定
+	drawMode;
 }
 
 void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material) {

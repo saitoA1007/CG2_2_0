@@ -13,11 +13,12 @@
 //#include"Animation.h"
 
 #include"TextureManager.h"
-#include"TrianglePSO.h"
-#include"ParticlePSO.h"
 #include"GridPSO.h"
 #include"BasePSO.h"
 #include"AnimationPSO.h"
+
+#include"PSO/Core/PSOManager.h"
+#include"PSO/Core/DrawPSOData.h"
 
 #include"Model.h"
 
@@ -42,7 +43,7 @@ namespace GameEngine {
 		/// <param name="device"></param>
 		/// <param name="commandList"></param>
 		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,
-			TrianglePSO* trianglePSO, ParticlePSO* particlePSO, AnimationPSO* animationPSO, GridPSO* gridPSO);
+			 AnimationPSO* animationPSO, GridPSO* gridPSO,PSOManager* psoManager);
 
 		/// <summary>
 		/// 描画前処理
@@ -131,12 +132,14 @@ namespace GameEngine {
 		static ID3D12GraphicsCommandList* commandList_;
 
 		// PSO設定
-		static TrianglePSO* trianglePSO_;
-		static ParticlePSO* particlePSO_;
 		static GridPSO* gridPSO_;
 		static AnimationPSO* animationPSO_;
 
+		// psoデータのリスト
+		static std::unordered_map<RenderMode, DrawPsoData> psoList_;
+
 		// テクスチャ
 		static TextureManager* textureManager_;
+
 	};
 }
