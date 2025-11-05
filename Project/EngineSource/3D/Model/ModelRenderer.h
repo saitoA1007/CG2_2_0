@@ -4,18 +4,8 @@
 #include <unordered_map>
 #include <wrl.h>
 
-//#include"VertexData.h"
-//#include"Mesh.h"
-//#include"Material.h"
-//#include"WorldTransform.h"
-//#include"WorldTransforms.h"
-//#include"AnimationData.h"
-//#include"Animation.h"
-
 #include"TextureManager.h"
-#include"GridPSO.h"
 #include"BasePSO.h"
-#include"AnimationPSO.h"
 
 #include"PSO/Core/PSOManager.h"
 #include"PSO/Core/DrawPSOData.h"
@@ -42,21 +32,14 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="device"></param>
 		/// <param name="commandList"></param>
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,
-			 AnimationPSO* animationPSO, GridPSO* gridPSO,PSOManager* psoManager);
+		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,PSOManager* psoManager);
 
 		/// <summary>
 		/// 描画前処理
 		/// </summary>
 		/// <param name="mode"></param>
 		/// <param name="blendMode"></param>
-		static void PreDraw(RenderMode mode, BlendMode blendMode);
-
-		/// <summary>
-		/// 描画前処理
-		/// </summary>
-		/// <param name="drawMode">描画状態を設定</param>
-		static void PreDraw(DrawModel drawMode);
+		static void PreDraw(RenderMode mode);
 
 	public:
 
@@ -130,10 +113,6 @@ namespace GameEngine {
 		static ID3D12Device* device_;
 		// コマンドリスト
 		static ID3D12GraphicsCommandList* commandList_;
-
-		// PSO設定
-		static GridPSO* gridPSO_;
-		static AnimationPSO* animationPSO_;
 
 		// psoデータのリスト
 		static std::unordered_map<RenderMode, DrawPsoData> psoList_;

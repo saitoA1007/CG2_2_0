@@ -36,6 +36,8 @@ namespace GameEngine {
 		void CreateDefaultLineElement();
 		// 通常のアニメーション用
 		void CreateDefaultAnimationElement();
+		// グリッド描画用
+		void CreateGridElement();
 
 		/// <summary>
 		/// シェーダーリフレクションから入力レイアウトを自動生成する

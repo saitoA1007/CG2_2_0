@@ -105,14 +105,14 @@ void GEScene::Draw() {
 	//===========================================================
 
 	// 3Dモデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode::DefaultModel, BlendMode::kBlendModeNormal);
+	ModelRenderer::PreDraw(RenderMode::DefaultModel);
 
 	// プレイヤーを描画
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform(),0, camera_->GetVPMatrix());
 
 #ifdef _DEBUG
 	// モデルの単体描画前処理
-	ModelRenderer::PreDraw(RenderMode::Grid, BlendMode::kBlendModeNone);
+	ModelRenderer::PreDraw(RenderMode::Grid);
 
 	// グリッドを描画
 	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
