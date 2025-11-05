@@ -78,7 +78,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	Sprite::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), spritePSO_.get(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 	// 3dを描画する処理の初期化
 	Model::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get());
-	ModelRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), animationPSO_.get(), gridPSO_.get(), psoManager_.get());
+	ModelRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), psoManager_.get());
 	// 線を描画する処理の初期化
 	PrimitiveRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), linePSO_.get());
 	// ワールドトランスフォームの初期化
@@ -191,17 +191,9 @@ bool Engine::IsWindowOpen() {
 
 void Engine::CreatePSO() {
 
-	// アニメーション用のPSO設定を初期化
-	animationPSO_ = std::make_unique<AnimationPSO>();
-	animationPSO_->Initialize(dxCommon_->GetDevice(), dxc_.get());
-
 	// 線のPSO設定の初期化
 	linePSO_ = std::make_unique<LinePSO>();
 	linePSO_->Initialize(L"Resources/Shaders/Primitive.VS.hlsl", L"Resources/Shaders/Primitive.PS.hlsl", dxCommon_->GetDevice(), dxc_.get());
-
-	// グリッド用の初期化
-	gridPSO_ = std::make_unique<GridPSO>();
-	gridPSO_->Initialize(L"Resources/Shaders/Grid.VS.hlsl", L"Resources/Shaders/Grid.PS.hlsl", dxCommon_->GetDevice(), dxc_.get());
 
 	// CopyPSOの初期化
 	copyPSO_ = std::make_unique<CopyPSO>();

@@ -81,12 +81,12 @@ void TitleScene::Draw() {
 	//===========================================================
 
 	// 3Dモデルの描画前処理
-	//ModelRenderer::PreDraw(RenderMode::DefaultModel, BlendMode::kBlendModeNormal);
+	//ModelRenderer::PreDraw(RenderMode::DefaultModel);
 
 
 #ifdef _DEBUG
 	// モデルの単体描画前処理
-	ModelRenderer::PreDraw(RenderMode::Grid, BlendMode::kBlendModeNone);
+	ModelRenderer::PreDraw(RenderMode::Grid);
 
 	// グリッドを描画
 	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());

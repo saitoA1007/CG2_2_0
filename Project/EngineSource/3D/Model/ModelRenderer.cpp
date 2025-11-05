@@ -6,72 +6,32 @@ using namespace GameEngine;
 ID3D12Device* ModelRenderer::device_ = nullptr;
 ID3D12GraphicsCommandList* ModelRenderer::commandList_ = nullptr;
 TextureManager* ModelRenderer::textureManager_ = nullptr;
-GridPSO* ModelRenderer::gridPSO_ = nullptr;
-AnimationPSO* ModelRenderer::animationPSO_ = nullptr;
 std::unordered_map<RenderMode, DrawPsoData> ModelRenderer::psoList_;
 
-void ModelRenderer::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,
-	 AnimationPSO* animationPSO, GridPSO* gridPSO, PSOManager* psoManager) {
+void ModelRenderer::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, PSOManager* psoManager) {
 	device_ = device;
 	commandList_ = commandList;
 	textureManager_ = textureManager;
-	gridPSO_ = gridPSO;
-	animationPSO_ = animationPSO;
 
 	// 通常描画のpsoデータを取得する
 	psoList_[RenderMode::DefaultModel] = psoManager->GetDrawPsoData("Default3D");
+	// インスタンシング描画用のデータを取得する
 	psoList_[RenderMode::Instancing] = psoManager->GetDrawPsoData("Instancing3D");
-
+	// グリッド描画用のデータを取得する
+	psoList_[RenderMode::Grid] = psoManager->GetDrawPsoData("Grid");
+	// アニメーション描画用のデータを取得する
+	psoList_[RenderMode::AnimationModel] = psoManager->GetDrawPsoData("Animation");
 }
 
-void ModelRenderer::PreDraw(RenderMode mode, BlendMode blendMode) {
-	switch (mode) {
-
-		// 単体描画設定
-	case RenderMode::DefaultModel: {
-
-		auto pso = psoList_.find(mode);
-		if (pso == psoList_.end()) {
-			assert(0);
-			return;
-			
-		} 
-
-		commandList_->SetGraphicsRootSignature(pso->second.rootSignature);
-		commandList_->SetPipelineState(pso->second.graphicsPipelineState);
-		break;
+void ModelRenderer::PreDraw(RenderMode mode) {
+	auto pso = psoList_.find(mode);
+	if (pso == psoList_.end()) {
+		assert(0);
+		return;
 	}
 
-		// 複数描画設定
-	case RenderMode::Instancing: {
-		auto pso = psoList_.find(mode);
-		if (pso == psoList_.end()) {
-			assert(0);
-			return;
-			blendMode;
-		}
-
-		commandList_->SetGraphicsRootSignature(pso->second.rootSignature);
-		commandList_->SetPipelineState(pso->second.graphicsPipelineState);
-		break;
-	}
-
-		// グリッド描画設定
-	case RenderMode::Grid:
-		commandList_->SetGraphicsRootSignature(gridPSO_->GetRootSignature());  // RootSignatureを設定。
-		commandList_->SetPipelineState(gridPSO_->GetPipelineState()); // trianglePSOを設定
-		break;
-
-		// アニメーション
-	case RenderMode::AnimationModel:
-		commandList_->SetGraphicsRootSignature(animationPSO_->GetRootSignature());  // RootSignatureを設定。
-		commandList_->SetPipelineState(animationPSO_->GetPipelineState()); // 指定したPSOを設定
-		break;
-	}
-}
-
-void ModelRenderer::PreDraw(DrawModel drawMode) {
-	drawMode;
+	commandList_->SetGraphicsRootSignature(pso->second.rootSignature);
+	commandList_->SetPipelineState(pso->second.graphicsPipelineState);
 }
 
 void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material) {

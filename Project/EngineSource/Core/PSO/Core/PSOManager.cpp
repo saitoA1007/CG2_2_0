@@ -183,6 +183,45 @@ void PSOManager::DefaultLoadPSO() {
     instancing3D.blendMode = BlendMode::kBlendModeAdd;
     RegisterPSO("AdditiveInstancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
 
+    // グリッド描画用のPSO
+    CreatePSOData grid;
+    grid.rootSigName = "Grid";
+    grid.vsPath = L"Resources/Shaders/Grid.VS.hlsl";
+    grid.psPath = L"Resources/Shaders/Grid.PS.hlsl";
+    grid.drawMode = DrawModel::None;
+    grid.blendMode = BlendMode::kBlendModeNormal;
+    grid.isDepthEnable = true;
+    RootSignatureBuilder gridRootSigBuilder;
+    gridRootSigBuilder.Initialize(device_);
+    gridRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
+    gridRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
+    gridRootSigBuilder.CreateRootSignature();
+    InputLayoutBuilder gridInputLayoutBuilder;
+    gridInputLayoutBuilder.CreateGridElement();
+    RegisterPSO("Grid", grid, &gridRootSigBuilder, &gridInputLayoutBuilder);
+
+    // アニメーション描画用のPSO
+    CreatePSOData animation;
+    animation.rootSigName = "Animation";
+    animation.vsPath = L"Resources/Shaders/SkinningObject3d.VS.hlsl";
+    animation.psPath = L"Resources/Shaders/Object3d.PS.hlsl";
+    animation.drawMode = DrawModel::None;
+    animation.blendMode = BlendMode::kBlendModeNormal;
+    animation.isDepthEnable = true;
+    RootSignatureBuilder animationRootSigBuilder;
+    animationRootSigBuilder.Initialize(device_);
+    animationRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
+    animationRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
+    animationRootSigBuilder.AddSRVDescriptorTable(0, 1, D3D12_SHADER_VISIBILITY_PIXEL);
+    animationRootSigBuilder.AddSRVDescriptorTable(0, 1, D3D12_SHADER_VISIBILITY_VERTEX);
+    animationRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
+    animationRootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
+    animationRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    animationRootSigBuilder.CreateRootSignature();
+    InputLayoutBuilder animationInputLayoutBuilder;
+    animationInputLayoutBuilder.CreateDefaultAnimationElement();
+    RegisterPSO("Animation", animation, &animationRootSigBuilder, &animationInputLayoutBuilder);
+
     LogManager::GetInstance().Log("Default PSOs loaded");
 }
 

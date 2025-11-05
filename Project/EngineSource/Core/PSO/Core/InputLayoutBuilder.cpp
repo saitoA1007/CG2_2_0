@@ -64,6 +64,13 @@ void InputLayoutBuilder::CreateDefaultAnimationElement() {
 	CreateInputLayoutDesc();
 }
 
+void InputLayoutBuilder::CreateGridElement() {
+    Reset();
+    CreateInputElement("POSITION", 0, 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
+    SetSemanticName();
+    CreateInputLayoutDesc();
+}
+
 void InputLayoutBuilder::CreateInputLayoutFromReflection(IDxcUtils* utils,IDxcBlob* vsBlob) {
     DxcBuffer reflectionBuffer{};
     reflectionBuffer.Ptr = vsBlob->GetBufferPointer();

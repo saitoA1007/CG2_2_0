@@ -189,9 +189,6 @@
     <ClCompile Include="EngineSource\Core\PSO\GaussianBlurPSO.cpp">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\GridPSO.cpp">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\3D\Model\Mesh.cpp">
       <Filter>EngineSource\3D</Filter>
     </ClCompile>
@@ -253,7 +250,6 @@
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\3D\Model\Animation.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\AnimationPSO.cpp" />
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
     <ClCompile Include="Application\Core\Scene\GEScene.cpp" />
     <ClCompile Include="Application\Player.cpp" />
@@ -437,9 +433,6 @@
     <ClInclude Include="EngineSource\Core\PSO\GaussianBlurPSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\GridPSO.h">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\Mesh.h">
       <Filter>EngineSource\3D</Filter>
     </ClInclude>
@@ -513,7 +506,6 @@
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\Animation.h" />
-    <ClInclude Include="EngineSource\Core\PSO\AnimationPSO.h" />
     <ClInclude Include="EngineSource\Input\InputCommand.h" />
     <ClInclude Include="Application\Core\Scene\GEScene.h" />
     <ClInclude Include="Application\Player.h" />

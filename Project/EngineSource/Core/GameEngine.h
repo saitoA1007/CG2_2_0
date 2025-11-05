@@ -7,9 +7,7 @@
 
 // Core/PSO
 #include"LinePSO.h"
-#include"AnimationPSO.h"
 #include"SpritePSO.h"
-#include"GridPSO.h"
 #include"PostProcess/CopyPSO.h"
 #include"PostProcess/BloomPSO.h"
 #include"PostProcess/ScanLinePSO.h"
@@ -99,14 +97,8 @@ namespace GameEngine {
 
 		/// PSO ======================================
 
-		// アニメーション用のPSO設定
-		std::unique_ptr<AnimationPSO> animationPSO_;
-
 		// 線のPSO設定
 		std::unique_ptr<LinePSO> linePSO_;
-
-		// デバック用グリッドのPSO設定
-		std::unique_ptr<GridPSO> gridPSO_;
 
 		// スプライトのPSO設定
 		std::unique_ptr<SpritePSO> spritePSO_;
