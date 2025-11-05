@@ -7,6 +7,12 @@
 
 namespace GameEngine {
 
+	// パラメータタイプを設定した
+	enum class ParameterType {
+		CBV,
+		SRV
+	};
+
 	class RootSignatureBuilder {
 	public:
 
@@ -14,6 +20,8 @@ namespace GameEngine {
 
 		void AddCBVParameter(uint32_t shaderRegister, D3D12_SHADER_VISIBILITY visibility);
 		void AddSRVDescriptorTable(uint32_t shaderRegister, uint32_t arryNum, D3D12_SHADER_VISIBILITY visibility);
+
+		void AddSampler(uint32_t shaderRegister, D3D12_FILTER filter, D3D12_TEXTURE_ADDRESS_MODE texAddress, D3D12_SHADER_VISIBILITY visibility);
 
 		void CreateRootSignature();
 
@@ -26,6 +34,8 @@ namespace GameEngine {
 
 		ID3D12RootSignature* GetRootSignature() const { return rootSignature_.Get(); }
 
+		std::vector<ParameterType> GetParameterTypes() const { return parameterTypes_; }
+
 	private:
 
 		ID3D12Device* device_ = nullptr;
@@ -35,8 +45,9 @@ namespace GameEngine {
 		std::vector<D3D12_ROOT_PARAMETER> rootParameters_;
 		std::vector<D3D12_DESCRIPTOR_RANGE> descriptorRanges_;
 		std::vector<D3D12_STATIC_SAMPLER_DESC> staticSamplers_;
-
-		D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
+		
+		// パラメータのタイプ
+		std::vector<ParameterType> parameterTypes_;
 
 	private:
 

@@ -47,6 +47,11 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// PSOを作成
 	CreatePSO();
 
+	// PSOを作成
+	psoManager_ = std::make_unique<PSOManager>();
+	psoManager_->Initialize(dxCommon_->GetDevice(), dxc_.get());
+	psoManager_->DefaultLoadPSO();
+
 	// ImGuiの初期化
 	imGuiManager_ = std::make_unique<ImGuiManager>();
 	imGuiManager_->Initialize(windowsApp_.get(), dxCommon_.get(),srvManager_.get());
@@ -73,7 +78,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	Sprite::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), spritePSO_.get(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 	// 3dを描画する処理の初期化
 	Model::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get());
-	ModelRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), trianglePSO_.get(), particlePSO_.get(), animationPSO_.get(), gridPSO_.get());
+	ModelRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), animationPSO_.get(), gridPSO_.get(), psoManager_.get());
 	// 線を描画する処理の初期化
 	PrimitiveRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), linePSO_.get());
 	// ワールドトランスフォームの初期化
@@ -185,14 +190,6 @@ bool Engine::IsWindowOpen() {
 }
 
 void Engine::CreatePSO() {
-
-	// 三角形のPSO設定の初期化
-	trianglePSO_ = std::make_unique<TrianglePSO>();
-	trianglePSO_->Initialize(L"Resources/Shaders/Object3d.VS.hlsl", L"Resources/Shaders/Object3d.PS.hlsl", dxCommon_->GetDevice(), dxc_.get());
-
-	// パーティクル(複数描画用)のPSO設定を初期化
-	particlePSO_ = std::make_unique<ParticlePSO>();
-	particlePSO_->Initialize(L"Resources/Shaders/Particle.VS.hlsl", L"Resources/Shaders/particle.PS.hlsl", dxCommon_->GetDevice(), dxc_.get());
 
 	// アニメーション用のPSO設定を初期化
 	animationPSO_ = std::make_unique<AnimationPSO>();

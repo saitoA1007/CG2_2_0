@@ -7,8 +7,6 @@
 
 // Core/PSO
 #include"LinePSO.h"
-#include"TrianglePSO.h"
-#include"ParticlePSO.h"
 #include"AnimationPSO.h"
 #include"SpritePSO.h"
 #include"GridPSO.h"
@@ -56,6 +54,8 @@
 
 #include"SceneManager.h"
 
+#include"PSO/Core/PSOManager.h"
+
 namespace GameEngine {
 
 	class Engine final {
@@ -99,12 +99,6 @@ namespace GameEngine {
 
 		/// PSO ======================================
 
-		// 通常のPSO設定
-		std::unique_ptr<TrianglePSO> trianglePSO_;
-
-		// パーティクル(複数描画)のPSO設定
-		std::unique_ptr<ParticlePSO> particlePSO_;
-
 		// アニメーション用のPSO設定
 		std::unique_ptr<AnimationPSO> animationPSO_;
 
@@ -145,6 +139,9 @@ namespace GameEngine {
 		// 雑種
 		std::unique_ptr<FpsCounter> fpsCounter_;
 		std::unique_ptr<SceneManager> sceneManager_;
+
+
+		std::unique_ptr<PSOManager> psoManager_;
 
 	private:
 

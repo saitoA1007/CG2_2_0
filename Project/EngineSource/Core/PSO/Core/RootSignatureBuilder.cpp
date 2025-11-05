@@ -7,7 +7,13 @@ using namespace GameEngine;
 
 void RootSignatureBuilder::Initialize(ID3D12Device* device) {
 	device_ = device;
-	descriptionRootSignature_.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+    // SRVを作成する配列のメモリをあらかじめ確保しておく
+    // =====================================================
+    // 
+    // 一時敵な対処なので後で検討するべき
+    //
+    //======================================================
+    descriptorRanges_.reserve(8); 
 }
 
 void RootSignatureBuilder::AddCBVParameter(uint32_t shaderRegister, D3D12_SHADER_VISIBILITY visibility) {
@@ -19,34 +25,54 @@ void RootSignatureBuilder::AddCBVParameter(uint32_t shaderRegister, D3D12_SHADER
 }
 
 void RootSignatureBuilder::AddSRVDescriptorTable(uint32_t shaderRegister, uint32_t arryNum, D3D12_SHADER_VISIBILITY visibility) {
-	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-	descriptorRange[0].BaseShaderRegister = shaderRegister; // 始まる番号
-	descriptorRange[0].NumDescriptors = arryNum; // 数
-	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // SRVを使う
-	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // offsetを自動計算
+
+    D3D12_DESCRIPTOR_RANGE range{};
+    range.BaseShaderRegister = shaderRegister; // 始まる番号
+    range.NumDescriptors = arryNum; // 数
+    range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // SRVを使う
+    range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // offsetを自動計算
+    descriptorRanges_.push_back(std::move(range));
 
 	D3D12_ROOT_PARAMETER param{};
 	param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE; // DescriptorTableを使う
 	param.ShaderVisibility = visibility; // 使うシェーダー
-	param.DescriptorTable.pDescriptorRanges = descriptorRange; // Tableの中身の配列を指定
-	param.DescriptorTable.NumDescriptorRanges = _countof(descriptorRange); // Tableで利用する数
+	param.DescriptorTable.pDescriptorRanges = &descriptorRanges_.back(); // Tableの中身の配列を指定
+	param.DescriptorTable.NumDescriptorRanges = 1; // Tableで利用する数
 	rootParameters_.push_back(param);
+}
+
+void RootSignatureBuilder::AddSampler(uint32_t shaderRegister, D3D12_FILTER filter, D3D12_TEXTURE_ADDRESS_MODE texAddress, D3D12_SHADER_VISIBILITY visibility) {
+    D3D12_STATIC_SAMPLER_DESC samplerDesc{};
+    samplerDesc.Filter = filter; // バイリニアフィルタ
+    samplerDesc.AddressU = texAddress;
+    samplerDesc.AddressV = texAddress;
+    samplerDesc.AddressW = texAddress;
+    samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER; // 比較しない
+    samplerDesc.MaxLOD = D3D12_FLOAT32_MAX;
+    samplerDesc.ShaderRegister = shaderRegister; // レジスタ番号
+    samplerDesc.ShaderVisibility = visibility; // シェーダーモード
+    staticSamplers_.push_back(samplerDesc);
 }
 
 void RootSignatureBuilder::CreateRootSignature() {
 	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob, errorBlob;
 
+    // ルートシグネチャの作成
+    D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+    descriptionRootSignature.NumParameters = static_cast<UINT>(rootParameters_.size());
+    descriptionRootSignature.pParameters = rootParameters_.data();
+    descriptionRootSignature.NumStaticSamplers = static_cast<UINT>(staticSamplers_.size());
+    descriptionRootSignature.pStaticSamplers = staticSamplers_.data();
+    descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+   
 	// シリアライズしてバイナリにする
-	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature_,
-		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
 		LogManager::GetInstance().Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	// バイナリを元に生成
-	hr = device_->CreateRootSignature(0,
-		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
-		IID_PPV_ARGS(&rootSignature_));
+	hr = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr));
 }
 
@@ -77,8 +103,7 @@ void RootSignatureBuilder::CreateRootSignatureFromReflection(IDxcUtils* utils,ID
 
     // シリアライズしてバイナリにする
     Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob, errorBlob;
-    HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc,
-        D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+    HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr)) {
         if (errorBlob) {
             LogManager::GetInstance().Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
@@ -87,9 +112,7 @@ void RootSignatureBuilder::CreateRootSignatureFromReflection(IDxcUtils* utils,ID
     }
 
     // バイナリを元に生成
-    hr = device_->CreateRootSignature(0,
-        signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
-        IID_PPV_ARGS(&rootSignature_));
+    hr = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
     assert(SUCCEEDED(hr));
 }
 
@@ -122,6 +145,18 @@ void RootSignatureBuilder::ReflectionBoundResource(IDxcUtils* utils,DxcBuffer re
             param.Descriptor.ShaderRegister = bindDesc.BindPoint;
             param.Descriptor.RegisterSpace = bindDesc.Space;
             rootParameters_.push_back(param);
+            parameterTypes_.push_back(ParameterType::CBV);
+
+            std::string s = "none";
+            if (param.ShaderVisibility == D3D12_SHADER_VISIBILITY_VERTEX) {
+                s = "Vertex";
+            } else if (param.ShaderVisibility == D3D12_SHADER_VISIBILITY_PIXEL) {
+                s = "Pixel";
+            } else if (param.ShaderVisibility == D3D12_SHADER_VISIBILITY_ALL) {
+                s = "All";
+            }
+
+            LogManager::GetInstance().Log("arrayNum" + std::to_string(rootParameters_.size() - 1) + " / Type : CBV / registerNum : " + std::to_string(bindDesc.BindPoint) + " / visibility : " + s);
             break;
         }
 
@@ -134,12 +169,22 @@ void RootSignatureBuilder::ReflectionBoundResource(IDxcUtils* utils,DxcBuffer re
             range.BaseShaderRegister = bindDesc.BindPoint;
             range.RegisterSpace = bindDesc.Space;
             range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-            descriptorRanges_.push_back(range);
+            descriptorRanges_.push_back(std::move(range));
 
             param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
             param.DescriptorTable.NumDescriptorRanges = 1;
             param.DescriptorTable.pDescriptorRanges = &descriptorRanges_.back();
             rootParameters_.push_back(param);
+            parameterTypes_.push_back(ParameterType::SRV);
+            std::string s = "none";
+            if (param.ShaderVisibility == D3D12_SHADER_VISIBILITY_VERTEX) {
+                s = "Vertex";
+            } else if (param.ShaderVisibility == D3D12_SHADER_VISIBILITY_PIXEL) {
+                s = "Pixel";
+            } else if (param.ShaderVisibility == D3D12_SHADER_VISIBILITY_ALL) {
+                s = "All";
+            }
+            LogManager::GetInstance().Log("arrayNum" + std::to_string(rootParameters_.size() - 1) + " / Type : SRV / registerNum : " + std::to_string(bindDesc.BindPoint) + " / visibility : " + s);
             break;
         }
 
