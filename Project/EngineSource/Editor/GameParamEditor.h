@@ -21,6 +21,7 @@ public:
 	// グループ
 	struct Group {
 		std::map<std::string, Item> items;
+		std::string sceneName; // シーンの名前
 	};
 
 public:
@@ -37,7 +38,7 @@ public:
 	/// グループ作成
 	/// </summary>
 	/// <param name="groupName"></param>
-	void CreateGroup(const std::string& groupName);
+	void CreateGroup(const std::string& groupName,const std::string& sceneName = "none");
 
 	/// <summary>
 	/// ディレクトリの全ファイル読み込み
@@ -75,6 +76,10 @@ public:
 	/// <returns></returns>
 	const std::string& GetSelectGroup() const { return selectedGroupName_; }
 
+	void SetActiveScene(const std::string& sceneName);
+
+	const std::string& GetActiveScene() const { return activeSceneName_; }
+
 private:
 	GameParamEditor() = default;
 	~GameParamEditor() = default;
@@ -86,6 +91,9 @@ private:
 
 	// 選択中のグループ名
 	std::string selectedGroupName_;
+
+	// 現在アクティブなシーン名
+	std::string activeSceneName_ = "None";
 
 	// グローバル変数の保存先ファイルパス
 	const std::string kDirectoryPath = "Resources/Json/";

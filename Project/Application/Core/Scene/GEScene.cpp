@@ -2,6 +2,7 @@
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
 #include"SpriteRenderer.h"
+#include"GameParamEditor.h"
 #include<numbers>
 using namespace GameEngine;
 
@@ -32,6 +33,10 @@ void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inp
 	// グリッドの初期化
 	gridModel_ = modelManager->GetNameByModel("Grid");
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+
+	// 登録するパラメータを設定
+	GameParamEditor::GetInstance()->SetActiveScene("GEScene");
+
 #pragma endregion
 
 	// プレイヤーモデルを生成
