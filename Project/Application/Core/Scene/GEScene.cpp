@@ -1,6 +1,7 @@
 #include"GEScene.h"
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
+#include"SpriteRenderer.h"
 #include<numbers>
 using namespace GameEngine;
 
@@ -105,14 +106,14 @@ void GEScene::Draw() {
 	//===========================================================
 
 	// 3Dモデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode::DefaultModel);
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
 	// プレイヤーを描画
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform(),0, camera_->GetVPMatrix());
 
 #ifdef _DEBUG
 	// モデルの単体描画前処理
-	ModelRenderer::PreDraw(RenderMode::Grid);
+	ModelRenderer::PreDraw(RenderMode3D::Grid);
 
 	// グリッドを描画
 	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
@@ -123,10 +124,9 @@ void GEScene::Draw() {
 	//========================================================================
 
 	// 画像の描画前処理
-	Sprite::PreDraw(BlendMode::kBlendModeNormal);
+	SpriteRenderer::PreDraw(RenderMode2D::Normal);
 
-	// 画像を描画
-	sprite_->Draw(uvCheckerGH_);
+	SpriteRenderer::Draw(sprite_.get(), uvCheckerGH_);
 }
 
 void GEScene::InputRegisterCommand() {

@@ -88,10 +88,18 @@ void RootSignatureBuilder::CreateRootSignatureFromReflection(IDxcUtils* utils,ID
 		D3D12_SHADER_VISIBILITY_PIXEL
 	};
 
+    // 同じパラメータを統合するためのマップ
+    std::map<uint32_t, ResourceInfo> cbvMap;
+    std::map<uint32_t, ResourceInfo> srvMap;
+    std::map<uint32_t, ResourceInfo> samplerMap;
+
     // 分析する
     for (uint32_t index = 0; index < 2; ++index) {
-        ReflectionBoundResource(utils, reflectionBuffer, shaderBlobs[index], visibilities[index]);
+        ReflectionBoundResourceToMap(utils, reflectionBuffer, shaderBlobs[index], visibilities[index], cbvMap, srvMap, samplerMap);
     }
+
+    // 取得したパラメータマップからルートパラメータを作成
+    CreateParametersFromMaps(cbvMap, srvMap, samplerMap);
 
     // ルートシグネチャの作成
     D3D12_ROOT_SIGNATURE_DESC rootSigDesc{};
@@ -206,4 +214,169 @@ void RootSignatureBuilder::ReflectionBoundResource(IDxcUtils* utils,DxcBuffer re
         }
         }
     }
+}
+
+void RootSignatureBuilder::ReflectionBoundResourceToMap(IDxcUtils* utils, DxcBuffer reflectionBuffer, IDxcBlob* shaderBlob, D3D12_SHADER_VISIBILITY visibility,
+    std::map<uint32_t, ResourceInfo>& cbvMap, std::map<uint32_t, ResourceInfo>& srvMap, std::map<uint32_t, ResourceInfo>& samplerMap) {
+
+    reflectionBuffer.Ptr = shaderBlob->GetBufferPointer();
+    reflectionBuffer.Size = shaderBlob->GetBufferSize();
+
+    Microsoft::WRL::ComPtr<ID3D12ShaderReflection> reflection;
+    HRESULT hr = utils->CreateReflection(&reflectionBuffer, IID_PPV_ARGS(&reflection));
+    if (FAILED(hr)) {
+        assert(0);
+    }
+
+    D3D12_SHADER_DESC shaderDesc{};
+    reflection->GetDesc(&shaderDesc);
+
+    // 解析したデータをマップに保存する
+    for (UINT i = 0; i < shaderDesc.BoundResources; ++i) {
+        D3D12_SHADER_INPUT_BIND_DESC bindDesc{};
+        reflection->GetResourceBindingDesc(i, &bindDesc);
+
+        switch (bindDesc.Type) {
+        case D3D_SIT_CBUFFER: {
+            auto it = cbvMap.find(bindDesc.BindPoint);
+            if (it != cbvMap.end()) {
+                // 同じものがあれば統合
+                it->second.visibility = MergeVisibility(it->second.visibility, visibility);
+            } else {
+                // 存在しない場合、新しくcbvを作成
+                ResourceInfo info;
+                info.visibility = visibility;
+                info.bindPoint = bindDesc.BindPoint;
+                info.space = bindDesc.Space;
+                info.bindCount = 1;
+                cbvMap[bindDesc.BindPoint] = info;
+            }
+            break;
+        }
+
+        case D3D_SIT_TEXTURE: {
+            auto it = srvMap.find(bindDesc.BindPoint);
+            if (it != srvMap.end()) {
+                // 同じものがあれば統合
+                it->second.visibility = MergeVisibility(it->second.visibility, visibility);
+            } else {
+                // 存在しない場合、新しくsrvを作成
+                ResourceInfo info;
+                info.visibility = visibility;
+                info.bindPoint = bindDesc.BindPoint;
+                info.space = bindDesc.Space;
+                info.bindCount = bindDesc.BindCount;
+                srvMap[bindDesc.BindPoint] = info;
+            }
+            break;
+        }
+
+        case D3D_SIT_SAMPLER: {
+            auto it = samplerMap.find(bindDesc.BindPoint);
+            if (it != samplerMap.end()) {
+                // 同じものがあれば統合
+                it->second.visibility = MergeVisibility(it->second.visibility, visibility);
+            } else {
+                // 存在しない場合、新しくsamplerを作成
+                ResourceInfo info;
+                info.visibility = visibility;
+                info.bindPoint = bindDesc.BindPoint;
+                info.space = bindDesc.Space;
+                info.bindCount = 1;
+                samplerMap[bindDesc.BindPoint] = info;
+            }
+            break;
+        }
+        }
+    }
+}
+
+void RootSignatureBuilder::CreateParametersFromMaps(const std::map<uint32_t, ResourceInfo>& cbvMap, const std::map<uint32_t, ResourceInfo>& srvMap, const std::map<uint32_t, ResourceInfo>& samplerMap){
+    // CBVを追加
+    for (const auto& pair : cbvMap) {
+        const ResourceInfo& info = pair.second;
+
+        D3D12_ROOT_PARAMETER param{};
+        param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        param.ShaderVisibility = info.visibility;
+        param.Descriptor.ShaderRegister = info.bindPoint;
+        param.Descriptor.RegisterSpace = info.space;
+        rootParameters_.push_back(param);
+        parameterTypes_.push_back(ParameterType::CBV);
+
+        std::string s = "none";
+        if (info.visibility == D3D12_SHADER_VISIBILITY_VERTEX) {
+            s = "Vertex";
+        } else if (info.visibility == D3D12_SHADER_VISIBILITY_PIXEL) {
+            s = "Pixel";
+        } else if (info.visibility == D3D12_SHADER_VISIBILITY_ALL) {
+            s = "All";
+        }
+
+        LogManager::GetInstance().Log("arrayNum" + std::to_string(rootParameters_.size() - 1) + " / Type : CBV / registerNum : " + std::to_string(info.bindPoint) + " / visibility : " + s);
+    }
+
+    // SRVを追加
+    for (const auto& pair : srvMap) {
+        const ResourceInfo& info = pair.second;
+
+        D3D12_DESCRIPTOR_RANGE range{};
+        range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+        range.NumDescriptors = info.bindCount;
+        range.BaseShaderRegister = info.bindPoint;
+        range.RegisterSpace = info.space;
+        range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+        descriptorRanges_.push_back(std::move(range));
+
+        D3D12_ROOT_PARAMETER param{};
+        param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        param.ShaderVisibility = info.visibility;
+        param.DescriptorTable.NumDescriptorRanges = 1;
+        param.DescriptorTable.pDescriptorRanges = &descriptorRanges_.back();
+        rootParameters_.push_back(param);
+        parameterTypes_.push_back(ParameterType::SRV);
+
+        std::string s = "none";
+        if (info.visibility == D3D12_SHADER_VISIBILITY_VERTEX) {
+            s = "Vertex";
+        } else if (info.visibility == D3D12_SHADER_VISIBILITY_PIXEL) {
+            s = "Pixel";
+        } else if (info.visibility == D3D12_SHADER_VISIBILITY_ALL) {
+            s = "All";
+        }
+
+        LogManager::GetInstance().Log("arrayNum" + std::to_string(rootParameters_.size() - 1) + " / Type : SRV / registerNum : " + std::to_string(info.bindPoint) + " / visibility : " + s);
+    }
+
+    // サンプラーを追加
+    for (const auto& pair : samplerMap) {
+        const ResourceInfo& info = pair.second;
+
+        D3D12_STATIC_SAMPLER_DESC samplerDesc{};
+        samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+        samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+        samplerDesc.MaxLOD = D3D12_FLOAT32_MAX;
+        samplerDesc.ShaderRegister = info.bindPoint;
+        samplerDesc.RegisterSpace = info.space;
+        samplerDesc.ShaderVisibility = info.visibility;
+        staticSamplers_.push_back(samplerDesc);
+    }
+}
+
+D3D12_SHADER_VISIBILITY RootSignatureBuilder::MergeVisibility(D3D12_SHADER_VISIBILITY v1, D3D12_SHADER_VISIBILITY v2) {
+    // 既にAllならそのまま返す
+    if (v1 == D3D12_SHADER_VISIBILITY_ALL || v2 == D3D12_SHADER_VISIBILITY_ALL) {
+        return D3D12_SHADER_VISIBILITY_ALL;
+    }
+
+    // 異なる形で使用されている場合はAll
+    if (v1 != v2) {
+        return D3D12_SHADER_VISIBILITY_ALL;
+    }
+
+    // 同じならそのまま返す
+    return v1;
 }

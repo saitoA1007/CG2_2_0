@@ -15,12 +15,10 @@
 using namespace GameEngine;
 
 ID3D12Device* Model::device_ = nullptr;
-ID3D12GraphicsCommandList* Model::commandList_ = nullptr;
 TextureManager* Model::textureManager_ = nullptr;
 
-void Model::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager) {
+void Model::StaticInitialize(ID3D12Device* device, TextureManager* textureManager) {
 	device_ = device;
-	commandList_ = commandList;
 	textureManager_ = textureManager;
 }
 

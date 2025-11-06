@@ -195,9 +195,6 @@
     <ClCompile Include="EngineSource\Core\FPSCounter.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\SpritePSO.cpp">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Core\GameEngine.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
@@ -275,6 +272,7 @@
     <ClCompile Include="Externals\imgui\imgui_canvas.cpp" />
     <ClCompile Include="Externals\imgui\imgui_node_editor_api.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\MaterialEditor.cpp" />
+    <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -439,9 +437,6 @@
     <ClInclude Include="EngineSource\Core\FPSCounter.h">
       <Filter>EngineSource\Core</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\SpritePSO.h">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Core\GameEngine.h">
       <Filter>EngineSource\Core</Filter>
     </ClInclude>
@@ -534,6 +529,7 @@
     <ClInclude Include="Externals\imgui\imgui_bezier_math.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\MaterialEditor.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\DrawPSOData.h" />
+    <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

@@ -161,6 +161,8 @@ void PSOManager::DefaultLoadPSO() {
     defaultSprite.blendMode = BlendMode::kBlendModeNormal;
     defaultSprite.isDepthEnable = false;
     RegisterPSO("DefaultSprite", defaultSprite);
+    defaultSprite.blendMode = BlendMode::kBlendModeAdd;
+    RegisterPSO("AdditiveSprite", defaultSprite);
 
     // インスタンシング描画用PSO
     CreatePSOData instancing3D;

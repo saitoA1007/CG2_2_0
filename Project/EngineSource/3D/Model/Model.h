@@ -35,7 +35,7 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="device"></param>
 		/// <param name="commandList"></param>
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager);
+		static void StaticInitialize(ID3D12Device* device, TextureManager* textureManager);
 
 		/// <summary>
 		/// OBJファイルからメッシュ生成
@@ -157,8 +157,6 @@ namespace GameEngine {
 
 		// デバイス
 		static ID3D12Device* device_;
-		// コマンドリスト
-		static ID3D12GraphicsCommandList* commandList_;
 
 		// テクスチャ
 		static TextureManager* textureManager_;

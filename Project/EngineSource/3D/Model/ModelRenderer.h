@@ -15,7 +15,7 @@
 namespace GameEngine {
 
 	// モデルを描画するモード
-	enum class RenderMode {
+	enum class RenderMode3D {
 		DefaultModel, // 通常モデルを描画用
 		Instancing,   // インスタンシング描画用
 		Grid,  // グリッド描画用
@@ -30,16 +30,15 @@ namespace GameEngine {
 		/// <summary>
 		/// 静的初期化
 		/// </summary>
-		/// <param name="device"></param>
 		/// <param name="commandList"></param>
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,PSOManager* psoManager);
+		static void StaticInitialize(ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,PSOManager* psoManager);
 
 		/// <summary>
 		/// 描画前処理
 		/// </summary>
 		/// <param name="mode"></param>
 		/// <param name="blendMode"></param>
-		static void PreDraw(RenderMode mode);
+		static void PreDraw(RenderMode3D mode);
 
 	public:
 
@@ -109,16 +108,13 @@ namespace GameEngine {
 
 	private:
 
-		// デバイス
-		static ID3D12Device* device_;
 		// コマンドリスト
 		static ID3D12GraphicsCommandList* commandList_;
 
 		// psoデータのリスト
-		static std::unordered_map<RenderMode, DrawPsoData> psoList_;
+		static std::unordered_map<RenderMode3D, DrawPsoData> psoList_;
 
 		// テクスチャ
 		static TextureManager* textureManager_;
-
 	};
 }

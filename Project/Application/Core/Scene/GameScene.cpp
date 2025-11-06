@@ -147,7 +147,7 @@ void GameScene::Draw() {
 	//===========================================================
 
 	// 3Dモデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode::DefaultModel);
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
 	// 地面を描画
 	ModelRenderer::DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
@@ -157,14 +157,14 @@ void GameScene::Draw() {
 	//planeModel_->Draw(planeWorldTransform_, uvCheckerGH_, camera_->GetVPMatrix());
 
 	// アニメーションの描画前処理
-	ModelRenderer::PreDraw(RenderMode::AnimationModel);
+	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 
 	// アニメーションしているモデルを描画
 	ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_, camera_->GetVPMatrix(), skinClusterBron_);
 
 #ifdef _DEBUG
 	// モデルの単体描画前処理
-	ModelRenderer::PreDraw(RenderMode::Grid);
+	ModelRenderer::PreDraw(RenderMode3D::Grid);
 
 	// グリッドを描画
 	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());

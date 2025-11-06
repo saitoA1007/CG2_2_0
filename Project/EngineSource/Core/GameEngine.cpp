@@ -75,10 +75,11 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	Animation::StaticInitialize(dxCommon_->GetDevice(), srvManager_.get());
 
 	// 画像の初期化
-	Sprite::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), spritePSO_.get(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
+	Sprite::StaticInitialize(dxCommon_->GetDevice(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
+	SpriteRenderer::StaticInitialize(dxCommon_->GetCommandList(), textureManager_.get(), psoManager_.get());
 	// 3dを描画する処理の初期化
-	Model::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get());
-	ModelRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), textureManager_.get(), psoManager_.get());
+	Model::StaticInitialize(dxCommon_->GetDevice(), textureManager_.get());
+	ModelRenderer::StaticInitialize(dxCommon_->GetCommandList(), textureManager_.get(), psoManager_.get());
 	// 線を描画する処理の初期化
 	PrimitiveRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), linePSO_.get());
 	// ワールドトランスフォームの初期化
@@ -199,10 +200,6 @@ void Engine::CreatePSO() {
 	copyPSO_ = std::make_unique<CopyPSO>();
 	copyPSO_->Initialize(dxCommon_->GetDevice(), L"Resources/Shaders/PostEffect/Copy.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc_.get());
 	dxCommon_->SetCopyPSO(copyPSO_.get());
-
-	// スプライトのPSOを初期化
-	spritePSO_ = std::make_unique<SpritePSO>();
-	spritePSO_->Initialize(L"Resources/Shaders/Sprite.VS.hlsl", L"Resources/Shaders/Sprite.PS.hlsl", dxCommon_->GetDevice(), dxc_.get());
 
 	/// PostProcessのPSOを初期化
 

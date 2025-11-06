@@ -7,7 +7,6 @@
 
 // Core/PSO
 #include"LinePSO.h"
-#include"SpritePSO.h"
 #include"PostProcess/CopyPSO.h"
 #include"PostProcess/BloomPSO.h"
 #include"PostProcess/ScanLinePSO.h"
@@ -37,6 +36,7 @@
 // 2D
 #include"ImGuiManager.h"
 #include"Sprite.h"
+#include"SpriteRenderer.h"
 
 #include"TransformationMatrix.h"
 
@@ -99,9 +99,6 @@ namespace GameEngine {
 
 		// 線のPSO設定
 		std::unique_ptr<LinePSO> linePSO_;
-
-		// スプライトのPSO設定
-		std::unique_ptr<SpritePSO> spritePSO_;
 
 		/// ↓ポストエフェクト用のPSO設定
 

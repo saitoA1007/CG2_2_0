@@ -1,26 +1,14 @@
 #include"Sprite.h"
 #include"CreateBufferResource.h"
 #include"MyMath.h"
-#include"TextureManager.h"
 using namespace GameEngine;
 
 ID3D12Device* Sprite::device_ = nullptr;
-ID3D12GraphicsCommandList* Sprite::commandList_ = nullptr;
 Matrix4x4 Sprite::orthoMatrix_;
-TextureManager* Sprite::textureManager_ = nullptr;
-SpritePSO* Sprite::spritePSO_ = nullptr;
 
-void Sprite::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, SpritePSO* spritePSO, int32_t width, int32_t height) {
+void Sprite::StaticInitialize(ID3D12Device* device, int32_t width, int32_t height) {
 	device_ = device;
-	commandList_ = commandList;
 	orthoMatrix_ = Multiply(MakeIdentity4x4(), MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 100.0f));
-	textureManager_ = textureManager;
-	spritePSO_ = spritePSO;
-}
-
-void Sprite::PreDraw(BlendMode blendMode) {
-	commandList_->SetGraphicsRootSignature(spritePSO_->GetRootSignature());  // RootSignatureを設定。
-	commandList_->SetPipelineState(spritePSO_->GetPipelineState(blendMode)); // spritePSOを設定
 }
 
 std::unique_ptr<Sprite> Sprite::Create(const Vector2& position,const Vector2& size,const Vector2& anchorPoint,const Vector4& color,
@@ -62,21 +50,6 @@ void Sprite::Update() {
 	worldMatrix_ = MakeAffineMatrix(Vector3(scale_.x, scale_.y, 0.0f), Vector3(0.0f,0.0f,rotate_), Vector3(position_.x, position_.y, 0.0f));
 	// 座標を適用 
 	constBufferData_->WVP = Multiply(worldMatrix_, orthoMatrix_);
-}
-
-void Sprite::Draw(const uint32_t& textureHandle) {
-	// Spriteの描画。
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	commandList_->IASetIndexBuffer(&indexBufferView_);// IBVを設定
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	// CBufferの場所を設定
-	commandList_->SetGraphicsRootConstantBufferView(0, constBufferResource_->GetGPUVirtualAddress());
-	if (textureHandle != 1024) {
-		// SpriteがuvCheckerを描画するようにする
-		commandList_->SetGraphicsRootDescriptorTable(1, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
-	}
-	// 描画
-	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
 void Sprite::SetPosition(const Vector2& position) {

@@ -7,12 +7,7 @@
 #include"Vector4.h"
 #include"Transform.h"
 
-#include"SpritePSO.h"
-
 namespace GameEngine {
-
-	// 前方宣言
-	class TextureManager;
 
 	class Sprite final {
 	public:
@@ -37,13 +32,7 @@ namespace GameEngine {
 		/// <param name="device">デバイス</param>
 		/// <param name="window_width">画面幅</param>
 		/// <param name="window_height">画面高さ</param>
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, SpritePSO* spritePSO, int32_t width, int32_t height);
-
-		/// <summary>
-		/// 描画前処理
-		/// </summary>
-		/// <param name="blendMode">ブレンドモード = BlendMode::??</param>
-		static void PreDraw(BlendMode blendMode);
+		static void StaticInitialize(ID3D12Device* device, int32_t width, int32_t height);
 
 		/// <summary>
 		/// スプライト生成
@@ -62,11 +51,6 @@ namespace GameEngine {
 		/// 更新処理
 		/// </summary>
 		void Update();
-
-		/// <summary>
-		/// 描画
-		/// </summary>
-		void Draw(const uint32_t& textureHandle = 1024);
 
 		/// <summary>
 		/// 座標の設定
@@ -116,6 +100,11 @@ namespace GameEngine {
 		/// <param name="transform"></param>
 		void SetUvMatrix(const Transform& transform);
 
+		const D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView() const { return vertexBufferView_; }
+		const D3D12_INDEX_BUFFER_VIEW& GetIndexBufferView() const { return indexBufferView_; }
+
+		ID3D12Resource* GetResource() const { return constBufferResource_.Get(); }
+
 	public: // 変数
 
 		// 座標
@@ -135,15 +124,9 @@ namespace GameEngine {
 
 		// デバイス
 		static ID3D12Device* device_;
-		// コマンドリスト
-		static ID3D12GraphicsCommandList* commandList_;
 		// 射影行列
 		static Matrix4x4 orthoMatrix_;
-		// テクスチャ
-		static TextureManager* textureManager_;
-		// スプライトのPSO
-		static SpritePSO* spritePSO_;
-
+		
 		// アンカーポイント
 		Vector2 anchorPoint_{};
 		// ワールド行列

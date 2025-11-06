@@ -86,7 +86,7 @@ void TitleScene::Draw() {
 
 #ifdef _DEBUG
 	// モデルの単体描画前処理
-	ModelRenderer::PreDraw(RenderMode::Grid);
+	ModelRenderer::PreDraw(RenderMode3D::Grid);
 
 	// グリッドを描画
 	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
