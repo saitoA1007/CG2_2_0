@@ -10,9 +10,9 @@ GameParamEditor* GameParamEditor::GetInstance() {
 	return &instance;
 }
 
-void GameParamEditor::CreateGroup(const std::string& groupName) {
+void GameParamEditor::CreateGroup(const std::string& groupName, const std::string& sceneName) {
 	// 指定名のオブジェクトが無ければ追加する
-	datas_[groupName];
+	datas_[groupName].sceneName = sceneName;
 }
 
 void GameParamEditor::Update() {
@@ -66,6 +66,9 @@ void GameParamEditor::SaveFile(const std::string& groupName) {
 	root = json::object();
 	// jsonオブジェクト登録
 	root[groupName] = json::object();
+
+	// シーン名を保存
+	root[groupName]["SceneName"] = activeSceneName_;
 
 	// 各項目について
 	for (std::map<std::string, Item>::iterator itItem = itGroup->second.items.begin(); itItem != itGroup->second.items.end(); ++itItem) {
@@ -169,6 +172,10 @@ void GameParamEditor::LoadFile(const std::string& groupName) {
 	// ファイルを閉じる
 	ifs.close();
 
+	// シーン名を読み込み
+	std::string sceneName = root[groupName]["SceneName"].get<std::string>();
+	datas_[groupName].sceneName = sceneName;
+
 	// グループを検索
 	json::iterator itGroup = root.find(groupName);
 	// 未登録チェック
@@ -205,6 +212,9 @@ void GameParamEditor::AddItem(const std::string& groupName, const std::string& k
 		return;
 	}
 
+	// アクティブなシーンを登録
+	group.sceneName = activeSceneName_;
+
 	// 新しい項目のデータを設定
 	Item newItem{};
 	newItem.value = value;
@@ -221,6 +231,9 @@ void GameParamEditor::AddItem(const std::string& groupName, const std::string& k
 		return;
 	}
 
+	// アクティブなシーンを登録
+	group.sceneName = activeSceneName_;
+
 	// 新しい項目のデータを設定
 	Item newItem{};
 	newItem.value = value;
@@ -236,6 +249,9 @@ void GameParamEditor::AddItem(const std::string& groupName, const std::string& k
 	if (group.items.find(key) != group.items.end()) {
 		return;
 	}
+
+	// アクティブなシーンを登録
+	group.sceneName = activeSceneName_;
 
 	// 新しい項目のデータを設定
 	Item newItem{};
@@ -290,6 +306,10 @@ void GameParamEditor::SelectGroup(const std::string& groupName) {
 	selectedGroupName_ = groupName;
 }
 
+void GameParamEditor::SetActiveScene(const std::string& sceneName) {
+	activeSceneName_ = sceneName;
+}
+
 void GameParamEditor::DrawGroupHierarchy() {
 
 	if (!ImGui::Begin("ParameterHierarchy")) {
@@ -297,8 +317,24 @@ void GameParamEditor::DrawGroupHierarchy() {
 		return;
 	}
 
+	// シーンフィルタ表示
+	if (activeSceneName_.empty()) {
+		ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "All Groups");
+		ImGui::Separator();
+	} else {
+		ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "Active Scene: %s", activeSceneName_.c_str());
+		ImGui::Separator();
+	}
+
 	// 各グループをリスト表示
 	for (auto& [groupName, group] : datas_) {
+
+		// 指定したシーンにあった項目を表示する
+		if (!activeSceneName_.empty() &&!group.sceneName.empty() &&
+			group.sceneName != activeSceneName_) {
+			continue;
+		}
+
 		bool isSelected = (selectedGroupName_ == groupName);
 
 		// 項目数を表示
@@ -316,13 +352,6 @@ void GameParamEditor::DrawGroupHierarchy() {
 			}
 			if (ImGui::MenuItem("Load")) {
 				LoadFile(groupName);
-			}
-			if (ImGui::MenuItem("Delete Group")) {
-				// グループ削除処理（オプション）
-				datas_.erase(groupName);
-				if (selectedGroupName_ == groupName) {
-					selectedGroupName_.clear();
-				}
 			}
 			ImGui::EndPopup();
 		}

@@ -1,6 +1,7 @@
 #include"TitleScene.h"
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
+#include"GameParamEditor.h"
 using namespace GameEngine;
 
 TitleScene::~TitleScene() {
@@ -30,6 +31,10 @@ void TitleScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* 
 	// グリッドの初期化
 	gridModel_ = modelManager->GetNameByModel("Grid");
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+
+	// 登録するパラメータを設定
+	GameParamEditor::GetInstance()->SetActiveScene("TitleScene");
+
 #pragma endregion
 	
 	inputCommand_->RegisterCommand("CameraChange", {{InputState::KeyTrigger, DIK_F }});

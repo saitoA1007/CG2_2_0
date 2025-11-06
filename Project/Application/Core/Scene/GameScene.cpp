@@ -35,6 +35,10 @@ void GameScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* i
 	// グリッドの初期化
 	gridModel_ = modelManager->GetNameByModel("Grid");
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+
+	// 登録するパラメータを設定
+	GameParamEditor::GetInstance()->SetActiveScene("GameScene");
+
 #pragma endregion
 
 	// 平行光源ライト
