@@ -3,27 +3,25 @@
 
 using namespace GameEngine;
 
-ID3D12Device* ModelRenderer::device_ = nullptr;
 ID3D12GraphicsCommandList* ModelRenderer::commandList_ = nullptr;
 TextureManager* ModelRenderer::textureManager_ = nullptr;
-std::unordered_map<RenderMode, DrawPsoData> ModelRenderer::psoList_;
+std::unordered_map<RenderMode3D, DrawPsoData> ModelRenderer::psoList_;
 
-void ModelRenderer::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, PSOManager* psoManager) {
-	device_ = device;
+void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, PSOManager* psoManager) {
 	commandList_ = commandList;
 	textureManager_ = textureManager;
 
 	// 通常描画のpsoデータを取得する
-	psoList_[RenderMode::DefaultModel] = psoManager->GetDrawPsoData("Default3D");
+	psoList_[RenderMode3D::DefaultModel] = psoManager->GetDrawPsoData("Default3D");
 	// インスタンシング描画用のデータを取得する
-	psoList_[RenderMode::Instancing] = psoManager->GetDrawPsoData("Instancing3D");
+	psoList_[RenderMode3D::Instancing] = psoManager->GetDrawPsoData("Instancing3D");
 	// グリッド描画用のデータを取得する
-	psoList_[RenderMode::Grid] = psoManager->GetDrawPsoData("Grid");
+	psoList_[RenderMode3D::Grid] = psoManager->GetDrawPsoData("Grid");
 	// アニメーション描画用のデータを取得する
-	psoList_[RenderMode::AnimationModel] = psoManager->GetDrawPsoData("Animation");
+	psoList_[RenderMode3D::AnimationModel] = psoManager->GetDrawPsoData("Animation");
 }
 
-void ModelRenderer::PreDraw(RenderMode mode) {
+void ModelRenderer::PreDraw(RenderMode3D mode) {
 	auto pso = psoList_.find(mode);
 	if (pso == psoList_.end()) {
 		assert(0);

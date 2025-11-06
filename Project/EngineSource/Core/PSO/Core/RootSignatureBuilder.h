@@ -4,6 +4,7 @@
 #include<vector>
 #include<string>
 #include <wrl.h>
+#include<map>
 
 namespace GameEngine {
 
@@ -11,6 +12,14 @@ namespace GameEngine {
 	enum class ParameterType {
 		CBV,
 		SRV
+	};
+
+	// パラメータの情報を保持するデータ
+	struct ResourceInfo {
+		D3D12_SHADER_VISIBILITY visibility;
+		uint32_t bindPoint;
+		uint32_t space;
+		uint32_t bindCount; // SRV用
 	};
 
 	class RootSignatureBuilder {
@@ -56,5 +65,11 @@ namespace GameEngine {
 		/// </summary>
 		void ReflectionBoundResource(IDxcUtils* utils, DxcBuffer reflectionBuffer, IDxcBlob* shaderBlob,D3D12_SHADER_VISIBILITY visibility);
 
+		void ReflectionBoundResourceToMap(IDxcUtils* utils, DxcBuffer reflectionBuffer, IDxcBlob* shaderBlob, D3D12_SHADER_VISIBILITY visibility,
+			std::map<uint32_t, ResourceInfo>& cbvMap, std::map<uint32_t, ResourceInfo>& srvMap, std::map<uint32_t, ResourceInfo>& samplerMap);
+
+		void CreateParametersFromMaps(const std::map<uint32_t, ResourceInfo>& cbvMap, const std::map<uint32_t, ResourceInfo>& srvMap, const std::map<uint32_t, ResourceInfo>& samplerMap);
+
+		D3D12_SHADER_VISIBILITY MergeVisibility(D3D12_SHADER_VISIBILITY v1, D3D12_SHADER_VISIBILITY v2);
 	};
 }

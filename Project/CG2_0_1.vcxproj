@@ -173,6 +173,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Player.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
+    <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Animation.cpp" />
     <ClCompile Include="EngineSource\3D\Model\AxisIndicator.cpp" />
@@ -222,7 +223,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\SpritePSO.cpp" />
     <ClCompile Include="EngineSource\Core\RandomGenerator.cpp" />
     <ClCompile Include="EngineSource\Core\DirectX\SrvManager.cpp" />
     <ClCompile Include="EngineSource\Core\TextureManager.cpp" />
@@ -259,6 +259,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Player.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
+    <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelRenderer.h" />
     <ClInclude Include="EngineSource\3D\Model\Animation.h" />
     <ClInclude Include="EngineSource\3D\Model\AnimationData.h" />
@@ -321,7 +322,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.h" />
-    <ClInclude Include="EngineSource\Core\PSO\SpritePSO.h" />
     <ClInclude Include="EngineSource\Core\RandomGenerator.h" />
     <ClInclude Include="EngineSource\Core\DirectX\SrvManager.h" />
     <ClInclude Include="EngineSource\Core\TextureManager.h" />
