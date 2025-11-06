@@ -2,7 +2,7 @@
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
 
-#include"Application/GameParamEditor.h"
+#include"GameParamEditor.h"
 #include"FPSCounter.h"
 
 using namespace GameEngine;

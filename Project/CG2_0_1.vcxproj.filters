@@ -228,7 +228,7 @@
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\CopyPSO.cpp">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClCompile>
-    <ClCompile Include="Application\GameParamEditor.cpp">
+    <ClCompile Include="EngineSource\Editor\GameParamEditor.cpp">
       <Filter>GameSource</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.cpp">
@@ -273,6 +273,7 @@
     <ClCompile Include="Externals\imgui\imgui_node_editor_api.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\MaterialEditor.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
+    <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -479,7 +480,7 @@
     <ClInclude Include="EngineSource\Core\PSO\BasePSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
-    <ClInclude Include="Application\GameParamEditor.h">
+    <ClInclude Include="EngineSource\Editor\GameParamEditor.h">
       <Filter>GameSource</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.h">
@@ -530,6 +531,7 @@
     <ClInclude Include="EngineSource\Core\PSO\Core\MaterialEditor.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\DrawPSOData.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
+    <ClInclude Include="EngineSource\Editor\ParamEditorManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

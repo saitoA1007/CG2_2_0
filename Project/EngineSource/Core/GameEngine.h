@@ -48,7 +48,7 @@
 
 #include"FPSCounter.h"
 #include"RandomGenerator.h"
-#include"Application/GameParamEditor.h"
+#include"GameParamEditor.h"
 
 #include"SceneManager.h"
 
