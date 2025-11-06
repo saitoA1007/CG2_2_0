@@ -62,7 +62,19 @@ public:
 	float GetFloatValue(const std::string& groupName, const std::string& key) const;
 
 	Vector3 GetVector3Value(const std::string& groupName, const std::string& key) const;
-	
+
+	/// <summary>
+	/// グループを選択
+	/// </summary>
+	/// <param name="groupName"></param>
+	void SelectGroup(const std::string& groupName);
+
+	/// <summary>
+	/// 選択中のグループを取得
+	/// </summary>
+	/// <returns></returns>
+	const std::string& GetSelectGroup() const { return selectedGroupName_; }
+
 private:
 	GameParamEditor() = default;
 	~GameParamEditor() = default;
@@ -71,6 +83,9 @@ private:
 
 	// 全データ
 	std::map<std::string, Group> datas_;
+
+	// 選択中のグループ名
+	std::string selectedGroupName_;
 
 	// グローバル変数の保存先ファイルパス
 	const std::string kDirectoryPath = "Resources/Json/";
@@ -88,4 +103,8 @@ private:
 	void SetValue(const std::string& groupName, const std::string& key, float value);
 
 	void SetValue(const std::string& groupName, const std::string& key, const Vector3& value);
+
+	void DrawGroupHierarchy();
+
+	void DrawParameterInspector();
 };

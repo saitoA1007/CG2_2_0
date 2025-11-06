@@ -16,72 +16,12 @@ void GameParamEditor::CreateGroup(const std::string& groupName) {
 }
 
 void GameParamEditor::Update() {
-	if (!ImGui::Begin("GameParamater", nullptr)) {
-		ImGui::End();
-		return;
-	}
 
-	// 各グループについて
-	for (std::map<std::string, Group>::iterator itGroup = datas_.begin();
-		itGroup != datas_.end(); ++itGroup) {
+	// グループを管理
+	DrawGroupHierarchy();
 
-		// グループ名を取得
-		const std::string& groupName = itGroup->first;
-		// グループの参照を取得
-		Group& group = itGroup->second;
-
-		// コラプシングヘッダーでグループを表示（デフォルトで開いた状態も可能、ImGuiTreeNodeFlags_DefaultOpen)
-		if (ImGui::CollapsingHeader(groupName.c_str())) {
-
-			// インデントを追加して階層感を出す
-			ImGui::Indent();
-
-			// 各項目について
-			for (std::map<std::string, Item>::iterator itItem = group.items.begin();
-				itItem != group.items.end(); ++itItem) {
-
-				// 項目名を取得
-				const std::string& itemName = itItem->first;
-				// 項目の参照を取得
-				Item& item = itItem->second;
-
-				// 各型の項目を表示
-				if (std::holds_alternative<int32_t>(item.value)) {
-					// int32_t型の値を保持していれば
-					int32_t* ptr = std::get_if<int32_t>(&item.value);
-					ImGui::DragInt(itemName.c_str(), ptr, 1);
-
-				} else if (std::holds_alternative<float>(item.value)) {
-					// float型の値を保持していれば
-					float* ptr = std::get_if<float>(&item.value);
-					ImGui::DragFloat(itemName.c_str(), ptr, 0.01f);
-
-				} else if (std::holds_alternative<Vector3>(item.value)) {
-					// Vector3型の値を保持していれば
-					Vector3* ptr = std::get_if<Vector3>(&item.value);
-					ImGui::DragFloat3(itemName.c_str(), reinterpret_cast<float*>(ptr), 0.01f);
-				}
-			}
-
-			// 少しスペースを空ける
-			ImGui::Spacing();
-
-			// 保存ボタン
-			if (ImGui::Button(("Save " + groupName).c_str())) {
-				SaveFile(groupName);
-				std::string message = std::format("{}.json saved.", groupName);
-				MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
-			}
-
-			// インデントを戻す
-			ImGui::Unindent();
-
-			// グループ間にセパレータを追加（見やすさのため）
-			ImGui::Separator();
-		}
-	}
-
-	ImGui::End();
+	// 指定したグループのパラメータを管理
+	DrawParameterInspector();
 }
 
 void GameParamEditor::SetValue(const std::string& groupName, const std::string& key, int32_t value) {
@@ -344,4 +284,128 @@ Vector3 GameParamEditor::GetVector3Value(const std::string& groupName, const std
 
 	// グループの参照を取得
 	return std::get<Vector3>(itItem->second.value);
+}
+
+void GameParamEditor::SelectGroup(const std::string& groupName) {
+	selectedGroupName_ = groupName;
+}
+
+void GameParamEditor::DrawGroupHierarchy() {
+
+	if (!ImGui::Begin("ParameterHierarchy")) {
+		ImGui::End();
+		return;
+	}
+
+	// 各グループをリスト表示
+	for (auto& [groupName, group] : datas_) {
+		bool isSelected = (selectedGroupName_ == groupName);
+
+		// 項目数を表示
+		std::string label = groupName;
+		if (ImGui::Selectable(label.c_str(), isSelected)) {
+			SelectGroup(groupName);
+		}
+
+		// 右クリックメニュー
+		if (ImGui::BeginPopupContextItem()) {
+			if (ImGui::MenuItem("Save")) {
+				SaveFile(groupName);
+				std::string message = std::format("{}.json saved.", groupName);
+				MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
+			}
+			if (ImGui::MenuItem("Load")) {
+				LoadFile(groupName);
+			}
+			if (ImGui::MenuItem("Delete Group")) {
+				// グループ削除処理（オプション）
+				datas_.erase(groupName);
+				if (selectedGroupName_ == groupName) {
+					selectedGroupName_.clear();
+				}
+			}
+			ImGui::EndPopup();
+		}
+	}
+
+	ImGui::End();
+}
+
+void GameParamEditor::DrawParameterInspector() {
+	if (!ImGui::Begin("Parameter Inspector")) {
+		ImGui::End();
+		return;
+	}
+
+	// グループが選択されていない場合の表示
+	if (selectedGroupName_.empty()) {
+		ImGui::TextDisabled("No group selected");
+		ImGui::TextWrapped("No select");
+		ImGui::End();
+		return;
+	}
+
+	// 選択されたグループが存在するかチェック
+	auto itGroup = datas_.find(selectedGroupName_);
+	if (itGroup == datas_.end()) {
+		ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Group not found");
+		selectedGroupName_.clear();
+		ImGui::End();
+		return;
+	}
+
+	// グループ名をヘッダーに表示
+	ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "Group: %s", selectedGroupName_.c_str());
+	ImGui::Separator();
+
+	// 保存ボタン
+	if (ImGui::Button("Save")) {
+		SaveFile(selectedGroupName_);
+		std::string message = std::format("{}.json saved.", selectedGroupName_);
+		MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
+	}
+
+	ImGui::SameLine();
+
+	// 読み込みボタン
+	if (ImGui::Button("Load")) {
+		LoadFile(selectedGroupName_);
+	}
+
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+
+	// グループの参照を取得
+	Group& group = itGroup->second;
+
+	// パラメータが無い場合
+	if (group.items.empty()) {
+		ImGui::TextDisabled("No parameters in this group");
+		ImGui::TextWrapped("None parameter");
+		ImGui::End();
+		return;
+	}
+
+	for (auto& [itemName, item] : group.items) {
+		ImGui::PushID(itemName.c_str());
+
+		// 型に応じて編集UI表示
+		if (std::holds_alternative<int32_t>(item.value)) {
+			int32_t* ptr = std::get_if<int32_t>(&item.value);
+			ImGui::DragInt(itemName.c_str(), ptr, 1);
+
+		} else if (std::holds_alternative<float>(item.value)) {
+			float* ptr = std::get_if<float>(&item.value);
+			ImGui::DragFloat(itemName.c_str(), ptr, 0.01f);
+
+		} else if (std::holds_alternative<Vector3>(item.value)) {
+			Vector3* ptr = std::get_if<Vector3>(&item.value);
+			ImGui::DragFloat3(itemName.c_str(), reinterpret_cast<float*>(ptr), 0.01f);
+		}
+
+		ImGui::PopID();
+	}
+
+	ImGui::End();
 }
