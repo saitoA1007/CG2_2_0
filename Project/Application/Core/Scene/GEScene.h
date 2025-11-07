@@ -7,6 +7,7 @@
 #include"Model.h"
 #include"WorldTransform.h"
 #include"Sprite.h"
+#include"DebugRenderer.h"
 
 #include"Application/Player.h"
 #include"Application/CameraController.h"
@@ -60,6 +61,9 @@ private: // エンジンの低レイヤー機能を取得
 
 	// 入力処理のコマンドシステム
 	GameEngine::InputCommand* inputCommand_ = nullptr;
+
+	// デバック描画するリスト
+	std::unique_ptr<GameEngine::DebugRenderer> debugRenderer_;
 
 private: // シーン機能
 

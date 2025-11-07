@@ -80,15 +80,13 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// 3dを描画する処理の初期化
 	Model::StaticInitialize(dxCommon_->GetDevice(), textureManager_.get());
 	ModelRenderer::StaticInitialize(dxCommon_->GetCommandList(), textureManager_.get(), psoManager_.get());
-	// 線を描画する処理の初期化
-	PrimitiveRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), linePSO_.get());
 	// ワールドトランスフォームの初期化
 	WorldTransform::StaticInitialize(dxCommon_->GetDevice());
 	WorldTransforms::StaticInitialize(dxCommon_.get(),srvManager_.get());
 	// マテリアルの初期化
 	Material::StaticInitialize(dxCommon_->GetDevice());
-	// 線を描画する為のメッシュの初期化
-	LineMesh::StaticInitialize(dxCommon_->GetDevice());
+	// デバック描画用
+	DebugRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), linePSO_.get());
 
 	// 軸方向表示の初期化
 	AxisIndicator::StaticInitialize(dxCommon_->GetCommandList());

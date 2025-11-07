@@ -114,16 +114,10 @@
     <ClCompile Include="EngineSource\3D\Model\AxisIndicator.cpp">
       <Filter>EngineSource\3D</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\3D\Model\LineMesh.cpp">
-      <Filter>EngineSource\3D</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\3D\Model\Material.cpp">
       <Filter>EngineSource\3D</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\3D\Model\Model.cpp">
-      <Filter>EngineSource\3D</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineSource\3D\Model\PrimitiveRenderer.cpp">
       <Filter>EngineSource\3D</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\3D\Model\WorldTransform.cpp">
@@ -275,6 +269,7 @@
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
     <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp" />
     <ClCompile Include="EngineSource\Collision\CollisionManager.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\DebugRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -310,16 +305,10 @@
     <ClInclude Include="EngineSource\3D\Model\AxisIndicator.h">
       <Filter>EngineSource\3D</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\3D\Model\LineMesh.h">
-      <Filter>EngineSource\3D</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\Material.h">
       <Filter>EngineSource\3D</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\Model.h">
-      <Filter>EngineSource\3D</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\3D\Model\PrimitiveRenderer.h">
       <Filter>EngineSource\3D</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\VertexData.h">
@@ -537,6 +526,7 @@
     <ClInclude Include="EngineSource\Collision\CollisionConfig.h" />
     <ClInclude Include="EngineSource\Collision\CollisionManager.h" />
     <ClInclude Include="EngineSource\Collision\CollisionVisitor.h" />
+    <ClInclude Include="EngineSource\3D\Model\DebugRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
