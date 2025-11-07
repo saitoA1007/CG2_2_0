@@ -274,6 +274,7 @@
     <ClCompile Include="EngineSource\Core\PSO\Core\MaterialEditor.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
     <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp" />
+    <ClCompile Include="EngineSource\Collision\CollisionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -532,6 +533,10 @@
     <ClInclude Include="EngineSource\Core\PSO\Core\DrawPSOData.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
     <ClInclude Include="EngineSource\Editor\ParamEditorManager.h" />
+    <ClInclude Include="EngineSource\Collision\Collider.h" />
+    <ClInclude Include="EngineSource\Collision\CollisionConfig.h" />
+    <ClInclude Include="EngineSource\Collision\CollisionManager.h" />
+    <ClInclude Include="EngineSource\Collision\CollisionVisitor.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
