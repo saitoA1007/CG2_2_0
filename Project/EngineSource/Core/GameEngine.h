@@ -28,10 +28,9 @@
 #include"WorldTransform.h"
 #include"WorldTransforms.h"
 #include"AxisIndicator.h"
-#include"PrimitiveRenderer.h"
-#include"LineMesh.h"
 #include"Animation.h"
 #include"ModelRenderer.h"
+#include"DebugRenderer.h"
 
 // 2D
 #include"ImGuiManager.h"

@@ -61,16 +61,21 @@ void PSOManager::RegisterPSO(const std::string& name, const CreatePSOData& psoDa
     }    
 
     // DepthStencilStateの設定
+     // DepthStencilStateの設定
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-    depthStencilDesc.DepthEnable = true;
-    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+    if (psoData.isDepthEnable) {
+        depthStencilDesc.DepthEnable = true;
+        depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+        depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+    } else {
+        depthStencilDesc.DepthEnable = false;
+    }
 
     // PSO設定
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
     psoDesc.pRootSignature = rootSignatureList_[psoData.rootSigName].rootSignature.Get();
     psoDesc.InputLayout = inputLayout->GetInputLayoutDesc();
-    psoDesc.RasterizerState = rasterizerBuiler_.GetRasterizerDesc(DrawModel::FillFront);
+    psoDesc.RasterizerState = rasterizerBuiler_.GetRasterizerDesc(psoData.drawMode);
     psoDesc.BlendState = blendBuilder_.GetBlendDesc(psoData.blendMode);
     psoDesc.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
     psoDesc.PS = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
@@ -207,7 +212,7 @@ void PSOManager::DefaultLoadPSO() {
     animation.rootSigName = "Animation";
     animation.vsPath = L"Resources/Shaders/SkinningObject3d.VS.hlsl";
     animation.psPath = L"Resources/Shaders/Object3d.PS.hlsl";
-    animation.drawMode = DrawModel::None;
+    animation.drawMode = DrawModel::FillFront;
     animation.blendMode = BlendMode::kBlendModeNormal;
     animation.isDepthEnable = true;
     RootSignatureBuilder animationRootSigBuilder;

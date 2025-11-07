@@ -34,6 +34,9 @@ void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inp
 	gridModel_ = modelManager->GetNameByModel("Grid");
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
+	// デバック用描画の初期化
+	debugRenderer_ = DebugRenderer::Create();
+
 	// 登録するパラメータを設定
 	GameParamEditor::GetInstance()->SetActiveScene("GEScene");
 
@@ -59,6 +62,9 @@ void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inp
 }
 
 void GEScene::Update() {
+
+	// デバックリストを削除
+	debugRenderer_->Clear();
 
 	// プレイヤーの更新処理
 	player_->Update(inputCommand_);
@@ -122,6 +128,9 @@ void GEScene::Draw() {
 
 	// グリッドを描画
 	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
+
+	// デバック描画
+	debugRenderer_->DrawAll(camera_->GetVPMatrix());
 #endif
 
 	//========================================================================
