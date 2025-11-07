@@ -55,5 +55,8 @@ namespace GameEngine {
 		WindowsApp* windowsApp_ = nullptr;
 		DirectXCommon* dxCommon_ = nullptr;
 		SrvManager* srvManager_ = nullptr;
+
+		// 固定したいアスペクト比 (16:9)
+		const float kTargetAspect = 1280.0f / 720.0f;
 	};
 }
