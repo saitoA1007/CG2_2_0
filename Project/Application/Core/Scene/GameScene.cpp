@@ -181,6 +181,6 @@ void GameScene::RegisterBebugParam() {
 }
 
 void GameScene::ApplyDebugParam() {
-	testNumber = GameParamEditor::GetInstance()->GetFloatValue("Test1", "testNum");
-	testVector = GameParamEditor::GetInstance()->GetVector3Value("Test2", "testVec");
+	testNumber = GameParamEditor::GetInstance()->GetValue<float>("Test1", "testNum");
+	testVector = GameParamEditor::GetInstance()->GetValue<Vector3>("Test2", "testVec");
 }
