@@ -1,8 +1,6 @@
 #include"GameParamEditor.h"
 #include<cassert>
 
-#include"ImguiManager.h"
-
 using namespace GameEngine;
 
 GameParamEditor* GameParamEditor::GetInstance() {
@@ -22,36 +20,6 @@ void GameParamEditor::Update() {
 
 	// 指定したグループのパラメータを管理
 	DrawParameterInspector();
-}
-
-void GameParamEditor::SetValue(const std::string& groupName, const std::string& key, int32_t value) {
-	// グループの参照を取得
-	Group& group = datas_[groupName];
-	// 新しい項目のデータを設定
-	Item newItem{};
-	newItem.value = value;
-	// 設定した項目をstd::mapに追加
-	group.items[key] = newItem;
-}
-
-void GameParamEditor::SetValue(const std::string& groupName, const std::string& key, float value) {
-	// グループの参照を取得
-	Group& group = datas_[groupName];
-	// 新しい項目のデータを設定
-	Item newItem{};
-	newItem.value = value;
-	// 設定した項目をstd::mapに追加
-	group.items[key] = newItem;
-}
-
-void GameParamEditor::SetValue(const std::string& groupName, const std::string& key, const Vector3& value) {
-	// グループの参照を取得
-	Group& group = datas_[groupName];
-	// 新しい項目のデータを設定
-	Item newItem{};
-	newItem.value = value;
-	// 設定した項目をstd::mapに追加
-	group.items[key] = newItem;
 }
 
 void GameParamEditor::SaveFile(const std::string& groupName) {
@@ -78,20 +46,9 @@ void GameParamEditor::SaveFile(const std::string& groupName) {
 		// 項目の参照を取得
 		Item& item = itItem->second;
 
-		// int32_t型の値を保持
-		if (std::holds_alternative<int32_t>(item.value)) {
-			// int32_t型の値を登録
-			root[groupName][itemName] = std::get<int32_t>(item.value);
-
-		} else if (std::holds_alternative<float>(item.value)) {
-			// float型の値を登録
-			root[groupName][itemName] = std::get<float>(item.value);
-
-		} else if (std::holds_alternative<Vector3>(item.value)) {
-			// Vector3型の値を登録
-			Vector3 value = std::get<Vector3>(item.value);
-			root[groupName][itemName] = json::array({ value.x,value.y,value.z });
-		}
+		// jsonに値を保存する
+		json & jsonNode = root[groupName][itemName];
+		std::visit(JsonSaveVisitor{ jsonNode }, item.value);
 	}
 
 	// ディレクトリがなければ作成する
@@ -185,121 +142,55 @@ void GameParamEditor::LoadFile(const std::string& groupName) {
 	for (json::iterator itItem = itGroup->begin(); itItem != itGroup->end(); ++itItem) {
 		// アイテム名を取得
 		const std::string& itemName = itItem.key();
+		if (itemName == "SceneName") {
+			continue;
+		}
 
-		// int32_t型の値を保持
-		if (itItem->is_number_integer()) {
-			// int型の値を登録
-			int32_t value = itItem->get<int32_t>();
-			SetValue(groupName, itemName, value);
+		// パラメータの型を取得
+		const auto itemType = itItem->type();
 
-		} else if (itItem->is_number_float()) {
-			float value = itItem->get<float>();
-			SetValue(groupName, itemName, value);
-		} else if (itItem->is_array() && itItem->size() == 3) {
-			// float型のjson配列登録
-			Vector3 value = { itItem->at(0),itItem->at(1), itItem->at(2) };
-			SetValue(groupName, itemName, value);
+		switch (itemType)
+		{
+			// bool型を取得
+		case json::value_t::boolean:
+			SetValue(groupName, itemName, itItem->get<bool>());
+			break;
+
+			// int32_t型を取得
+		case json::value_t::number_integer:
+			SetValue(groupName, itemName, itItem->get<int32_t>());
+			break;
+
+			// uint32_t型を取得
+		case json::value_t::number_unsigned:
+			SetValue(groupName, itemName, itItem->get<uint32_t>());
+			break;
+
+			// float型を取得
+		case json::value_t::number_float:
+			SetValue(groupName, itemName, itItem->get<float>());
+			break;
+
+			// Vector型を取得
+		case json::value_t::array:
+			if (itItem->size() == 3) {
+				Vector3 value = { itItem->at(0), itItem->at(1), itItem->at(2) };
+				SetValue(groupName, itemName, value);
+			} else if (itItem->size() == 2) {
+				Vector2 value = { itItem->at(0), itItem->at(1) };
+				SetValue(groupName, itemName, value);
+			}
+			break;
+
+			// std::string型を取得
+		case json::value_t::string:
+			SetValue(groupName, itemName, itItem->get<std::string>());
+			break;
+
+		default:
+			break;
 		}
 	}
-}
-
-void GameParamEditor::AddItem(const std::string& groupName, const std::string& key, int32_t value) {
-	// グループの参照を取得
-	Group& group = datas_[groupName];
-
-	// すでに登録されていれば何もしない
-	if (group.items.find(key) != group.items.end()) {
-		return;
-	}
-
-	// アクティブなシーンを登録
-	group.sceneName = activeSceneName_;
-
-	// 新しい項目のデータを設定
-	Item newItem{};
-	newItem.value = value;
-	// 設定した項目をstd::mapに追加
-	group.items[key] = newItem;
-}
-
-void GameParamEditor::AddItem(const std::string& groupName, const std::string& key, float value) {
-	// グループの参照を取得
-	Group& group = datas_[groupName];
-
-	// すでに登録されていれば何もしない
-	if (group.items.find(key) != group.items.end()) {
-		return;
-	}
-
-	// アクティブなシーンを登録
-	group.sceneName = activeSceneName_;
-
-	// 新しい項目のデータを設定
-	Item newItem{};
-	newItem.value = value;
-	// 設定した項目をstd::mapに追加
-	group.items[key] = newItem;
-}
-
-void GameParamEditor::AddItem(const std::string& groupName, const std::string& key, const Vector3& value) {
-	// グループの参照を取得
-	Group& group = datas_[groupName];
-
-	// すでに登録されていれば何もしない
-	if (group.items.find(key) != group.items.end()) {
-		return;
-	}
-
-	// アクティブなシーンを登録
-	group.sceneName = activeSceneName_;
-
-	// 新しい項目のデータを設定
-	Item newItem{};
-	newItem.value = value;
-	// 設定した項目をstd::mapに追加
-	group.items[key] = newItem;
-}
-
-int32_t GameParamEditor::GetIntValue(const std::string& groupName, const std::string& key) const {
-	// 指定グループが存在するかチェック
-	assert(datas_.find(groupName) != datas_.end());
-
-	// 指定キーが存在するかチェック
-	const Group& group = datas_.at(groupName);
-	assert(group.items.find(key) != group.items.end());
-
-	auto itItem = group.items.find(key);
-
-	// グループの参照を取得
-	return std::get<int32_t>(itItem->second.value);
-}
-
-float GameParamEditor::GetFloatValue(const std::string& groupName, const std::string& key) const {
-	// 指定グループが存在するかチェック
-	assert(datas_.find(groupName) != datas_.end());
-
-	// 指定キーが存在するかチェック
-	const Group& group = datas_.at(groupName);
-	assert(group.items.find(key) != group.items.end());
-
-	auto itItem = group.items.find(key);
-
-	// グループの参照を取得
-	return std::get<float>(itItem->second.value);
-}
-
-Vector3 GameParamEditor::GetVector3Value(const std::string& groupName, const std::string& key) const {
-	// 指定グループが存在するかチェック
-	assert(datas_.find(groupName) != datas_.end());
-
-	// 指定キーが存在するかチェック
-	const Group& group = datas_.at(groupName);
-	assert(group.items.find(key) != group.items.end());
-
-	auto itItem = group.items.find(key);
-
-	// グループの参照を取得
-	return std::get<Vector3>(itItem->second.value);
 }
 
 void GameParamEditor::SelectGroup(const std::string& groupName) {
@@ -420,18 +311,7 @@ void GameParamEditor::DrawParameterInspector() {
 		ImGui::PushID(itemName.c_str());
 
 		// 型に応じて編集UI表示
-		if (std::holds_alternative<int32_t>(item.value)) {
-			int32_t* ptr = std::get_if<int32_t>(&item.value);
-			ImGui::DragInt(itemName.c_str(), ptr, 1);
-
-		} else if (std::holds_alternative<float>(item.value)) {
-			float* ptr = std::get_if<float>(&item.value);
-			ImGui::DragFloat(itemName.c_str(), ptr, 0.01f);
-
-		} else if (std::holds_alternative<Vector3>(item.value)) {
-			Vector3* ptr = std::get_if<Vector3>(&item.value);
-			ImGui::DragFloat3(itemName.c_str(), reinterpret_cast<float*>(ptr), 0.01f);
-		}
+		std::visit(DebugParameterVisitor{ itemName }, item.value);
 
 		ImGui::PopID();
 	}
