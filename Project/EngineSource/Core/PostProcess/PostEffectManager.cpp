@@ -134,14 +134,19 @@ void PostEffectManager::PostDraw(ID3D12GraphicsCommandList* commandList, const D
 
     /// ここにポストエフェクトの描画処理を記入===================
 
+    D3D12_GPU_DESCRIPTOR_HANDLE currentInputSRV = drawObjectSRVHandle_;
+
     // アウトラインを描画
-    DrawOutLine(commandList, depthSRV);
+    DrawOutLine(commandList, depthSRV, currentInputSRV);
+    currentInputSRV = outLineSRVHandle_;
 
     // ブルームを描画
-    DrawBloom(commandList, viewport, scissorRect);
+    DrawBloom(commandList, currentInputSRV, viewport, scissorRect);
+    currentInputSRV = bloomSRVHandle_[3];
 
     // ヴィネットの描画
-    DrawVignetting(commandList);
+    DrawVignetting(commandList, currentInputSRV);
+    currentInputSRV = vignettingSRVHandle_;
 
     switch (drawMode_)
     {
@@ -150,36 +155,22 @@ void PostEffectManager::PostDraw(ID3D12GraphicsCommandList* commandList, const D
 
     case GameEngine::PostEffectManager::DrawMode::ScanLine:
         // scanLineを描画
-        DrawScanLine(commandList);
+        DrawScanLine(commandList, currentInputSRV);
+        currentInputSRV = scanLineSRVHandle_;
         break;
 
     case GameEngine::PostEffectManager::DrawMode::RadialBlur:
         // ラジアルブルーを描画
-        DrawRadialBlur(commandList);
+        DrawRadialBlur(commandList, currentInputSRV);
+        currentInputSRV = radialBlurSRVHandle_;
         break;
     }
+
+    resultSRVHandle_ = currentInputSRV;
 }
 
 CD3DX12_GPU_DESCRIPTOR_HANDLE& PostEffectManager::GetSRVHandle() { 
-
-    // 描画形態に応じて返すSRVを変える
-    switch (drawMode_)
-    {
-    case GameEngine::PostEffectManager::DrawMode::Default:
-        return vignettingSRVHandle_;
-        //return outLineSRVHandle_;
-        break;
-
-    case GameEngine::PostEffectManager::DrawMode::ScanLine:
-        return scanLineSRVHandle_;
-        break;
-
-    case GameEngine::PostEffectManager::DrawMode::RadialBlur:
-        return radialBlurSRVHandle_;
-        break;
-    }
-
-    return vignettingSRVHandle_;
+    return resultSRVHandle_;
 }
 
 void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
@@ -290,7 +281,7 @@ void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_
     LogManager::GetInstance().Log("End Create BloomRenderTargets\n");
 }
 
-void PostEffectManager::DrawBloom(ID3D12GraphicsCommandList* commandList, const D3D12_VIEWPORT& baseViewport, const D3D12_RECT& baseScissorRect) {
+void PostEffectManager::DrawBloom(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv, const D3D12_VIEWPORT& baseViewport, const D3D12_RECT& baseScissorRect) {
     // SRVヒープをセット
     ID3D12DescriptorHeap* heaps[] = { srvManager_->GetSRVHeap()};
     commandList->SetDescriptorHeaps(1, heaps);
@@ -314,7 +305,7 @@ void PostEffectManager::DrawBloom(ID3D12GraphicsCommandList* commandList, const 
     commandList->OMSetRenderTargets(1, &bloomRTVHandle_[0], false, nullptr);
 
     commandList->SetGraphicsRootConstantBufferView(1, bloomPSO_->GetBloomParameterResource()->GetGPUVirtualAddress());
-    commandList->SetGraphicsRootDescriptorTable(2, outLineSRVHandle_);
+    commandList->SetGraphicsRootDescriptorTable(2, currentSrv);
     
     // 明るい部分抽出の描画
     bloomPSO_->Draw(commandList, bloomSRVHandle_[0]);
@@ -430,61 +421,19 @@ void PostEffectManager::InitializeScanLine(uint32_t width, uint32_t height, uint
     // スキャンラインの生成
     LogManager::GetInstance().Log("Start Create ScanLineRenderTargets");
 
-    // テクスチャリソース作成
-    D3D12_RESOURCE_DESC desc{};
-    desc.Width = width;   // テクスチャの幅
-    desc.Height = height; // テクスチャの高さ
-    desc.MipLevels = 1;  // mipMapの数
-    desc.DepthOrArraySize = 1; //  奥行 or 配列Textureの配列数
-    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // TextureのFormat
-    desc.SampleDesc.Count = 1; // ダンプリングのカウント
-    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D; // Textureの次元数
-    desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-
-    // 利用するHeapの設定。
-    CD3DX12_HEAP_PROPERTIES heapProps{};
-    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-
-    HRESULT hr;
-
-    // オブジェクトを描画する用のリソースを作成
-    hr = device_->CreateCommittedResource(
-        &heapProps, // Heapの設定
-        D3D12_HEAP_FLAG_NONE,  // Heapの特殊な設定。特になし
-        &desc,  // Resourceの設定
-        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, // データの転送される設定
-        &clearValue_, // Clearの最適値
-        IID_PPV_ARGS(&scanLineResource_));  // 作成するResourceポインタへのポインタ
-    assert(SUCCEEDED(hr));
-
-    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-
-    // オブジェクト描画用RTVを作成
-    scanLineRTVHandle_ = GetCPUDescriptorHandle(postProcessRTVHeap_.Get(), descriptorSizeRTV, ++rtvIndex_);
-    device_->CreateRenderTargetView(scanLineResource_.Get(), &rtvDesc, scanLineRTVHandle_);
-
-    // SRV作成
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.Texture2D.MipLevels = 1;
-
-    // SRVハンドル取得
-    uint32_t index = srvManager_->AllocateSrvIndex();
-    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(index);
-    scanLineSRVHandle_ = srvManager_->GetGPUHandle(index);
-
-    // オブジェクト描画用SRV
-    device_->CreateShaderResourceView(scanLineResource_.Get(), &srvDesc, srvCPUHandle);
+    // スキャンラインのポストエフェクトのリソースを作成する
+    CreatePostEffectResources(
+        postProcessRTVHeap_.Get(), rtvIndex_, descriptorSizeRTV,
+        width, height,
+        scanLineResource_,
+        scanLineRTVHandle_,
+        scanLineSRVHandle_
+    );
 
     LogManager::GetInstance().Log("End Create ScanLineRenderTargets\n");
 }
 
-void PostEffectManager::DrawScanLine(ID3D12GraphicsCommandList* commandList) {
+void PostEffectManager::DrawScanLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv) {
    
     D3D12_RESOURCE_BARRIER barrier{};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -502,7 +451,7 @@ void PostEffectManager::DrawScanLine(ID3D12GraphicsCommandList* commandList) {
     commandList->OMSetRenderTargets(1, &scanLineRTVHandle_, false, nullptr);
 
     // ラインを描画
-    scanLinePSO_->Draw(commandList, vignettingSRVHandle_);
+    scanLinePSO_->Draw(commandList, currentSrv);
 
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -515,61 +464,19 @@ void PostEffectManager::InitializeVignetting(uint32_t width, uint32_t height, ui
     // ヴィネットの生成
     LogManager::GetInstance().Log("Start Create VignettingRenderTargets");
 
-    // テクスチャリソース作成
-    D3D12_RESOURCE_DESC desc{};
-    desc.Width = width;   // テクスチャの幅
-    desc.Height = height; // テクスチャの高さ
-    desc.MipLevels = 1;  // mipMapの数
-    desc.DepthOrArraySize = 1; //  奥行 or 配列Textureの配列数
-    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // TextureのFormat
-    desc.SampleDesc.Count = 1; // ダンプリングのカウント
-    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D; // Textureの次元数
-    desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-
-    // 利用するHeapの設定。
-    CD3DX12_HEAP_PROPERTIES heapProps{};
-    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-
-    HRESULT hr;
-
-    // オブジェクトを描画する用のリソースを作成
-    hr = device_->CreateCommittedResource(
-        &heapProps, // Heapの設定
-        D3D12_HEAP_FLAG_NONE,  // Heapの特殊な設定。特になし
-        &desc,  // Resourceの設定
-        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, // データの転送される設定
-        &clearValue_, // Clearの最適値
-        IID_PPV_ARGS(&vignettingResource_));  // 作成するResourceポインタへのポインタ
-    assert(SUCCEEDED(hr));
-
-    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-
-    // オブジェクト描画用RTVを作成
-    vignettingRTVHandle_ = GetCPUDescriptorHandle(postProcessRTVHeap_.Get(), descriptorSizeRTV, ++rtvIndex_);
-    device_->CreateRenderTargetView(vignettingResource_.Get(), &rtvDesc, vignettingRTVHandle_);
-
-    // SRV作成
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.Texture2D.MipLevels = 1;
-
-    // SRVハンドル取得
-    uint32_t index = srvManager_->AllocateSrvIndex();
-    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(index);
-    vignettingSRVHandle_ = srvManager_->GetGPUHandle(index);
-
-    // オブジェクト描画用SRV
-    device_->CreateShaderResourceView(vignettingResource_.Get(), &srvDesc, srvCPUHandle);
+    // ヴィネットのポストエフェクトのリソースを作成する
+    CreatePostEffectResources(
+        postProcessRTVHeap_.Get(), rtvIndex_, descriptorSizeRTV,
+        width, height,
+        vignettingResource_,
+        vignettingRTVHandle_,
+        vignettingSRVHandle_
+    );
 
     LogManager::GetInstance().Log("End Create VignettingRenderTargets\n");
 }
 
-void PostEffectManager::DrawVignetting(ID3D12GraphicsCommandList* commandList) {
+void PostEffectManager::DrawVignetting(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv) {
     D3D12_RESOURCE_BARRIER barrier{};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -586,7 +493,7 @@ void PostEffectManager::DrawVignetting(ID3D12GraphicsCommandList* commandList) {
     commandList->OMSetRenderTargets(1, &vignettingRTVHandle_, false, nullptr);
 
     // ヴィネットを描画
-    vignettingPSO_->Draw(commandList, bloomSRVHandle_[3]);
+    vignettingPSO_->Draw(commandList, currentSrv);
 
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -599,61 +506,19 @@ void PostEffectManager::InitializeRadialBlur(uint32_t width, uint32_t height, ui
     // ラジアルブラーの生成
     LogManager::GetInstance().Log("Start Create RadialBlurRenderTargets");
 
-    // テクスチャリソース作成
-    D3D12_RESOURCE_DESC desc{};
-    desc.Width = width;   // テクスチャの幅
-    desc.Height = height; // テクスチャの高さ
-    desc.MipLevels = 1;  // mipMapの数
-    desc.DepthOrArraySize = 1; //  奥行 or 配列Textureの配列数
-    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // TextureのFormat
-    desc.SampleDesc.Count = 1; // ダンプリングのカウント
-    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D; // Textureの次元数
-    desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-
-    // 利用するHeapの設定。
-    CD3DX12_HEAP_PROPERTIES heapProps{};
-    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-
-    HRESULT hr;
-
-    // オブジェクトを描画する用のリソースを作成
-    hr = device_->CreateCommittedResource(
-        &heapProps, // Heapの設定
-        D3D12_HEAP_FLAG_NONE,  // Heapの特殊な設定。特になし
-        &desc,  // Resourceの設定
-        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, // データの転送される設定
-        &clearValue_, // Clearの最適値
-        IID_PPV_ARGS(&radialBlurResource_));  // 作成するResourceポインタへのポインタ
-    assert(SUCCEEDED(hr));
-
-    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-
-    // オブジェクト描画用RTVを作成
-    radialBlurRTVHandle_ = GetCPUDescriptorHandle(postProcessRTVHeap_.Get(), descriptorSizeRTV, ++rtvIndex_);
-    device_->CreateRenderTargetView(radialBlurResource_.Get(), &rtvDesc, radialBlurRTVHandle_);
-
-    // SRV作成
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.Texture2D.MipLevels = 1;
-
-    // SRVハンドル取得
-    uint32_t index = srvManager_->AllocateSrvIndex();
-    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(index);
-    radialBlurSRVHandle_ = srvManager_->GetGPUHandle(index);
-
-    // オブジェクト描画用SRV
-    device_->CreateShaderResourceView(radialBlurResource_.Get(), &srvDesc, srvCPUHandle);
+    // ラジアルブラーのポストエフェクトのリソースを作成する
+    CreatePostEffectResources(
+        postProcessRTVHeap_.Get(), rtvIndex_, descriptorSizeRTV,
+        width, height,
+        radialBlurResource_,
+        radialBlurRTVHandle_,
+        radialBlurSRVHandle_
+    );
 
     LogManager::GetInstance().Log("End Create RadialBlurRenderTargets");
 }
 
-void PostEffectManager::DrawRadialBlur(ID3D12GraphicsCommandList* commandList) {
+void PostEffectManager::DrawRadialBlur(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv) {
     D3D12_RESOURCE_BARRIER barrier{};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -670,7 +535,7 @@ void PostEffectManager::DrawRadialBlur(ID3D12GraphicsCommandList* commandList) {
     commandList->OMSetRenderTargets(1, &radialBlurRTVHandle_, false, nullptr);
 
     // ラジアルブルーを描画
-    radialBlurPSO_->Draw(commandList, vignettingSRVHandle_);
+    radialBlurPSO_->Draw(commandList, currentSrv);
 
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -683,61 +548,19 @@ void  PostEffectManager::InitializeOutLine(uint32_t width, uint32_t height, uint
     // アウトラインの生成
     LogManager::GetInstance().Log("Start Create OutLineRenderTargets");
 
-    // テクスチャリソース作成
-    D3D12_RESOURCE_DESC desc{};
-    desc.Width = width;   // テクスチャの幅
-    desc.Height = height; // テクスチャの高さ
-    desc.MipLevels = 1;  // mipMapの数
-    desc.DepthOrArraySize = 1; //  奥行 or 配列Textureの配列数
-    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // TextureのFormat
-    desc.SampleDesc.Count = 1; // ダンプリングのカウント
-    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D; // Textureの次元数
-    desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-
-    // 利用するHeapの設定。
-    CD3DX12_HEAP_PROPERTIES heapProps{};
-    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-
-    HRESULT hr;
-
-    // オブジェクトを描画する用のリソースを作成
-    hr = device_->CreateCommittedResource(
-        &heapProps, // Heapの設定
-        D3D12_HEAP_FLAG_NONE,  // Heapの特殊な設定。特になし
-        &desc,  // Resourceの設定
-        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, // データの転送される設定
-        &clearValue_, // Clearの最適値
-        IID_PPV_ARGS(&outLineResource_));  // 作成するResourceポインタへのポインタ
-    assert(SUCCEEDED(hr));
-
-    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-
-    // オブジェクト描画用RTVを作成
-    outLineRTVHandle_ = GetCPUDescriptorHandle(postProcessRTVHeap_.Get(), descriptorSizeRTV, ++rtvIndex_);
-    device_->CreateRenderTargetView(outLineResource_.Get(), &rtvDesc, outLineRTVHandle_);
-
-    // SRV作成
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.Texture2D.MipLevels = 1;
-
-    // SRVハンドル取得
-    uint32_t index = srvManager_->AllocateSrvIndex();
-    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(index);
-    outLineSRVHandle_ = srvManager_->GetGPUHandle(index);
-
-    // オブジェクト描画用SRV
-    device_->CreateShaderResourceView(outLineResource_.Get(), &srvDesc, srvCPUHandle);
+    // アウトラインのポストエフェクトのリソースを作成する
+    CreatePostEffectResources(
+        postProcessRTVHeap_.Get(), rtvIndex_, descriptorSizeRTV,
+        width, height,
+        outLineResource_,
+        outLineRTVHandle_,
+        outLineSRVHandle_
+    );
 
     LogManager::GetInstance().Log("End Create OutLineRenderTargets");
 }
 
-void  PostEffectManager::DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV) {
+void  PostEffectManager::DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv) {
     D3D12_RESOURCE_BARRIER barrier{};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -754,10 +577,72 @@ void  PostEffectManager::DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D
     commandList->OMSetRenderTargets(1, &outLineRTVHandle_, false, nullptr);
 
     // アウトラインを描画
-    outLinePSO_->Draw(commandList, drawObjectSRVHandle_, depthSRV);
+    outLinePSO_->Draw(commandList, currentSrv, depthSRV);
 
     // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     commandList->ResourceBarrier(1, &barrier);
+}
+
+void PostEffectManager::CreatePostEffectResources(
+    ID3D12DescriptorHeap* rtvHeap,
+    uint32_t& rtvIndex,
+    uint32_t descriptorSizeRTV,
+    uint32_t width,
+    uint32_t height,
+    Microsoft::WRL::ComPtr<ID3D12Resource>& resource,
+    D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle,
+    D3D12_GPU_DESCRIPTOR_HANDLE& srvGpuHandle
+) {
+
+    // テクスチャリソース作成
+    D3D12_RESOURCE_DESC desc{};
+    desc.Width = width;// テクスチャの幅
+    desc.Height = height;// テクスチャの高さ
+    desc.MipLevels = 1;// mipMapの数
+    desc.DepthOrArraySize = 1;//  奥行 or 配列Textureの配列数
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // TextureのFormat
+    desc.SampleDesc.Count = 1;// ダンプリングのカウント
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+    // 利用するHeapの設定。
+    CD3DX12_HEAP_PROPERTIES heapProps{};
+    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+    HRESULT hr;
+    hr = device_->CreateCommittedResource(
+        &heapProps, // Heapの設定
+        D3D12_HEAP_FLAG_NONE, // Heapの特殊な設定。特になし
+        &desc, // Resourceの設定
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, // データの転送される設定
+        &clearValue_, // Clearの最適値
+        IID_PPV_ARGS(&resource)); // 作成するResourceポインタへのポインタ
+    assert(SUCCEEDED(hr));
+
+    // RTV作成
+    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+
+    // オブジェクト描画用RTVを作成
+    rtvHandle = GetCPUDescriptorHandle(rtvHeap, descriptorSizeRTV, ++rtvIndex);
+    device_->CreateRenderTargetView(resource.Get(), &rtvDesc, rtvHandle);
+
+    // SRV作成
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Texture2D.MipLevels = 1;
+
+    // SRVハンドル取得
+    uint32_t srvIndex = srvManager_->AllocateSrvIndex();
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(srvIndex);
+    srvGpuHandle = srvManager_->GetGPUHandle(srvIndex);
+
+    // オブジェクト描画用SRV
+    device_->CreateShaderResourceView(resource.Get(), &srvDesc, srvCPUHandle);
 }

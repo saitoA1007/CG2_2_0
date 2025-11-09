@@ -270,6 +270,7 @@
     <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp" />
     <ClCompile Include="EngineSource\Collision\CollisionManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\DebugRenderer.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -467,9 +468,6 @@
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\CopyPSO.h">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\BasePSO.h">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Editor\GameParamEditor.h">
       <Filter>GameSource</Filter>
     </ClInclude>
@@ -527,6 +525,9 @@
     <ClInclude Include="EngineSource\Collision\CollisionManager.h" />
     <ClInclude Include="EngineSource\Collision\CollisionVisitor.h" />
     <ClInclude Include="EngineSource\3D\Model\DebugRenderer.h" />
+    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.h" />
+    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleData.h" />
+    <ClInclude Include="EngineSource\Math\Range.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

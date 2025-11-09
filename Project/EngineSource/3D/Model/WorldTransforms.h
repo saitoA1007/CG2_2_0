@@ -10,8 +10,6 @@
 
 #include"Externals/DirectXTex/d3dx12.h"
 
-#include"DirectXCommon.h"
-
 #include"SrvManager.h"
 
 namespace GameEngine {
@@ -36,7 +34,7 @@ namespace GameEngine {
 		/// 静的初期化
 		/// </summary>
 		/// <param name="device"></param>
-		static void StaticInitialize(DirectXCommon* dxCommon,SrvManager* srvManager);
+		static void StaticInitialize(ID3D12Device* device,SrvManager* srvManager);
 
 		/// <summary>
 		/// 初期化
@@ -74,7 +72,7 @@ namespace GameEngine {
 		WorldTransforms(const WorldTransforms&) = delete;
 		WorldTransforms& operator=(const WorldTransforms&) = delete;
 
-		static DirectXCommon* dxCommon_;
+		static ID3D12Device* device_;
 		static SrvManager* srvManager_;
 
 		// インスタンスが持つsrvインデックス

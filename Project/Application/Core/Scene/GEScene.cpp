@@ -57,6 +57,14 @@ void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inp
 	// uvCheckerの画像を取得
 	uvCheckerGH_ = textureManager->GetHandleByName("uvChecker");
 
+	// パーティクルのシステムを初期化
+	testParticle_ = std::make_unique<ParticleBehavior>();
+	testParticle_->Initialize("testParticle",16, uvCheckerGH_);
+	testParticle_->Emit({ 0.0f,0.0f,0.0f });
+
+	// 平面モデル
+	planeModel_ = modelManager->GetNameByModel("plane.obj");
+
 	// 入力コマンドを設定する
 	InputRegisterCommand();
 }
@@ -68,6 +76,9 @@ void GEScene::Update() {
 
 	// プレイヤーの更新処理
 	player_->Update(inputCommand_);
+
+	// パーティクルの更新処理
+	testParticle_->Update();
 
 	// カメラコントロールの更新処理
 	cameraController_->Update(inputCommand_,player_->GetPlayerPos());
@@ -114,7 +125,13 @@ void GEScene::Draw() {
 
 	//===========================================================
 	// 3D描画
-	//===========================================================
+	//===========================================================09
+
+	// 複数モデルの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::Instancing);
+
+	// パーティクルを描画
+	ModelRenderer::DrawInstancing(planeModel_, testParticle_->GetCurrentNumInstance(), *testParticle_->GetWorldTransforms(), testParticle_->GetTexture(), camera_->GetVPMatrix());
 
 	// 3Dモデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);

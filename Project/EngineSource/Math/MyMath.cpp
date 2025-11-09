@@ -190,8 +190,16 @@ Vector3 Max(Vector3 pos1, Vector3 pos2) {
 	return Vector3(std::max(pos1.x, pos2.x), std::max(pos1.y, pos2.y), std::max(pos1.z, pos2.z));
 }
 
+Vector4 MaxVector4(Vector4 pos1, Vector4 pos2) {
+	return Vector4(std::max(pos1.x, pos2.x), std::max(pos1.y, pos2.y), std::max(pos1.z, pos2.z), std::max(pos1.w, pos2.w));
+}
+
 Vector3 Min(Vector3 pos1, Vector3 pos2) {
 	return Vector3(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), std::min(pos1.z, pos2.z));
+}
+
+Vector4 MinVector4(Vector4 pos1, Vector4 pos2) {
+	return Vector4(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), std::min(pos1.z, pos2.z), std::min(pos1.w, pos2.w));
 }
 
 Matrix4x4 MakeIdentity4x4() {

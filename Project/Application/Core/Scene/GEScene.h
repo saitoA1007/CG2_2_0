@@ -12,6 +12,8 @@
 #include"Application/Player.h"
 #include"Application/CameraController.h"
 
+#include"ParticleSystem/ParticleBehavior.h"
+
 class GEScene : public BaseScene {
 public:
 
@@ -93,6 +95,12 @@ private: // シーン機能
 	// uvChecker
 	std::unique_ptr<GameEngine::Sprite> sprite_;
 	uint32_t uvCheckerGH_ = 0;
+
+	// パーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> testParticle_;
+
+	// 平面モデル
+	GameEngine::Model* planeModel_;
 
 private:
 

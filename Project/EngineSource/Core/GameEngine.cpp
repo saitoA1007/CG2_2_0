@@ -9,7 +9,7 @@ using namespace GameEngine;
 void Engine::RunEngine(HINSTANCE& hInstance) {
 
 	// 初期化
-	Initialize(L"CG2_LE2A_05_サイトウ_アオイ", 1280, 720, hInstance);
+	Initialize(L"LE2A_07_サイトウ_アオイ", 1280, 720, hInstance);
 
 	// 更新処理
 	Update();
@@ -82,7 +82,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	ModelRenderer::StaticInitialize(dxCommon_->GetCommandList(), textureManager_.get(), psoManager_.get());
 	// ワールドトランスフォームの初期化
 	WorldTransform::StaticInitialize(dxCommon_->GetDevice());
-	WorldTransforms::StaticInitialize(dxCommon_.get(),srvManager_.get());
+	WorldTransforms::StaticInitialize(dxCommon_->GetDevice(),srvManager_.get());
 	// マテリアルの初期化
 	Material::StaticInitialize(dxCommon_->GetDevice());
 	// デバック描画用

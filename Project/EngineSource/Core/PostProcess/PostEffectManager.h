@@ -3,7 +3,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 
-#include"externals/DirectXTex/d3dx12.h"
+#include"Externals/DirectXTex/d3dx12.h"
 
 #include"PostProcess/BloomPSO.h"
 #include"PostProcess/ScanLinePSO.h"
@@ -25,6 +25,12 @@ namespace GameEngine {
             RadialBlur, // 中心に集中するぼかし
         };
 
+        struct EffectData {
+            Microsoft::WRL::ComPtr<ID3D12Resource> resource;
+            D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle{};
+            CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle{};
+        };
+
     public:
 
         /// <summary>
@@ -44,8 +50,7 @@ namespace GameEngine {
         /// <param name="descriptorSizeRTV"></param>
         /// <param name="descriptorSizeSRV"></param>
         /// <param name="srvHeap_"></param>
-        void Initialize(ID3D12Device* device, float clearColor_[4], uint32_t width, uint32_t height,
-            uint32_t descriptorSizeRTV, SrvManager* srvManager);
+        void Initialize(ID3D12Device* device, float clearColor_[4], uint32_t width, uint32_t height, uint32_t descriptorSizeRTV, SrvManager* srvManager);
 
         /// <summary>
         /// 描画前処理
@@ -132,6 +137,9 @@ namespace GameEngine {
         // srvを管理する
         SrvManager* srvManager_;
 
+        // 最終的に出力するsrvHandle
+        CD3DX12_GPU_DESCRIPTOR_HANDLE resultSRVHandle_;
+
     private:
 
         // ブルーム用のRTVハンドル
@@ -155,6 +163,9 @@ namespace GameEngine {
 
         // 線を描画するためのリソース
         Microsoft::WRL::ComPtr<ID3D12Resource> scanLineResource_;
+
+        // スキャンラインのデータ
+        EffectData scanLineData_;
 
     private:
 
@@ -206,7 +217,7 @@ namespace GameEngine {
         /// <param name="commandList"></param>
         /// <param name="baseViewport"></param>
         /// <param name="baseScissorRect"></param>
-        void DrawBloom(ID3D12GraphicsCommandList* commandList, const D3D12_VIEWPORT& baseViewport, const D3D12_RECT& baseScissorRect);
+        void DrawBloom(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv, const D3D12_VIEWPORT& baseViewport, const D3D12_RECT& baseScissorRect);
 
         /// <summary>
         /// ラインの描画するためのRTVを設定
@@ -221,7 +232,7 @@ namespace GameEngine {
         /// ラインの描画処理
         /// </summary>
         /// <param name="commandList"></param>
-        void DrawScanLine(ID3D12GraphicsCommandList* commandList);
+        void DrawScanLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
 
         /// <summary>
         /// ヴィネットの描画するためのRTVを設定
@@ -236,7 +247,7 @@ namespace GameEngine {
         /// ヴィネットの描画処理
         /// </summary>
         /// <param name="commandList"></param>
-        void DrawVignetting(ID3D12GraphicsCommandList* commandList);
+        void DrawVignetting(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
 
         /// <summary>
         /// ラジアルブルーの描画するためのRTVを設定
@@ -251,7 +262,7 @@ namespace GameEngine {
         /// ラジアルブルーの描画処理
         /// </summary>
         /// <param name="commandList"></param>
-        void DrawRadialBlur(ID3D12GraphicsCommandList* commandList);
+        void DrawRadialBlur(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
 
         /// <summary>
         /// アウトラインの描画するためのRTVを設定
@@ -267,6 +278,18 @@ namespace GameEngine {
         /// </summary>
         /// <param name="commandList"></param>
         /// <param name="depthSRV"></param>
-        void DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV);
+        void DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
+
+        // ポストエフェクトを仕様するためのリソースを作成する
+        void CreatePostEffectResources(
+            ID3D12DescriptorHeap* rtvHeap,
+            uint32_t& rtvIndex,
+            uint32_t descriptorSizeRTV,
+            uint32_t width,
+            uint32_t height,
+            Microsoft::WRL::ComPtr<ID3D12Resource>& resource,   // 作成するリソース
+            D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle,             // 作成するrtvHandle
+            D3D12_GPU_DESCRIPTOR_HANDLE& srvGpuHandle           // 作成するsrvHandle
+        );
     };
 }

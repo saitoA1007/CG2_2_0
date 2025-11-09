@@ -1,6 +1,7 @@
 #pragma once
 #include"Vector2.h"
 #include"Vector3.h"
+#include"Vector4.h"
 #include"Matrix4x4.h"
 
 #include"Quaternion.h"
@@ -57,8 +58,10 @@ Vector3 Project(const Vector3 & worldPosition, const Vector2 & viewport, const f
 
 // 最大値
 Vector3 Max(Vector3 pos1, Vector3 pos2);
+Vector4 MaxVector4(Vector4 pos1, Vector4 pos2);
 // 最小値
 Vector3 Min(Vector3 pos1, Vector3 pos2);
+Vector4 MinVector4(Vector4 pos1, Vector4 pos2);
 
 // 単位行列を生成する関数
 Matrix4x4 MakeIdentity4x4();
