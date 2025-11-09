@@ -4,7 +4,7 @@
 #include"DescriptorHandle.h"
 using namespace GameEngine;
 
-DirectXCommon* WorldTransforms::dxCommon_ = nullptr;
+ID3D12Device* WorldTransforms::device_ = nullptr;
 SrvManager* WorldTransforms::srvManager_ = nullptr;
 
 WorldTransforms::~WorldTransforms() {
@@ -23,8 +23,8 @@ WorldTransforms::~WorldTransforms() {
 	transformDatas_.clear();
 }
 
-void WorldTransforms::StaticInitialize(DirectXCommon* dxCommon, SrvManager* srvManager) {
-	dxCommon_ = dxCommon; 
+void WorldTransforms::StaticInitialize(ID3D12Device* device, SrvManager* srvManager) {
+	device_ = device;
 	srvManager_ = srvManager;
 }
 
@@ -42,7 +42,7 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& 
 	numInstance_ = kNumInstance;
 
 	// Instancing用のTransformationMatrixリソースを作る
-	instancingResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(ParticleForGPU) * numInstance_);
+	instancingResource_ = CreateBufferResource(device_, sizeof(ParticleForGPU) * numInstance_);
 	// 書き込むためのアドレスを取得
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
 	// 単位行列を書き込んでおく
@@ -65,7 +65,7 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& 
 	instancingSrvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
 	instancingSrvHandleCPU_ = srvManager_->GetCPUHandle(srvIndex_);
 	instancingSrvHandleGPU_ = srvManager_->GetGPUHandle(srvIndex_);
-	dxCommon_->GetDevice()->CreateShaderResourceView(instancingResource_.Get(), &instancingSrvDesc, instancingSrvHandleCPU_);
+	device_->CreateShaderResourceView(instancingResource_.Get(), &instancingSrvDesc, instancingSrvHandleCPU_);
 }
 
 void WorldTransforms::UpdateTransformMatrix(const uint32_t& numInstance) {

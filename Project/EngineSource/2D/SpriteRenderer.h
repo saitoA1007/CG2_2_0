@@ -5,7 +5,6 @@
 #include <wrl.h>
 
 #include"TextureManager.h"
-#include"BasePSO.h"
 
 #include"PSO/Core/PSOManager.h"
 #include"PSO/Core/DrawPSOData.h"

@@ -173,7 +173,7 @@ void PSOManager::DefaultLoadPSO() {
     CreatePSOData instancing3D;
     instancing3D.rootSigName = "Instancing3D";
     instancing3D.vsPath = L"Resources/Shaders/Particle.VS.hlsl";
-    instancing3D.psPath = L"Resources/Shaders/particle.PS.hlsl";
+    instancing3D.psPath = L"Resources/Shaders/Particle.PS.hlsl";
     instancing3D.drawMode = DrawModel::FillFront;
     instancing3D.blendMode = BlendMode::kBlendModeNormal;
     instancing3D.isDepthEnable = true;

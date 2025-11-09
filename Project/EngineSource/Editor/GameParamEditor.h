@@ -4,11 +4,14 @@
 #include<map>
 #include<string>
 
+#include"Vector4.h"
 #include"Vector3.h"
 #include"Vector2.h"
+#include"Range.h"
 
 #include<json.hpp>
 #include"ImguiManager.h"
+#include"MyMath.h"
 
 using json = nlohmann::json;
 
@@ -17,7 +20,7 @@ public:
 
 	// 項目
 	struct Item {
-		std::variant<int32_t, uint32_t, float, Vector2, Vector3, bool, std::string> value;
+		std::variant<int32_t, uint32_t, float, Vector2, Vector3,Vector4,Range3, Range4, bool, std::string> value;
 	};
 
 	// グループ
@@ -155,6 +158,24 @@ private:
 	struct JsonSaveVisitor {
 		json& jsonData;
 		explicit JsonSaveVisitor(json& jsonNode) : jsonData(jsonNode){}
+
+		void operator()(const Range3& value) const {
+			jsonData = json::object({
+				{ "Min", json::array({ value.min.x, value.min.y, value.min.z }) },
+				{ "Max", json::array({ value.max.x, value.max.y, value.max.z }) }
+			});
+		}
+
+		void operator()(const Range4& value) const {
+			jsonData = json::object({
+				{ "Min", json::array({ value.min.x, value.min.y, value.min.z, value.min.w}) },
+				{ "Max", json::array({ value.max.x, value.max.y, value.max.z, value.max.w}) }
+				});
+		}
+
+		void operator()(const Vector4& value) const {
+			jsonData = json::array({ value.x, value.y, value.z,value.w });
+		}
 		
 		void operator()(const Vector3& value) const {
 			jsonData = json::array({ value.x, value.y, value.z });
@@ -193,6 +214,36 @@ private:
 
 		void operator()(Vector3& value) const {
 			ImGui::DragFloat3(itemName.c_str(), reinterpret_cast<float*>(&value), 0.01f);
+		}
+
+		void operator()(Vector4& value) const {
+			ImGui::ColorEdit4(itemName.c_str(), reinterpret_cast<float*>(&value));
+		}
+
+		void operator()(Range3& value) const {
+			if (ImGui::TreeNode(itemName.c_str())) {
+				bool isChangeMin = ImGui::DragFloat3("Min", reinterpret_cast<float*>(&value.min), 0.01f);
+				bool isChangeMax = ImGui::DragFloat3("Max", reinterpret_cast<float*>(&value.max), 0.01f);
+
+				if (isChangeMin || isChangeMax) {
+					value.min = Min(value.min, value.max);
+					value.max = Max(value.min, value.max);
+				}
+				ImGui::TreePop();
+			}
+		}
+
+		void operator()(Range4& value) const {
+			if (ImGui::TreeNode(itemName.c_str())) {
+				bool isChangeMin = ImGui::ColorEdit4("Min", reinterpret_cast<float*>(&value.min));
+				bool isChangeMax = ImGui::ColorEdit4("Max", reinterpret_cast<float*>(&value.max));
+
+				if (isChangeMin || isChangeMax) {
+					value.min = MinVector4(value.min, value.max);
+					value.max = MaxVector4(value.min, value.max);
+				}
+				ImGui::TreePop();
+			}
 		}
 
 		void operator()(bool& value) const {

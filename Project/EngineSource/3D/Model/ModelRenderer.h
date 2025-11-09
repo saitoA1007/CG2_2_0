@@ -5,7 +5,6 @@
 #include <wrl.h>
 
 #include"TextureManager.h"
-#include"BasePSO.h"
 
 #include"PSO/Core/PSOManager.h"
 #include"PSO/Core/DrawPSOData.h"
@@ -76,7 +75,7 @@ namespace GameEngine {
 		/// <param name="textureHandle"></param>
 		/// <param name="VPMatrix"></param>
 		/// <param name="material"></param>
-		static void Draw(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material = nullptr);
+		static void DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material = nullptr);
 
 		/// <summary>
 		/// 生成したモデルの複数描画
@@ -85,7 +84,7 @@ namespace GameEngine {
 		/// <param name="textureHandle"></param>
 		/// <param name="VPMatrix"></param>
 		/// <param name="material"></param>
-		static void Draw(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const Matrix4x4& VPMatrix, const Material* material = nullptr);
+		static void DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const Matrix4x4& VPMatrix, const Material* material = nullptr);
 
 		/// <summary>
 		/// グリッドを描画

@@ -179,6 +179,31 @@ void GameParamEditor::LoadFile(const std::string& groupName) {
 			} else if (itItem->size() == 2) {
 				Vector2 value = { itItem->at(0), itItem->at(1) };
 				SetValue(groupName, itemName, value);
+			} else if (itItem->size() == 4) {
+				Vector4 value = { itItem->at(0), itItem->at(1), itItem->at(2),itItem->at(3) };
+				SetValue(groupName, itemName, value);
+			}
+			break;
+
+		case json::value_t::object:
+			if (itItem->contains("Min") && itItem->contains("Max")) {
+				const auto& minArray = itItem->at("Min");
+				const auto& maxArray = itItem->at("Max");
+
+				if (minArray.is_array() && maxArray.is_array() &&
+					minArray.size() == 3 && maxArray.size() == 3) {
+					Range3 value = {
+						{ minArray[0], minArray[1], minArray[2] },
+						{ maxArray[0], maxArray[1], maxArray[2] }
+					};
+					SetValue(groupName, itemName, value);
+				} else if (minArray.size() == 4 && maxArray.size() == 4) {
+					Range4 value = {
+						{ minArray[0], minArray[1], minArray[2], minArray[3] },
+						{ maxArray[0], maxArray[1], maxArray[2], maxArray[3] }
+					};
+					SetValue(groupName, itemName, value);
+				}
 			}
 			break;
 

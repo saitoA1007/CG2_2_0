@@ -142,7 +142,11 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 	}
 }
 
-void ModelRenderer::Draw(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material) {
+void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material) {
+	
+	// 描画するのが0以下の場合は早期リターン
+	if (numInstance <= 0) { return;}
+
 	// カメラ座標に変換
 	if (model->IsLoad()) {
 		worldTransforms.SetWVPMatrix(numInstance, model->GetLocalMatrix(), VPMatrix);
@@ -171,14 +175,18 @@ void ModelRenderer::Draw(const Model* model, const uint32_t& numInstance, WorldT
 		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
 
 		if (meshes[i]->GetTotalIndices() != 0) {
-			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
+			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), numInstance, 0, 0, 0);
 		} else {
-			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), 1, 0, 0);
+			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), numInstance, 0, 0);
 		}
 	}
 }
 
-void ModelRenderer::Draw(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const Matrix4x4& VPMatrix, const Material* material) {
+void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const Matrix4x4& VPMatrix, const Material* material) {
+
+	// 描画するのが0以下の場合は早期リターン
+	if (numInstance <= 0) { return; }
+
 	// カメラ座標に変換
 	if (model->IsLoad()) {
 		worldTransforms.SetWVPMatrix(numInstance, model->GetLocalMatrix(), VPMatrix);
