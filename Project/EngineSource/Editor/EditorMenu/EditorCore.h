@@ -1,6 +1,7 @@
 #pragma once
 #include"EditorWindowManager.h"
 #include"EditorMenuBar.h"
+#include"EditorLayout.h"
 
 #include"Windows/SceneWIndow.h"
 #include"Windows/AssetWindow.h"
@@ -16,11 +17,15 @@ public:
 
 	void Run();
 
+	void Finalize();
+
 private:
 
 	std::unique_ptr<EditorWindowManager> windowManager_;
 
 	std::unique_ptr<EditorMenuBar> menuBar_;
+
+	std::unique_ptr<EditorLayout> editorLayout_;
 
 private:
 

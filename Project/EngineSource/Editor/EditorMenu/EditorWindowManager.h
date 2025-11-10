@@ -18,6 +18,11 @@ public:
 	/// </summary>
 	void DrawAllWindows();
 
+	/// <summary>
+	/// 登録しているウィンドウデータを取得する
+	/// </summary>
+	/// <returns></returns>
+	std::vector<std::unique_ptr<IEditorWindow>>& GetWindows() { return windows_; }
 	const std::vector<std::unique_ptr<IEditorWindow>>& GetWindows() const { return windows_; }
 
 private:

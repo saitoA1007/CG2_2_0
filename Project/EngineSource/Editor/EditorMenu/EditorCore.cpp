@@ -4,6 +4,7 @@
 void EditorCore::Initialize() {
 	windowManager_ = std::make_unique<EditorWindowManager>();
 	menuBar_ = std::make_unique<EditorMenuBar>();
+	editorLayout_ = std::make_unique<EditorLayout>();
 
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>());
 	windowManager_->RegisterWindow(std::make_unique<AssetWindow>());
@@ -11,6 +12,9 @@ void EditorCore::Initialize() {
 	windowManager_->RegisterWindow(std::make_unique<InspectorWindow>());
 	windowManager_->RegisterWindow(std::make_unique<ConsoleWindow>());
 	windowManager_->RegisterWindow(std::make_unique<PerformanceWindow>());
+
+	// レイアウトのデータを取得する
+	editorLayout_->LoadLayout(windowManager_->GetWindows());
 }
 
 void EditorCore::Run() {
@@ -36,4 +40,9 @@ void EditorCore::BeginDockSpace() {
 	ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
 	ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 	ImGui::End();
+}
+
+void EditorCore::Finalize() {
+	// レイアウトデータを保存する
+	editorLayout_->SaveLayout(windowManager_->GetWindows());
 }
