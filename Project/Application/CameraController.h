@@ -23,6 +23,12 @@ public:
 	/// <returns></returns>
 	Matrix4x4 GetVPMatirx() { return camera_->GetVPMatrix(); }
 
+	/// <summary>
+	/// ワールド行列を取得
+	/// </summary>
+	/// <returns></returns>
+	Matrix4x4 GetWorldMatrix() { return camera_->GetWorldMatrix(); }
+
 private:
 
 	// カメラ

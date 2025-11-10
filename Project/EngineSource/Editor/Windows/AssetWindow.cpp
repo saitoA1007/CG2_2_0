@@ -3,6 +3,6 @@
 
 void AssetWindow::Draw() {
     ImGui::Begin("Asset", &isActive);
-    ImGui::Text("Scene view goes here");
+    ImGui::Text("None");
     ImGui::End();
 }
