@@ -29,7 +29,7 @@ void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum, uint3
     RegisterBebugParam();
 #endif
     // 保存したデータを取得する
-    ApplyDebugParam();
+    //ApplyDebugParam();
 }
 
 void ParticleBehavior::Update() {

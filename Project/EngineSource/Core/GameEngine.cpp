@@ -130,15 +130,6 @@ void Engine::Update() {
 		// シーンの更新処理
 		sceneManager_->Update();
 
-#ifdef _DEBUG
-
-		// パラメーターの更新処理
-		GameParamEditor::GetInstance()->Update();
-
-		// Fps計測器の描画
-		fpsCounter_->DrawImGui();
-#endif
-
 		// 更新後処理
 		PostUpdate();
 
@@ -163,8 +154,10 @@ void Engine::PreUpdate() {
 	// ImGuiにフレームが始まる旨を伝える
 	imGuiManager_->BeginFrame();
 
+#ifdef _DEBUG
 	// エディターの処理
 	editorCore_->Run();
+#endif
 }
 
 void Engine::PostUpdate() {

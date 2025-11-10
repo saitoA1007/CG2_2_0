@@ -7,7 +7,10 @@ void EditorCore::Initialize() {
 
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>());
 	windowManager_->RegisterWindow(std::make_unique<AssetWindow>());
+	windowManager_->RegisterWindow(std::make_unique<HierarchyWindow>());
+	windowManager_->RegisterWindow(std::make_unique<InspectorWindow>());
 	windowManager_->RegisterWindow(std::make_unique<ConsoleWindow>());
+	windowManager_->RegisterWindow(std::make_unique<PerformanceWindow>());
 }
 
 void EditorCore::Run() {
