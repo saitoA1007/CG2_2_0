@@ -176,6 +176,10 @@ void Engine::PostDraw() {
 }
 
 void Engine::Finalize() {
+
+	// エディターの終了処理
+	editorCore_->Finalize();
+
 	// テクスチャの解放
 	textureManager_->Finalize();
 	// ImGuiの解放処理
