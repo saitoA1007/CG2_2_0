@@ -1,5 +1,6 @@
 #include"GameParamEditor.h"
 #include<cassert>
+#include<algorithm>
 
 using namespace GameEngine;
 
@@ -332,14 +333,39 @@ void GameParamEditor::DrawParameterInspector() {
 		return;
 	}
 
+	// 優先順位でソートする
+	std::vector<std::pair<std::string, Item*>> sortedItems;
 	for (auto& [itemName, item] : group.items) {
+		sortedItems.push_back({ itemName, &item });
+	}
+	// 優先順位でソート。小さい順で並べる
+	std::sort(sortedItems.begin(), sortedItems.end(),
+		[](const auto& a, const auto& b) {
+			if (a.second->priority != b.second->priority) {
+				return a.second->priority < b.second->priority;
+			}
+			return a.first < b.first;
+		}
+	);
+
+	// ソート済みの順序で表示
+	for (auto& [itemName, itemPtr] : sortedItems) {
 		ImGui::PushID(itemName.c_str());
 
 		// 型に応じて編集UI表示
-		std::visit(DebugParameterVisitor{ itemName }, item.value);
+		std::visit(DebugParameterVisitor{ itemName }, itemPtr->value);
 
 		ImGui::PopID();
 	}
+
+	//for (auto& [itemName, item] : group.items) {
+	//	ImGui::PushID(itemName.c_str());
+
+	//	// 型に応じて編集UI表示
+	//	std::visit(DebugParameterVisitor{ itemName }, item.value);
+
+	//	ImGui::PopID();
+	//}
 
 	ImGui::End();
 }

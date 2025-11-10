@@ -271,6 +271,13 @@
     <ClCompile Include="EngineSource\Collision\CollisionManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\DebugRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.cpp" />
+    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorMenuBar.cpp" />
+    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorWindowManager.cpp" />
+    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorLayout.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\SceneWIndow.cpp" />
+    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorCore.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\ConsoleWindow.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\AssetWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -528,6 +535,14 @@
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleData.h" />
     <ClInclude Include="EngineSource\Math\Range.h" />
+    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorMenuBar.h" />
+    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorWindowManager.h" />
+    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorLayout.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\IEditorWindow.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\SceneWIndow.h" />
+    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorCore.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\ConsoleWindow.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\AssetWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

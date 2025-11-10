@@ -35,6 +35,12 @@ namespace GameEngine{
 		WorldTransforms* GetWorldTransforms() const { return worldTransforms_.get(); }
 
 		/// <summary>
+		/// テクスチャを設定する
+		/// </summary>
+		/// <param name="texture"></param>
+		void SetTexture(const uint32_t& texture) { textureHandle_ = texture; }
+
+		/// <summary>
 		/// テクスチャの取得
 		/// </summary>
 		/// <returns></returns>
@@ -45,6 +51,18 @@ namespace GameEngine{
 		/// </summary>
 		/// <returns></returns>
 		uint32_t GetCurrentNumInstance() const { return currentNumInstance_; }
+
+		/// <summary>
+		/// 発生位置を設定
+		/// </summary>
+		/// <param name="pos"></param>
+		void SetEmitterPos(const Vector3& pos) { emitterPos_ = pos; }
+
+		/// <summary>
+		/// パーティクルのパラメータを設定
+		/// </summary>
+		/// <param name="particelEmitter"></param>
+		void SetParticleEmitter(const ParticelEmitter& particelEmitter) { particleEmitter_ = particelEmitter; }
 
 	private:
 		// パーティクルの配列
