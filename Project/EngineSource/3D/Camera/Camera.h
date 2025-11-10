@@ -58,6 +58,8 @@ namespace GameEngine {
 
 		Vector3 GetWorldPosition();
 
+		void SetterWorldMatrix(const Matrix4x4& worldMatrix) { cameraMatrix_ = worldMatrix; }
+
 	private:
 
 		Matrix4x4 cameraMatrix_;

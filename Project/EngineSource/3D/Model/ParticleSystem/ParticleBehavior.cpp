@@ -32,7 +32,7 @@ void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum, uint3
     //ApplyDebugParam();
 }
 
-void ParticleBehavior::Update() {
+void ParticleBehavior::Update(const Matrix4x4& cameraMatrix) {
 
 #ifdef _DEBUG
     // デバック結果を適応する
@@ -46,10 +46,7 @@ void ParticleBehavior::Update() {
     }
 
     // 移動処理
-    Move();
-
-    // 行列の更新処理
-    worldTransforms_->UpdateTransformMatrix(currentNumInstance_);
+    Move(cameraMatrix);
 }
 
 void ParticleBehavior::Emit(const Vector3& pos) {
@@ -116,7 +113,7 @@ void ParticleBehavior::Create() {
     }
 }
 
-void ParticleBehavior::Move() {
+void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
     currentNumInstance_ = 0;
     for (uint32_t i = 0; i < maxNumInstance_; ++i) {
         ParticleData& particle = particles_[i];
@@ -132,9 +129,20 @@ void ParticleBehavior::Move() {
         particle.transform.translate += particle.velocity * FpsCounter::deltaTime;
 
         // worldTransformsの更新
-        worldTransforms_->transformDatas_[currentNumInstance_].transform = particles_[i].transform;
+        if (particleEmitter_.isBillBoard) {
+            // ビルボードを適応する
+            worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = MakeBillboardMatrix(particles_[i].transform.scale, particles_[i].transform.translate, cameraMatrix);
+        } else {
+            worldTransforms_->transformDatas_[currentNumInstance_].transform = particles_[i].transform;
+        }
+
         worldTransforms_->transformDatas_[currentNumInstance_].color = particles_[i].color;
         currentNumInstance_++;
+    }
+
+    // 行列の更新処理
+    if (!particleEmitter_.isBillBoard) {
+        worldTransforms_->UpdateTransformMatrix(currentNumInstance_);
     }
 }
 
@@ -143,6 +151,7 @@ void ParticleBehavior::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(name_, "SpawnMaxCount", particleEmitter_.spawnMaxCount, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "SpawnCoolTime", particleEmitter_.spawnCoolTime, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "IsLoop", particleEmitter_.isLoop, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "IsBillBoard", particleEmitter_.isBillBoard, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "LifeTime", particleEmitter_.lifeTime, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "FieldAcceleration", particleEmitter_.fieldAcceleration, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "VelocityRange", particleEmitter_.velocityRange, index++);
@@ -155,6 +164,7 @@ void ParticleBehavior::ApplyDebugParam() {
     particleEmitter_.spawnMaxCount = GameParamEditor::GetInstance()->GetValue<uint32_t>(name_, "SpawnMaxCount");
     particleEmitter_.spawnCoolTime = GameParamEditor::GetInstance()->GetValue<float>(name_, "SpawnCoolTime");
     particleEmitter_.isLoop = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsLoop");
+    particleEmitter_.isBillBoard = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsBillBoard");
     particleEmitter_.lifeTime = GameParamEditor::GetInstance()->GetValue<float>(name_, "LifeTime");
     particleEmitter_.fieldAcceleration = GameParamEditor::GetInstance()->GetValue<Vector3>(name_, "FieldAcceleration");
     particleEmitter_.velocityRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "VelocityRange");

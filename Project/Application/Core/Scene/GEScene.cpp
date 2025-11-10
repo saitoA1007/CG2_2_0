@@ -78,7 +78,7 @@ void GEScene::Update() {
 	player_->Update(inputCommand_);
 
 	// パーティクルの更新処理
-	testParticle_->Update();
+	testParticle_->Update(camera_->GetWorldMatrix());
 
 	// カメラコントロールの更新処理
 	cameraController_->Update(inputCommand_,player_->GetPlayerPos());
@@ -98,6 +98,7 @@ void GEScene::Update() {
 	} else {
 		// カメラの更新処理
 		//camera_->Update();
+		camera_->SetterWorldMatrix(cameraController_->GetWorldMatrix());
 		camera_->SetVPMatrix(cameraController_->GetVPMatirx());
 
 		// グリッドの更新処理

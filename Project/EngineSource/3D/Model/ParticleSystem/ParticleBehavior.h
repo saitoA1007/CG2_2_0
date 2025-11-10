@@ -20,7 +20,7 @@ namespace GameEngine{
 		/// <summary>
 		/// 更新処理
 		/// </summary>
-		void Update();
+		void Update(const Matrix4x4& cameraMatrix);
 
 		/// <summary>
 		/// パーティクルの生成
@@ -104,7 +104,7 @@ namespace GameEngine{
 		/// <summary>
 		/// 移動処理
 		/// </summary>
-		void Move();
+		void Move(const Matrix4x4& cameraMatrix);
 
 		/// <summary>
 		/// デバックした値を登録
