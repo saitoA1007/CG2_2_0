@@ -278,6 +278,9 @@
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorCore.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\ConsoleWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\AssetWindow.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\InspectorWindow.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\HierarchyWindow.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\PerformanceWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -543,6 +546,9 @@
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorCore.h" />
     <ClInclude Include="EngineSource\Editor\Windows\ConsoleWindow.h" />
     <ClInclude Include="EngineSource\Editor\Windows\AssetWindow.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\InspectorWindow.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\HierarchyWindow.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\PerformanceWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

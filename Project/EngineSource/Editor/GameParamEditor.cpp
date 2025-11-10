@@ -1,8 +1,8 @@
 #include"GameParamEditor.h"
 #include<cassert>
 #include<algorithm>
-
-using namespace GameEngine;
+#include <fstream>
+#include<Windows.h>
 
 GameParamEditor* GameParamEditor::GetInstance() {
 	static GameParamEditor instance;
@@ -12,15 +12,6 @@ GameParamEditor* GameParamEditor::GetInstance() {
 void GameParamEditor::CreateGroup(const std::string& groupName, const std::string& sceneName) {
 	// 指定名のオブジェクトが無ければ追加する
 	datas_[groupName].sceneName = sceneName;
-}
-
-void GameParamEditor::Update() {
-
-	// グループを管理
-	DrawGroupHierarchy();
-
-	// 指定したグループのパラメータを管理
-	DrawParameterInspector();
 }
 
 void GameParamEditor::SaveFile(const std::string& groupName) {
@@ -225,147 +216,4 @@ void GameParamEditor::SelectGroup(const std::string& groupName) {
 
 void GameParamEditor::SetActiveScene(const std::string& sceneName) {
 	activeSceneName_ = sceneName;
-}
-
-void GameParamEditor::DrawGroupHierarchy() {
-
-	if (!ImGui::Begin("ParameterHierarchy")) {
-		ImGui::End();
-		return;
-	}
-
-	// シーンフィルタ表示
-	if (activeSceneName_.empty()) {
-		ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "All Groups");
-		ImGui::Separator();
-	} else {
-		ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "Active Scene: %s", activeSceneName_.c_str());
-		ImGui::Separator();
-	}
-
-	// 各グループをリスト表示
-	for (auto& [groupName, group] : datas_) {
-
-		// 指定したシーンにあった項目を表示する
-		if (!activeSceneName_.empty() &&!group.sceneName.empty() &&
-			group.sceneName != activeSceneName_) {
-			continue;
-		}
-
-		bool isSelected = (selectedGroupName_ == groupName);
-
-		// 項目数を表示
-		std::string label = groupName;
-		if (ImGui::Selectable(label.c_str(), isSelected)) {
-			SelectGroup(groupName);
-		}
-
-		// 右クリックメニュー
-		if (ImGui::BeginPopupContextItem()) {
-			if (ImGui::MenuItem("Save")) {
-				SaveFile(groupName);
-				std::string message = std::format("{}.json saved.", groupName);
-				MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
-			}
-			if (ImGui::MenuItem("Load")) {
-				LoadFile(groupName);
-			}
-			ImGui::EndPopup();
-		}
-	}
-
-	ImGui::End();
-}
-
-void GameParamEditor::DrawParameterInspector() {
-	if (!ImGui::Begin("Parameter Inspector")) {
-		ImGui::End();
-		return;
-	}
-
-	// グループが選択されていない場合の表示
-	if (selectedGroupName_.empty()) {
-		ImGui::TextDisabled("No group selected");
-		ImGui::TextWrapped("No select");
-		ImGui::End();
-		return;
-	}
-
-	// 選択されたグループが存在するかチェック
-	auto itGroup = datas_.find(selectedGroupName_);
-	if (itGroup == datas_.end()) {
-		ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Group not found");
-		selectedGroupName_.clear();
-		ImGui::End();
-		return;
-	}
-
-	// グループ名をヘッダーに表示
-	ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "Group: %s", selectedGroupName_.c_str());
-	ImGui::Separator();
-
-	// 保存ボタン
-	if (ImGui::Button("Save")) {
-		SaveFile(selectedGroupName_);
-		std::string message = std::format("{}.json saved.", selectedGroupName_);
-		MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
-	}
-
-	ImGui::SameLine();
-
-	// 読み込みボタン
-	if (ImGui::Button("Load")) {
-		LoadFile(selectedGroupName_);
-	}
-
-	ImGui::Spacing();
-	ImGui::Separator();
-	ImGui::Spacing();
-
-	// グループの参照を取得
-	Group& group = itGroup->second;
-
-	// パラメータが無い場合
-	if (group.items.empty()) {
-		ImGui::TextDisabled("No parameters in this group");
-		ImGui::TextWrapped("None parameter");
-		ImGui::End();
-		return;
-	}
-
-	// 優先順位でソートする
-	std::vector<std::pair<std::string, Item*>> sortedItems;
-	for (auto& [itemName, item] : group.items) {
-		sortedItems.push_back({ itemName, &item });
-	}
-	// 優先順位でソート。小さい順で並べる
-	std::sort(sortedItems.begin(), sortedItems.end(),
-		[](const auto& a, const auto& b) {
-			if (a.second->priority != b.second->priority) {
-				return a.second->priority < b.second->priority;
-			}
-			return a.first < b.first;
-		}
-	);
-
-	// ソート済みの順序で表示
-	for (auto& [itemName, itemPtr] : sortedItems) {
-		ImGui::PushID(itemName.c_str());
-
-		// 型に応じて編集UI表示
-		std::visit(DebugParameterVisitor{ itemName }, itemPtr->value);
-
-		ImGui::PopID();
-	}
-
-	//for (auto& [itemName, item] : group.items) {
-	//	ImGui::PushID(itemName.c_str());
-
-	//	// 型に応じて編集UI表示
-	//	std::visit(DebugParameterVisitor{ itemName }, item.value);
-
-	//	ImGui::PopID();
-	//}
-
-	ImGui::End();
 }

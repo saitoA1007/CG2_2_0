@@ -235,6 +235,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\AssetWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\ConsoleWindow.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\HierarchyWindow.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\InspectorWindow.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\PerformanceWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\SceneWIndow.cpp" />
     <ClCompile Include="EngineSource\Input\InPut.cpp" />
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
@@ -346,7 +349,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Editor\ParamEditorManager.h" />
     <ClInclude Include="EngineSource\Editor\Windows\AssetWindow.h" />
     <ClInclude Include="EngineSource\Editor\Windows\ConsoleWindow.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\HierarchyWindow.h" />
     <ClInclude Include="EngineSource\Editor\Windows\IEditorWindow.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\InspectorWindow.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\PerformanceWindow.h" />
     <ClInclude Include="EngineSource\Editor\Windows\SceneWIndow.h" />
     <ClInclude Include="EngineSource\Input\InPut.h" />
     <ClInclude Include="EngineSource\Input\InputCommand.h" />

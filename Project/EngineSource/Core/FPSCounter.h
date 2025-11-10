@@ -18,11 +18,6 @@ namespace GameEngine {
 		void Update();
 
 		/// <summary>
-		/// 描画処理
-		/// </summary>
-		void DrawImGui();
-
-		/// <summary>
 		/// デルタタイムを取得
 		/// </summary>
 		/// <returns></returns>
@@ -40,13 +35,15 @@ namespace GameEngine {
 		// デルタ時間
 		static float deltaTime;
 
+		// fpsの累積
+		static int frameCount_;
+
 	private:
 		// 現在の時間を保持
 		std::chrono::time_point<std::chrono::high_resolution_clock> currentTime_;
 		// 前の時間を保持
 		std::chrono::time_point<std::chrono::high_resolution_clock> preTime_;
-		// fpsの累積
-		int frameCount_ = 0;
+		
 		// fpsの最大値
 		int maxFrameCount_ = 0;
 		// 時間の累積
