@@ -28,6 +28,8 @@ void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum, uint3
     // パラメータを登録する
     RegisterBebugParam();
 #endif
+    // 保存したデータを取得する
+    ApplyDebugParam();
 }
 
 void ParticleBehavior::Update() {
@@ -126,7 +128,7 @@ void ParticleBehavior::Move() {
         // 経過時間を加算
         particle.currentTime += FpsCounter::deltaTime;
         // 速度を追加
-        particle.velocity += particleEmitter_.fieldAcceleration;
+        particle.velocity += particleEmitter_.fieldAcceleration * FpsCounter::deltaTime;
         particle.transform.translate += particle.velocity * FpsCounter::deltaTime;
 
         // worldTransformsの更新
@@ -137,15 +139,16 @@ void ParticleBehavior::Move() {
 }
 
 void ParticleBehavior::RegisterBebugParam() {
-    GameParamEditor::GetInstance()->AddItem(name_, "SpawnMaxCount", particleEmitter_.spawnMaxCount);
-    GameParamEditor::GetInstance()->AddItem(name_, "SpawnCoolTime", particleEmitter_.spawnCoolTime);
-    GameParamEditor::GetInstance()->AddItem(name_, "IsLoop", particleEmitter_.isLoop);
-    GameParamEditor::GetInstance()->AddItem(name_, "LifeTime", particleEmitter_.lifeTime);
-    GameParamEditor::GetInstance()->AddItem(name_, "FieldAcceleration", particleEmitter_.fieldAcceleration);
-    GameParamEditor::GetInstance()->AddItem(name_, "VelocityRange", particleEmitter_.velocityRange);
-    GameParamEditor::GetInstance()->AddItem(name_, "SpawnRange", particleEmitter_.posRange);
-    GameParamEditor::GetInstance()->AddItem(name_, "ScaleRange", particleEmitter_.scaleRange);
-    GameParamEditor::GetInstance()->AddItem(name_, "ColorRange", particleEmitter_.colorRange);
+    int index = 0;
+    GameParamEditor::GetInstance()->AddItem(name_, "SpawnMaxCount", particleEmitter_.spawnMaxCount, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "SpawnCoolTime", particleEmitter_.spawnCoolTime, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "IsLoop", particleEmitter_.isLoop, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "LifeTime", particleEmitter_.lifeTime, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "FieldAcceleration", particleEmitter_.fieldAcceleration, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "VelocityRange", particleEmitter_.velocityRange, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "SpawnRange", particleEmitter_.posRange, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "ScaleRange", particleEmitter_.scaleRange, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "ColorRange", particleEmitter_.colorRange, index++);
 }
 
 void ParticleBehavior::ApplyDebugParam() {
@@ -163,9 +166,4 @@ void ParticleBehavior::ApplyDebugParam() {
     if (maxNumInstance_ <= particleEmitter_.spawnMaxCount) {
         particleEmitter_.spawnMaxCount = maxNumInstance_;
     }
-
-    // 範囲に収める
-    particleEmitter_.velocityRange.min = Min(particleEmitter_.velocityRange.min, particleEmitter_.velocityRange.max);
-    particleEmitter_.posRange.min = Min(particleEmitter_.posRange.min, particleEmitter_.posRange.max);
-    particleEmitter_.scaleRange.min = Min(particleEmitter_.scaleRange.min, particleEmitter_.scaleRange.max);
 }

@@ -10,7 +10,7 @@ using namespace GameEngine;
 void Player::Initialize() {
 
 	// ワールド行列を初期化
-	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,0.0f} });
+	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
 }
 
 void Player::Update(GameEngine::InputCommand* inputCommand) {

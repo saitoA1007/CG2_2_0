@@ -13,7 +13,7 @@
 #include"PostProcess/VignettingPSO.h"
 #include"PostProcess/RadialBlurPSO.h"
 #include"PostProcess/OutLinePSO.h"
-
+#include"PSO/Core/PSOManager.h"
 #include"PostProcess/PostEffectManager.h"
 
 #include"LogManager.h"
@@ -45,13 +45,13 @@
 // Audio
 #include"AudioManager.h"
 
+// 未定のインクルード
 #include"FPSCounter.h"
 #include"RandomGenerator.h"
 #include"GameParamEditor.h"
-
 #include"SceneManager.h"
+#include"EditorMenu/EditorCore.h"
 
-#include"PSO/Core/PSOManager.h"
 
 namespace GameEngine {
 
@@ -119,6 +119,8 @@ namespace GameEngine {
 		// アウトライン用のPSO設定
 		std::unique_ptr<OutLinePSO> outLinePSO_;
 
+		std::unique_ptr<PSOManager> psoManager_;
+
 		/// Input =============================
 
 		// 入力処理
@@ -128,8 +130,9 @@ namespace GameEngine {
 		std::unique_ptr<FpsCounter> fpsCounter_;
 		std::unique_ptr<SceneManager> sceneManager_;
 
+		// Editor =======================================
 
-		std::unique_ptr<PSOManager> psoManager_;
+		std::unique_ptr<EditorCore> editorCore_;
 
 	private:
 

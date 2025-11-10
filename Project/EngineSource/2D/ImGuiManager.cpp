@@ -39,52 +39,25 @@ void ImGuiManager::BeginFrame() {
 	ImGui::NewFrame();
 	ImGuizmo::BeginFrame();
 
-	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-	ImGuiViewport* viewport = ImGui::GetMainViewport();
-	ImGui::SetNextWindowPos(viewport->WorkPos);
-	ImGui::SetNextWindowSize(viewport->WorkSize);
-	ImGui::SetNextWindowViewport(viewport->ID);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-	
-	ImGui::Begin("DockSpace Window", nullptr, window_flags);
-	ImGui::PopStyleVar(2);
-	
-	ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
-	//ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
-	ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
-
-	if (ImGui::BeginMenuBar()) {
-		if (ImGui::BeginMenu("View")) {
-			ImGui::Text("NoneParameter");
-			ImGui::EndMenu();
-		}
-		ImGui::EndMenuBar();
-	}
-	
-	ImGui::End();
-
-	ImGui::Begin("NodeEditor");
-	ImGui::Separator();
-	ed::SetCurrentEditor(g_NodeContext);
-	ed::Begin("My Editor", ImVec2(0.0, 0.0f));
-	int uniqueId = 1;
-	// Start drawing nodes.
-	ed::BeginNode(uniqueId++);
-	ImGui::Text("Node A");
-	ed::BeginPin(uniqueId++, ed::PinKind::Input);
-	ImGui::Text("-> In");
-	ed::EndPin();
-	ImGui::SameLine();
-	ed::BeginPin(uniqueId++, ed::PinKind::Output);
-	ImGui::Text("Out ->");
-	ed::EndPin();
-	ed::EndNode();
-	ed::End();
-	ed::SetCurrentEditor(nullptr);
-	ImGui::End();
+	//ImGui::Begin("NodeEditor");
+	//ImGui::Separator();
+	//ed::SetCurrentEditor(g_NodeContext);
+	//ed::Begin("My Editor", ImVec2(0.0, 0.0f));
+	//int uniqueId = 1;
+	//// Start drawing nodes.
+	//ed::BeginNode(uniqueId++);
+	//ImGui::Text("Node A");
+	//ed::BeginPin(uniqueId++, ed::PinKind::Input);
+	//ImGui::Text("-> In");
+	//ed::EndPin();
+	//ImGui::SameLine();
+	//ed::BeginPin(uniqueId++, ed::PinKind::Output);
+	//ImGui::Text("Out ->");
+	//ed::EndPin();
+	//ed::EndNode();
+	//ed::End();
+	//ed::SetCurrentEditor(nullptr);
+	//ImGui::End();
 }
 
 void ImGuiManager::EndFrame() {

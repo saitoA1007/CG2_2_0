@@ -11,7 +11,7 @@ namespace GameEngine {
 	struct ParticelEmitter {
 		uint32_t spawnMaxCount = 1; // 出現する数
 		float spawnCoolTime = 1.0f; // 発生する時間
-		bool isLoop = false; // ループするかを判断する
+		bool isLoop = true; // ループするかを判断する
 		float lifeTime = 1.0f; // 生存時間
 		Vector3 fieldAcceleration = { 0.0f,0.0f,0.0f }; // 場の力
 		Range3 velocityRange = { {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} }; // 速度の範囲

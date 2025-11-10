@@ -101,6 +101,10 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// 全てのデバック用ファイルを読み込み
 	GameParamEditor::GetInstance()->LoadFiles();
 
+	// エディターの初期化
+	editorCore_ = std::make_unique<EditorCore>();
+	editorCore_->Initialize();
+
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();
 	sceneManager_->Initialize(input_.get(), textureManager_.get(), audioManager_.get(), dxc_.get(), dxCommon_.get());
@@ -158,6 +162,9 @@ void Engine::PreUpdate() {
 	input_->Update();
 	// ImGuiにフレームが始まる旨を伝える
 	imGuiManager_->BeginFrame();
+
+	// エディターの処理
+	editorCore_->Run();
 }
 
 void Engine::PostUpdate() {

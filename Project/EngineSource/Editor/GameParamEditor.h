@@ -21,6 +21,7 @@ public:
 	// 項目
 	struct Item {
 		std::variant<int32_t, uint32_t, float, Vector2, Vector3,Vector4,Range3, Range4, bool, std::string> value;
+		int priority = INT_MAX; // 優先順位
 	};
 
 	// グループ
@@ -88,12 +89,13 @@ public:
 	/// <param name="key"></param>
 	/// <param name="value"></param>
 	template<typename T>
-	void AddItem(const std::string& groupName, const std::string& key, const T& value) {
+	void AddItem(const std::string& groupName, const std::string& key, const T& value, int priority = INT_MAX) {
 		// グループの参照を取得
 		Group& group = datas_[groupName];
 
 		// すでに登録されていれば何もしない
 		if (group.items.find(key) != group.items.end()) {
+			group.items[key].priority = priority; // 優先順位は別なので取得する
 			return;
 		}
 
@@ -105,6 +107,7 @@ public:
 		// 新しい項目のデータを設定
 		Item newItem{};
 		newItem.value = value;
+		newItem.priority = priority;
 		// 設定した項目をstd::mapに追加
 		group.items[key] = newItem;
 	}
@@ -280,6 +283,13 @@ private:
 	/// </summary>
 	void DrawParameterInspector();
 
+	/// <summary>
+	/// 外部ファイルから値を取得する
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="groupName"></param>
+	/// <param name="key"></param>
+	/// <param name="value"></param>
 	template<typename T>
 	void SetValue(const std::string& groupName, const std::string& key, T value) {
 		// グループの参照を取得
