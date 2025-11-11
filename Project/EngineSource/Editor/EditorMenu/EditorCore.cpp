@@ -1,11 +1,13 @@
 #include"EditorCore.h"
 #include"ImGuiManager.h"
 
-void EditorCore::Initialize() {
+using namespace GameEngine;
+
+void EditorCore::Initialize(TextureManager* textureManager) {
 	windowManager_ = std::make_unique<EditorWindowManager>();
 	menuBar_ = std::make_unique<EditorMenuBar>();
 	editorLayout_ = std::make_unique<EditorLayout>();
-	editorToolBar_ = std::make_unique<EditorToolBar>();
+	editorToolBar_ = std::make_unique<EditorToolBar>(textureManager);
 
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>());
 	windowManager_->RegisterWindow(std::make_unique<AssetWindow>());
@@ -47,4 +49,8 @@ void EditorCore::BeginDockSpace() {
 void EditorCore::Finalize() {
 	// レイアウトデータを保存する
 	editorLayout_->SaveLayout(windowManager_->GetWindows());
+}
+
+bool EditorCore::IsActiveUpdate() const {
+	return editorToolBar_->GetIsActiveUpdate();
 }

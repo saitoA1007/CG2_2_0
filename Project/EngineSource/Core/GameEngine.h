@@ -134,6 +134,9 @@ namespace GameEngine {
 
 		std::unique_ptr<EditorCore> editorCore_;
 
+		// 更新状態を管理
+		bool isActiveUpdate_ = true;
+
 	private:
 
 		/// <summary>

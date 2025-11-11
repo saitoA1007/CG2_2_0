@@ -1,4 +1,6 @@
 #pragma once
+#include"TextureManager.h"
+
 #include"EditorWindowManager.h"
 #include"EditorMenuBar.h"
 #include"EditorLayout.h"
@@ -11,30 +13,36 @@
 #include"Windows/InspectorWindow.h"
 #include"Windows/PerformanceWindow.h"
 
-class EditorCore {
-public:
+namespace GameEngine {
 
-	void Initialize();
+	class EditorCore {
+	public:
 
-	void Run();
+		void Initialize(TextureManager* textureManager);
 
-	void Finalize();
+		void Run();
 
-private:
+		// 更新状態を取得する
+		bool IsActiveUpdate() const;
 
-	std::unique_ptr<EditorWindowManager> windowManager_;
+		void Finalize();
 
-	std::unique_ptr<EditorMenuBar> menuBar_;
+	private:
 
-	std::unique_ptr<EditorLayout> editorLayout_;
+		std::unique_ptr<EditorWindowManager> windowManager_;
 
-	std::unique_ptr<EditorToolBar> editorToolBar_;
+		std::unique_ptr<EditorMenuBar> menuBar_;
 
-private:
+		std::unique_ptr<EditorLayout> editorLayout_;
 
-	/// <summary>
-	/// Dockをするためのスペースを作成する
-	/// </summary>
-	void BeginDockSpace();
+		std::unique_ptr<EditorToolBar> editorToolBar_;
 
-};
+	private:
+
+		/// <summary>
+		/// Dockをするためのスペースを作成する
+		/// </summary>
+		void BeginDockSpace();
+
+	};
+}

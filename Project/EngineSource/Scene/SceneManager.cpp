@@ -61,7 +61,6 @@ void SceneManager::Update() {
 
 		// シーンを切り替える
 		ChangeScene(currentScene_->NextSceneState());
-		currentScene_->Update();
 		isChangeScene_ = false;
 	} else {
 
@@ -121,6 +120,9 @@ void SceneManager::ChangeScene(SceneState nextSceneState) {
 		currentScene_->Initialize(input_, inputCommand_.get(), modelManager_.get(), textureManager_, audioManager_, dxCommon_);
 		break;
 	}
+
+	// 1回だけ更新処理を挟む
+	currentScene_->Update();
 }
 
 void SceneManager::DebugChangeScene() {
