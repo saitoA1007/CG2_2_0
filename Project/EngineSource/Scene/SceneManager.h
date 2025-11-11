@@ -1,9 +1,7 @@
 #pragma once
 #include"SceneContext.h"
-
-#include"Camera.h"
-
 #include"BaseScene.h"
+#include"Camera.h"
 
 /// <summary>
 /// シーンの管理
@@ -30,9 +28,21 @@ public:
 	void Draw();
 
 	/// <summary>
+	/// シーンの切り替え処理
+	/// </summary>
+	/// <param name="sceneState">切り替え先の状態</param>
+	void ChangeScene(SceneState nextSceneState);
+
+	/// <summary>
 	/// 現在のシーンをリセットする
 	/// </summary>
 	void ResetCurrentScene();
+
+	/// <summary>
+	/// 現在のシーンの状態を取得する
+	/// </summary>
+	/// <returns></returns>
+	SceneState GetCurrentSceneState() const { return currentSceneState_; }
 
 private: // エンジン機能
 
@@ -53,21 +63,7 @@ private: // シーン機能
 	// 現在のシーン状態の保存
 	SceneState currentSceneState_ = SceneState::Unknown;
 
-	// デバック用に各シーンの名前を保存している
-	static inline const char* sceneNames[] = { "Title","Game","GE"};
-
 private:
-
-	/// <summary>
-	/// シーンの切り替え処理
-	/// </summary>
-	/// <param name="sceneState">切り替え先の状態</param>
-	void ChangeScene(SceneState nextSceneState);
-
-	/// <summary>
-	/// デバックする時のシーン切り替え処理
-	/// </summary>
-	void DebugChangeScene();
 
 	/// <summary>
 	/// 使用するモデルデータを読み込む
@@ -78,4 +74,11 @@ private:
 	/// 使用する画像データを読み込む
 	/// </summary>
 	void LoadSpriteData();
+
+	/// <summary>
+	/// シーンを作成する
+	/// </summary>
+	/// <param name="sceneState"></param>
+	/// <returns></returns>
+	std::unique_ptr<BaseScene> CreateScene(SceneState sceneState);
 };

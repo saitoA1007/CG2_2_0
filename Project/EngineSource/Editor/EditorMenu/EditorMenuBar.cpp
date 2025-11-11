@@ -6,11 +6,6 @@ void EditorMenuBar::Run(EditorWindowManager* windowManager) {
 	// メインメニュー
 	if (ImGui::BeginMainMenuBar()) {
 
-		if (ImGui::BeginMenu("File")) {
-			ImGui::Text("None");
-			ImGui::EndMenu();
-		}
-
 		if (ImGui::BeginMenu("Edit")) {
 			ImGui::Text("NoneMaterialEditor");
 			ImGui::EndMenu();

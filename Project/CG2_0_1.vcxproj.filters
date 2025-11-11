@@ -275,13 +275,14 @@
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorWindowManager.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorLayout.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\SceneWIndow.cpp" />
-    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorCore.cpp" />
+    <ClCompile Include="EngineSource\Editor\EditorCore.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\ConsoleWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\AssetWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\InspectorWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\HierarchyWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\PerformanceWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorToolBar.cpp" />
+    <ClCompile Include="EngineSource\Editor\EditorMenu\SceneMenuBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -544,7 +545,7 @@
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorLayout.h" />
     <ClInclude Include="EngineSource\Editor\Windows\IEditorWindow.h" />
     <ClInclude Include="EngineSource\Editor\Windows\SceneWIndow.h" />
-    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorCore.h" />
+    <ClInclude Include="EngineSource\Editor\EditorCore.h" />
     <ClInclude Include="EngineSource\Editor\Windows\ConsoleWindow.h" />
     <ClInclude Include="EngineSource\Editor\Windows\AssetWindow.h" />
     <ClInclude Include="EngineSource\Editor\Windows\InspectorWindow.h" />
@@ -552,6 +553,9 @@
     <ClInclude Include="EngineSource\Editor\Windows\PerformanceWindow.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorToolBar.h" />
     <ClInclude Include="EngineSource\Scene\SceneContext.h" />
+    <ClInclude Include="EngineSource\Editor\EditorMenu\SceneMenuBar.h" />
+    <ClInclude Include="EngineSource\Scene\SceneState.h" />
+    <ClInclude Include="EngineSource\Scene\SceneChangeRequest.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

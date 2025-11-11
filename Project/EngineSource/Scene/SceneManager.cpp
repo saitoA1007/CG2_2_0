@@ -53,77 +53,12 @@ void SceneManager::Update() {
 		// 現在シーンの更新処理
 		currentScene_->Update();
 	}
-
-#ifdef _DEBUG
-
-	// シーンに対してのデバック処理
-	DebugChangeScene();
-#endif
 }
 
 void SceneManager::Draw() {
 
 	// 現在シーンの描画処理
 	currentScene_->Draw();
-}
-
-void SceneManager::ChangeScene(SceneState nextSceneState) {
-
-	// シーンの状態を保存
-	currentSceneState_ = nextSceneState;
-
-	switch (nextSceneState) {
-
-	case SceneState::Unknown:
-	case SceneState::Title:
-
-		// 前の要素を削除
-		currentScene_.reset();
-
-		// タイトルシーンを挿入
-		currentScene_ = std::make_unique<TitleScene>();
-		currentScene_->Initialize(context_);
-		break;
-
-	case SceneState::Game: {
-
-		// 前の要素を削除
-		currentScene_.reset();
-
-		// ゲームシーンを挿入
-		std::unique_ptr<GameScene> gameScene = std::make_unique<GameScene>();
-		gameScene->Initialize(context_);
-		currentScene_ = std::move(gameScene);
-		break;
-	}
-
-	case SceneState::GE:
-		// 前の要素を削除
-		currentScene_.reset();
-
-		// GEシーンを挿入
-		currentScene_ = std::make_unique<GEScene>();
-		currentScene_->Initialize(context_);
-		break;
-	}
-
-	// 1回だけ更新処理を挟む
-	currentScene_->Update();
-}
-
-void SceneManager::DebugChangeScene() {
-
-	// シーンのデバック
-	ImGui::Begin("SceneState");
-
-	int currentIndex = static_cast<int>(currentSceneState_);
-	// シーンを切り替える
-	if (ImGui::Combo("currentSceneState", &currentIndex, sceneNames, IM_ARRAYSIZE(sceneNames))) {
-		currentSceneState_ = static_cast<SceneState>(currentIndex);
-		ChangeScene(currentSceneState_);
-	}
-
-	ImGui::End();
 }
 
 void SceneManager::LoadModelData() {
@@ -152,7 +87,47 @@ void SceneManager::LoadSpriteData() {
 	context_->textureManager->RegisterTexture("grass", "Resources/Models/Terrain/grass.png");
 }
 
+void SceneManager::ChangeScene(SceneState nextSceneState) {
+
+	// シーンの状態を保存
+	currentSceneState_ = nextSceneState;
+
+	// 前の要素を削除
+	currentScene_.reset();
+
+	// 新しいシーンを作成
+	currentScene_ = CreateScene(nextSceneState);
+
+	if (currentScene_) {
+		// 新しく作ったシーンを初期化
+		currentScene_->Initialize(context_);
+		// 1回だけ更新処理を挟む
+		currentScene_->Update();
+	} else {
+		// 新しいシーンのインスタンスを作れなかった場合
+		assert(0);
+	}
+}
+
 void SceneManager::ResetCurrentScene() {
 	// 現在のシーンを再初期化する
 	ChangeScene(currentSceneState_);
+}
+
+std::unique_ptr<BaseScene> SceneManager::CreateScene(SceneState sceneState) {
+	switch (sceneState) {
+
+	case SceneState::Unknown:
+	case SceneState::Title:
+		return std::make_unique<TitleScene>();
+
+	case SceneState::Game:
+		return std::make_unique<GameScene>();
+
+	case SceneState::GE:
+		return std::make_unique<GEScene>();
+
+	default:
+		return nullptr;
+	}
 }
