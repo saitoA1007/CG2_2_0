@@ -4,6 +4,13 @@
 #include <Windows.h>
 #include<filesystem>
 #include<chrono>
+#include<unordered_set>
+
+// ログの書き込むデータ
+struct LogData {
+	std::string message;    // 表示する文字
+	std::string groupName;  // ログのグループ名
+};
 
 class LogManager {
 public:
@@ -28,8 +35,41 @@ public:
 	/// <param name="message">出力するメッセージ</param>
 	void Log(const std::string& message);
 
-	std::ofstream GetLogStream() {}
+	/// <summary>
+	/// デバック時にコンソールに出力する用のログ
+	/// </summary>
+	/// <param name="message"></param>
+	/// <param name="groupName"></param>
+	void Log(const std::string& message, const std::string& groupName);
+
+	/// <summary>
+	/// ログをクリア
+	/// </summary>
+	void ClearLogs();
+
+	/// <summary>
+	/// ログを保存したファイルを取得
+	/// </summary>
+	/// <returns></returns>
+	const std::vector<LogData>& GetLogs() const { return logs_; }
+
+	/// <summary>
+	/// 登録しているグループを取得
+	/// </summary>
+	/// <returns></returns>
+	const std::unordered_set<std::string>& GetGroups() const { return groups_; }
 
 private:
 	static std::ofstream logStream_;
+	// ログを保存する
+	std::vector<LogData> logs_;
+	// ログの所属するグループを保存する
+	std::unordered_set<std::string> groups_;
 };
+
+/// <summary>
+///	ログを出力する
+/// </summary>
+/// <param name="message">メッセージを入力</param>
+/// <param name="groupName">グループ名を登録 : デフォルトではGenerate</param>
+void Log(const std::string& message, const std::string& groupName = "Generate");

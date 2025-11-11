@@ -21,15 +21,15 @@ namespace GameEngine {
 		/// <summary>
 		/// モデルデータを登録
 		/// </summary>
-		/// <param name="modelName"></param>
-		/// <returns></returns>
-		void RegisterMode(const std::string& modelName, const std::string& modelFile);
+		/// <param name="modelFile">モデルファイル名</param>
+		/// <param name="modelName">.obj名</param>
+		void RegisterMode(const std::string& modelFile,const std::string& objFileName);
 
 		/// <summary>
 		/// モデルデータを登録
 		/// </summary>
-		/// <param name="modelName"></param>
-		/// <param name="model"></param>
+		/// <param name="modelName">登録したいモデル名</param>
+		/// <param name="model">モデルデータ</param>
 		void RegisterMode(const std::string& modelName, std::unique_ptr<Model> model);
 
 		/// <summary>

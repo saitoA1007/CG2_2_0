@@ -27,4 +27,34 @@ void LogManager::Create() {
 	std::string logFilePath = std::string("logs/") + dateString + ".log";
 	// ファイルを作って書き込み準備
 	logStream_.open(logFilePath);
+
+	// ゲームで使用するログを書き込んだファイルを使用する
+	if (!std::filesystem::exists("logs")) {
+		std::filesystem::create_directory("logs");
+	}
+
+}
+
+void LogManager::Log(const std::string& message, const std::string& groupName) {
+
+	// ログをファイルに保存
+	logStream_ << message << std::endl;
+	OutputDebugStringA(message.c_str());
+
+	// ログを保存
+	LogData logData;
+	logData.message = message;
+	logData.groupName = groupName;
+	logs_.push_back(logData);
+
+	// グループを登録する
+	groups_.insert(groupName);
+}
+
+void LogManager::ClearLogs() {
+	logs_.clear();
+}
+
+void Log(const std::string& message, const std::string& groupName) {
+	LogManager::GetInstance().Log(message, groupName);
 }

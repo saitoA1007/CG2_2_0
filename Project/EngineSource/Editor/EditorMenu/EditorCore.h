@@ -2,6 +2,7 @@
 #include"EditorWindowManager.h"
 #include"EditorMenuBar.h"
 #include"EditorLayout.h"
+#include"EditorToolBar.h"
 
 #include"Windows/SceneWIndow.h"
 #include"Windows/AssetWindow.h"
@@ -26,6 +27,8 @@ private:
 	std::unique_ptr<EditorMenuBar> menuBar_;
 
 	std::unique_ptr<EditorLayout> editorLayout_;
+
+	std::unique_ptr<EditorToolBar> editorToolBar_;
 
 private:
 

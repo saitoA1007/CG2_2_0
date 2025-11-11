@@ -6,10 +6,10 @@ ModelManager::~ModelManager() {
 	models_.clear();
 }
 
-void ModelManager::RegisterMode(const std::string& modelName, const std::string& modelFile) {
+void ModelManager::RegisterMode(const std::string& modelFile, const std::string& objFileName) {
 
 	// 同名のモデルが登録されている場合は早期リターン
-	auto getName = nameToHandles_.find(modelName);
+	auto getName = nameToHandles_.find(objFileName);
 	if (getName != nameToHandles_.end()) {
 		return;
 	}
@@ -19,12 +19,12 @@ void ModelManager::RegisterMode(const std::string& modelName, const std::string&
 
 	// 登録データするを作成
 	ModelEntryData entryData;
-	entryData.name = modelName;
-	entryData.model = Model::CreateModel(modelName, modelFile);
+	entryData.name = objFileName;
+	entryData.model = Model::CreateModel(objFileName, modelFile);
 
 	// 登録する
 	models_[handle] = std::move(entryData);
-	nameToHandles_[modelName] = handle;
+	nameToHandles_[objFileName] = handle;
 }
 
 void ModelManager::RegisterMode(const std::string& modelName, std::unique_ptr<Model> model) {

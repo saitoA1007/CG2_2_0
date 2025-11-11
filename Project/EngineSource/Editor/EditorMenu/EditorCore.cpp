@@ -5,6 +5,7 @@ void EditorCore::Initialize() {
 	windowManager_ = std::make_unique<EditorWindowManager>();
 	menuBar_ = std::make_unique<EditorMenuBar>();
 	editorLayout_ = std::make_unique<EditorLayout>();
+	editorToolBar_ = std::make_unique<EditorToolBar>();
 
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>());
 	windowManager_->RegisterWindow(std::make_unique<AssetWindow>());
@@ -20,7 +21,8 @@ void EditorCore::Initialize() {
 void EditorCore::Run() {
 	BeginDockSpace();
 
-	menuBar_->Draw(windowManager_.get());
+	menuBar_->Run(windowManager_.get());
+	editorToolBar_->Run();
 	windowManager_->DrawAllWindows();
 }
 

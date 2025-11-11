@@ -231,6 +231,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorCore.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorLayout.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorMenuBar.cpp" />
+    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorToolBar.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorWindowManager.cpp" />
     <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\AssetWindow.cpp" />
@@ -345,6 +346,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorCore.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorLayout.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorMenuBar.h" />
+    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorToolBar.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorWindowManager.h" />
     <ClInclude Include="EngineSource\Editor\ParamEditorManager.h" />
     <ClInclude Include="EngineSource\Editor\Windows\AssetWindow.h" />
