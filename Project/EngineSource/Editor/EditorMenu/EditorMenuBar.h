@@ -4,5 +4,5 @@
 class EditorMenuBar {
 public:
 
-	void Draw(EditorWindowManager* windowManager);
+	void Run(EditorWindowManager* windowManager);
 };

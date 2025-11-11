@@ -3,6 +3,7 @@
 #include"ModelRenderer.h"
 #include"SpriteRenderer.h"
 #include"GameParamEditor.h"
+#include"LogManager.h"
 #include<numbers>
 using namespace GameEngine;
 
@@ -64,6 +65,10 @@ void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inp
 
 	// 平面モデル
 	planeModel_ = modelManager->GetNameByModel("plane.obj");
+
+	// ログのテスト
+	Log("HallWorldConsloe","test");
+	Log("HallWorldConsloe");
 
 	// 入力コマンドを設定する
 	InputRegisterCommand();
