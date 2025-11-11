@@ -551,6 +551,7 @@
     <ClInclude Include="EngineSource\Editor\Windows\HierarchyWindow.h" />
     <ClInclude Include="EngineSource\Editor\Windows\PerformanceWindow.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorToolBar.h" />
+    <ClInclude Include="EngineSource\Scene\SceneContext.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

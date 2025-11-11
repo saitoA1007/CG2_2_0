@@ -14,27 +14,13 @@ SceneManager::~SceneManager() {
 	currentScene_.release();
 }
 
-void SceneManager::Initialize(GameEngine::Input* input, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DXC* dxc, GameEngine::DirectXCommon* dxCommon) {
+void SceneManager::Initialize(SceneContext* context) {
 
-	// 入力処理を取得
-	input_ = input;
-	// 画像処理を取得
-	textureManager_ = textureManager;
-	// 音声処理を取得
-	audioManager_ = audioManager;
-	// shader機能
-	dxc_ = dxc;
-	// DirectXの機能を取得
-	dxCommon_ = dxCommon;
-
-	// 入力処理のコマンドシステムを生成
-	inputCommand_ = std::make_unique<InputCommand>(input_);
-
-	// モデルを管理するクラスを生成
-	modelManager_ = std::make_unique<ModelManager>();
+	// エンジン機能を取得する
+	context_ = context;
 
 	// white2x2の画像をロード
-	whiteGH_ = textureManager_->Load("Resources/Textures/white2x2.png");
+	whiteGH_ = context_->textureManager->Load("Resources/Textures/white2x2.png");
 
 	// モデルを読み込む
 	LoadModelData();
@@ -49,7 +35,7 @@ void SceneManager::Initialize(GameEngine::Input* input, GameEngine::TextureManag
 void SceneManager::Update() {
 
 	// 入力処理のコマンドシステムを更新処理
-	inputCommand_->Update();
+	context_->inputCommand->Update();
 
 	// 終了したらシーンの切り替え処理を有効
 	if (currentScene_->IsFinished() && !isChangeScene_) {
@@ -96,7 +82,7 @@ void SceneManager::ChangeScene(SceneState nextSceneState) {
 
 		// タイトルシーンを挿入
 		currentScene_ = std::make_unique<TitleScene>();
-		currentScene_->Initialize(input_, inputCommand_.get(), modelManager_.get(), textureManager_, audioManager_, dxCommon_);
+		currentScene_->Initialize(context_);
 		break;
 
 	case SceneState::Game: {
@@ -106,7 +92,7 @@ void SceneManager::ChangeScene(SceneState nextSceneState) {
 
 		// ゲームシーンを挿入
 		std::unique_ptr<GameScene> gameScene = std::make_unique<GameScene>();
-		gameScene->Initialize(input_, inputCommand_.get(), modelManager_.get(), textureManager_, audioManager_, dxCommon_);
+		gameScene->Initialize(context_);
 		currentScene_ = std::move(gameScene);
 		break;
 	}
@@ -117,7 +103,7 @@ void SceneManager::ChangeScene(SceneState nextSceneState) {
 
 		// GEシーンを挿入
 		currentScene_ = std::make_unique<GEScene>();
-		currentScene_->Initialize(input_, inputCommand_.get(), modelManager_.get(), textureManager_, audioManager_, dxCommon_);
+		currentScene_->Initialize(context_);
 		break;
 	}
 
@@ -143,29 +129,27 @@ void SceneManager::DebugChangeScene() {
 void SceneManager::LoadModelData() {
 
 	// グリッドモデルをロードと登録
-	modelManager_->RegisterMode("Grid", Model::CreateGridPlane({ 200.0f,200.0f }));
+	context_->modelManager->RegisterMode("Grid", Model::CreateGridPlane({ 200.0f,200.0f }));
 
 	// 平面モデルをロードと登録
-	modelManager_->RegisterMode("Plane","plane.obj");
+	context_->modelManager->RegisterMode("Plane","plane.obj");
 	// 箱モデルをロードと登録
-	modelManager_->RegisterMode("Cube","cube.obj");
+	context_->modelManager->RegisterMode("Cube","cube.obj");
 
 	// 地面モデルをロードと登録
-	modelManager_->RegisterMode("Terrain","terrain.obj");
+	context_->modelManager->RegisterMode("Terrain","terrain.obj");
 	// 歩く人型モデルをロードと登録
-	modelManager_->RegisterMode("Walk","walk.gltf");
+	context_->modelManager->RegisterMode("Walk","walk.gltf");
 }
 
 void SceneManager::LoadSpriteData() {
 
 	// white2x2の画像を登録する
-	textureManager_->RegisterTexture("white", "Resources/Textures/white2x2.png");
-
+	context_->textureManager->RegisterTexture("white", "Resources/Textures/white2x2.png");
 	// uvCheckerの画像を登録する
-	textureManager_->RegisterTexture("uvChecker", "Resources/Textures/uvChecker.png");
-
+	context_->textureManager->RegisterTexture("uvChecker", "Resources/Textures/uvChecker.png");
 	// 草原の画像を登録する
-	textureManager_->RegisterTexture("grass", "Resources/Models/Terrain/grass.png");
+	context_->textureManager->RegisterTexture("grass", "Resources/Models/Terrain/grass.png");
 }
 
 void SceneManager::ResetCurrentScene() {

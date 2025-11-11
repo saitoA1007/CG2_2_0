@@ -16,6 +16,7 @@
 #include"PSO/Core/PSOManager.h"
 #include"PostProcess/PostEffectManager.h"
 
+// Common
 #include"LogManager.h"
 #include"ResourceLeakChecker.h"
 #include"CrashHandle.h"
@@ -51,7 +52,7 @@
 #include"GameParamEditor.h"
 #include"SceneManager.h"
 #include"EditorMenu/EditorCore.h"
-
+#include"SceneContext.h"
 
 namespace GameEngine {
 
@@ -71,6 +72,10 @@ namespace GameEngine {
 		// ImGuiの機能
 		std::unique_ptr<ImGuiManager> imGuiManager_;
 
+		// 3D ===============================================
+
+		// モデルのリソースを管理
+		std::unique_ptr<GameEngine::ModelManager> modelManager_;
 
 		/// Audio ========================================
 
@@ -126,9 +131,8 @@ namespace GameEngine {
 		// 入力処理
 		std::unique_ptr<Input> input_;
 
-		// 雑種
-		std::unique_ptr<FpsCounter> fpsCounter_;
-		std::unique_ptr<SceneManager> sceneManager_;
+		// 入力処理のコマンドシステム
+		std::unique_ptr<GameEngine::InputCommand> inputCommand_;
 
 		// Editor =======================================
 
@@ -139,6 +143,13 @@ namespace GameEngine {
 		bool isActiveUpdate_ = true;
 		bool isReset = true;
 		bool isPause_ = false;
+
+		// 雑種
+		std::unique_ptr<FpsCounter> fpsCounter_;
+		std::unique_ptr<SceneManager> sceneManager_;
+
+		// ゲームシーンで使用するエンジン機能まとめ
+		SceneContext sceneContext;
 
 	private:
 

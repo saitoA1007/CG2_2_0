@@ -1,9 +1,5 @@
 #pragma once
-#include"Input.h"
-#include"TextureManager.h"
-#include"AudioManager.h"
-#include"InputCommand.h"
-#include"ModelManager.h"
+#include"SceneContext.h"
 
 #include"Camera.h"
 
@@ -20,12 +16,8 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	/// <param name="input">入力処理</param>
-	/// <param name="textureManager">画像機能</param>
-	/// <param name="audioManager">音声機能</param>
-	/// <param name="dxc">Shader機能</param>
-	/// <param name="dxCommon">DirectX全般の機能</param>
-	void Initialize(GameEngine::Input* input, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DXC* dxc, GameEngine::DirectXCommon* dxCommon);
+	/// <param name="context"></param>
+	void Initialize(SceneContext* context);
 
 	/// <summary>
 	/// 更新処理
@@ -44,26 +36,8 @@ public:
 
 private: // エンジン機能
 
-	// shader機能
-	GameEngine::DXC* dxc_ = nullptr;
-
-	// DirectX機能の取得
-	GameEngine::DirectXCommon* dxCommon_ = nullptr;
-
-	// 入力処理の取得
-	GameEngine::Input* input_ = nullptr;
-
-	// テクスチャ機能を取得
-	GameEngine::TextureManager* textureManager_ = nullptr;
-
-	// 音声機能を取得
-	GameEngine::AudioManager* audioManager_ = nullptr;
-
-	// 入力処理のコマンドシステム
-	std::unique_ptr<GameEngine::InputCommand> inputCommand_;
-
-	// モデルのリソースを管理
-	std::unique_ptr<GameEngine::ModelManager> modelManager_;
+	// エンジン機能
+	SceneContext* context_ = nullptr;
 
 private: // シーン機能
 

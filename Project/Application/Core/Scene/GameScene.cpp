@@ -11,29 +11,21 @@ GameScene::~GameScene() {
 
 }
 
-void GameScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
+void GameScene::Initialize(SceneContext* context) {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem
-	// 入力を取得
-	input_ = input;
-	// テクスチャ機能を取得
-	textureManager_ = textureManager;
-	// 音声機能を取得
-	audioManager_ = audioManager;
-	// DirectX機能を取得
-	dxCommon_ = dxCommon;
-	// 入力処理のコマンドシステムを取得
-	inputCommand_ = inputCommand;
+	// エンジン機能を取得
+	context_ = context;
 
 	// カメラの初期化
 	camera_ = std::make_unique<Camera>();
-	camera_->Initialize(cameraTransform_, 1280, 720, dxCommon_->GetDevice());
+	camera_->Initialize(cameraTransform_, 1280, 720, context_->dxCommon->GetDevice());
 	// デバックカメラの初期化
 	debugCamera_ = std::make_unique<DebugCamera>();
-	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, dxCommon_->GetDevice());
+	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->dxCommon->GetDevice());
 
 	// グリッドの初期化
-	gridModel_ = modelManager->GetNameByModel("Grid");
+	gridModel_ = context_->modelManager->GetNameByModel("Grid");
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 登録するパラメータを設定
@@ -43,7 +35,7 @@ void GameScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* i
 
 	// 平行光源ライト
 	lightManager_ = std::make_unique<LightManager>();
-	lightManager_->Initialize(dxCommon_->GetDevice(), true, false, false);
+	lightManager_->Initialize(context_->dxCommon->GetDevice(), true, false, false);
 	directionalData_.active = true;
 	directionalData_.color = { 1.0f,1.0f,1.0f,1.0f };
 	directionalData_.direction = { 0.0,0.0f,1.0f };
@@ -51,19 +43,19 @@ void GameScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* i
 	lightManager_->SetDirectionalData(directionalData_);
 
 	// 地面モデルを生成
-	terrainModel_ = modelManager->GetNameByModel("terrain.obj");
+	terrainModel_ = context_->modelManager->GetNameByModel("terrain.obj");
 	terrainModel_->SetDefaultIsEnableLight(true);
-	grassGH_ = textureManager->GetHandleByName("grass");
+	grassGH_ = context_->textureManager->GetHandleByName("grass");
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 平面モデルを生成
-	planeModel_ = modelManager->GetNameByModel("plane.obj");
+	planeModel_ = context_->modelManager->GetNameByModel("plane.obj");
 	planeModel_->SetDefaultIsEnableLight(true);
-	uvCheckerGH_ = textureManager->GetHandleByName("uvChecker");
+	uvCheckerGH_ = context_->textureManager->GetHandleByName("uvChecker");
 	planeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,0.0f} });
 
 	// ボーンアニメーションを生成する
-	bronAnimationModel_ = modelManager->GetNameByModel("walk.gltf");
+	bronAnimationModel_ = context_->modelManager->GetNameByModel("walk.gltf");
 	bronAnimationWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 	// ボーンアニメーションデータを取得する
 	bronAnimation_ = Model::LoadAnimationFile("walk.gltf", "Walk");
@@ -93,7 +85,7 @@ void GameScene::Update() {
 #pragma region Camera
 	if (isDebugCameraActive_) {
 		// デバックカメラの更新
-		debugCamera_->Update(input_);
+		debugCamera_->Update(context_->input);
 		// デバックカメラの値をカメラに代入
 		camera_->SetVPMatrix(debugCamera_->GetVPMatrix());
 
@@ -132,7 +124,7 @@ void GameScene::Update() {
 
 	// カメラの切り替え処理
 #pragma region CameraTransition
-	if (input_->TriggerKey(DIK_F)) {
+	if (context_->input->TriggerKey(DIK_F)) {
 		if (isDebugCameraActive_) {
 			isDebugCameraActive_ = false;
 		} else {

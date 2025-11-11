@@ -7,29 +7,21 @@ using namespace GameEngine;
 TitleScene::~TitleScene() {
 }
 
-void TitleScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
+void TitleScene::Initialize(SceneContext* context) {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem 
-	// 入力を取得
-	input_ = input;
-	// テクスチャ機能を取得
-	textureManager_ = textureManager;
-	// 音声機能を取得
-	audioManager_ = audioManager;
-	// DirectX機能を取得
-	dxCommon_ = dxCommon;
-	// 入力処理のコマンドシステムを取得
-	inputCommand_ = inputCommand;
+	// エンジン機能を取得
+	context_ = context;
 
 	// カメラの初期化
 	camera_ = std::make_unique<Camera>();
 	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
 	// デバックカメラの初期化
 	debugCamera_ = std::make_unique<DebugCamera>();
-	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, dxCommon->GetDevice());
+	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->dxCommon->GetDevice());
 
 	// グリッドの初期化
-	gridModel_ = modelManager->GetNameByModel("Grid");
+	gridModel_ = context_->modelManager->GetNameByModel("Grid");
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 登録するパラメータを設定
@@ -37,7 +29,7 @@ void TitleScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* 
 
 #pragma endregion
 	
-	inputCommand_->RegisterCommand("CameraChange", {{InputState::KeyTrigger, DIK_F }});
+	context_->inputCommand->RegisterCommand("CameraChange", {{InputState::KeyTrigger, DIK_F }});
 }
 
 void TitleScene::Update() {
@@ -46,7 +38,7 @@ void TitleScene::Update() {
 #pragma region Camera
 	if (isDebugCameraActive_) {
 		// デバックカメラの更新
-		debugCamera_->Update(input_);
+		debugCamera_->Update(context_->input);
 		// デバックカメラの値をカメラに代入
 		camera_->SetVPMatrix(debugCamera_->GetVPMatrix());
 
@@ -68,7 +60,7 @@ void TitleScene::Update() {
 
 	// カメラの切り替え処理
 #pragma region CameraTransition
-	if (inputCommand_->IsCommandAcitve("CameraChange")) {
+	if (context_->inputCommand->IsCommandAcitve("CameraChange")) {
 		if (isDebugCameraActive_) {
 			isDebugCameraActive_ = false;
 		} else {

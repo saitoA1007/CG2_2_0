@@ -10,29 +10,21 @@ using namespace GameEngine;
 GEScene::~GEScene() {
 }
 
-void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) {
+void GEScene::Initialize(SceneContext* context) {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem 
-	// 入力を取得
-	input_ = input;
-	// テクスチャ機能を取得
-	textureManager_ = textureManager;
-	// 音声機能を取得
-	audioManager_ = audioManager;
-	// DirectX機能を取得
-	dxCommon_ = dxCommon;
-	// 入力処理のコマンドシステムを取得
-	inputCommand_ = inputCommand;
+	// エンジン機能を取得
+	context_ = context;
 
 	// カメラの初期化
 	camera_ = std::make_unique<Camera>();
 	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
 	// デバックカメラの初期化
 	debugCamera_ = std::make_unique<DebugCamera>();
-	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, dxCommon->GetDevice());
+	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->dxCommon->GetDevice());
 
 	// グリッドの初期化
-	gridModel_ = modelManager->GetNameByModel("Grid");
+	gridModel_ = context_->modelManager->GetNameByModel("Grid");
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// デバック用描画の初期化
@@ -44,7 +36,7 @@ void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inp
 #pragma endregion
 
 	// プレイヤーモデルを生成
-	playerModel_ = modelManager->GetNameByModel("cube.obj");
+	playerModel_ = context_->modelManager->GetNameByModel("cube.obj");
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
@@ -56,7 +48,7 @@ void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inp
 	// 画像
 	sprite_ = Sprite::Create({0.0f,0.0f},{256.0f,256.0f},{0.0f,0.0f});
 	// uvCheckerの画像を取得
-	uvCheckerGH_ = textureManager->GetHandleByName("uvChecker");
+	uvCheckerGH_ = context_->textureManager->GetHandleByName("uvChecker");
 
 	// パーティクルのシステムを初期化
 	testParticle_ = std::make_unique<ParticleBehavior>();
@@ -64,7 +56,7 @@ void GEScene::Initialize(GameEngine::Input* input, GameEngine::InputCommand* inp
 	testParticle_->Emit({ 0.0f,0.0f,0.0f });
 
 	// 平面モデル
-	planeModel_ = modelManager->GetNameByModel("plane.obj");
+	planeModel_ = context_->modelManager->GetNameByModel("plane.obj");
 
 	// ログのテスト
 	Log("HallWorldConsloe","test");
@@ -80,19 +72,19 @@ void GEScene::Update() {
 	debugRenderer_->Clear();
 
 	// プレイヤーの更新処理
-	player_->Update(inputCommand_);
+	player_->Update(context_->inputCommand);
 
 	// パーティクルの更新処理
 	testParticle_->Update(camera_->GetWorldMatrix());
 
 	// カメラコントロールの更新処理
-	cameraController_->Update(inputCommand_,player_->GetPlayerPos());
+	cameraController_->Update(context_->inputCommand,player_->GetPlayerPos());
 
 	// カメラ処理
 #pragma region Camera
 	if (isDebugCameraActive_) {
 		// デバックカメラの更新
-		debugCamera_->Update(input_);
+		debugCamera_->Update(context_->input);
 		// デバックカメラの値をカメラに代入
 		camera_->SetVPMatrix(debugCamera_->GetVPMatrix());
 
@@ -116,7 +108,7 @@ void GEScene::Update() {
 
 	// カメラの切り替え処理
 #pragma region CameraTransition
-	if (inputCommand_->IsCommandAcitve("CameraChange")) {
+	if (context_->inputCommand->IsCommandAcitve("CameraChange")) {
 		if (isDebugCameraActive_) {
 			isDebugCameraActive_ = false;
 		} else {
@@ -168,17 +160,17 @@ void GEScene::Draw() {
 
 void GEScene::InputRegisterCommand() {
 	// カメラを操作を切り替える入力コマンドを登録
-	inputCommand_->RegisterCommand("CameraChange", { {InputState::KeyTrigger, DIK_F },{ InputState::KeyTrigger, DIK_G } });
+	context_->inputCommand->RegisterCommand("CameraChange", { {InputState::KeyTrigger, DIK_F },{ InputState::KeyTrigger, DIK_G } });
 
 	// 移動の入力コマンドを登録する
-	inputCommand_->RegisterCommand("MoveUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
-	inputCommand_->RegisterCommand("MoveDown", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });
-	inputCommand_->RegisterCommand("MoveLeft", { {InputState::KeyPush, DIK_A },{InputState::PadLeftStick,0,{-1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_LEFT } });
-	inputCommand_->RegisterCommand("MoveRight", { {InputState::KeyPush, DIK_D },{InputState::PadLeftStick,0,{1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_RIGHT } });
+	context_->inputCommand->RegisterCommand("MoveUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
+	context_->inputCommand->RegisterCommand("MoveDown", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });
+	context_->inputCommand->RegisterCommand("MoveLeft", { {InputState::KeyPush, DIK_A },{InputState::PadLeftStick,0,{-1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_LEFT } });
+	context_->inputCommand->RegisterCommand("MoveRight", { {InputState::KeyPush, DIK_D },{InputState::PadLeftStick,0,{1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_RIGHT } });
 	// ジャンプコマンドを登録する
-	inputCommand_->RegisterCommand("Jump", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
+	context_->inputCommand->RegisterCommand("Jump", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
 
 	// カメラ操作のコマンドを登録する
-	inputCommand_->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
-	inputCommand_->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
+	context_->inputCommand->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
+	context_->inputCommand->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
 }

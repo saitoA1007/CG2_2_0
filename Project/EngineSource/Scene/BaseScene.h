@@ -1,10 +1,5 @@
 #pragma once
-#include"Input.h"
-#include"TextureManager.h"
-#include"AudioManager.h"
-
-#include"InputCommand.h"
-#include"ModelManager.h"
+#include"SceneContext.h"
 
 // 各シーン
 enum class SceneState {
@@ -30,7 +25,7 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	virtual void Initialize(GameEngine::Input* input,GameEngine::InputCommand* inputCommand,GameEngine::ModelManager* modelManager,GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) = 0;
+	virtual void Initialize(SceneContext* context) = 0;
 
 	/// <summary>
 	/// 更新処理
@@ -53,4 +48,8 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	virtual SceneState NextSceneState() = 0;
+
+protected:
+	// エンジン機能
+	SceneContext* context_ = nullptr;
 };
