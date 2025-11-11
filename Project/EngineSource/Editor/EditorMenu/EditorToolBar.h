@@ -2,8 +2,8 @@
 #include"TextureManager.h"
 
 enum class ScenePlayMode {
-	Play, // 再生
-	Pause // 停止
+	Play,  // 再生
+	Stop,  // 停止
 };
 
 class EditorToolBar {
@@ -21,12 +21,18 @@ public:
 	// 更新しているかを取得
 	bool GetIsActiveUpdate() const;
 
+	// 一時停止を取得する
+	bool GetIsPauce() const { return isPause_; }
+
 private:
 	D3D12_GPU_DESCRIPTOR_HANDLE playImagesrvHandle_;
 	D3D12_GPU_DESCRIPTOR_HANDLE pauseImagesrvHandle_;
-	
+	D3D12_GPU_DESCRIPTOR_HANDLE stopImagesrvHandle_;
 
-	ScenePlayMode playMode_ = ScenePlayMode::Pause;
+	// 実行状態を管理する
+	ScenePlayMode playMode_ = ScenePlayMode::Stop;
+
+	bool isPause_ = false;
 
 private:
 

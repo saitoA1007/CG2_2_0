@@ -54,3 +54,7 @@ void EditorCore::Finalize() {
 bool EditorCore::IsActiveUpdate() const {
 	return editorToolBar_->GetIsActiveUpdate();
 }
+
+bool EditorCore::IsPause() const {
+	return editorToolBar_->GetIsPauce();
+}

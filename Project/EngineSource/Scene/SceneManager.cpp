@@ -167,3 +167,8 @@ void SceneManager::LoadSpriteData() {
 	// 草原の画像を登録する
 	textureManager_->RegisterTexture("grass", "Resources/Models/Terrain/grass.png");
 }
+
+void SceneManager::ResetCurrentScene() {
+	// 現在のシーンを再初期化する
+	ChangeScene(currentSceneState_);
+}

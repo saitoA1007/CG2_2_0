@@ -25,6 +25,8 @@ namespace GameEngine {
 		// 更新状態を取得する
 		bool IsActiveUpdate() const;
 
+		bool IsPause() const;
+
 		void Finalize();
 
 	private:

@@ -37,6 +37,11 @@ public:
 	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// 現在のシーンをリセットする
+	/// </summary>
+	void ResetCurrentScene();
+
 private: // エンジン機能
 
 	// shader機能

@@ -132,10 +132,13 @@ namespace GameEngine {
 
 		// Editor =======================================
 
+		// エディター
 		std::unique_ptr<EditorCore> editorCore_;
 
 		// 更新状態を管理
 		bool isActiveUpdate_ = true;
+		bool isReset = true;
+		bool isPause_ = false;
 
 	private:
 

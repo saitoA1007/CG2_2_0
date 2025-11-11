@@ -133,7 +133,9 @@ void Engine::Update() {
 
 		// シーンの更新処理
 		if (isActiveUpdate_) {
-			sceneManager_->Update();
+			if (!isPause_) {
+				sceneManager_->Update();
+			}
 		}
 
 		// 更新後処理
@@ -165,6 +167,22 @@ void Engine::PreUpdate() {
 	editorCore_->Run();
 	// 更新処理の実行状態を取得する
 	isActiveUpdate_ = editorCore_->IsActiveUpdate();
+
+	// 一時停止状態を取得する
+	isPause_ = editorCore_->IsPause();
+
+	// 更新処理を管理する
+	if (isActiveUpdate_) {
+		if (isReset) {
+			isReset = false;
+		}
+	} else {
+		// 更新処理が停止してる時、リセットされていなければリセット
+		if (!isReset) {
+			sceneManager_->ResetCurrentScene();
+			isReset = true;
+		}
+	}
 #endif
 }
 
