@@ -6,10 +6,12 @@ EditorToolBar::EditorToolBar(GameEngine::TextureManager* textureManager) {
 	// デバックで使用する画像を登録する
 	textureManager->RegisterTexture("debugPlay", "Resources/Textures/DebugImages/debugPlay.png");
 	textureManager->RegisterTexture("debugPause", "Resources/Textures/DebugImages/debugPause.png");
+	textureManager->RegisterTexture("debugStop", "Resources/Textures/DebugImages/debugStop.png");
 
 	// 画像のsrvHandleを取得する
 	playImagesrvHandle_ = textureManager->GetTextureSrvHandlesGPU(textureManager->GetHandleByName("debugPlay"));
 	pauseImagesrvHandle_ = textureManager->GetTextureSrvHandlesGPU(textureManager->GetHandleByName("debugPause"));
+	stopImagesrvHandle_ = textureManager->GetTextureSrvHandlesGPU(textureManager->GetHandleByName("debugStop"));
 }
 
 void EditorToolBar::Initialize() {
@@ -25,17 +27,33 @@ void EditorToolBar::Run() {
 	if (ImGui::BeginMainMenuBar()) {
 		ImVec2 imageSize = { 12.0f,12.0f };
 		// playMode_ の状態に応じて表示するボタンを切り替える
-		if (playMode_ == ScenePlayMode::Pause) {
-			// 現在「停止」中の場合、「再生」ボタンを表示
+		if (playMode_ == ScenePlayMode::Stop) {
+			// 停止中の場合、再生する
 			if (ImGui::ImageButton("PlayButton",static_cast<ImTextureID>(playImagesrvHandle_.ptr), imageSize)) {
 				playMode_ = ScenePlayMode::Play;
 			}
-		} else {
-			// 現在「再生」中の場合、「停止」ボタンを表示
-			if (ImGui::ImageButton("PauseButton", static_cast<ImTextureID>(pauseImagesrvHandle_.ptr), imageSize)) {
-				playMode_ = ScenePlayMode::Pause;
+		} else if (playMode_ == ScenePlayMode::Play) {
+			
+			// 再生中の場合、リセットする
+			if (ImGui::ImageButton("ResetButton", static_cast<ImTextureID>(stopImagesrvHandle_.ptr), imageSize)) {
+				playMode_ = ScenePlayMode::Stop;
+				isPause_ = false;
 			}
 		}
+
+		ImGui::SameLine();
+
+		// 一時停止する
+		if (ImGui::ImageButton("PauseButton", static_cast<ImTextureID>(pauseImagesrvHandle_.ptr), imageSize)) {
+			if (playMode_ == ScenePlayMode::Play) {
+				if (isPause_) {
+					isPause_ = false;
+				} else {
+					isPause_ = true;
+				}
+			}
+		}
+
 		ImGui::EndMainMenuBar();
 	}
 }
@@ -47,7 +65,7 @@ bool EditorToolBar::GetIsActiveUpdate() const {
 		return true;
 		break;
 
-	case ScenePlayMode::Pause:
+	case ScenePlayMode::Stop:
 		return false;
 		break;
 	}
@@ -62,8 +80,20 @@ void EditorToolBar::UpdateShortcutsKey() {
 		playMode_ = ScenePlayMode::Play;
 	}
 
-	// Ctrl + Shift + Pで停止
+	// Ctrl + Alt + Pで停止する
+	if (io.KeyCtrl && io.KeyAlt && ImGui::IsKeyPressed(ImGuiKey_P, false)) {
+		playMode_ = ScenePlayMode::Stop;
+		isPause_ = false;
+	}
+
+	// Ctrl + Shift + Pで一時停止
 	if (io.KeyCtrl && io.KeyShift && ImGui::IsKeyPressed(ImGuiKey_P, false)) {
-		playMode_ = ScenePlayMode::Pause;
+		if (playMode_ == ScenePlayMode::Play) {
+			if (isPause_) {
+				isPause_ = false;
+			} else {
+				isPause_ = true;
+			}
+		}	
 	}
 }
