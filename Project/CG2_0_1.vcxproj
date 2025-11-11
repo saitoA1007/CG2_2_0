@@ -369,6 +369,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Math\Vector2.h" />
     <ClInclude Include="EngineSource\Math\Vector3.h" />
     <ClInclude Include="EngineSource\Math\Vector4.h" />
+    <ClInclude Include="EngineSource\Scene\SceneContext.h" />
     <ClInclude Include="Externals\imgui\crude_json.h" />
     <ClInclude Include="Externals\imgui\imconfig.h" />
     <ClInclude Include="Externals\imgui\imgui.h" />

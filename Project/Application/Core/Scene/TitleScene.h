@@ -16,7 +16,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="input"></param>
-	void Initialize(GameEngine::Input* input, GameEngine::InputCommand* inputCommand, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, GameEngine::AudioManager* audioManager, GameEngine::DirectXCommon* dxCommon) override;
+	void Initialize(SceneContext* context) override;
 
 	/// <summary>
 	/// 更新処理
@@ -39,23 +39,6 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	SceneState NextSceneState() override { return SceneState::Game; }
-
-private: // エンジンの低レイヤー機能を取得
-
-	// 入力処理の取得
-	GameEngine::Input* input_ = nullptr;
-
-	// テクスチャ機能の取得
-	GameEngine::TextureManager* textureManager_;
-
-	// 音声機能を取得
-	GameEngine::AudioManager* audioManager_ = nullptr;
-
-	// DirectXの機能を取得
-	GameEngine::DirectXCommon* dxCommon_;
-
-	// 入力処理のコマンドシステム
-	GameEngine::InputCommand* inputCommand_ = nullptr;
 
 private: // シーン機能
 
