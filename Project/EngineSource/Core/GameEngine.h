@@ -20,6 +20,8 @@
 #include"LogManager.h"
 #include"ResourceLeakChecker.h"
 #include"CrashHandle.h"
+#include"FPSCounter.h"
+#include"RandomGenerator.h"
 
 // 3D
 #include"Camera.h"
@@ -46,13 +48,14 @@
 // Audio
 #include"AudioManager.h"
 
-// 未定のインクルード
-#include"FPSCounter.h"
-#include"RandomGenerator.h"
+// Editor
+#include"EditorCore.h"
 #include"GameParamEditor.h"
-#include"SceneManager.h"
-#include"EditorMenu/EditorCore.h"
+
+// Scene
 #include"SceneContext.h"
+#include"SceneChangeRequest.h"
+#include"SceneManager.h"
 
 namespace GameEngine {
 
@@ -144,12 +147,19 @@ namespace GameEngine {
 		bool isReset = true;
 		bool isPause_ = false;
 
-		// 雑種
-		std::unique_ptr<FpsCounter> fpsCounter_;
-		std::unique_ptr<SceneManager> sceneManager_;
+		// Scene ============================================
 
 		// ゲームシーンで使用するエンジン機能まとめ
 		SceneContext sceneContext;
+
+		// ゲームシーンを管理
+		std::unique_ptr<SceneManager> sceneManager_;
+
+		// シーン切り替えの通知を管理
+		std::unique_ptr<SceneChangeRequest> sceneChangeRequest_;
+
+		// 雑種
+		std::unique_ptr<FpsCounter> fpsCounter_;
 
 	private:
 

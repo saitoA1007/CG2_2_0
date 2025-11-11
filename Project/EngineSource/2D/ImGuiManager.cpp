@@ -63,7 +63,7 @@ void ImGuiManager::BeginFrame() {
 void ImGuiManager::EndFrame() {
 
 	// 描画した結果を移す
-	ImGui::Begin("Scene");
+	ImGui::Begin("GameScene");
 	ImVec2 sceneWindowSize = ImGui::GetContentRegionAvail();
 	D3D12_GPU_DESCRIPTOR_HANDLE& srvHandle = dxCommon_->GetSRVHandle();
 

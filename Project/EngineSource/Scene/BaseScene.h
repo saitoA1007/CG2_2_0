@@ -1,15 +1,6 @@
 #pragma once
+#include"SceneState.h"
 #include"SceneContext.h"
-
-// 各シーン
-enum class SceneState {
-
-	Title,       // タイトルシーン
-	Game,        // ゲームシーン
-	GE,          // GEシーン
-
-	Unknown,
-};
 
 /// <summary>
 /// 各シーンの元

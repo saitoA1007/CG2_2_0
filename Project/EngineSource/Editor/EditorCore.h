@@ -1,10 +1,11 @@
 #pragma once
 #include"TextureManager.h"
 
-#include"EditorWindowManager.h"
-#include"EditorMenuBar.h"
-#include"EditorLayout.h"
-#include"EditorToolBar.h"
+#include"EditorMenu/EditorWindowManager.h"
+#include"EditorMenu/EditorMenuBar.h"
+#include"EditorMenu/EditorLayout.h"
+#include"EditorMenu/EditorToolBar.h"
+#include"EditorMenu/SceneMenuBar.h"
 
 #include"Windows/SceneWIndow.h"
 #include"Windows/AssetWindow.h"
@@ -18,7 +19,7 @@ namespace GameEngine {
 	class EditorCore {
 	public:
 
-		void Initialize(TextureManager* textureManager);
+		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest);
 
 		void Run();
 
@@ -34,6 +35,8 @@ namespace GameEngine {
 		std::unique_ptr<EditorWindowManager> windowManager_;
 
 		std::unique_ptr<EditorMenuBar> menuBar_;
+
+		std::unique_ptr<SceneMenuBar> sceneMenuBar_;
 
 		std::unique_ptr<EditorLayout> editorLayout_;
 

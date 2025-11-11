@@ -108,21 +108,27 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// 全てのデバック用ファイルを読み込み
 	GameParamEditor::GetInstance()->LoadFiles();
 
-	// エディターの初期化
-#ifdef _DEBUG
-	editorCore_ = std::make_unique<EditorCore>();
-	editorCore_->Initialize(textureManager_.get());
-#endif
-	
-	// シーンの初期化
-	sceneManager_ = std::make_unique<SceneManager>();
+	// ゲームシーンで使用するエンジン機能を取得
 	sceneContext.input = input_.get();
 	sceneContext.inputCommand = inputCommand_.get();
 	sceneContext.textureManager = textureManager_.get();
 	sceneContext.modelManager = modelManager_.get();
 	sceneContext.audioManager = audioManager_.get();
 	sceneContext.dxCommon = dxCommon_.get();
+
+	// シーンの初期化
+	sceneManager_ = std::make_unique<SceneManager>();
 	sceneManager_->Initialize(&sceneContext);
+
+	// エディターの初期化
+#ifdef _DEBUG
+	// シーン切り替えの通知を管理する機能を初期化
+	sceneChangeRequest_ = std::make_unique<SceneChangeRequest>();
+	sceneChangeRequest_->SetCurrentSceneState(sceneManager_->GetCurrentSceneState());
+
+	editorCore_ = std::make_unique<EditorCore>();
+	editorCore_->Initialize(textureManager_.get(), sceneChangeRequest_.get());
+#endif
 }
 
 void Engine::Update() {
@@ -193,6 +199,15 @@ void Engine::PreUpdate() {
 			sceneManager_->ResetCurrentScene();
 			isReset = true;
 		}
+	}
+
+	// シーン切り替えリクエストを処理
+	if (sceneChangeRequest_->HasChangeRequest()) {
+		// シーンを切り替える
+		sceneManager_->ChangeScene(sceneChangeRequest_->GetRequestScene());
+		sceneChangeRequest_->ClearChangeRequest();
+		// 変更したシーンの状態を取得
+		sceneChangeRequest_->SetCurrentSceneState(sceneManager_->GetCurrentSceneState());
 	}
 #endif
 }

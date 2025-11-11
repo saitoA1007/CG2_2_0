@@ -3,11 +3,12 @@
 
 using namespace GameEngine;
 
-void EditorCore::Initialize(TextureManager* textureManager) {
+void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest) {
 	windowManager_ = std::make_unique<EditorWindowManager>();
 	menuBar_ = std::make_unique<EditorMenuBar>();
 	editorLayout_ = std::make_unique<EditorLayout>();
 	editorToolBar_ = std::make_unique<EditorToolBar>(textureManager);
+	sceneMenuBar_ = std::make_unique<SceneMenuBar>(sceneChangeRequest);
 
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>());
 	windowManager_->RegisterWindow(std::make_unique<AssetWindow>());
@@ -21,8 +22,10 @@ void EditorCore::Initialize(TextureManager* textureManager) {
 }
 
 void EditorCore::Run() {
+
 	BeginDockSpace();
 
+	sceneMenuBar_->Run();
 	menuBar_->Run(windowManager_.get());
 	editorToolBar_->Run();
 	windowManager_->DrawAllWindows();
