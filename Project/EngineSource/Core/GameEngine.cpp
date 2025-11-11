@@ -67,6 +67,8 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// テクスチャの初期化
 	textureManager_ = std::make_shared<TextureManager>();
 	textureManager_->Initialize(dxCommon_.get(),srvManager_.get());
+	// 初期の画像をロードする
+	textureManager_->Load("Resources/Textures/white2x2.png");
 
 	// ポストエフェクトの初期化
 	PostEffectManager::StaticInitialize(bloomPSO_.get(), scanLinePSO_.get(), vignettingPSO_.get(), radialBlurPSO_.get(), outLinePSO_.get());
@@ -102,9 +104,11 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	GameParamEditor::GetInstance()->LoadFiles();
 
 	// エディターの初期化
+#ifdef _DEBUG
 	editorCore_ = std::make_unique<EditorCore>();
-	editorCore_->Initialize();
-
+	editorCore_->Initialize(textureManager_.get());
+#endif
+	
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();
 	sceneManager_->Initialize(input_.get(), textureManager_.get(), audioManager_.get(), dxc_.get(), dxCommon_.get());
@@ -128,7 +132,9 @@ void Engine::Update() {
 		PreUpdate();
 
 		// シーンの更新処理
-		sceneManager_->Update();
+		if (isActiveUpdate_) {
+			sceneManager_->Update();
+		}
 
 		// 更新後処理
 		PostUpdate();
@@ -157,6 +163,8 @@ void Engine::PreUpdate() {
 #ifdef _DEBUG
 	// エディターの処理
 	editorCore_->Run();
+	// 更新処理の実行状態を取得する
+	isActiveUpdate_ = editorCore_->IsActiveUpdate();
 #endif
 }
 
@@ -178,8 +186,10 @@ void Engine::PostDraw() {
 void Engine::Finalize() {
 
 	// エディターの終了処理
+#ifdef _DEBUG
 	editorCore_->Finalize();
-
+#endif
+	
 	// テクスチャの解放
 	textureManager_->Finalize();
 	// ImGuiの解放処理
