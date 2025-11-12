@@ -3,6 +3,8 @@
 #include "ImGuiManager.h"
 #include <format>
 
+using namespace GameEngine;
+
 void HierarchyWindow::Draw() {
     if (!isActive) return;
 

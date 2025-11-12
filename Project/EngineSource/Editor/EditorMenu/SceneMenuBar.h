@@ -2,15 +2,19 @@
 #include"SceneState.h"
 #include"SceneChangeRequest.h"
 
-class SceneMenuBar {
-public:
+namespace GameEngine {
 
-	SceneMenuBar(SceneChangeRequest* request);
+	class SceneMenuBar {
+	public:
 
-	void Run();
+		SceneMenuBar(SceneChangeRequest* request);
 
-private:
-	SceneState sceneState_ = SceneState::GE;
-	SceneChangeRequest* sceneChangeRequest_ = nullptr;
-	static inline const char* sceneNames_[] = { "Title", "Game", "GE" };
-};
+		void Run();
+
+	private:
+		SceneState sceneState_ = SceneState::GE;
+		SceneChangeRequest* sceneChangeRequest_ = nullptr;
+		static inline const char* sceneNames_[] = { "Title", "Game", "GE" };
+	};
+}
+

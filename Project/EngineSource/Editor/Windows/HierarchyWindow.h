@@ -2,9 +2,12 @@
 #include "IEditorWindow.h"
 #include "ImGuiManager.h"
 
-class HierarchyWindow : public IEditorWindow {
-public:
+namespace GameEngine {
 
-    void Draw() override;
-    std::string GetName() const override { return "ParameterHierarchy"; }
-};
+    class HierarchyWindow : public IEditorWindow {
+    public:
+
+        void Draw() override;
+        std::string GetName() const override { return "ParameterHierarchy"; }
+    };
+}

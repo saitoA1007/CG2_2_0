@@ -1,6 +1,8 @@
 #include"SceneMenuBar.h"
 #include"ImGuiManager.h"
 
+using namespace GameEngine;
+
 SceneMenuBar::SceneMenuBar(SceneChangeRequest* request) {
 	sceneChangeRequest_ = request;
 }

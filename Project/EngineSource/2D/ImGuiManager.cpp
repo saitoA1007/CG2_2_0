@@ -2,11 +2,10 @@
 using namespace GameEngine;
 
 void ImGuiManager::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, DXGI_SWAP_CHAIN_DESC1 swapChainDesc,
-	WindowsApp* windowsApp, RendererManager* rendererManager, SrvManager* srvManager) {
+	WindowsApp* windowsApp, SrvManager* srvManager) {
 
 	commandList_ = commandList;
 	windowsApp_ = windowsApp;
-	rendererManager_ = rendererManager;
 	srvManager_ = srvManager;
 
 	// ImGuiの初期化。
@@ -63,36 +62,6 @@ void ImGuiManager::BeginFrame() {
 }
 
 void ImGuiManager::EndFrame() {
-
-	// 描画した結果を移す
-	ImGui::Begin("GameScene");
-	ImVec2 sceneWindowSize = ImGui::GetContentRegionAvail();
-	D3D12_GPU_DESCRIPTOR_HANDLE& srvHandle = rendererManager_->GetSRVHandle();
-
-	// 実際に使うサイズ
-	ImVec2 imageSize = sceneWindowSize;
-
-	// ウィンドウの比率
-	float windowAspect = sceneWindowSize.x / sceneWindowSize.y;
-
-	if (windowAspect > kTargetAspect) {
-		// ウィンドウが横長すぎる場合、高さに合わせる
-		imageSize.x = sceneWindowSize.y * kTargetAspect;
-		imageSize.y = sceneWindowSize.y;
-	} else {
-		// ウィンドウが縦長すぎる場合、幅に合わせる
-		imageSize.x = sceneWindowSize.x;
-		imageSize.y = sceneWindowSize.x / kTargetAspect;
-	}
-
-	// 上を基準にする
-	float offsetX = (sceneWindowSize.x - imageSize.x) * 0.5f;
-	ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-	ImGui::SetCursorScreenPos(ImVec2(cursorPos.x + offsetX, cursorPos.y));
-
-	ImGui::Image((ImTextureID)srvHandle.ptr, imageSize);
-	ImGui::End();
-
 	// ImGuiの内部コマンドを生成する
 	ImGui::Render();
 	//// Imguiの描画用のDescriptorHeapの設定

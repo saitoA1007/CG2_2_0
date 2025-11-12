@@ -3,13 +3,16 @@
 #include<vector>
 #include<unordered_map>
 
-class ConsoleWindow : public IEditorWindow {
-public:
-	void Draw() override;
-	std::string GetName() const override { return "Console"; };
+namespace GameEngine {
 
-private:
+	class ConsoleWindow : public IEditorWindow {
+	public:
+		void Draw() override;
+		std::string GetName() const override { return "Console"; };
 
-	// フィルターするグループを保存する
-	std::unordered_map<std::string, bool> groupFilters_;
-};
+	private:
+
+		// フィルターするグループを保存する
+		std::unordered_map<std::string, bool> groupFilters_;
+	};
+}

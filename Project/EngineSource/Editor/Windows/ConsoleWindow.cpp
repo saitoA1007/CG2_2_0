@@ -2,6 +2,8 @@
 #include"ImGuiManager.h"
 #include"LogManager.h"
 
+using namespace GameEngine;
+
 void ConsoleWindow::Draw() {
     ImGui::Begin("Console", &isActive);
 

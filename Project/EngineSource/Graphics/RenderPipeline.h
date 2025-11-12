@@ -40,18 +40,34 @@ namespace GameEngine {
         void EndFrame(ImGuiManager* imGuiManager);
 
     public:
+
+        /// <summary>
+        /// 描画を管理するクラスを取得
+        /// </summary>
+        /// <returns></returns>
         RendererManager* GetRendererManager() const { return rendererManager_.get(); }
 
+        /// <summary>
+        /// PostEffect用のPSOを設定
+        /// </summary>
+        /// <param name="copyPSO"></param>
         void SetCopyPSO(CopyPSO* copyPSO) { rendererManager_->SetCopyPSO(copyPSO); }
 
+        /// <summary>
+        /// 最終的な描画先のsrvHandleを取得
+        /// </summary>
+        /// <returns></returns>
         CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSRVHandle() { return rendererManager_->GetSRVHandle(); }
 
     private:
         RenderPipeline(const RenderPipeline&) = delete;
         RenderPipeline& operator=(const RenderPipeline&) = delete;
 
+        // DirectXのコア機能
         GraphicsDevice* graphicsDevice_ = nullptr;
+        // 描画管理機能
         std::unique_ptr<RendererManager> rendererManager_;
+        // Fps管理機能
         std::unique_ptr<FrameRateController> frameRateController_;
     };
 }

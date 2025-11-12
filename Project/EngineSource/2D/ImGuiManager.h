@@ -5,9 +5,10 @@
 
 #include"Externals/imgui/ImGuizmo.h"
 
+#include <dxgi1_6.h>
+
 #include"WindowsApp.h"
 #include"SrvManager.h"
-#include"RendererManager.h"
 
 #include "Externals/imgui/imgui_node_editor.h"
 namespace ed = ax::NodeEditor;
@@ -27,7 +28,7 @@ namespace GameEngine {
 		/// <param name="windowsApp"></param>
 		/// <param name="dxCommon"></param>
 		void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, DXGI_SWAP_CHAIN_DESC1 swapChainDesc,
-			WindowsApp* windowsApp, RendererManager* rendererManager,SrvManager* srvManager);
+			WindowsApp* windowsApp,SrvManager* srvManager);
 
 		/// <summary>
 		/// 更新前処理
@@ -55,10 +56,6 @@ namespace GameEngine {
 
 		ID3D12GraphicsCommandList* commandList_ = nullptr;
 		WindowsApp* windowsApp_ = nullptr;
-		RendererManager* rendererManager_ = nullptr;
 		SrvManager* srvManager_ = nullptr;
-
-		// 固定したいアスペクト比 (16:9)
-		const float kTargetAspect = 1280.0f / 720.0f;
 	};
 }

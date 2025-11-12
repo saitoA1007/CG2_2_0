@@ -1,8 +1,11 @@
 #pragma once
 #include"EditorWindowManager.h"
 
-class EditorMenuBar {
-public:
+namespace GameEngine {
 
-	void Run(EditorWindowManager* windowManager);
-};
+	class EditorMenuBar {
+	public:
+
+		void Run(EditorWindowManager* windowManager);
+	};
+}
