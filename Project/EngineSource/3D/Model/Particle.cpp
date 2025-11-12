@@ -10,7 +10,6 @@ using namespace GameEngine;
 ID3D12Device* Particles::device_ = nullptr;
 ID3D12GraphicsCommandList* Particles::commandList_ = nullptr;
 ParticleCSPSO* Particles::particleCSPSO_ = nullptr;
-DirectXCommon* Particles::dxCommon_ = nullptr;
 TextureManager* Particles::textureManager_ = nullptr;
 uint32_t Particles::StaticSrvIndex_ = 0;
 
@@ -46,7 +45,7 @@ void Particles::Initialize() {
 	uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
 	//uavHandleCPU_ = GetCPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), StaticSrvIndex_ + static_cast<uint32_t>(ResourceCount::kStartModelCount));
 	//uavHandleGPU_ = GetGPUDescriptorHandle(dxCommon_->GetSRVHeap(), dxCommon_->GetSRVDescriptorSize(), StaticSrvIndex_ + static_cast<uint32_t>(ResourceCount::kStartModelCount));
-	dxCommon_->GetDevice()->CreateUnorderedAccessView(computeResource_.Get(), nullptr, &uavDesc, uavHandleCPU_);
+	//dxCommon_->GetDevice()->CreateUnorderedAccessView(computeResource_.Get(), nullptr, &uavDesc, uavHandleCPU_);
 
 	// srvを更新
 	StaticSrvIndex_++;

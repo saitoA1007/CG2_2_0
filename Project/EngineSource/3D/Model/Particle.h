@@ -7,7 +7,6 @@
 #include"Mesh.h"
 
 #include"ComputePSO/ParticleCSPSO.h"
-#include"DirectXCommon.h"
 #include"TextureManager.h"
 #include <d3d12.h>
 
@@ -30,8 +29,6 @@ namespace GameEngine {
 		};
 
 	public:
-
-		static DirectXCommon* dxCommon_;
 
 		void Initialize();
 
