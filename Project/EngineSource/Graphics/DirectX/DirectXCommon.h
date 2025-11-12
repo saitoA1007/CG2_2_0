@@ -7,6 +7,7 @@
 #include"DXRenderTarget.h"
 #include"DXDepthStencil.h"
 #include"DXFence.h"
+#include"DXDebugger.h"
 #include <fstream>
 #include"LogManager.h"
 #include"Externals/DirectXTex/d3dx12.h"
@@ -59,18 +60,15 @@ namespace GameEngine {
         DirectXCommon(const DirectXCommon&) = delete;
         DirectXCommon& operator=(const DirectXCommon&) = delete;
 
-#ifdef _DEBUG
-        void DebugLayer(ID3D12Device* device);
-#endif
-
-    private:
         std::unique_ptr<DXDevice> device_;
         std::unique_ptr<DXCommand> command_;
         std::unique_ptr<DXSwapChain> swapChain_;
         std::unique_ptr<DXRenderTarget> renderTarget_;
         std::unique_ptr<DXDepthStencil> depthStencil_;
         std::unique_ptr<DXFence> fence_;
-
+#ifdef _DEBUG
+        std::unique_ptr<DXDebugger> debugger_;
+#endif
         // ビューポート
         D3D12_VIEWPORT viewport_{};
         // シザー矩形
