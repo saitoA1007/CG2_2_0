@@ -1,6 +1,4 @@
 #pragma once
-#include<chrono>
-#include<thread>
 #include"DXDevice.h"
 #include"DXCommand.h"
 #include"DXSwapChain.h"
@@ -8,12 +6,14 @@
 #include"DXDepthStencil.h"
 #include"DXFence.h"
 #include"DXDebugger.h"
+
 #include <fstream>
 #include"LogManager.h"
 #include"Externals/DirectXTex/d3dx12.h"
 
-#include"PostProcess/CopyPSO.h"
+#include"FrameRateController.h"
 
+#include"PostProcess/CopyPSO.h"
 #include"PostProcess/PostEffectManager.h"
 
 #include"SrvManager.h"
@@ -84,15 +84,7 @@ namespace GameEngine {
         // ポストエフェクト
         std::unique_ptr<PostEffectManager> postEffectManager_;
 
-        // 記録時間(FPS固定用)
-        std::chrono::steady_clock::time_point reference_;
-
-    private:
-
-        // FPS固定初期化
-        void InitializeFixFPS();
-
-        // FPS固定更新
-        void UpdateFixFPS();
+        // Fpsを管理する
+        std::unique_ptr<FrameRateController> frameRateController_;
     };
 }
