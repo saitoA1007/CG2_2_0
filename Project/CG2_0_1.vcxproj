@@ -242,6 +242,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Editor\Windows\InspectorWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\PerformanceWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\SceneWIndow.cpp" />
+    <ClCompile Include="EngineSource\Graphics\FrameRateController.cpp" />
     <ClCompile Include="EngineSource\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="EngineSource\Graphics\RendererManager.cpp" />
     <ClCompile Include="EngineSource\Input\InPut.cpp" />
@@ -362,6 +363,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Editor\Windows\InspectorWindow.h" />
     <ClInclude Include="EngineSource\Editor\Windows\PerformanceWindow.h" />
     <ClInclude Include="EngineSource\Editor\Windows\SceneWIndow.h" />
+    <ClInclude Include="EngineSource\Graphics\FrameRateController.h" />
     <ClInclude Include="EngineSource\Graphics\GraphicsDevice.h" />
     <ClInclude Include="EngineSource\Graphics\RendererManager.h" />
     <ClInclude Include="EngineSource\Input\InPut.h" />
