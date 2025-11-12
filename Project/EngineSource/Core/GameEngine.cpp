@@ -142,9 +142,6 @@ void Engine::Update() {
 		// 更新処理
 		//==================================================================
 
-		// fpsを計測する
-		fpsCounter_->Update();
-
 		// 更新前処理
 		PreUpdate();
 
@@ -174,6 +171,10 @@ void Engine::Update() {
 }
 
 void Engine::PreUpdate() {
+
+	// fpsを計測する
+	fpsCounter_->Update();
+
 	// キー入力の更新処理
 	input_->Update();
 	// ImGuiにフレームが始まる旨を伝える

@@ -129,7 +129,7 @@
     <ClCompile Include="EngineSource\Core\PSO\LinePSO.cpp">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\DirectX\DirectXCommon.cpp">
+    <ClCompile Include="EngineSource\Graphics\DirectX\DirectXCommon.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Core\DXC.cpp">
@@ -245,15 +245,15 @@
     <ClCompile Include="Application\Core\Scene\GEScene.cpp" />
     <ClCompile Include="Application\Player.cpp" />
     <ClCompile Include="Application\CameraController.cpp" />
-    <ClCompile Include="EngineSource\Core\DirectX\SrvManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\SrvManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelRenderer.cpp" />
-    <ClCompile Include="EngineSource\Core\DirectX\DXDevice.cpp" />
-    <ClCompile Include="EngineSource\Core\DirectX\DXCommand.cpp" />
-    <ClCompile Include="EngineSource\Core\DirectX\DXSwapChain.cpp" />
-    <ClCompile Include="EngineSource\Core\DirectX\DXRenderTarget.cpp" />
-    <ClCompile Include="EngineSource\Core\DirectX\DXDepthStencil.cpp" />
-    <ClCompile Include="EngineSource\Core\DirectX\DXFence.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXDevice.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXCommand.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXSwapChain.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXRenderTarget.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXDepthStencil.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXFence.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\PSOManager.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.cpp" />
@@ -354,7 +354,7 @@
     <ClInclude Include="EngineSource\Core\PSO\LinePSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\DirectX\DirectXCommon.h">
+    <ClInclude Include="EngineSource\Graphics\DirectX\DirectXCommon.h">
       <Filter>EngineSource\Core</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Core\DXC.h">
@@ -506,15 +506,15 @@
     <ClInclude Include="Application\Core\Scene\GEScene.h" />
     <ClInclude Include="Application\Player.h" />
     <ClInclude Include="Application\CameraController.h" />
-    <ClInclude Include="EngineSource\Core\DirectX\SrvManager.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\SrvManager.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelRenderer.h" />
-    <ClInclude Include="EngineSource\Core\DirectX\DXDevice.h" />
-    <ClInclude Include="EngineSource\Core\DirectX\DXCommand.h" />
-    <ClInclude Include="EngineSource\Core\DirectX\DXSwapChain.h" />
-    <ClInclude Include="EngineSource\Core\DirectX\DXRenderTarget.h" />
-    <ClInclude Include="EngineSource\Core\DirectX\DXDepthStencil.h" />
-    <ClInclude Include="EngineSource\Core\DirectX\DXFence.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXDevice.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXCommand.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXSwapChain.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXRenderTarget.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXDepthStencil.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXFence.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\PSOManager.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.h" />
