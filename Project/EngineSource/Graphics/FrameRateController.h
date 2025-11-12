@@ -2,13 +2,20 @@
 #include<chrono>
 #include<thread>
 
+/// <summary>
+/// FPSを固定化する
+/// </summary>
 class FrameRateController {
 public:
 
-	// FPS固定初期化
+	/// <summary>
+	/// FPS固定初期化
+	/// </summary>
 	void InitializeFixFPS();
 
-	// FPS固定更新
+	/// <summary>
+	/// FPS固定更新
+	/// </summary>
 	void UpdateFixFPS();
 
 private:

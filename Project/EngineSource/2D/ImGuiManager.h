@@ -6,8 +6,8 @@
 #include"Externals/imgui/ImGuizmo.h"
 
 #include"WindowsApp.h"
-#include"DirectXCommon.h"
 #include"SrvManager.h"
+#include"RendererManager.h"
 
 #include "Externals/imgui/imgui_node_editor.h"
 namespace ed = ax::NodeEditor;
@@ -26,7 +26,8 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="windowsApp"></param>
 		/// <param name="dxCommon"></param>
-		void Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon,SrvManager* srvManager);
+		void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, DXGI_SWAP_CHAIN_DESC1 swapChainDesc,
+			WindowsApp* windowsApp, RendererManager* rendererManager,SrvManager* srvManager);
 
 		/// <summary>
 		/// 更新前処理
@@ -52,8 +53,9 @@ namespace GameEngine {
 		ImGuiManager(const ImGuiManager&) = delete;
 		const ImGuiManager& operator=(const ImGuiManager&) = delete;
 
+		ID3D12GraphicsCommandList* commandList_ = nullptr;
 		WindowsApp* windowsApp_ = nullptr;
-		DirectXCommon* dxCommon_ = nullptr;
+		RendererManager* rendererManager_ = nullptr;
 		SrvManager* srvManager_ = nullptr;
 
 		// 固定したいアスペクト比 (16:9)

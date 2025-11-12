@@ -1,10 +1,12 @@
 #include"ImGuiManager.h"
 using namespace GameEngine;
 
-void ImGuiManager::Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon, SrvManager* srvManager) {
+void ImGuiManager::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, DXGI_SWAP_CHAIN_DESC1 swapChainDesc,
+	WindowsApp* windowsApp, RendererManager* rendererManager, SrvManager* srvManager) {
 
+	commandList_ = commandList;
 	windowsApp_ = windowsApp;
-	dxCommon_ = dxCommon;
+	rendererManager_ = rendererManager;
 	srvManager_ = srvManager;
 
 	// ImGuiの初期化。
@@ -20,8 +22,8 @@ void ImGuiManager::Initialize(WindowsApp* windowsApp, DirectXCommon* dxCommon, S
 
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(windowsApp_->GetHwnd());
-	ImGui_ImplDX12_Init(dxCommon_->GetDevice(),
-		dxCommon_->GetSwapChainDesc().BufferCount,
+	ImGui_ImplDX12_Init(device,
+		swapChainDesc.BufferCount,
 		rtvDesc_.Format,
 		srvManager_->GetSRVHeap(),
 		srvManager_->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(),
@@ -65,7 +67,7 @@ void ImGuiManager::EndFrame() {
 	// 描画した結果を移す
 	ImGui::Begin("GameScene");
 	ImVec2 sceneWindowSize = ImGui::GetContentRegionAvail();
-	D3D12_GPU_DESCRIPTOR_HANDLE& srvHandle = dxCommon_->GetSRVHandle();
+	D3D12_GPU_DESCRIPTOR_HANDLE& srvHandle = rendererManager_->GetSRVHandle();
 
 	// 実際に使うサイズ
 	ImVec2 imageSize = sceneWindowSize;
@@ -95,12 +97,12 @@ void ImGuiManager::EndFrame() {
 	ImGui::Render();
 	//// Imguiの描画用のDescriptorHeapの設定
 	ID3D12DescriptorHeap* descriptorHeaps[] = { srvManager_->GetSRVHeap() };
-	dxCommon_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
+	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
 void ImGuiManager::Draw() {
 	// 実際のcommandListのImGuiの描画コマンドを積む
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon_->GetCommandList());
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_);
 }
 
 void ImGuiManager::Finalize() {

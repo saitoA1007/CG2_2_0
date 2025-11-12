@@ -7,8 +7,9 @@
 #include"LogManager.h"
 using namespace GameEngine;
 
-void TextureManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager) {
-	dxCommon_ = dxCommon;
+void TextureManager::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+	device_ = device;
+	commandList_ = commandList;
 	srvManager_ = srvManager;
 }
 
@@ -69,13 +70,13 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 	}
 	metadata_ = &texture.mipImage.GetMetadata();
 	// テクスチャリソースを作成
-	texture.textureResource = CreateTextureResource(dxCommon_->GetDevice(), *metadata_);
+	texture.textureResource = CreateTextureResource(device_, *metadata_);
 	if (!texture.textureResource) {
 		LogManager::GetInstance().Log("Failed to create textureResource for: " + fileName);
 		assert(false);
 	}
 	// テクスチャデータをアップロード
-	texture.intermediateResources_ = UploadTextureData(texture.textureResource.Get(), texture.mipImage, dxCommon_->GetDevice(), dxCommon_->GetCommandList());
+	texture.intermediateResources_ = UploadTextureData(texture.textureResource.Get(), texture.mipImage, device_, commandList_);
 	if (!texture.intermediateResources_) {
 		LogManager::GetInstance().Log("Failed to upload texture data for: " + fileName);
 		assert(false);
@@ -95,7 +96,7 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 	texture.textureSrvHandleGPU = srvManager_->GetGPUHandle(index);
 	LogManager::GetInstance().Log(std::format("CPU Handle: {}, GPU Handle: {}", texture.textureSrvHandleCPU.ptr, texture.textureSrvHandleGPU.ptr));
 	// SRVを作成
-	dxCommon_->GetDevice()->CreateShaderResourceView(texture.textureResource.Get(), &srvDesc_, texture.textureSrvHandleCPU);
+	device_->CreateShaderResourceView(texture.textureResource.Get(), &srvDesc_, texture.textureSrvHandleCPU);
 
 	// 登録
 	textures_.push_back(std::move(texture));

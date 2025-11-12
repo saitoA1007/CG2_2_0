@@ -5,7 +5,7 @@
 
 namespace GameEngine {
 
-	class DXDevice {
+	class DXDevice final {
 	public:
 
 		DXDevice() = default;

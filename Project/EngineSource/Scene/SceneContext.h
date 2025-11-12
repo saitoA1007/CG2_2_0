@@ -1,4 +1,5 @@
 #pragma once
+#include"GraphicsDevice.h"
 #include"Input.h"
 #include"TextureManager.h"
 #include"AudioManager.h"
@@ -13,5 +14,5 @@ struct SceneContext {
 	GameEngine::ModelManager* modelManager = nullptr;
 	GameEngine::TextureManager* textureManager = nullptr;
 	GameEngine::AudioManager* audioManager = nullptr;
-	GameEngine::DirectXCommon* dxCommon = nullptr;
+	GameEngine::GraphicsDevice* graphicsDevice = nullptr;
 };

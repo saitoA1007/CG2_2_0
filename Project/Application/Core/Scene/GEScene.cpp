@@ -21,7 +21,7 @@ void GEScene::Initialize(SceneContext* context) {
 	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
 	// デバックカメラの初期化
 	debugCamera_ = std::make_unique<DebugCamera>();
-	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->dxCommon->GetDevice());
+	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->graphicsDevice->GetDevice());
 
 	// グリッドの初期化
 	gridModel_ = context_->modelManager->GetNameByModel("Grid");

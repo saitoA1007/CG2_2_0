@@ -2,6 +2,7 @@
 #include"EngineSource/Math/MyMath.h"
 #include"EngineSource/Common/CreateBufferResource.h"
 #include"EngineSource/2D/ImGuiManager.h"
+#include<algorithm>
 
 using namespace GameEngine;
 

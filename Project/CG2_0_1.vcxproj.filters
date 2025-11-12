@@ -129,9 +129,6 @@
     <ClCompile Include="EngineSource\Core\PSO\LinePSO.cpp">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\DirectX\DirectXCommon.cpp">
-      <Filter>EngineSource\Core</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Core\DXC.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
@@ -287,6 +284,8 @@
     <ClCompile Include="EngineSource\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\DXDebugger.cpp" />
     <ClCompile Include="EngineSource\Graphics\FrameRateController.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXViewportState.cpp" />
+    <ClCompile Include="EngineSource\Graphics\RenderPipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -357,9 +356,6 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Core\PSO\LinePSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\DirectX\DirectXCommon.h">
-      <Filter>EngineSource\Core</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Core\DXC.h">
       <Filter>EngineSource\Core</Filter>
@@ -564,6 +560,8 @@
     <ClInclude Include="EngineSource\Graphics\GraphicsDevice.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\DXDebugger.h" />
     <ClInclude Include="EngineSource\Graphics\FrameRateController.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXViewportState.h" />
+    <ClInclude Include="EngineSource\Graphics\RenderPipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

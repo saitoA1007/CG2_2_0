@@ -4,7 +4,7 @@
 
 namespace GameEngine {
 
-	class DXCommand {
+	class DXCommand final {
 	public:
 
 		DXCommand() = default;
