@@ -1,43 +1,46 @@
 #pragma once
 #include"TextureManager.h"
 
-enum class ScenePlayMode {
-	Play,  // 再生
-	Stop,  // 停止
-};
+namespace GameEngine {
 
-class EditorToolBar {
-public:
+	enum class ScenePlayMode {
+		Play,  // 再生
+		Stop,  // 停止
+	};
 
-	EditorToolBar(GameEngine::TextureManager* textureManager);
+	class EditorToolBar {
+	public:
 
-	void Initialize();
+		EditorToolBar(GameEngine::TextureManager* textureManager);
 
-	void Run();
+		void Initialize();
 
-	// 状態取得
-	ScenePlayMode GetPlayMode() const { return playMode_; }
+		void Run();
 
-	// 更新しているかを取得
-	bool GetIsActiveUpdate() const;
+		// 状態取得
+		ScenePlayMode GetPlayMode() const { return playMode_; }
 
-	// 一時停止を取得する
-	bool GetIsPauce() const { return isPause_; }
+		// 更新しているかを取得
+		bool GetIsActiveUpdate() const;
 
-private:
-	D3D12_GPU_DESCRIPTOR_HANDLE playImagesrvHandle_;
-	D3D12_GPU_DESCRIPTOR_HANDLE pauseImagesrvHandle_;
-	D3D12_GPU_DESCRIPTOR_HANDLE stopImagesrvHandle_;
+		// 一時停止を取得する
+		bool GetIsPauce() const { return isPause_; }
 
-	// 実行状態を管理する
-	ScenePlayMode playMode_ = ScenePlayMode::Stop;
+	private:
+		D3D12_GPU_DESCRIPTOR_HANDLE playImagesrvHandle_;
+		D3D12_GPU_DESCRIPTOR_HANDLE pauseImagesrvHandle_;
+		D3D12_GPU_DESCRIPTOR_HANDLE stopImagesrvHandle_;
 
-	bool isPause_ = false;
+		// 実行状態を管理する
+		ScenePlayMode playMode_ = ScenePlayMode::Stop;
 
-private:
+		bool isPause_ = false;
 
-	/// <summary>
-	/// ショートカットキーでも行えるようにする
-	/// </summary>
-	void UpdateShortcutsKey();
-};
+	private:
+
+		/// <summary>
+		/// ショートカットキーでも行えるようにする
+		/// </summary>
+		void UpdateShortcutsKey();
+	};
+}

@@ -1,6 +1,8 @@
 #include"EditorToolBar.h"
 #include"ImGuiManager.h"
 
+using namespace GameEngine;
+
 EditorToolBar::EditorToolBar(GameEngine::TextureManager* textureManager) {
 
 	// デバックで使用する画像を登録する

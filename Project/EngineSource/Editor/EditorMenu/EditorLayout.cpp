@@ -4,6 +4,8 @@
 #include<cassert>
 #include<Windows.h>
 
+using namespace GameEngine;
+
 void EditorLayout::SaveLayout(const std::vector<std::unique_ptr<IEditorWindow>>& windows) const {
 	json layoutJson;
 

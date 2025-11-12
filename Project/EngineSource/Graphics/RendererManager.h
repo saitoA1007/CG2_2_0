@@ -52,9 +52,16 @@ namespace GameEngine {
         void TransitionBackBuffer(D3D12_RESOURCE_STATES stateBefore, D3D12_RESOURCE_STATES stateAfter);
 
     public:
-        // PSOを受け取る
+        /// <summary>
+        /// PostEffect用のPSOを設定
+        /// </summary>
+        /// <param name="copyPSO"></param>
         void SetCopyPSO(CopyPSO* copyPSO) { copyPSO_ = copyPSO; }
 
+        /// <summary>
+        /// 最終的な描画先のsrvHandleを取得
+        /// </summary>
+        /// <returns></returns>
         CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSRVHandle() { return postEffectManager_->GetSRVHandle(); }
 
     private:
@@ -73,6 +80,5 @@ namespace GameEngine {
         // 画面クリアの色
         float clearColor_[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
         //float clearColor_[4] = { 1.0f,0.0f,1.0f,1.0f };
-
 	};
 }

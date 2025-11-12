@@ -19,7 +19,7 @@ namespace GameEngine {
 	class EditorCore {
 	public:
 
-		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest);
+		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest,RendererManager* rendererManager);
 
 		void Run();
 

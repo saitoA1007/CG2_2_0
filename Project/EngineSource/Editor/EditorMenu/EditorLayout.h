@@ -7,23 +7,26 @@
 #include<json.hpp>
 using json = nlohmann::json;
 
-class EditorLayout {
-public:
+namespace GameEngine {
 
-	/// <summary>
-	/// ウィンドウレイアウトをjsonファイルに保存する
-	/// </summary>
-	/// <param name="windows"></param>
-	void SaveLayout(const std::vector<std::unique_ptr<IEditorWindow>>& windows) const;
+	class EditorLayout {
+	public:
 
-	/// <summary>
-	/// jsonファイルからウィンドウレイアウトを取得する
-	/// </summary>
-	/// <param name="windows"></param>
-	void LoadLayout(std::vector<std::unique_ptr<IEditorWindow>>& windows);
+		/// <summary>
+		/// ウィンドウレイアウトをjsonファイルに保存する
+		/// </summary>
+		/// <param name="windows"></param>
+		void SaveLayout(const std::vector<std::unique_ptr<IEditorWindow>>& windows) const;
 
-private:
+		/// <summary>
+		/// jsonファイルからウィンドウレイアウトを取得する
+		/// </summary>
+		/// <param name="windows"></param>
+		void LoadLayout(std::vector<std::unique_ptr<IEditorWindow>>& windows);
 
-	// ウィンドウレイアウトが保存してあるファイルパス名
-	const std::string& kFilePath = "Resources/Json/DebugData/windowLayout.json";
-};
+	private:
+
+		// ウィンドウレイアウトが保存してあるファイルパス名
+		const std::string& kFilePath = "Resources/Json/DebugData/windowLayout.json";
+	};
+}

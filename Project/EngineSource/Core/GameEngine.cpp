@@ -59,7 +59,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// ImGuiの初期化
 	imGuiManager_ = std::make_unique<ImGuiManager>();
 	imGuiManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), graphicsDevice_->GetSwapChainDesc(),
-		windowsApp_.get(), renderPipeline_->GetRendererManager(), srvManager_.get());
+		windowsApp_.get(), srvManager_.get());
 
 	// 入力処理を初期化
 	input_ = std::make_unique<Input>();
@@ -132,7 +132,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneChangeRequest_->SetCurrentSceneState(sceneManager_->GetCurrentSceneState());
 
 	editorCore_ = std::make_unique<EditorCore>();
-	editorCore_->Initialize(textureManager_.get(), sceneChangeRequest_.get());
+	editorCore_->Initialize(textureManager_.get(), sceneChangeRequest_.get(), renderPipeline_->GetRendererManager());
 #endif
 }
 

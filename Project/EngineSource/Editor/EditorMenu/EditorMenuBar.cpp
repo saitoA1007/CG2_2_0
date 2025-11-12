@@ -1,6 +1,8 @@
 #include"EditorMenuBar.h"
 #include"ImGuiManager.h"
 
+using namespace GameEngine;
+
 void EditorMenuBar::Run(EditorWindowManager* windowManager) {
 
 	// メインメニュー

@@ -1,5 +1,7 @@
 #include "InspectorWindow.h"
 
+using namespace GameEngine;
+
 void InspectorWindow::Draw() {
     if (!isActive) return;
 
