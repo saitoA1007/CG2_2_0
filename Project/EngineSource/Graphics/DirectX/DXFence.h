@@ -5,7 +5,7 @@
 
 namespace GameEngine {
 
-	class DXFence {
+	class DXFence final {
 	public:
 
 		DXFence() = default;

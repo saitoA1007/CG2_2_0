@@ -36,9 +36,13 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// srvManagerを生成
 	srvManager_ = std::make_unique<SrvManager>();
 
-	// DirectXCommonの初期化
-	dxCommon_ = std::make_unique<DirectXCommon>();
-	dxCommon_->Initialize(windowsApp_->GetHwnd(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight,srvManager_.get());
+	// DirectXの機能を生成
+	graphicsDevice_ = std::make_unique<GraphicsDevice>();
+	graphicsDevice_->Initialize(windowsApp_->GetHwnd(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight, srvManager_.get());
+
+	// 描画の流れを管理するクラスを初期化
+	renderPipeline_ = std::make_unique<RenderPipeline>();
+	renderPipeline_->Initialize(windowsApp_->kWindowWidth, windowsApp_->kWindowHeight, srvManager_.get(), graphicsDevice_.get());
 
 	// dxcCompilerの初期化
 	dxc_ = std::make_unique<DXC>();
@@ -49,12 +53,13 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// PSOを作成
 	psoManager_ = std::make_unique<PSOManager>();
-	psoManager_->Initialize(dxCommon_->GetDevice(), dxc_.get());
+	psoManager_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
 	psoManager_->DefaultLoadPSO();
 
 	// ImGuiの初期化
 	imGuiManager_ = std::make_unique<ImGuiManager>();
-	imGuiManager_->Initialize(windowsApp_.get(), dxCommon_.get(),srvManager_.get());
+	imGuiManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), graphicsDevice_->GetSwapChainDesc(),
+		windowsApp_.get(), renderPipeline_->GetRendererManager(), srvManager_.get());
 
 	// 入力処理を初期化
 	input_ = std::make_unique<Input>();
@@ -66,7 +71,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// テクスチャの初期化
 	textureManager_ = std::make_shared<TextureManager>();
-	textureManager_->Initialize(dxCommon_.get(),srvManager_.get());
+	textureManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), srvManager_.get());
 	// 初期の画像をロードする
 	textureManager_->Load("Resources/Textures/white2x2.png");
 
@@ -79,24 +84,24 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	PostEffectManager::StaticInitialize(bloomPSO_.get(), scanLinePSO_.get(), vignettingPSO_.get(), radialBlurPSO_.get(), outLinePSO_.get());
 
 	// アニメーションの初期化
-	Animation::StaticInitialize(dxCommon_->GetDevice(), srvManager_.get());
+	Animation::StaticInitialize(graphicsDevice_->GetDevice(), srvManager_.get());
 
 	// 画像の初期化
-	Sprite::StaticInitialize(dxCommon_->GetDevice(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
-	SpriteRenderer::StaticInitialize(dxCommon_->GetCommandList(), textureManager_.get(), psoManager_.get());
+	Sprite::StaticInitialize(graphicsDevice_->GetDevice(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
+	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), psoManager_.get());
 	// 3dを描画する処理の初期化
-	Model::StaticInitialize(dxCommon_->GetDevice(), textureManager_.get());
-	ModelRenderer::StaticInitialize(dxCommon_->GetCommandList(), textureManager_.get(), psoManager_.get());
+	Model::StaticInitialize(graphicsDevice_->GetDevice(), textureManager_.get());
+	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), psoManager_.get());
 	// ワールドトランスフォームの初期化
-	WorldTransform::StaticInitialize(dxCommon_->GetDevice());
-	WorldTransforms::StaticInitialize(dxCommon_->GetDevice(),srvManager_.get());
+	WorldTransform::StaticInitialize(graphicsDevice_->GetDevice());
+	WorldTransforms::StaticInitialize(graphicsDevice_->GetDevice(),srvManager_.get());
 	// マテリアルの初期化
-	Material::StaticInitialize(dxCommon_->GetDevice());
+	Material::StaticInitialize(graphicsDevice_->GetDevice());
 	// デバック描画用
-	DebugRenderer::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList(), linePSO_.get());
+	DebugRenderer::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), linePSO_.get());
 
 	// 軸方向表示の初期化
-	AxisIndicator::StaticInitialize(dxCommon_->GetCommandList());
+	AxisIndicator::StaticInitialize(graphicsDevice_->GetCommandList());
 
 	// fpsを計測する
 	fpsCounter_ = std::make_unique<FpsCounter>();
@@ -114,7 +119,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneContext.textureManager = textureManager_.get();
 	sceneContext.modelManager = modelManager_.get();
 	sceneContext.audioManager = audioManager_.get();
-	sceneContext.dxCommon = dxCommon_.get();
+	sceneContext.graphicsDevice = graphicsDevice_.get();
 
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();
@@ -220,12 +225,12 @@ void Engine::PostUpdate() {
 
 void Engine::PreDraw() {
 	// 描画前処理
-	dxCommon_->PreDraw();
+	renderPipeline_->BeginFrame();
 }
 
 void Engine::PostDraw() {
 	// 描画後処理
-	dxCommon_->PostDraw(imGuiManager_.get());
+	renderPipeline_->EndFrame(imGuiManager_.get());
 }
 
 void Engine::Finalize() {
@@ -251,18 +256,18 @@ void Engine::CreatePSO() {
 
 	// 線のPSO設定の初期化
 	linePSO_ = std::make_unique<LinePSO>();
-	linePSO_->Initialize(L"Resources/Shaders/Primitive.VS.hlsl", L"Resources/Shaders/Primitive.PS.hlsl", dxCommon_->GetDevice(), dxc_.get());
+	linePSO_->Initialize(L"Resources/Shaders/Primitive.VS.hlsl", L"Resources/Shaders/Primitive.PS.hlsl", graphicsDevice_->GetDevice(), dxc_.get());
 
 	// CopyPSOの初期化
 	copyPSO_ = std::make_unique<CopyPSO>();
-	copyPSO_->Initialize(dxCommon_->GetDevice(), L"Resources/Shaders/PostEffect/Copy.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc_.get());
-	dxCommon_->SetCopyPSO(copyPSO_.get());
+	copyPSO_->Initialize(graphicsDevice_->GetDevice(), L"Resources/Shaders/PostEffect/Copy.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc_.get());
+	renderPipeline_->SetCopyPSO(copyPSO_.get());
 
 	/// PostProcessのPSOを初期化
 
 	// BloomPSOの初期化
 	bloomPSO_ = std::make_unique<BloomPSO>();
-	bloomPSO_->Initialize(dxCommon_->GetDevice(), L"Resources/Shaders/PostEffect/Bloom.VS.hlsl", dxc_.get(),
+	bloomPSO_->Initialize(graphicsDevice_->GetDevice(), L"Resources/Shaders/PostEffect/Bloom.VS.hlsl", dxc_.get(),
 		L"Resources/Shaders/PostEffect/HighLumMask.PS.hlsl",
 		L"Resources/Shaders/PostEffect/Bloom.PS.hlsl",
 		L"Resources/Shaders/PostEffect/BloomResult.PS.hlsl",
@@ -270,17 +275,17 @@ void Engine::CreatePSO() {
 
 	// scanLinePSOの初期化
 	scanLinePSO_ = std::make_unique<ScanLinePSO>();
-	scanLinePSO_->Initialize(dxCommon_->GetDevice(), dxc_.get());
+	scanLinePSO_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
 
 	// ヴィネットPSOの初期化
 	vignettingPSO_ = std::make_unique<VignettingPSO>();
-	vignettingPSO_->Initialize(dxCommon_->GetDevice(), dxc_.get());
+	vignettingPSO_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
 
 	// ラジアルブルーPSOの初期化
 	radialBlurPSO_ = std::make_unique<RadialBlurPSO>();
-	radialBlurPSO_->Initialize(dxCommon_->GetDevice(), dxc_.get());
+	radialBlurPSO_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
 
 	// アウトラインPSOの初期化
 	outLinePSO_ = std::make_unique<OutLinePSO>();
-	outLinePSO_->Initialize(dxCommon_->GetDevice(), dxc_.get());
+	outLinePSO_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
 }

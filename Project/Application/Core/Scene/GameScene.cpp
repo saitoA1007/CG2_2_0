@@ -19,10 +19,10 @@ void GameScene::Initialize(SceneContext* context) {
 
 	// カメラの初期化
 	camera_ = std::make_unique<Camera>();
-	camera_->Initialize(cameraTransform_, 1280, 720, context_->dxCommon->GetDevice());
+	camera_->Initialize(cameraTransform_, 1280, 720, context_->graphicsDevice->GetDevice());
 	// デバックカメラの初期化
 	debugCamera_ = std::make_unique<DebugCamera>();
-	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->dxCommon->GetDevice());
+	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->graphicsDevice->GetDevice());
 
 	// グリッドの初期化
 	gridModel_ = context_->modelManager->GetNameByModel("Grid");
@@ -35,7 +35,7 @@ void GameScene::Initialize(SceneContext* context) {
 
 	// 平行光源ライト
 	lightManager_ = std::make_unique<LightManager>();
-	lightManager_->Initialize(context_->dxCommon->GetDevice(), true, false, false);
+	lightManager_->Initialize(context_->graphicsDevice->GetDevice(), true, false, false);
 	directionalData_.active = true;
 	directionalData_.color = { 1.0f,1.0f,1.0f,1.0f };
 	directionalData_.direction = { 0.0,0.0f,1.0f };

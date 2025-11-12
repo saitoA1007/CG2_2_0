@@ -6,7 +6,7 @@
 
 namespace GameEngine {
 
-	class DXSwapChain {
+	class DXSwapChain final {
 	public:
 
 		DXSwapChain() = default;

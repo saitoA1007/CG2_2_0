@@ -6,7 +6,7 @@
 
 namespace GameEngine {
 
-	class DXRenderTarget {
+	class DXRenderTarget final {
 	public:
 
 		DXRenderTarget() = default;

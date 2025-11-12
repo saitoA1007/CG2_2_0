@@ -6,7 +6,7 @@
 
 namespace GameEngine {
 
-	class DXDepthStencil {
+	class DXDepthStencil final {
 	public:
 
 		DXDepthStencil() = default;

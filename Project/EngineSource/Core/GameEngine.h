@@ -1,7 +1,6 @@
 #pragma once
 // Core
 #include"WindowsApp.h"
-#include"DirectXCommon.h"
 #include"TextureManager.h"
 #include"SrvManager.h"
 
@@ -15,6 +14,10 @@
 #include"PostProcess/OutLinePSO.h"
 #include"PSO/Core/PSOManager.h"
 #include"PostProcess/PostEffectManager.h"
+
+// Graphics
+#include"GraphicsDevice.h"
+#include"RenderPipeline.h"
 
 // Common
 #include"LogManager.h"
@@ -90,9 +93,6 @@ namespace GameEngine {
 		// Windowsのアプリ機能
 		std::unique_ptr<WindowsApp> windowsApp_;
 
-		// DirectXのアプリ機能
-		std::unique_ptr<DirectXCommon> dxCommon_;
-
 		// dxcCompilerの機能
 		std::unique_ptr<DXC> dxc_;
 
@@ -128,6 +128,14 @@ namespace GameEngine {
 		std::unique_ptr<OutLinePSO> outLinePSO_;
 
 		std::unique_ptr<PSOManager> psoManager_;
+
+		// Graphics ==================================
+
+		// DirectXのコア機能
+		std::unique_ptr<GraphicsDevice> graphicsDevice_;
+
+		// 描画の流れを管理
+		std::unique_ptr<RenderPipeline> renderPipeline_;
 
 		/// Input =============================
 

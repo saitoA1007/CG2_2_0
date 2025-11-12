@@ -7,7 +7,6 @@
 #include"Externals/DirectXTex/DirectXTex.h"
 #include"Externals/DirectXTex/d3dx12.h"
 
-#include"DirectXCommon.h"
 #include<format>
 
 #include"SrvManager.h"
@@ -40,7 +39,7 @@ namespace GameEngine {
 		/// 初期化
 		/// </summary>
 		/// <param name="dxCommon"></param>
-		void Initialize(DirectXCommon* dxCommon,SrvManager* srvManager);
+		void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList,SrvManager* srvManager);
 
 		// 解放処理
 		void Finalize();
@@ -74,8 +73,8 @@ namespace GameEngine {
 		TextureManager(const TextureManager&) = delete;
 		TextureManager& operator=(const TextureManager&) = delete;
 
-		// DirectXCommon
-		DirectXCommon* dxCommon_ = nullptr;
+		ID3D12Device* device_ = nullptr;
+		ID3D12GraphicsCommandList* commandList_ = nullptr;
 
 		// テクスチャデータを管理する変数
 		std::vector<Texture> textures_;
