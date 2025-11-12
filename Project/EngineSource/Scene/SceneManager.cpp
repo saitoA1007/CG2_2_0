@@ -19,16 +19,13 @@ void SceneManager::Initialize(SceneContext* context) {
 	// エンジン機能を取得する
 	context_ = context;
 
-	// white2x2の画像をロード
-	whiteGH_ = context_->textureManager->Load("Resources/Textures/white2x2.png");
-
 	// モデルを読み込む
 	LoadModelData();
 
 	// 画像を読み込む
 	LoadSpriteData();
 	
-	// シーンの初期化。最初はタイトルシーンに設定
+	// シーンの初期化。
 	ChangeScene(SceneState::GE);
 }
 

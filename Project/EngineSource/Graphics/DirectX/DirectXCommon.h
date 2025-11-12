@@ -1,12 +1,12 @@
 #pragma once
 #include<chrono>
 #include<thread>
-#include "DXDevice.h"
-#include "DXCommand.h"
-#include "DXSwapChain.h"
-#include "DXRenderTarget.h"
-#include "DXDepthStencil.h"
-#include "DXFence.h"
+#include"DXDevice.h"
+#include"DXCommand.h"
+#include"DXSwapChain.h"
+#include"DXRenderTarget.h"
+#include"DXDepthStencil.h"
+#include"DXFence.h"
 #include <fstream>
 #include"LogManager.h"
 #include"Externals/DirectXTex/d3dx12.h"

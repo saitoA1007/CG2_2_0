@@ -46,7 +46,7 @@ public:
 
 private: // エンジン機能
 
-	// エンジン機能
+	// エンジン機能群
 	SceneContext* context_ = nullptr;
 
 private: // シーン機能
@@ -56,9 +56,6 @@ private: // シーン機能
 
 	// シーンの切り替え処理をしているか判断する
 	bool isChangeScene_ = false;
-
-	// white2x2テクスチャの読み込み
-	uint32_t whiteGH_ = 0u;
 
 	// 現在のシーン状態の保存
 	SceneState currentSceneState_ = SceneState::Unknown;
