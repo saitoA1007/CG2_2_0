@@ -38,6 +38,16 @@ struct CollisionVisitor {
 		return IsAABBSegmentCollision(b, a);
 	}
 
+	// obbと球の当たり判定
+	bool operator()(const OBB& a, const Sphere& b) const {
+		return IsOBBSphereCollision(a,b);
+	}
+
+	// obbと線の当たり判定
+	bool operator()(const OBB& a, const Segment& b) const {
+		return IsOBBSegmentCollision(a,b);
+	}
+
 	// 登録していない当たり判定は衝突しないようにする
 	template <typename T, typename U>
 	bool operator()(const T&, const U&) const {
