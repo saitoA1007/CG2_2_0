@@ -4,10 +4,11 @@
 
 using namespace GameEngine;
 
-void Camera::Initialize(Transform transform, int kClientWidth, int kClientHeight, ID3D12Device* device) {
+void Camera::Initialize(const Transform& transform, int kClientWidth, int kClientHeight, ID3D12Device* device) {
 	// Matrixの初期化
-	cameraMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	viewMatrix_ = InverseMatrix(cameraMatrix_);
+	transform_ = transform;
+	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	viewMatrix_ = InverseMatrix(worldMatrix_);
 	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, static_cast<float>(kClientWidth) / static_cast<float>(kClientHeight), 0.1f, 200.0f);
 	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 
@@ -23,6 +24,8 @@ void Camera::Initialize(Transform transform, int kClientWidth, int kClientHeight
 }
 
 void Camera::Update() {
+	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	viewMatrix_ = InverseMatrix(worldMatrix_);
 	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 
 	if (cameraForGPU_) {
@@ -30,19 +33,8 @@ void Camera::Update() {
 	}	
 }
 
-void Camera::SetCameraPosition(const Transform& transform) {
-	cameraMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	viewMatrix_ = InverseMatrix(cameraMatrix_);
-	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
-
-	if (cameraForGPU_) {
-		cameraForGPU_->worldPosition = GetWorldPosition();
-	}
-}
-
-void Camera::SetCameraWorldMatrix(const Matrix4x4& worldMatrix) {
-	cameraMatrix_ = worldMatrix;
-	viewMatrix_ = InverseMatrix(cameraMatrix_);
+void Camera::UpdateFromWorldMatrix() {
+	viewMatrix_ = InverseMatrix(worldMatrix_);
 	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 
 	if (cameraForGPU_) {
@@ -67,8 +59,8 @@ Vector3 Camera::GetWorldPosition() {
 	// ワールド座標を入れる変数
 	Vector3 worldPos;
 	// ワールド行列の平行移動成分を取得
-	worldPos.x = cameraMatrix_.m[3][0];
-	worldPos.y = cameraMatrix_.m[3][1];
-	worldPos.z = cameraMatrix_.m[3][2];
+	worldPos.x = worldMatrix_.m[3][0];
+	worldPos.y = worldMatrix_.m[3][1];
+	worldPos.z = worldMatrix_.m[3][2];
 	return worldPos;
 }

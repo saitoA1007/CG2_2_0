@@ -1,9 +1,9 @@
 #pragma once
-#include"EngineSource/Math/Matrix4x4.h"
-#include"EngineSource/Math/Vector3.h"
-#include"EngineSource/Math/Transform.h"
+#include"Matrix4x4.h"
+#include"Vector3.h"
+#include"Transform.h"
 
-#include"EngineSource/Math/TransformationMatrix.h"
+#include"TransformationMatrix.h"
 
 #include <d3d12.h>
 #include <wrl.h>
@@ -19,7 +19,7 @@ namespace GameEngine {
 		/// <param name="transform">Scale,Rotate,Translate : 各型Vector3</param>
 		/// <param name="kClientWidth">画面横幅</param>
 		/// <param name="kClientHeight">画面縦幅</param>
-		void Initialize(Transform transform, int kClientWidth, int kClientHeight, ID3D12Device* device = nullptr);
+		void Initialize(const Transform& transform, int kClientWidth, int kClientHeight, ID3D12Device* device = nullptr);
 
 		/// <summary>
 		/// カメラの更新処理
@@ -27,14 +27,63 @@ namespace GameEngine {
 		void Update();
 
 		/// <summary>
-		/// カメラの位置を変更
+		/// ワールド行列から更新処理をおこなう
 		/// </summary>
-		/// <param name="transform"></param>
-		void SetCameraPosition(const Transform& transform);
-
-		void SetCameraWorldMatrix(const Matrix4x4& worldMatrix);
+		/// <param name="worldMatrix"></param>
+		void UpdateFromWorldMatrix();
 
 	public:
+
+		/// <summary>
+		/// カメラのワールド位置を取得する
+		/// </summary>
+		/// <returns></returns>
+		Vector3 GetWorldPosition();
+
+		/// <summary>
+		/// ワールド行列を設定する
+		/// </summary>
+		/// <param name="worldMatrix"></param>
+		void SetWorldMatrix(const Matrix4x4& worldMatrix) { worldMatrix_ = worldMatrix; }
+
+		/// <summary>
+		/// ワールド行列を取得
+		/// </summary>
+		/// <returns></returns>
+		Matrix4x4 GetWorldMatrix() const { return worldMatrix_; }
+
+		Matrix4x4 GetViewMatrix() { return viewMatrix_; }
+		void SetViewMatrix(const Matrix4x4& viewMatrix);
+
+		/// <summary>
+		/// カメラの描画範囲を設定
+		/// </summary>
+		/// <param name="fovY">視野</param>
+		/// <param name="kClientWidth">画面の横幅</param>
+		/// <param name="kClientHeight">縦幅</param>
+		/// <param name="nearPlane">描画する最小の距離</param>
+		/// <param name="farPlane">描画する最大の距離</param>
+		void SetProjectionMatrix(float fovY, int kClientWidth, int kClientHeight, float nearPlane, float farPlane);
+
+		Matrix4x4 GetProjectionMatrix() { return projectionMatrix_; }
+
+		/// <summary>
+		/// ビュープロジェクション行列を設定
+		/// </summary>
+		/// <param name="VPMatrix"></param>
+		void SetVPMatrix(Matrix4x4 VPMatrix) { VPMatrix_ = VPMatrix; }
+
+		/// <summary>
+		/// ビュープロジェクション行列を取得
+		/// </summary>
+		/// <returns></returns>
+		Matrix4x4 GetVPMatrix() const { return VPMatrix_; }
+
+		/// <summary>
+		/// カメラリソースを取得する
+		/// </summary>
+		/// <returns></returns>
+		inline ID3D12Resource* GetCameraResource() const { return cameraResource_.Get(); }
 
 		/// <summary>
 		/// モデルをカメラ座標に変換する処理
@@ -43,31 +92,23 @@ namespace GameEngine {
 		/// <returns></returns>
 		Matrix4x4 MakeWVPMatrix(Matrix4x4 worldMatrix);
 
-		Matrix4x4 GetViewMatrix() { return viewMatrix_; }
-		void SetViewMatrix(const Matrix4x4& viewMatrix);
+	public:
 
-		Matrix4x4 GetProjectionMatrix() { return projectionMatrix_; }
-		void SetProjectionMatrix(float fovY, int kClientWidth, int kClientHeight, float nearPlane, float farPlane);
-
-		Matrix4x4 GetVPMatrix() const { return VPMatrix_; }
-		void SetVPMatrix(Matrix4x4 VPMatrix) { VPMatrix_ = VPMatrix; }
-
-		Matrix4x4 GetWorldMatrix() const { return cameraMatrix_; }
-
-		inline ID3D12Resource* GetCameraResource() const { return cameraResource_.Get(); }
-
-		Vector3 GetWorldPosition();
-
-		void SetterWorldMatrix(const Matrix4x4& worldMatrix) { cameraMatrix_ = worldMatrix; }
+		// カメラのトランスフォーム
+		Transform transform_;
 
 	private:
-
-		Matrix4x4 cameraMatrix_;
+		// ワールド行列
+		Matrix4x4 worldMatrix_;
+		// ビュー行列
 		Matrix4x4 viewMatrix_;
+		// プロジェクション行列
 		Matrix4x4 projectionMatrix_;
+		// ビュープロジェクション行列
 		Matrix4x4 VPMatrix_;
 		Matrix4x4 WVPMatrix_;
 
+		// カメラのリソース
 		Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
 		CameraForGPU* cameraForGPU_ = nullptr;
 	};

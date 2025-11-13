@@ -57,9 +57,8 @@ private: // シーン機能
 	// 終了フラグ
 	bool isFinished_ = false;
 
-	// カメラ
-	Transform cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.19f,-9.55f,-10.89f} };
-	std::unique_ptr<GameEngine::Camera> camera_;
+	// メインカメラ
+	std::unique_ptr<GameEngine::Camera> mainCamera_;
 
 	// 自キャラのモデル
 	GameEngine::Model* playerModel_;

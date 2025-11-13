@@ -24,9 +24,9 @@ void GEScene::Initialize(SceneContext* context) {
 
 #pragma endregion
 
-	// カメラの初期化
-	camera_ = std::make_unique<Camera>();
-	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
+	// メインカメラの初期化
+	mainCamera_ = std::make_unique<Camera>();
+	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
 
 	// プレイヤーモデルを生成
 	playerModel_ = context_->modelManager->GetNameByModel("cube.obj");
@@ -68,15 +68,15 @@ void GEScene::Update() {
 	player_->Update(context_->inputCommand);
 
 	// パーティクルの更新処理
-	testParticle_->Update(camera_->GetWorldMatrix());
+	testParticle_->Update(mainCamera_->GetWorldMatrix());
 
 	// カメラコントロールの更新処理
 	cameraController_->Update(context_->inputCommand,player_->GetPlayerPos());
 
 	// カメラの更新処理
 	//camera_->Update();
-	camera_->SetterWorldMatrix(cameraController_->GetWorldMatrix());
-	camera_->SetVPMatrix(cameraController_->GetVPMatirx());
+	mainCamera_->SetWorldMatrix(cameraController_->GetWorldMatrix());
+	mainCamera_->SetVPMatrix(cameraController_->GetVPMatirx());
 }
 
 void GEScene::Draw(const bool& isDebugView) {
@@ -87,7 +87,7 @@ void GEScene::Draw(const bool& isDebugView) {
 		ModelRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
 	} else {
 		// 描画に使用するカメラを設定
-		ModelRenderer::SetCamera(camera_->GetVPMatrix(), camera_->GetCameraResource());
+		ModelRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
 	}
 
 	//===========================================================
@@ -110,7 +110,9 @@ void GEScene::Draw(const bool& isDebugView) {
 #ifdef _DEBUG
 
 	// デバック描画
-	debugRenderer_->DrawAll(camera_->GetVPMatrix());
+	if (isDebugView) {
+		debugRenderer_->DrawAll(context_->debugCamera_->GetVPMatrix());
+	} 
 #endif
 
 	//========================================================================
