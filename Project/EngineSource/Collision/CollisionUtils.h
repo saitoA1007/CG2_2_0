@@ -23,4 +23,10 @@ namespace GameEngine {
 
 	// aabbと線の衝突判定
 	bool IsAABBSegmentCollision(const AABB& aabb, const Segment& segment);
+
+	// obbと球の衝突判定
+	bool IsOBBSphereCollision(const OBB& obb, const Sphere& sphere);
+
+	// obbと線の衝突判定
+	bool IsOBBSegmentCollision(const OBB& obb, const Segment& segment);
 }

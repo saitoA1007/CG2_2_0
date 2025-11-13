@@ -7,7 +7,7 @@
 // 当たり判定の形状
 struct CollisionType {
 	// 当たり判定の属性
-	std::variant<Sphere, AABB, Segment> type;
+	std::variant<Sphere, AABB,OBB, Segment> type;
 
 	// 形状を取得する
 	template<typename T>
@@ -115,8 +115,39 @@ public:
 
 	// 線の方向
 	const Vector3 GetDiff() const { return diff_; }
-	void SetSize(const Vector3& diff) { diff_ = diff; }
+	void SetDiff(const Vector3& diff) { diff_ = diff; }
 
 private:
 	Vector3 diff_;
+};
+
+/// <summary>
+/// OBBの当たり判定
+/// </summary>
+class OBBCollider : public Collider {
+public:
+	// obbの当たり判定を登録する
+	CollisionType GetCollisionType() const override {
+		CollisionType collisiontype;
+		OBB tmpOBB;
+		tmpOBB.center = GetWorldPosition();
+		tmpOBB.size = size_;
+		std::memcpy(tmpOBB.orientations, orientations_, sizeof(Vector3) * 3);
+		collisiontype.type = tmpOBB;
+		return collisiontype;
+	}
+
+	// 座標軸
+	void SetOrientations(Vector3 orientations[3]) { std::memcpy(orientations_, orientations, sizeof(Vector3) * 3); }
+	const Vector3* GetOrientations() const {return orientations_;}
+
+	// サイズ
+	void SetSize(const Vector3& size) { size_ = size; }
+	const Vector3& GetSize() const { return size_; }
+
+private:
+	// 座標軸
+	Vector3 orientations_[3];
+	// 座標軸方向の長さの半分。中心から面までの距離
+	Vector3 size_;
 };

@@ -134,3 +134,64 @@ bool GameEngine::IsAABBSegmentCollision(const AABB& aabb, const Segment& segment
 		return false;
 	}
 }
+
+bool GameEngine::IsOBBSphereCollision(const OBB& obb, const Sphere& sphere) {
+
+	// 球からobbの中心へのベクトル
+	Vector3 v = sphere.center - obb.center;
+
+	// ベクトルをOBBのローカル座標系に変換
+	Vector3 centerInOBBLocalSpace = {
+		Dot(v, obb.orientations[0]),
+		Dot(v, obb.orientations[1]),
+		Dot(v, obb.orientations[2]) 
+	};
+
+	// obbのローカル空間の球の位置を求める
+	Sphere sphereOBBLocal;
+	sphereOBBLocal.center = centerInOBBLocalSpace;
+	sphereOBBLocal.radius = sphere.radius;
+
+	// obbのローカル空間の大きさを求める
+	AABB aabbOBBLocal;
+	aabbOBBLocal.min = obb.size * -1.0f;
+	aabbOBBLocal.max = obb.size;
+
+	// ローカル空間での衝突判定の結果を返す
+	return IsAABBSphereCollision(aabbOBBLocal, sphereOBBLocal);
+}
+
+bool GameEngine::IsOBBSegmentCollision(const OBB& obb, const Segment& segment) {
+
+	// ワールド座標での線の終点を求める
+	Vector3 worldEnd = segment.origin + segment.diff;
+
+	// 線の始点をOBBのローカル座標系に変換
+	Vector3 vOrigin = segment.origin - obb.center;
+	Vector3 localOrigin = {
+		Dot(vOrigin, obb.orientations[0]),
+		Dot(vOrigin, obb.orientations[1]),
+		Dot(vOrigin, obb.orientations[2]) 
+	};
+
+	// 線の終点をOBBのローカル座標系に変換
+	Vector3 vEnd = worldEnd - obb.center;
+	Vector3 localEnd = {
+		Dot(vEnd, obb.orientations[0]),
+		Dot(vEnd, obb.orientations[1]),
+		Dot(vEnd, obb.orientations[2]) 
+	};
+
+	// ローカル空間での線を求める
+	Segment segmentLocal;
+	segmentLocal.origin = localOrigin;
+	segmentLocal.diff = localEnd - localOrigin;
+
+	// obbのローカル空間の大きさを求める
+	AABB aabbOBBLocal;
+	aabbOBBLocal.min = obb.size * -1.0f;
+	aabbOBBLocal.max = obb.size;
+
+	// ローカル空間での衝突判定の結果を返す
+	return IsAABBSegmentCollision(aabbOBBLocal, segmentLocal);
+}
