@@ -1,12 +1,11 @@
 #include"SceneManager.h"
 
 // 各シーン
-#include"Application/Core/Scene/TitleScene.h"
-#include"Application/Core/Scene/GameScene.h"
-#include"Application/Core/Scene/GEScene.h"
+#include"Application/Scene/TitleScene.h"
+#include"Application/Scene/GameScene.h"
+#include"Application/Scene/GEScene.h"
 
 #include"ImguiManager.h"
-
 #include"ModelRenderer.h"
 
 using namespace GameEngine;

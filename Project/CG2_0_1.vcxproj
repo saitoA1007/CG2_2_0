@@ -169,7 +169,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application\CameraController.cpp" />
-    <ClCompile Include="Application\Core\Scene\GEScene.cpp" />
+    <ClCompile Include="Application\Scene\GEScene.cpp" />
     <ClCompile Include="Application\Player.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
@@ -264,8 +264,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Application\ColorEditor.cpp" />
     <ClCompile Include="EngineSource\Scene\SceneManager.cpp" />
-    <ClCompile Include="Application\Core\Scene\GameScene.cpp" />
-    <ClCompile Include="Application\Core\Scene\TitleScene.cpp" />
+    <ClCompile Include="Application\Scene\GameScene.cpp" />
+    <ClCompile Include="Application\Scene\TitleScene.cpp" />
     <ClCompile Include="EngineSource\Editor\GameParamEditor.cpp" />
     <ClCompile Include="Application\main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
@@ -274,7 +274,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\CameraController.h" />
-    <ClInclude Include="Application\Core\Scene\GEScene.h" />
+    <ClInclude Include="Application\Scene\GEScene.h" />
     <ClInclude Include="Application\Player.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
@@ -402,8 +402,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\ColorEditor.h" />
     <ClInclude Include="EngineSource\Scene\SceneManager.h" />
     <ClInclude Include="EngineSource\Scene\BaseScene.h" />
-    <ClInclude Include="Application\Core\Scene\GameScene.h" />
-    <ClInclude Include="Application\Core\Scene\TitleScene.h" />
+    <ClInclude Include="Application\Scene\GameScene.h" />
+    <ClInclude Include="Application\Scene\TitleScene.h" />
     <ClInclude Include="EngineSource\Editor\GameParamEditor.h" />
   </ItemGroup>
   <ItemGroup>
