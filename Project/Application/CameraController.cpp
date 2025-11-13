@@ -37,8 +37,10 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand, const Vect
 	worldMatrix_.m[3][1] = position_.y;
 	worldMatrix_.m[3][2] = position_.z;
 
-	// カメラを更新
-	camera_->SetCameraWorldMatrix(worldMatrix_);
+	// ワールド行列を設定
+	camera_->SetWorldMatrix(worldMatrix_);
+	// ワールド行列から更新する
+	camera_->UpdateFromWorldMatrix();
 }
 
 Matrix4x4 CameraController::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {

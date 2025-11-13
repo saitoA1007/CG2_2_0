@@ -18,15 +18,15 @@ void TitleScene::Initialize(SceneContext* context) {
 
 #pragma endregion
 
-	// カメラの初期化
-	camera_ = std::make_unique<Camera>();
-	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
+	// メインカメラの初期化
+	mainCamera_ = std::make_unique<Camera>();
+	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
 }
 
 void TitleScene::Update() {
 
 	// カメラの更新処理
-	camera_->Update();
+	mainCamera_->Update();
 }
 
 void TitleScene::Draw(const bool& isDebugView) {
@@ -37,7 +37,7 @@ void TitleScene::Draw(const bool& isDebugView) {
 		ModelRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
 	} else {
 		// 描画に使用するカメラを設定
-		ModelRenderer::SetCamera(camera_->GetVPMatrix(), camera_->GetCameraResource());
+		ModelRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
 	}
 
 	//===========================================================

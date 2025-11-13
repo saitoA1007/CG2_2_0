@@ -1,7 +1,6 @@
 #include"DebugCamera.h"
 #include"EngineSource/Math/MyMath.h"
 #include"EngineSource/Common/CreateBufferResource.h"
-#include"EngineSource/2D/ImGuiManager.h"
 #include<algorithm>
 
 using namespace GameEngine;
@@ -93,21 +92,12 @@ void DebugCamera::Update(Input* input) {
 	// カメラの変更した内容を適用する処理
 	viewMatrix_ = InverseMatrix(worldMatrix_);
 
-#ifdef _DEBUG
-
-	ImGui::Begin("DebugCamera");
-	ImGui::DragFloat2("mouseDelta", &mouseMove_.x, 0.1f);
-	ImGui::Text("x:%f,y:%f", input->GetMouseDelta().x, input->GetMouseDelta().y);
-	ImGui::DragFloat3("CameraPos", &translate_.x,0.01f);
-	ImGui::DragFloat3("CaeraRotate", &rotate_.x, 0.01f);
-
-	if (ImGui::Button("ResetTargetPosition")) {
+	// 初期位置にリセットする
+	if (input->PushKey(DIK_G) && input->PushKey(DIK_LCONTROL)) {
 		targetPos_ = { 0.0f,0.0f,0.0f };
+		mouseMove_ = { 3.1f,1.0f };
+		distance_ = 40.0f;
 	}
-
-	ImGui::End();
-#endif
-
 }
 
 Matrix4x4 DebugCamera::GetVPMatrix() {

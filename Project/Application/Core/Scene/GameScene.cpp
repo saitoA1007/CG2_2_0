@@ -22,9 +22,9 @@ void GameScene::Initialize(SceneContext* context) {
 
 #pragma endregion
 
-	// カメラの初期化
-	camera_ = std::make_unique<Camera>();
-	camera_->Initialize(cameraTransform_, 1280, 720, context_->graphicsDevice->GetDevice());
+	// メインカメラの初期化
+	mainCamera_ = std::make_unique<Camera>();
+	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
 
 	// 平行光源ライト
 	lightManager_ = std::make_unique<LightManager>();
@@ -76,15 +76,15 @@ void GameScene::Update() {
 	Animation::Update(skinClusterBron_, skeletonBron_, bronAnimation_, animationTime);
 
 	// カメラの更新処理
-	camera_->Update();
+	mainCamera_->Update();
 
 #ifdef _DEBUG
 
 	// 光源をデバック
 	ImGui::Begin("DebugWindow");
 	// カメラのデバック
-	ImGui::DragFloat3("CameraTranslate", &cameraTransform_.translate.x, 0.01f);
-	ImGui::DragFloat3("CameraRotate", &cameraTransform_.rotate.x, 0.01f);
+	ImGui::DragFloat3("CameraTranslate", &mainCamera_->transform_.translate.x, 0.01f);
+	ImGui::DragFloat3("CameraRotate", &mainCamera_->transform_.translate.x, 0.01f);
 
 	// 平行光源
 	if (ImGui::TreeNodeEx("Light", ImGuiTreeNodeFlags_Framed)) {
@@ -107,11 +107,8 @@ void GameScene::Draw(const bool& isDebugView) {
 		ModelRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
 	} else {
 		// 描画に使用するカメラを設定
-		ModelRenderer::SetCamera(camera_->GetVPMatrix(), camera_->GetCameraResource());
+		ModelRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
 	}
-
-	// 描画に使用するカメラを設定
-	ModelRenderer::SetCamera(camera_->GetVPMatrix(), camera_->GetCameraResource());
 
 	//===========================================================
 	// 3D描画
