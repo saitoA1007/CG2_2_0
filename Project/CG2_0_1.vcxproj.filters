@@ -231,15 +231,15 @@
     <ClCompile Include="EngineSource\Scene\SceneManager.cpp">
       <Filter>GameSource\Core\SceneSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Core\Scene\TitleScene.cpp">
+    <ClCompile Include="Application\Scene\TitleScene.cpp">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Core\Scene\GameScene.cpp">
+    <ClCompile Include="Application\Scene\GameScene.cpp">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\3D\Model\Animation.cpp" />
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
-    <ClCompile Include="Application\Core\Scene\GEScene.cpp" />
+    <ClCompile Include="Application\Scene\GEScene.cpp" />
     <ClCompile Include="Application\Player.cpp" />
     <ClCompile Include="Application\CameraController.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\SrvManager.cpp" />
@@ -495,15 +495,15 @@
     <ClInclude Include="EngineSource\Scene\BaseScene.h">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Core\Scene\TitleScene.h">
+    <ClInclude Include="Application\Scene\TitleScene.h">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Core\Scene\GameScene.h">
+    <ClInclude Include="Application\Scene\GameScene.h">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\Animation.h" />
     <ClInclude Include="EngineSource\Input\InputCommand.h" />
-    <ClInclude Include="Application\Core\Scene\GEScene.h" />
+    <ClInclude Include="Application\Scene\GEScene.h" />
     <ClInclude Include="Application\Player.h" />
     <ClInclude Include="Application\CameraController.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\SrvManager.h" />

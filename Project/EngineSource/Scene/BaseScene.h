@@ -24,6 +24,11 @@ public:
 	virtual void Update() = 0;
 
 	/// <summary>
+	/// デバック時、処理して良いものを更新する
+	/// </summary>
+	virtual void DebugUpdate() = 0;
+
+	/// <summary>
 	/// 描画処理
 	/// </summary>
 	virtual void Draw(const bool& isDebugView) = 0;
