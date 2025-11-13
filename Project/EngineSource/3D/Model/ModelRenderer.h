@@ -39,6 +39,13 @@ namespace GameEngine {
 		/// <param name="blendMode"></param>
 		static void PreDraw(RenderMode3D mode);
 
+		/// <summary>
+		/// カメラを設定する
+		/// </summary>
+		/// <param name="vpMatrix"></param>
+		/// <param name="cameraResource"></param>
+		static void SetCamera(const Matrix4x4& vpMatrix, ID3D12Resource* cameraResource);
+
 	public:
 
 		/// <summary>
@@ -48,7 +55,7 @@ namespace GameEngine {
 		/// <param name="directionalLightResource">光源</param>
 		/// <param name="textureHandle">テクスチャハンドル</param>
 		/// <param name="material">マテリアル : 何の書かなければデフォルトのマテリアルを適応</param>
-		static void Draw(const Model* model,WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material = nullptr);
+		static void Draw(const Model* model,WorldTransform& worldTransform, const uint32_t& textureHandle, const Material* material = nullptr);
 
 		/// <summary>
 		/// 生成したモデルを描画(元のテクスチャを使用)
@@ -56,7 +63,7 @@ namespace GameEngine {
 		/// <param name="worldMatrix">ワールド行列</param>
 		/// <param name="directionalLightResource">光源</param>
 		/// <param name="material">マテリアル : 何の書かなければデフォルトのマテリアルを適応</param>
-		static void Draw(const Model* model, WorldTransform& worldTransform, const Matrix4x4& VPMatrix, const Material* material = nullptr);
+		static void Draw(const Model* model, WorldTransform& worldTransform, const Material* material = nullptr);
 
 		/// <summary>
 		/// 生成したモデルの描画(ライト適応、複数マテリアル対応)
@@ -66,7 +73,7 @@ namespace GameEngine {
 		/// <param name="lightGroupResource"></param>
 		/// <param name="cameraResource"></param>
 		/// <param name="material"></param>
-		static void Draw(const Model* model, WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource, const Material* material = nullptr);
+		static void Draw(const Model* model, WorldTransform& worldTransform, ID3D12Resource* lightGroupResource, const Material* material = nullptr);
 
 		/// <summary>
 		/// 生成したモデルの複数描画
@@ -75,7 +82,7 @@ namespace GameEngine {
 		/// <param name="textureHandle"></param>
 		/// <param name="VPMatrix"></param>
 		/// <param name="material"></param>
-		static void DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material = nullptr);
+		static void DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Material* material = nullptr);
 
 		/// <summary>
 		/// 生成したモデルの複数描画
@@ -84,7 +91,7 @@ namespace GameEngine {
 		/// <param name="textureHandle"></param>
 		/// <param name="VPMatrix"></param>
 		/// <param name="material"></param>
-		static void DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const Matrix4x4& VPMatrix, const Material* material = nullptr);
+		static void DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const Material* material = nullptr);
 
 		/// <summary>
 		/// グリッドを描画
@@ -97,13 +104,13 @@ namespace GameEngine {
 		/// <param name="worldTransform"></param>
 		/// <param name="VPMatrix"></param>
 		/// <param name="material"></param>
-		static void DrawAnimation(const Model* model, WorldTransform& worldTransform, const Matrix4x4& VPMatrix, const SkinCluster& skinCluster, const Material* material = nullptr);
+		static void DrawAnimation(const Model* model, WorldTransform& worldTransform, const SkinCluster& skinCluster, const Material* material = nullptr);
 
 		/// <summary>
 		/// モデルに光源を適応させる
 		/// </summary>
 		/// <param name="directionalLightResource"></param>
-		static void DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource);
+		static void DrawLight(ID3D12Resource* lightGroupResource);
 
 	private:
 
@@ -115,5 +122,10 @@ namespace GameEngine {
 
 		// テクスチャ
 		static TextureManager* textureManager_;
+
+		// カメラ行列
+		static Matrix4x4 vpMatrix_;
+		// カメラリソース
+		static ID3D12Resource* cameraResource_;
 	};
 }

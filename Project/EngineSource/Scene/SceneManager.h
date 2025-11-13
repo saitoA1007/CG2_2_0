@@ -23,6 +23,11 @@ public:
 	void Update();
 
 	/// <summary>
+	/// デバック時の更新処理
+	/// </summary>
+	void DebugUpdate();
+
+	/// <summary>
 	/// 描画処理
 	/// </summary>
 	void Draw();
@@ -59,6 +64,16 @@ private: // シーン機能
 
 	// 現在のシーン状態の保存
 	SceneState currentSceneState_ = SceneState::Unknown;
+
+	// デバックカメラ
+	std::unique_ptr<GameEngine::DebugCamera> debugCamera_;
+
+	// グリッドを描画するためのモデル
+	GameEngine::Model* gridModel_;
+	GameEngine::WorldTransform gridWorldTransform_;
+
+	// デバックカメラとの切り替えを管理
+	bool isDebugView_ = true;
 
 private:
 

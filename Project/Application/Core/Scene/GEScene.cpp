@@ -16,17 +16,6 @@ void GEScene::Initialize(SceneContext* context) {
 	// エンジン機能を取得
 	context_ = context;
 
-	// カメラの初期化
-	camera_ = std::make_unique<Camera>();
-	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
-	// デバックカメラの初期化
-	debugCamera_ = std::make_unique<DebugCamera>();
-	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->graphicsDevice->GetDevice());
-
-	// グリッドの初期化
-	gridModel_ = context_->modelManager->GetNameByModel("Grid");
-	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
-
 	// デバック用描画の初期化
 	debugRenderer_ = DebugRenderer::Create();
 
@@ -34,6 +23,10 @@ void GEScene::Initialize(SceneContext* context) {
 	GameParamEditor::GetInstance()->SetActiveScene("GEScene");
 
 #pragma endregion
+
+	// カメラの初期化
+	camera_ = std::make_unique<Camera>();
+	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
 
 	// プレイヤーモデルを生成
 	playerModel_ = context_->modelManager->GetNameByModel("cube.obj");
@@ -80,69 +73,41 @@ void GEScene::Update() {
 	// カメラコントロールの更新処理
 	cameraController_->Update(context_->inputCommand,player_->GetPlayerPos());
 
-	// カメラ処理
-#pragma region Camera
-	if (isDebugCameraActive_) {
-		// デバックカメラの更新
-		debugCamera_->Update(context_->input);
-		// デバックカメラの値をカメラに代入
-		camera_->SetVPMatrix(debugCamera_->GetVPMatrix());
-
-		// グリッドの更新処理
-		gridWorldTransform_.transform_.translate = Vector3(debugCamera_->GetTargetPosition().x, -0.1f, debugCamera_->GetTargetPosition().z);
-		gridWorldTransform_.UpdateTransformMatrix();
-
-	} else {
-		// カメラの更新処理
-		//camera_->Update();
-		camera_->SetterWorldMatrix(cameraController_->GetWorldMatrix());
-		camera_->SetVPMatrix(cameraController_->GetVPMatirx());
-
-		// グリッドの更新処理
-		gridWorldTransform_.transform_.translate = Vector3(camera_->GetWorldPosition().x, -0.1f, camera_->GetWorldPosition().z);
-		gridWorldTransform_.UpdateTransformMatrix();
-	}
-#pragma endregion
-
-#ifdef _DEBUG
-
-	// カメラの切り替え処理
-#pragma region CameraTransition
-	if (context_->inputCommand->IsCommandAcitve("CameraChange")) {
-		if (isDebugCameraActive_) {
-			isDebugCameraActive_ = false;
-		} else {
-			isDebugCameraActive_ = true;
-		}
-	}
-#pragma endregion
-#endif
+	// カメラの更新処理
+	//camera_->Update();
+	camera_->SetterWorldMatrix(cameraController_->GetWorldMatrix());
+	camera_->SetVPMatrix(cameraController_->GetVPMatirx());
 }
 
-void GEScene::Draw() {
+void GEScene::Draw(const bool& isDebugView) {
+
+	// 描画に使用するカメラを設定
+	if (isDebugView) {
+		// 描画に使用するカメラを設定
+		ModelRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	} else {
+		// 描画に使用するカメラを設定
+		ModelRenderer::SetCamera(camera_->GetVPMatrix(), camera_->GetCameraResource());
+	}
 
 	//===========================================================
 	// 3D描画
-	//===========================================================09
+	//===========================================================
 
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::Instancing);
 
 	// パーティクルを描画
-	ModelRenderer::DrawInstancing(planeModel_, testParticle_->GetCurrentNumInstance(), *testParticle_->GetWorldTransforms(), testParticle_->GetTexture(), camera_->GetVPMatrix());
+	ModelRenderer::DrawInstancing(planeModel_, testParticle_->GetCurrentNumInstance(), *testParticle_->GetWorldTransforms(), testParticle_->GetTexture());
 
 	// 3Dモデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
 	// プレイヤーを描画
-	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform(),0, camera_->GetVPMatrix());
+	uint32_t DefaultWhiteGH = 0;
+	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform(), DefaultWhiteGH);
 
 #ifdef _DEBUG
-	// モデルの単体描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::Grid);
-
-	// グリッドを描画
-	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
 
 	// デバック描画
 	debugRenderer_->DrawAll(camera_->GetVPMatrix());
@@ -159,9 +124,6 @@ void GEScene::Draw() {
 }
 
 void GEScene::InputRegisterCommand() {
-	// カメラを操作を切り替える入力コマンドを登録
-	context_->inputCommand->RegisterCommand("CameraChange", { {InputState::KeyTrigger, DIK_F },{ InputState::KeyTrigger, DIK_G } });
-
 	// 移動の入力コマンドを登録する
 	context_->inputCommand->RegisterCommand("MoveUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
 	context_->inputCommand->RegisterCommand("MoveDown", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });
