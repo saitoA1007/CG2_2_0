@@ -1,7 +1,7 @@
 #pragma once
-#include"EngineSource/Math/Vector3.h"
-#include"EngineSource/Math/Matrix4x4.h"
-#include"EngineSource/Input/InPut.h"
+#include"Vector3.h"
+#include"Matrix4x4.h"
+#include"InPut.h"
 
 #include"EngineSource/Math/TransformationMatrix.h"
 

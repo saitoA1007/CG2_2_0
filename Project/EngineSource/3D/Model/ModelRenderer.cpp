@@ -6,6 +6,8 @@ using namespace GameEngine;
 ID3D12GraphicsCommandList* ModelRenderer::commandList_ = nullptr;
 TextureManager* ModelRenderer::textureManager_ = nullptr;
 std::unordered_map<RenderMode3D, DrawPsoData> ModelRenderer::psoList_;
+Matrix4x4 ModelRenderer::vpMatrix_ = {};
+ID3D12Resource* ModelRenderer::cameraResource_ = nullptr;
 
 void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, PSOManager* psoManager) {
 	commandList_ = commandList;
@@ -32,13 +34,18 @@ void ModelRenderer::PreDraw(RenderMode3D mode) {
 	commandList_->SetPipelineState(pso->second.graphicsPipelineState);
 }
 
-void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material) {
+void ModelRenderer::SetCamera(const Matrix4x4& vpMatrix, ID3D12Resource* cameraResource) {
+	vpMatrix_ = vpMatrix;
+	cameraResource_ = cameraResource;
+}
+
+void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const uint32_t& textureHandle, const Material* material) {
 
 	// カメラ座標に変換
 	if (model->IsLoad()) {
-		worldTransform.SetWVPMatrix(model->GetLocalMatrix(), VPMatrix);
+		worldTransform.SetWVPMatrix(model->GetLocalMatrix(), vpMatrix_);
 	} else {
-		worldTransform.SetWVPMatrix(VPMatrix);
+		worldTransform.SetWVPMatrix(vpMatrix_);
 	}
 
 	// メッシュを取得
@@ -69,12 +76,12 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 	}
 }
 
-void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const Matrix4x4& VPMatrix, const Material* material) {
+void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const Material* material) {
 	// カメラ座標に変換
 	if (model->IsLoad()) {
-		worldTransform.SetWVPMatrix(model->GetLocalMatrix(), VPMatrix);
+		worldTransform.SetWVPMatrix(model->GetLocalMatrix(), vpMatrix_);
 	} else {
-		worldTransform.SetWVPMatrix(VPMatrix);
+		worldTransform.SetWVPMatrix(vpMatrix_);
 	}
 
 	// メッシュを取得
@@ -105,12 +112,12 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 	}
 }
 
-void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource, const Material* material) {
+void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, ID3D12Resource* lightGroupResource, const Material* material) {
 	// カメラ座標に変換
 	if (model->IsLoad()) {
-		worldTransform.SetWVPMatrix(model->GetLocalMatrix(), VPMatrix);
+		worldTransform.SetWVPMatrix(model->GetLocalMatrix(), vpMatrix_);
 	} else {
-		worldTransform.SetWVPMatrix(VPMatrix);
+		worldTransform.SetWVPMatrix(vpMatrix_);
 	}
 
 	// メッシュを取得
@@ -133,7 +140,7 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
 		} else {
@@ -142,16 +149,16 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 	}
 }
 
-void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Matrix4x4& VPMatrix, const Material* material) {
+void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Material* material) {
 	
 	// 描画するのが0以下の場合は早期リターン
 	if (numInstance <= 0) { return;}
 
 	// カメラ座標に変換
 	if (model->IsLoad()) {
-		worldTransforms.SetWVPMatrix(numInstance, model->GetLocalMatrix(), VPMatrix);
+		worldTransforms.SetWVPMatrix(numInstance, model->GetLocalMatrix(), vpMatrix_);
 	} else {
-		worldTransforms.SetWVPMatrix(numInstance, VPMatrix);
+		worldTransforms.SetWVPMatrix(numInstance, vpMatrix_);
 	}
 
 	// メッシュを取得
@@ -182,16 +189,16 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 	}
 }
 
-void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const Matrix4x4& VPMatrix, const Material* material) {
+void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const Material* material) {
 
 	// 描画するのが0以下の場合は早期リターン
 	if (numInstance <= 0) { return; }
 
 	// カメラ座標に変換
 	if (model->IsLoad()) {
-		worldTransforms.SetWVPMatrix(numInstance, model->GetLocalMatrix(), VPMatrix);
+		worldTransforms.SetWVPMatrix(numInstance, model->GetLocalMatrix(), vpMatrix_);
 	} else {
-		worldTransforms.SetWVPMatrix(numInstance, VPMatrix);
+		worldTransforms.SetWVPMatrix(numInstance, vpMatrix_);
 	}
 
 	// メッシュを取得
@@ -222,9 +229,9 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 	}
 }
 
-void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, const Matrix4x4& VPMatrix, const SkinCluster& skinCluster, const Material* material) {
+void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, const SkinCluster& skinCluster, const Material* material) {
 	// カメラ座標に変換
-	worldTransform.SetWVPMatrix(VPMatrix);
+	worldTransform.SetWVPMatrix(vpMatrix_);
 
 	// メッシュを取得
 	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
@@ -277,7 +284,7 @@ void ModelRenderer::DrawGrid(const Model* model, WorldTransform& worldTransform,
 	commandList_->DrawIndexedInstanced(meshes[0]->GetTotalIndices(), 1, 0, 0, 0);
 }
 
-void ModelRenderer::DrawLight(ID3D12Resource* lightGroupResource, ID3D12Resource* cameraResource) {
+void ModelRenderer::DrawLight(ID3D12Resource* lightGroupResource) {
 	commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 }

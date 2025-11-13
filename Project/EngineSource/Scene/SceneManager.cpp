@@ -7,6 +7,8 @@
 
 #include"ImguiManager.h"
 
+#include"ModelRenderer.h"
+
 using namespace GameEngine;
 
 SceneManager::~SceneManager() {
@@ -24,6 +26,14 @@ void SceneManager::Initialize(SceneContext* context) {
 
 	// 画像を読み込む
 	LoadSpriteData();
+
+	// デバックカメラを生成
+	debugCamera_ = std::make_unique<DebugCamera>();
+	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->graphicsDevice->GetDevice());
+	context_->debugCamera_ = debugCamera_.get();
+	// グリッドの初期化
+	gridModel_ = context_->modelManager->GetNameByModel("Grid");
+	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 	
 	// シーンの初期化。
 	ChangeScene(SceneState::GE);
@@ -52,10 +62,40 @@ void SceneManager::Update() {
 	}
 }
 
+void SceneManager::DebugUpdate() {
+
+	// デバック状態を切り替える
+	if (context_->input->TriggerKey(DIK_F)) {
+		if (isDebugView_) {
+			isDebugView_ = false;
+		} else {
+			isDebugView_ = true;
+		}
+	}
+
+	// デバック状態で無ければ早期リターン
+	if (!isDebugView_) { return; }
+
+	// デバックカメラを操作
+	debugCamera_->Update(context_->input);
+	// グリッドの更新処理
+	gridWorldTransform_.transform_.translate = Vector3(context_->debugCamera_->GetTargetPosition().x, -0.1f, context_->debugCamera_->GetTargetPosition().z);
+	gridWorldTransform_.UpdateTransformMatrix();
+}
+
 void SceneManager::Draw() {
+	// デバック用のグリッドを描画
+#ifdef _DEBUG
+	if (isDebugView_) {
+		// モデルの単体描画前処理
+		ModelRenderer::PreDraw(RenderMode3D::Grid);
+		// グリッドを描画
+		ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	}
+#endif
 
 	// 現在シーンの描画処理
-	currentScene_->Draw();
+	currentScene_->Draw(isDebugView_);
 }
 
 void SceneManager::LoadModelData() {

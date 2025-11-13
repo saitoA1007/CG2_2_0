@@ -17,21 +17,14 @@ void GameScene::Initialize(SceneContext* context) {
 	// エンジン機能を取得
 	context_ = context;
 
-	// カメラの初期化
-	camera_ = std::make_unique<Camera>();
-	camera_->Initialize(cameraTransform_, 1280, 720, context_->graphicsDevice->GetDevice());
-	// デバックカメラの初期化
-	debugCamera_ = std::make_unique<DebugCamera>();
-	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->graphicsDevice->GetDevice());
-
-	// グリッドの初期化
-	gridModel_ = context_->modelManager->GetNameByModel("Grid");
-	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
-
 	// 登録するパラメータを設定
 	GameParamEditor::GetInstance()->SetActiveScene("GameScene");
 
 #pragma endregion
+
+	// カメラの初期化
+	camera_ = std::make_unique<Camera>();
+	camera_->Initialize(cameraTransform_, 1280, 720, context_->graphicsDevice->GetDevice());
 
 	// 平行光源ライト
 	lightManager_ = std::make_unique<LightManager>();
@@ -63,6 +56,7 @@ void GameScene::Initialize(SceneContext* context) {
 	skinClusterBron_ = Animation::CreateSkinCluster(skeletonBron_, bronAnimationModel_->modelData_);
 	timer_ = 0.0f;
 
+	// 値の保存の登録と適応(テスト)
 	RegisterBebugParam();
 	ApplyDebugParam();
 }
@@ -81,27 +75,8 @@ void GameScene::Update() {
 	float animationTime = fmodf(timer_, bronAnimation_.duration);
 	Animation::Update(skinClusterBron_, skeletonBron_, bronAnimation_, animationTime);
 
-	// カメラ処理
-#pragma region Camera
-	if (isDebugCameraActive_) {
-		// デバックカメラの更新
-		debugCamera_->Update(context_->input);
-		// デバックカメラの値をカメラに代入
-		camera_->SetVPMatrix(debugCamera_->GetVPMatrix());
-
-		// グリッドの更新処理
-		gridWorldTransform_.transform_.translate = Vector3(debugCamera_->GetTargetPosition().x, -0.1f, debugCamera_->GetTargetPosition().z);
-		gridWorldTransform_.UpdateTransformMatrix();
-
-	} else {
-		// カメラの更新処理
-		camera_->Update();
-
-		// グリッドの更新処理
-		gridWorldTransform_.transform_.translate = Vector3(camera_->GetWorldPosition().x, -0.1f, camera_->GetWorldPosition().z);
-		gridWorldTransform_.UpdateTransformMatrix();
-	}
-#pragma endregion
+	// カメラの更新処理
+	camera_->Update();
 
 #ifdef _DEBUG
 
@@ -121,22 +96,22 @@ void GameScene::Update() {
 		ImGui::TreePop();
 	}
 	ImGui::End();
-
-	// カメラの切り替え処理
-#pragma region CameraTransition
-	if (context_->input->TriggerKey(DIK_F)) {
-		if (isDebugCameraActive_) {
-			isDebugCameraActive_ = false;
-		} else {
-			isDebugCameraActive_ = true;
-		}
-	}
-#pragma endregion
-
 #endif
 }
 
-void GameScene::Draw() {
+void GameScene::Draw(const bool& isDebugView) {
+
+	// 描画に使用するカメラを設定
+	if (isDebugView) {
+		// 描画に使用するカメラを設定
+		ModelRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	} else {
+		// 描画に使用するカメラを設定
+		ModelRenderer::SetCamera(camera_->GetVPMatrix(), camera_->GetCameraResource());
+	}
+
+	// 描画に使用するカメラを設定
+	ModelRenderer::SetCamera(camera_->GetVPMatrix(), camera_->GetCameraResource());
 
 	//===========================================================
 	// 3D描画
@@ -146,8 +121,8 @@ void GameScene::Draw() {
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
 	// 地面を描画
-	ModelRenderer::DrawLight(lightManager_->GetResource(), camera_->GetCameraResource());
-	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_, grassGH_, camera_->GetVPMatrix());
+	ModelRenderer::DrawLight(lightManager_->GetResource());
+	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_, grassGH_);
 
 	// 平面描画
 	//planeModel_->Draw(planeWorldTransform_, uvCheckerGH_, camera_->GetVPMatrix());
@@ -156,15 +131,7 @@ void GameScene::Draw() {
 	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 
 	// アニメーションしているモデルを描画
-	ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_, camera_->GetVPMatrix(), skinClusterBron_);
-
-#ifdef _DEBUG
-	// モデルの単体描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::Grid);
-
-	// グリッドを描画
-	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
-#endif
+	ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_, skinClusterBron_);
 }
 
 void GameScene::RegisterBebugParam() {

@@ -33,7 +33,7 @@ public:
 	/// <summary>
 	/// 描画処理
 	/// </summary>
-	void Draw() override;
+	void Draw(const bool& isDebugView) override;
 
 	/// <summary>
 	/// 終了したことを伝える
@@ -60,14 +60,6 @@ private: // シーン機能
 	// カメラ
 	Transform cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.19f,-9.55f,-10.89f} };
 	std::unique_ptr<GameEngine::Camera> camera_;
-	// デバックカメラ
-	std::unique_ptr<GameEngine::DebugCamera> debugCamera_;
-	// デバックカメラの有効の判定
-	bool isDebugCameraActive_ = false;
-
-	// グリッドを描画するためのモデル
-	GameEngine::Model* gridModel_;
-	GameEngine::WorldTransform gridWorldTransform_;
 
 	// 自キャラのモデル
 	GameEngine::Model* playerModel_;

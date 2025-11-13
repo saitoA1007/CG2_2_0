@@ -215,6 +215,9 @@ void Engine::PreUpdate() {
 		// 変更したシーンの状態を取得
 		sceneChangeRequest_->SetCurrentSceneState(sceneManager_->GetCurrentSceneState());
 	}
+
+	// シーンのデバックに必要な処理を更新する
+	sceneManager_->DebugUpdate();
 #endif
 }
 

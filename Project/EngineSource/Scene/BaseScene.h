@@ -26,7 +26,7 @@ public:
 	/// <summary>
 	/// 描画処理
 	/// </summary>
-	virtual void Draw() = 0;
+	virtual void Draw(const bool& isDebugView) = 0;
 
 	/// <summary>
 	/// 終了したことを伝える

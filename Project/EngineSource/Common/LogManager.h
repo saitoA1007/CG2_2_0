@@ -1,7 +1,7 @@
 #pragma once
 #include<iostream>
 #include<fstream>
-#include <Windows.h>
+#include<Windows.h>
 #include<filesystem>
 #include<chrono>
 #include<unordered_set>
@@ -65,6 +65,9 @@ private:
 	std::vector<LogData> logs_;
 	// ログの所属するグループを保存する
 	std::unordered_set<std::string> groups_;
+
+	// 保存するログの数
+	const size_t kMaxLogs = 200;
 };
 
 /// <summary>

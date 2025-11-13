@@ -47,6 +47,11 @@ void LogManager::Log(const std::string& message, const std::string& groupName) {
 	logData.groupName = groupName;
 	logs_.push_back(logData);
 
+	// ログの保存量を超えたら古い順から削除していく
+	if (logs_.size() > kMaxLogs) {
+		logs_.erase(logs_.begin(), logs_.begin() + (logs_.size() - kMaxLogs));
+	}
+
 	// グループを登録する
 	groups_.insert(groupName);
 }

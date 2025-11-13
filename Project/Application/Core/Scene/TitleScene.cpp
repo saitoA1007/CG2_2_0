@@ -13,65 +13,32 @@ void TitleScene::Initialize(SceneContext* context) {
 	// エンジン機能を取得
 	context_ = context;
 
-	// カメラの初期化
-	camera_ = std::make_unique<Camera>();
-	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
-	// デバックカメラの初期化
-	debugCamera_ = std::make_unique<DebugCamera>();
-	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->graphicsDevice->GetDevice());
-
-	// グリッドの初期化
-	gridModel_ = context_->modelManager->GetNameByModel("Grid");
-	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
-
 	// 登録するパラメータを設定
 	GameParamEditor::GetInstance()->SetActiveScene("TitleScene");
 
 #pragma endregion
-	
-	context_->inputCommand->RegisterCommand("CameraChange", {{InputState::KeyTrigger, DIK_F }});
+
+	// カメラの初期化
+	camera_ = std::make_unique<Camera>();
+	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
 }
 
 void TitleScene::Update() {
 
-	// カメラ処理
-#pragma region Camera
-	if (isDebugCameraActive_) {
-		// デバックカメラの更新
-		debugCamera_->Update(context_->input);
-		// デバックカメラの値をカメラに代入
-		camera_->SetVPMatrix(debugCamera_->GetVPMatrix());
-
-		// グリッドの更新処理
-		gridWorldTransform_.transform_.translate = Vector3(debugCamera_->GetTargetPosition().x, -0.1f, debugCamera_->GetTargetPosition().z);
-		gridWorldTransform_.UpdateTransformMatrix();
-
-	} else {
-		// カメラの更新処理
-		camera_->Update();
-
-		// グリッドの更新処理
-		gridWorldTransform_.transform_.translate = Vector3(camera_->GetWorldPosition().x, -0.1f, camera_->GetWorldPosition().z);
-		gridWorldTransform_.UpdateTransformMatrix();
-	}
-#pragma endregion
-
-#ifdef _DEBUG
-
-	// カメラの切り替え処理
-#pragma region CameraTransition
-	if (context_->inputCommand->IsCommandAcitve("CameraChange")) {
-		if (isDebugCameraActive_) {
-			isDebugCameraActive_ = false;
-		} else {
-			isDebugCameraActive_ = true;
-		}
-	}
-#pragma endregion
-#endif
+	// カメラの更新処理
+	camera_->Update();
 }
 
-void TitleScene::Draw() {
+void TitleScene::Draw(const bool& isDebugView) {
+
+	// 描画に使用するカメラを設定
+	if (isDebugView) {
+		// 描画に使用するカメラを設定
+		ModelRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	} else {
+		// 描画に使用するカメラを設定
+		ModelRenderer::SetCamera(camera_->GetVPMatrix(), camera_->GetCameraResource());
+	}
 
 	//===========================================================
 	// 3D描画
@@ -80,12 +47,4 @@ void TitleScene::Draw() {
 	// 3Dモデルの描画前処理
 	//ModelRenderer::PreDraw(RenderMode::DefaultModel);
 
-
-#ifdef _DEBUG
-	// モデルの単体描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::Grid);
-
-	// グリッドを描画
-	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, camera_->GetVPMatrix(), debugCamera_->GetCameraResource());
-#endif
 }
