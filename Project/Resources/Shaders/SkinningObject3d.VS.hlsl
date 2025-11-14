@@ -26,6 +26,11 @@ StructuredBuffer<Well> gMatrixPalette : register(t0);
 
 Skinned Skinning(VertexShaderInput input) {
     Skinned skinned;
+    
+     // 初期化
+    skinned.position = float32_t4(0.0f, 0.0f, 0.0f, 0.0f);
+    skinned.normal = float32_t3(0.0f, 0.0f, 0.0f);
+    
     // 位置を変換
     skinned.position = mul(input.position, gMatrixPalette[input.index.x].skeletonSpaceMatrix) * input.weight.x;
     skinned.position += mul(input.position, gMatrixPalette[input.index.y].skeletonSpaceMatrix) * input.weight.y;
