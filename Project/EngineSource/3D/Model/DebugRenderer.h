@@ -61,6 +61,11 @@ namespace GameEngine {
 		void AddBox(const Vector3& centerPos,const Vector3& size, const Vector4& color = { 0,1,1,1 });
 
 		/// <summary>
+		/// OBBボックスを追加
+		/// </summary>
+		void AddBox(const OBB& obb, const Vector4& color);
+
+		/// <summary>
 		/// 球を追加
 		/// </summary>
 		void AddSphere(const Sphere& sphere, const Vector4& color = { 0,1,1,1 }, int segments = 16);
