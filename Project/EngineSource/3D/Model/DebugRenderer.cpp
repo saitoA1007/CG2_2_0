@@ -67,6 +67,92 @@ void DebugRenderer::AddBox(const Vector3& centerPos, const Vector3& size, const 
     AddBox(resultAABB, color);
 }
 
+void DebugRenderer::AddBox(const OBB& obb, const Vector4& color) {
+    // スケールを適応した軸のベクトル
+    Vector3 scaledX = {
+        obb.orientations[0].x * obb.size.x,
+        obb.orientations[0].y * obb.size.x,
+        obb.orientations[0].z * obb.size.x
+    };
+    Vector3 scaledY = {
+        obb.orientations[1].x * obb.size.y,
+        obb.orientations[1].y * obb.size.y,
+        obb.orientations[1].z * obb.size.y
+    };
+    Vector3 scaledZ = {
+        obb.orientations[2].x * obb.size.z,
+        obb.orientations[2].y * obb.size.z,
+        obb.orientations[2].z * obb.size.z
+    };
+
+    // 頂点を計算
+    Vector3 corners[8];
+    // v0(-x, -y, -z)
+    corners[0] = {
+        obb.center.x - scaledX.x - scaledY.x - scaledZ.x,
+        obb.center.y - scaledX.y - scaledY.y - scaledZ.y,
+        obb.center.z - scaledX.z - scaledY.z - scaledZ.z
+    };
+    // v1(+x, -y, -z)
+    corners[1] = {
+        obb.center.x + scaledX.x - scaledY.x - scaledZ.x,
+        obb.center.y + scaledX.y - scaledY.y - scaledZ.y,
+        obb.center.z + scaledX.z - scaledY.z - scaledZ.z
+    };
+    // v2(-x, +y, -z)
+    corners[2] = {
+        obb.center.x - scaledX.x + scaledY.x - scaledZ.x,
+        obb.center.y - scaledX.y + scaledY.y - scaledZ.y,
+        obb.center.z - scaledX.z + scaledY.z - scaledZ.z
+    };
+    // v3(+x, +y, -z)
+    corners[3] = {
+        obb.center.x + scaledX.x + scaledY.x - scaledZ.x,
+        obb.center.y + scaledX.y + scaledY.y - scaledZ.y,
+        obb.center.z + scaledX.z + scaledY.z - scaledZ.z
+    };
+    // v4(-x, -y, +z)
+    corners[4] = {
+        obb.center.x - scaledX.x - scaledY.x + scaledZ.x,
+        obb.center.y - scaledX.y - scaledY.y + scaledZ.y,
+        obb.center.z - scaledX.z - scaledY.z + scaledZ.z
+    };
+    // v5(+x, -y, +z)
+    corners[5] = {
+        obb.center.x + scaledX.x - scaledY.x + scaledZ.x,
+        obb.center.y + scaledX.y - scaledY.y + scaledZ.y,
+        obb.center.z + scaledX.z - scaledY.y + scaledZ.z
+    };
+    // v6(-x, +y, +z)
+    corners[6] = {
+        obb.center.x - scaledX.x + scaledY.x + scaledZ.x,
+        obb.center.y - scaledX.y + scaledY.y + scaledZ.y,
+        obb.center.z - scaledX.z + scaledY.y + scaledZ.z
+    };
+    // v7(+x, +y, +z)
+    corners[7] = {
+        obb.center.x + scaledX.x + scaledY.x + scaledZ.x,
+        obb.center.y + scaledX.y + scaledY.y + scaledZ.y,
+        obb.center.z + scaledX.z + scaledY.z + scaledZ.z
+    };
+
+    // 下面
+    AddLine(corners[0], corners[1], color);
+    AddLine(corners[1], corners[5], color);
+    AddLine(corners[5], corners[4], color);
+    AddLine(corners[4], corners[0], color);
+    // 上面
+    AddLine(corners[2], corners[3], color);
+    AddLine(corners[3], corners[7], color);
+    AddLine(corners[7], corners[6], color);
+    AddLine(corners[6], corners[2], color);
+    // 縦の線
+    AddLine(corners[0], corners[2], color);
+    AddLine(corners[1], corners[3], color);
+    AddLine(corners[5], corners[7], color);
+    AddLine(corners[4], corners[6], color);
+}
+
 void DebugRenderer::AddSphere(const Sphere& sphere, const Vector4& color, int segments) {
     float angleStep = 2.0f * 3.14159265f / segments;
 
