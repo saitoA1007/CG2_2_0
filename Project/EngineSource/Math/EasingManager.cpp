@@ -1,6 +1,6 @@
 #include"EasingManager.h"
 #include<cmath>
-
+#include <algorithm>
 #include"EngineSource/Math/MyMath.h"
 
 float Lerp(const float& start, const float& end, const float& t) {
@@ -13,7 +13,7 @@ Vector3 Lerp(const Vector3& start, const Vector3& end, const float& t) {
 }
 
 Quaternion Lerp(const Quaternion& start, const Quaternion& end, const float& t) {
-	return Quaternion(start.x + t * (end.x - start.x), start.y + t * (end.y - start.y), start.z + t * (end.z - start.z));
+	return Quaternion(start.x + t * (end.x - start.x), start.y + t * (end.y - start.y), start.z + t * (end.z - start.z), start.w + t * (end.w - start.w));
 }
 
 float EaseIn(const float& t) {
@@ -40,6 +40,14 @@ Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
 		dot = -dot;
 		q1Copy = -q1;
 	}
+	// 内積が1,0fを超えないようにする
+	dot = std::clamp(dot, -1.0f, 1.0f);
+
+	if (dot > 0.9999f) {
+		Quaternion result = Lerp(q0, q1Copy, t);
+		return Normalize(result);
+	}
+
 	// なす角
 	float theta = std::acosf(dot);
 	float sinTheta = std::sinf(theta);
