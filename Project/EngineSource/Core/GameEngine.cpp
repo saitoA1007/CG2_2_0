@@ -182,10 +182,12 @@ void Engine::PreUpdate() {
 
 	// キー入力の更新処理
 	input_->Update();
+
 	// ImGuiにフレームが始まる旨を伝える
 	imGuiManager_->BeginFrame();
 
 #ifdef _DEBUG
+
 	// エディターの処理
 	editorCore_->Run();
 	// 更新処理の実行状態を取得する
