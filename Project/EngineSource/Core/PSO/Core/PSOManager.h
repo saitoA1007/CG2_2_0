@@ -40,6 +40,7 @@ namespace GameEngine {
 			DrawModel drawMode = DrawModel::FillFront; // 描画モード
 			BlendMode blendMode = BlendMode::kBlendModeNormal; // ブレンドモード
 			bool isDepthEnable = true; // 深度の使用
+			D3D12_PRIMITIVE_TOPOLOGY_TYPE primitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 描画タイプ
 		};
 
 		// グラフィックスパイプラインのデータ
@@ -77,7 +78,17 @@ namespace GameEngine {
 
 		void LoadFromJson(const std::string& filePath);
 
+		/// <summary>
+		/// デフォルトで使用するPSOを作成
+		/// </summary>
 		void DefaultLoadPSO();
+
+		/// <summary>
+		/// postEffectで使用するPSOを作成
+		/// </summary>
+		void DeaultLoadPostEffectPSO();
+
+	public:
 
 		ID3D12RootSignature* GetRootSignature(const std::string& name);
 		ID3D12PipelineState* GetPSO(const std::string& name);

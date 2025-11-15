@@ -562,6 +562,7 @@
     <ClInclude Include="EngineSource\Graphics\FrameRateController.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\DXViewportState.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPipeline.h" />
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\IPostEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

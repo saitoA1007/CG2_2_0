@@ -29,7 +29,7 @@ void GEScene::Initialize(SceneContext* context) {
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
 
 	// プレイヤーモデルを生成
-	playerModel_ = context_->modelManager->GetNameByModel("cube.obj");
+	playerModel_ = context_->modelManager->GetNameByModel("Cube");
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
@@ -49,7 +49,7 @@ void GEScene::Initialize(SceneContext* context) {
 	testParticle_->Emit({ 0.0f,0.0f,0.0f });
 
 	// 平面モデル
-	planeModel_ = context_->modelManager->GetNameByModel("plane.obj");
+	planeModel_ = context_->modelManager->GetNameByModel("Plane");
 
 	// ログのテスト
 	Log("HallWorldConsloe","test");

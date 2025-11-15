@@ -71,6 +71,11 @@ void InputLayoutBuilder::CreateGridElement() {
     CreateInputLayoutDesc();
 }
 
+void InputLayoutBuilder::CreateNone() {
+    inputLayoutDesc_.pInputElementDescs = nullptr;
+    inputLayoutDesc_.NumElements = 0;
+}
+
 void InputLayoutBuilder::CreateInputLayoutFromReflection(IDxcUtils* utils,IDxcBlob* vsBlob) {
     DxcBuffer reflectionBuffer{};
     reflectionBuffer.Ptr = vsBlob->GetBufferPointer();

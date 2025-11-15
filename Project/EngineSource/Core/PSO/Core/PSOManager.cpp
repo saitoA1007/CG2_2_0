@@ -83,7 +83,7 @@ void PSOManager::RegisterPSO(const std::string& name, const CreatePSOData& psoDa
     psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
     psoDesc.NumRenderTargets = 1;
     psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    psoDesc.PrimitiveTopologyType = psoData.primitiveType;
     psoDesc.SampleDesc.Count = 1;
     psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
@@ -126,6 +126,130 @@ void PSOManager::LoadFromJson(const std::string& fileName) {
     ifs.close();
 
 	LogManager::GetInstance().Log("PSO registerd name : " + fileName);
+}
+
+void PSOManager::CreatePSO(const std::string& psoName, const CreatePSOData& psoData) {
+	LogManager::GetInstance().Log("PSO create start : " + psoName);
+
+    // シェーダーをコンパイル
+    LogManager::GetInstance().Log("Compiling vertex shader");
+    shaderCompiler_.CompileVsShader(psoData.vsPath);
+
+    LogManager::GetInstance().Log("Compiling pixel shader");
+    shaderCompiler_.CompilePsShader(psoData.psPath);
+
+    IDxcBlob* vsBlob = shaderCompiler_.GetVertexShaderBlob();
+    IDxcBlob* psBlob = shaderCompiler_.GetPixelShaderBlob();
+
+    if (!vsBlob || !psBlob) {
+        LogManager::GetInstance().Log("Shader compilation failed for: " + psoName);
+        return;
+    }
+
+    // ルートシグネチャが登録されていなければ生成する
+    // RootSignatureの生成
+    RootSignatureBuilder rootSigBuilder;
+    if (rootSignatureList_.find(psoData.rootSigName) == rootSignatureList_.end()) {
+        rootSigBuilder.Initialize(device_);
+        rootSigBuilder.CreateRootSignatureFromReflection(dxc_->GetIDxcUtils(), vsBlob, psBlob);
+        RootSignatureData rootSignatureData;
+        rootSignatureData.rootSignature = rootSigBuilder.GetRootSignature();
+        rootSignatureData.parameterTypes = rootSigBuilder.GetParameterTypes();
+        // RootSignatureを保存
+        rootSignatureList_[psoData.rootSigName] = rootSignatureData;
+    }
+
+    // InputLayoutの生成
+    InputLayoutBuilder inputLayoutBuilder;
+    inputLayoutBuilder.CreateInputLayoutFromReflection(dxc_->GetIDxcUtils(), vsBlob);
+    D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = inputLayoutBuilder.GetInputLayoutDesc();
+
+    // DepthStencilStateの設定
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+    if (psoData.isDepthEnable) {
+        depthStencilDesc.DepthEnable = true;
+        depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+        depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+    } else {
+        depthStencilDesc.DepthEnable = false;
+    }
+
+    // PSOの設定
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
+    // InputLayout
+    psoDesc.InputLayout = inputLayoutDesc;
+    // RootSignature
+    psoDesc.pRootSignature = rootSignatureList_[psoData.rootSigName].rootSignature.Get();
+    // シェーダー
+    psoDesc.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
+    psoDesc.PS = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
+    // BlendState
+    psoDesc.BlendState = blendBuilder_.GetBlendDesc(psoData.blendMode);
+    // RasterizerState
+    psoDesc.RasterizerState = rasterizerBuiler_.GetRasterizerDesc(psoData.drawMode);
+    // DepthStencilState
+    psoDesc.DepthStencilState = depthStencilDesc;
+    psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    psoDesc.NumRenderTargets = 1;
+    psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    psoDesc.SampleDesc.Count = 1;
+    psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+    // 描画タイプ
+    psoDesc.PrimitiveTopologyType = psoData.primitiveType;
+    
+    // PSOの生成
+    PSOData pso;
+    // リンクするルートシグネチャを保存
+    pso.rootSigName = psoData.rootSigName;
+
+    // 実際に生成
+    HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso.graphicsPipelineState));
+    assert(SUCCEEDED(hr));
+
+    // PSOを保存
+    psoList_[psoName] = pso;
+
+    LogManager::GetInstance().Log("PSO create end : " + psoName);
+}
+
+ID3D12RootSignature* PSOManager::GetRootSignature(const std::string& name) {
+	auto it = rootSignatureList_.find(name);
+	if (it != rootSignatureList_.end()) {
+		return it->second.rootSignature.Get();
+	}
+
+	LogManager::GetInstance().Log("RootSignature not found: " + name);
+	assert(0);
+	return nullptr;
+}
+
+ID3D12PipelineState* PSOManager::GetPSO(const std::string& name) {
+	auto it = psoList_.find(name);
+	if (it != psoList_.end()) {
+		return it->second.graphicsPipelineState.Get();
+	}
+
+	LogManager::GetInstance().Log("PSO not found: " + name);
+	assert(0);
+	return nullptr;
+}
+
+DrawPsoData PSOManager::GetDrawPsoData(const std::string& PsoName) const {
+
+    auto pso = psoList_.find(PsoName);
+    if (pso == psoList_.end()) {
+        assert(0);
+    }
+
+    auto root = rootSignatureList_.find(pso->second.rootSigName);
+    if (root == rootSignatureList_.end()) {
+        assert(0);
+    }
+
+    DrawPsoData drawData;
+    drawData.rootSignature = root->second.rootSignature.Get();
+    drawData.graphicsPipelineState = pso->second.graphicsPipelineState.Get();
+    return drawData;
 }
 
 void PSOManager::DefaultLoadPSO() {
@@ -232,126 +356,34 @@ void PSOManager::DefaultLoadPSO() {
     LogManager::GetInstance().Log("Default PSOs loaded");
 }
 
-void PSOManager::CreatePSO(const std::string& psoName, const CreatePSOData& psoData) {
-	LogManager::GetInstance().Log("PSO create start : " + psoName);
-
-    // シェーダーをコンパイル
-    LogManager::GetInstance().Log("Compiling vertex shader");
-    shaderCompiler_.CompileVsShader(psoData.vsPath);
-
-    LogManager::GetInstance().Log("Compiling pixel shader");
-    shaderCompiler_.CompilePsShader(psoData.psPath);
-
-    IDxcBlob* vsBlob = shaderCompiler_.GetVertexShaderBlob();
-    IDxcBlob* psBlob = shaderCompiler_.GetPixelShaderBlob();
-
-    if (!vsBlob || !psBlob) {
-        LogManager::GetInstance().Log("Shader compilation failed for: " + psoName);
-        return;
-    }
-
-    // ルートシグネチャが登録されていなければ生成する
-    // RootSignatureの生成
+void PSOManager::DeaultLoadPostEffectPSO() {
+    // ヴィネットを作成
+    CreatePSOData defaultPostEffect;
+    defaultPostEffect.rootSigName = "DefaultPostEffect";
+    defaultPostEffect.vsPath = L"Resources/Shaders/PostEffect/Vignetting/Vignetting.VS.hlsl";
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Vignetting/Vignetting.PS.hlsl";
+    defaultPostEffect.drawMode = DrawModel::FillFront;
+    defaultPostEffect.blendMode = BlendMode::kBlendModeNone;
+    defaultPostEffect.isDepthEnable = false;
     RootSignatureBuilder rootSigBuilder;
-    if (rootSignatureList_.find(psoData.rootSigName) == rootSignatureList_.end()) {
-        rootSigBuilder.Initialize(device_);
-        rootSigBuilder.CreateRootSignatureFromReflection(dxc_->GetIDxcUtils(), vsBlob, psBlob);
-        RootSignatureData rootSignatureData;
-        rootSignatureData.rootSignature = rootSigBuilder.GetRootSignature();
-        rootSignatureData.parameterTypes = rootSigBuilder.GetParameterTypes();
-        // RootSignatureを保存
-        rootSignatureList_[psoData.rootSigName] = rootSignatureData;
-    }
-
-    // InputLayoutの生成
+    rootSigBuilder.Initialize(device_);
+    rootSigBuilder.AddSRVDescriptorTable(0, 1, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilder.CreateRootSignature();
     InputLayoutBuilder inputLayoutBuilder;
-    inputLayoutBuilder.CreateInputLayoutFromReflection(dxc_->GetIDxcUtils(), vsBlob);
-    D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = inputLayoutBuilder.GetInputLayoutDesc();
+    inputLayoutBuilder.CreateNone();
+    RegisterPSO("Vignetting", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
-    // DepthStencilStateの設定
-    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-    if (psoData.isDepthEnable) {
-        depthStencilDesc.DepthEnable = true;
-        depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-        depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-    } else {
-        depthStencilDesc.DepthEnable = false;
-    }
+    // スキャンラインを作成
+    defaultPostEffect.vsPath = L"Resources/Shaders/PostEffect/ScanLine/ScanLine.VS.hlsl";
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/ScanLine/ScanLine.PS.hlsl";
+    RegisterPSO("ScanLine", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
-    // PSOの設定
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
-    // InputLayout
-    psoDesc.InputLayout = inputLayoutDesc;
-    // RootSignature
-    psoDesc.pRootSignature = rootSignatureList_[psoData.rootSigName].rootSignature.Get();
-    // シェーダー
-    psoDesc.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
-    psoDesc.PS = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
-    // BlendState
-    psoDesc.BlendState = blendBuilder_.GetBlendDesc(psoData.blendMode);
-    // RasterizerState
-    psoDesc.RasterizerState = rasterizerBuiler_.GetRasterizerDesc(psoData.drawMode);
-    // DepthStencilState
-    psoDesc.DepthStencilState = depthStencilDesc;
-    psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    psoDesc.NumRenderTargets = 1;
-    psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    psoDesc.SampleDesc.Count = 1;
-    psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-    // 描画タイプ
-    psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    // ラジアルブラーを作成
+    defaultPostEffect.vsPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.VS.hlsl";
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.PS.hlsl";
+    RegisterPSO("ScanLine", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
-    // PSOの生成
-    PSOData pso;
-    // リンクするルートシグネチャを保存
-    pso.rootSigName = psoData.rootSigName;
 
-    // 実際に生成
-    HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso.graphicsPipelineState));
-    assert(SUCCEEDED(hr));
-
-    // PSOを保存
-    psoList_[psoName] = pso;
-
-    LogManager::GetInstance().Log("PSO create end : " + psoName);
-}
-
-ID3D12RootSignature* PSOManager::GetRootSignature(const std::string& name) {
-	auto it = rootSignatureList_.find(name);
-	if (it != rootSignatureList_.end()) {
-		return it->second.rootSignature.Get();
-	}
-
-	LogManager::GetInstance().Log("RootSignature not found: " + name);
-	assert(0);
-	return nullptr;
-}
-
-ID3D12PipelineState* PSOManager::GetPSO(const std::string& name) {
-	auto it = psoList_.find(name);
-	if (it != psoList_.end()) {
-		return it->second.graphicsPipelineState.Get();
-	}
-
-	LogManager::GetInstance().Log("PSO not found: " + name);
-	assert(0);
-	return nullptr;
-}
-
-DrawPsoData PSOManager::GetDrawPsoData(const std::string& PsoName) const {
-
-    auto pso = psoList_.find(PsoName);
-    if (pso == psoList_.end()) {
-        assert(0);
-    }
-
-    auto root = rootSignatureList_.find(pso->second.rootSigName);
-    if (root == rootSignatureList_.end()) {
-        assert(0);
-    }
-
-    DrawPsoData drawData;
-    drawData.rootSignature = root->second.rootSignature.Get();
-    drawData.graphicsPipelineState = pso->second.graphicsPipelineState.Get();
-    return drawData;
 }
