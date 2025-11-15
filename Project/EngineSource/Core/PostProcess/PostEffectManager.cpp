@@ -110,6 +110,14 @@ void PostEffectManager::PreDraw(ID3D12GraphicsCommandList* commandList,const D3D
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
     commandList->ResourceBarrier(1, &barrier);
 
+    // ヒープを設定する
+#ifdef USE_IMGUI
+    // ImGuiの方で普段は設定されている
+#else
+    ID3D12DescriptorHeap* descriptorHeaps[] = { srvManager_->GetSRVHeap() };
+    commandList->SetDescriptorHeaps(1, descriptorHeaps);
+#endif
+
     // 描画先をオフスクリーンRTVに
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
     commandList->OMSetRenderTargets(1, &drawObjectRTVHandle_, false, &dsvHandle);

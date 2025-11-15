@@ -17,6 +17,7 @@ void RendererManager::Initialize(GraphicsDevice* graphicsDevice, uint32_t width,
 }
 
 void RendererManager::BeginFrame() {
+
     // 深度バッファをSRVから深度書き込みに遷移
     TransitionDepthToWrite();
 

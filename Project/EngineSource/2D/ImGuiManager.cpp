@@ -1,9 +1,9 @@
 #include"ImGuiManager.h"
 using namespace GameEngine;
 
-void ImGuiManager::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, DXGI_SWAP_CHAIN_DESC1 swapChainDesc,
-	WindowsApp* windowsApp, SrvManager* srvManager) {
-
+void ImGuiManager::Initialize([[maybe_unused]]ID3D12Device* device, [[maybe_unused]] ID3D12GraphicsCommandList* commandList, [[maybe_unused]] DXGI_SWAP_CHAIN_DESC1 swapChainDesc,
+	[[maybe_unused]] WindowsApp* windowsApp, [[maybe_unused]] SrvManager* srvManager) {
+#ifdef USE_IMGUI
 	commandList_ = commandList;
 	windowsApp_ = windowsApp;
 	srvManager_ = srvManager;
@@ -31,9 +31,11 @@ void ImGuiManager::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* c
 	ed::Config config;
 	config.SettingsFile = "node_editor_docked.json";
 	g_NodeContext = ed::CreateEditor(&config);
+#endif
 }
 
 void ImGuiManager::BeginFrame() {
+#ifdef USE_IMGUI
 	// ImGuiにフレームが始まる旨を伝える
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -59,24 +61,31 @@ void ImGuiManager::BeginFrame() {
 	//ed::End();
 	//ed::SetCurrentEditor(nullptr);
 	//ImGui::End();
+#endif
 }
 
 void ImGuiManager::EndFrame() {
+#ifdef USE_IMGUI
 	// ImGuiの内部コマンドを生成する
 	ImGui::Render();
 	//// Imguiの描画用のDescriptorHeapの設定
 	ID3D12DescriptorHeap* descriptorHeaps[] = { srvManager_->GetSRVHeap() };
 	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
+#endif
 }
 
 void ImGuiManager::Draw() {
+#ifdef USE_IMGUI
 	// 実際のcommandListのImGuiの描画コマンドを積む
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_);
+#endif
 }
 
 void ImGuiManager::Finalize() {
+#ifdef USE_IMGUI
 	// ImGuiの終了処理
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+#endif
 }

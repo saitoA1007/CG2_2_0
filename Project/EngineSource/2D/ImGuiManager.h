@@ -1,19 +1,20 @@
 #pragma once
-#include"Externals/imgui/imgui.h"
-#include"Externals/imgui/imgui_impl_dx12.h"
-#include"Externals/imgui/imgui_impl_win32.h"
-
-#include"Externals/imgui/ImGuizmo.h"
-
 #include <dxgi1_6.h>
 
 #include"WindowsApp.h"
 #include"SrvManager.h"
 
+#ifdef USE_IMGUI
+#include"Externals/imgui/imgui.h"
+#include"Externals/imgui/imgui_impl_dx12.h"
+#include"Externals/imgui/imgui_impl_win32.h"
+#include"Externals/imgui/ImGuizmo.h"
+
 #include "Externals/imgui/imgui_node_editor.h"
 namespace ed = ax::NodeEditor;
 
 static ed::EditorContext* g_NodeContext = nullptr;
+#endif
 
 namespace GameEngine {
 
