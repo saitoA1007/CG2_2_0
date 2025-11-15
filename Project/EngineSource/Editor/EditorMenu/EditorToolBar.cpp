@@ -6,14 +6,14 @@ using namespace GameEngine;
 EditorToolBar::EditorToolBar(GameEngine::TextureManager* textureManager) {
 
 	// デバックで使用する画像を登録する
-	textureManager->RegisterTexture("debugPlay", "Resources/Textures/DebugImages/debugPlay.png");
-	textureManager->RegisterTexture("debugPause", "Resources/Textures/DebugImages/debugPause.png");
-	textureManager->RegisterTexture("debugStop", "Resources/Textures/DebugImages/debugStop.png");
+	textureManager->RegisterTexture("Resources/Textures/DebugImages/debugPlay.png");
+	textureManager->RegisterTexture("Resources/Textures/DebugImages/debugPause.png");
+	textureManager->RegisterTexture("Resources/Textures/DebugImages/debugStop.png");
 
 	// 画像のsrvHandleを取得する
-	playImagesrvHandle_ = textureManager->GetTextureSrvHandlesGPU(textureManager->GetHandleByName("debugPlay"));
-	pauseImagesrvHandle_ = textureManager->GetTextureSrvHandlesGPU(textureManager->GetHandleByName("debugPause"));
-	stopImagesrvHandle_ = textureManager->GetTextureSrvHandlesGPU(textureManager->GetHandleByName("debugStop"));
+	playImagesrvHandle_ = textureManager->GetTextureSrvHandlesGPU(textureManager->GetHandleByName("debugPlay.png"));
+	pauseImagesrvHandle_ = textureManager->GetTextureSrvHandlesGPU(textureManager->GetHandleByName("debugPause.png"));
+	stopImagesrvHandle_ = textureManager->GetTextureSrvHandlesGPU(textureManager->GetHandleByName("debugStop.png"));
 }
 
 void EditorToolBar::Initialize() {
@@ -79,7 +79,12 @@ void EditorToolBar::UpdateShortcutsKey() {
 
 	// Ctrl + Pで再生
 	if (io.KeyCtrl && !io.KeyShift && ImGui::IsKeyPressed(ImGuiKey_P, false)) {
-		playMode_ = ScenePlayMode::Play;
+
+		if (playMode_ == ScenePlayMode::Play) {
+			playMode_ = ScenePlayMode::Stop;
+		}else if (playMode_ == ScenePlayMode::Stop) {
+			playMode_ = ScenePlayMode::Play;
+		}
 	}
 
 	// Ctrl + Alt + Pで停止する

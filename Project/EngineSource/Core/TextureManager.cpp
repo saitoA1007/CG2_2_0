@@ -22,9 +22,12 @@ void TextureManager::Finalize() {
 	textures_.clear();
 }
 
-void TextureManager::RegisterTexture(const std::string& registerName, const std::string& fileName) {
+void TextureManager::RegisterTexture(const std::string& fileName) {
+
+	std::string textureName = GetFileName(fileName);
+
 	// 同名のモデルが登録されている場合は早期リターン
-	auto getName = nameToHandles_.find(registerName);
+	auto getName = nameToHandles_.find(textureName);
 	if (getName != nameToHandles_.end()) {
 		return;
 	}
@@ -33,7 +36,7 @@ void TextureManager::RegisterTexture(const std::string& registerName, const std:
 	uint32_t handle = Load(fileName);
 
 	// 登録する
-	nameToHandles_[registerName] = handle;
+	nameToHandles_[textureName] = handle;
 }
 
 uint32_t TextureManager::GetHandleByName(const std::string& name) const {
