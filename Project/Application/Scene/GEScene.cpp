@@ -74,9 +74,7 @@ void GEScene::Update() {
 	cameraController_->Update(context_->inputCommand,player_->GetPlayerPos());
 
 	// カメラの更新処理
-	//camera_->Update();
-	mainCamera_->SetWorldMatrix(cameraController_->GetWorldMatrix());
-	mainCamera_->SetVPMatrix(cameraController_->GetVPMatirx());
+	mainCamera_->SetCamera(cameraController_->GetCamera());
 }
 
 void GEScene::Draw(const bool& isDebugView) {

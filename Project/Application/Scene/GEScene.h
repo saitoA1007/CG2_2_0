@@ -9,8 +9,8 @@
 #include"Sprite.h"
 #include"DebugRenderer.h"
 
-#include"Application/Player.h"
-#include"Application/CameraController.h"
+#include"Application/Player/Player.h"
+#include"Application/Camera/CameraController.h"
 
 #include"ParticleSystem/ParticleBehavior.h"
 

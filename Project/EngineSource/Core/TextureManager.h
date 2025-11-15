@@ -69,6 +69,12 @@ namespace GameEngine {
 
 		D3D12_GPU_DESCRIPTOR_HANDLE& GetTextureSrvHandlesGPU(const uint32_t& textureHandle);
 
+
+		/// <summary>
+		/// 全てのテクスチャデータを読み込む
+		/// </summary>
+		void LoadAllTexture();
+
 	private:
 		TextureManager(const TextureManager&) = delete;
 		TextureManager& operator=(const TextureManager&) = delete;
