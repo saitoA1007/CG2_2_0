@@ -3,54 +3,55 @@
 #include"Geometry.h"
 #include"CollisionUtils.h"
 
-using namespace GameEngine;
+namespace GameEngine {
 
-/// <summary>
-/// 当たり判定の組み合わせを設定する
-/// </summary>
-struct CollisionVisitor {
+	/// <summary>
+	/// 当たり判定の組み合わせを設定する
+	/// </summary>
+	struct CollisionVisitor {
 
-	// 球と球の当たり判定
-	bool operator()(const Sphere& a, const Sphere& b) const {
-		return IsSpheresCollision(a, b);
-	}
+		// 球と球の当たり判定
+		bool operator()(const Sphere& a, const Sphere& b) const {
+			return IsSpheresCollision(a, b);
+		}
 
-	// AABBとAABBの当たり判定
-	bool operator()(const AABB& a, const AABB& b) const {
-		return IsAABBCollision(a, b);
-	}
+		// AABBとAABBの当たり判定
+		bool operator()(const AABB& a, const AABB& b) const {
+			return IsAABBCollision(a, b);
+		}
 
-	// 球とAABBの当たり判定
-	bool operator()(const Sphere& a, const AABB& b) const {
-		return IsAABBSphereCollision(b, a);
-	}
+		// 球とAABBの当たり判定
+		bool operator()(const Sphere& a, const AABB& b) const {
+			return IsAABBSphereCollision(b, a);
+		}
 
-	bool operator()(const AABB& a, const Sphere& b) const {
-		return IsAABBSphereCollision(a, b);
-	}
+		bool operator()(const AABB& a, const Sphere& b) const {
+			return IsAABBSphereCollision(a, b);
+		}
 
-	// AABBと線分の当たり判定
-	bool operator()(const AABB& a, const Segment& b) const {
-		return IsAABBSegmentCollision(a, b);
-	}
+		// AABBと線分の当たり判定
+		bool operator()(const AABB& a, const Segment& b) const {
+			return IsAABBSegmentCollision(a, b);
+		}
 
-	bool operator()(const Segment& a, const AABB& b) const {
-		return IsAABBSegmentCollision(b, a);
-	}
+		bool operator()(const Segment& a, const AABB& b) const {
+			return IsAABBSegmentCollision(b, a);
+		}
 
-	// obbと球の当たり判定
-	bool operator()(const OBB& a, const Sphere& b) const {
-		return IsOBBSphereCollision(a,b);
-	}
+		// obbと球の当たり判定
+		bool operator()(const OBB& a, const Sphere& b) const {
+			return IsOBBSphereCollision(a, b);
+		}
 
-	// obbと線の当たり判定
-	bool operator()(const OBB& a, const Segment& b) const {
-		return IsOBBSegmentCollision(a,b);
-	}
+		// obbと線の当たり判定
+		bool operator()(const OBB& a, const Segment& b) const {
+			return IsOBBSegmentCollision(a, b);
+		}
 
-	// 登録していない当たり判定は衝突しないようにする
-	template <typename T, typename U>
-	bool operator()(const T&, const U&) const {
-		return false;
-	}
-};
+		// 登録していない当たり判定は衝突しないようにする
+		template <typename T, typename U>
+		bool operator()(const T&, const U&) const {
+			return false;
+		}
+	};
+}

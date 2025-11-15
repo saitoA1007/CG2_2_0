@@ -109,15 +109,8 @@ void SceneManager::LoadModelData() {
 	// グリッドモデルをロードと登録
 	context_->modelManager->RegisterMode("Grid", Model::CreateGridPlane({ 200.0f,200.0f }));
 
-	// 平面モデルをロードと登録
-	context_->modelManager->RegisterMode("Plane","plane.obj");
-	// 箱モデルをロードと登録
-	context_->modelManager->RegisterMode("Cube","cube.obj");
-
-	// 地面モデルをロードと登録
-	context_->modelManager->RegisterMode("Terrain","terrain.obj");
-	// 歩く人型モデルをロードと登録
-	context_->modelManager->RegisterMode("Walk","walk.gltf");
+	// モデルリソースを全てロードする
+	context_->modelManager->LoadAllModel();
 }
 
 void SceneManager::LoadSpriteData() {

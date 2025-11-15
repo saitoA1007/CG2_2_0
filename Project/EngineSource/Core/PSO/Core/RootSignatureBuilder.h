@@ -25,11 +25,34 @@ namespace GameEngine {
 	class RootSignatureBuilder {
 	public:
 
+		/// <summary>
+		/// 初期化処理
+		/// </summary>
+		/// <param name="device"></param>
 		void Initialize(ID3D12Device* device);
 
+		/// <summary>
+		/// cbvを追加する
+		/// </summary>
+		/// <param name="shaderRegister">レジスタ番号</param>
+		/// <param name="visibility">使用するシェーダー</param>
 		void AddCBVParameter(uint32_t shaderRegister, D3D12_SHADER_VISIBILITY visibility);
+
+		/// <summary>
+		/// srvを追加する
+		/// </summary>
+		/// <param name="shaderRegister">レジスタ番号</param>
+		/// <param name="arryNum">配列の数</param>
+		/// <param name="visibility">使用するシェーダー</param>
 		void AddSRVDescriptorTable(uint32_t shaderRegister, uint32_t arryNum, D3D12_SHADER_VISIBILITY visibility);
 
+		/// <summary>
+		/// サンプラーを追加する
+		/// </summary>
+		/// <param name="shaderRegister">レジスタ番号</param>
+		/// <param name="filter">バイナリフィルタ</param>
+		/// <param name="texAddress">範囲外の振る舞い</param>
+		/// <param name="visibility">使用するシェーダー</param>
 		void AddSampler(uint32_t shaderRegister, D3D12_FILTER filter, D3D12_TEXTURE_ADDRESS_MODE texAddress, D3D12_SHADER_VISIBILITY visibility);
 
 		void CreateRootSignature();

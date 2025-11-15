@@ -9,7 +9,7 @@ namespace GameEngine {
 
 		// 登録するデータ
 		struct ModelEntryData {
-			std::string name; // ロードしたモデルの名前
+			std::string name; // ロードしたモデルファイル名(.obj,gltfなど)
 			std::unique_ptr<Model> model; // モデルデータ
 		};
 
@@ -21,7 +21,7 @@ namespace GameEngine {
 		/// <summary>
 		/// モデルデータを登録
 		/// </summary>
-		/// <param name="modelFile">モデルファイル名</param>
+		/// <param name="modelFile">モデルファイル名 : 登録名にもなる</param>
 		/// <param name="modelName">.obj名</param>
 		void RegisterMode(const std::string& modelFile,const std::string& objFileName);
 
@@ -67,6 +67,11 @@ namespace GameEngine {
 		/// <returns></returns>
 		[[nodiscard]]
 		Model* GetNameByModel(const std::string& name) const;
+
+		/// <summary>
+		/// リソースファイルにあるモデルデータを全て取得する
+		/// </summary>
+		void LoadAllModel();
 
 	private:
 		ModelManager(ModelManager&) = delete;

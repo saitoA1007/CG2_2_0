@@ -36,19 +36,19 @@ void GameScene::Initialize(SceneContext* context) {
 	lightManager_->SetDirectionalData(directionalData_);
 
 	// 地面モデルを生成
-	terrainModel_ = context_->modelManager->GetNameByModel("terrain.obj");
+	terrainModel_ = context_->modelManager->GetNameByModel("Terrain");
 	terrainModel_->SetDefaultIsEnableLight(true);
 	grassGH_ = context_->textureManager->GetHandleByName("grass");
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 平面モデルを生成
-	planeModel_ = context_->modelManager->GetNameByModel("plane.obj");
+	planeModel_ = context_->modelManager->GetNameByModel("Plane");
 	planeModel_->SetDefaultIsEnableLight(true);
 	uvCheckerGH_ = context_->textureManager->GetHandleByName("uvChecker");
 	planeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,0.0f} });
 
 	// ボーンアニメーションを生成する
-	bronAnimationModel_ = context_->modelManager->GetNameByModel("walk.gltf");
+	bronAnimationModel_ = context_->modelManager->GetNameByModel("Walk");
 	bronAnimationWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 	// ボーンアニメーションデータを取得する
 	bronAnimation_ = Model::LoadAnimationFile("walk.gltf", "Walk");

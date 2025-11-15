@@ -1,5 +1,6 @@
 #include"ModelManager.h"
-
+#include <filesystem>
+#include <iostream>
 using namespace GameEngine;
 
 ModelManager::~ModelManager() {
@@ -9,7 +10,7 @@ ModelManager::~ModelManager() {
 void ModelManager::RegisterMode(const std::string& modelFile, const std::string& objFileName) {
 
 	// 同名のモデルが登録されている場合は早期リターン
-	auto getName = nameToHandles_.find(objFileName);
+	auto getName = nameToHandles_.find(modelFile);
 	if (getName != nameToHandles_.end()) {
 		return;
 	}
@@ -24,7 +25,7 @@ void ModelManager::RegisterMode(const std::string& modelFile, const std::string&
 
 	// 登録する
 	models_[handle] = std::move(entryData);
-	nameToHandles_[objFileName] = handle;
+	nameToHandles_[modelFile] = handle;
 }
 
 void ModelManager::RegisterMode(const std::string& modelName, std::unique_ptr<Model> model) {
@@ -109,4 +110,68 @@ Model* ModelManager::GetNameByModel(const std::string& name) const {
 	}
 
 	return nullptr;
+}
+
+void ModelManager::LoadAllModel() {
+	const std::string kDirectoryPath = "Resources/Models";
+
+	// ファイルパスがなければ終了
+	if (!std::filesystem::exists(kDirectoryPath)) {
+		return;
+	}
+
+	// 登録する拡張子
+	const std::vector<std::string> allowedExtensions = { ".obj", ".gltf" };
+
+	try {
+		// "Resources/Models/" の中を検索する
+		for (const auto& dirEntry : std::filesystem::directory_iterator(kDirectoryPath)) {
+
+			// フォルダでなければスキップ
+			if (!dirEntry.is_directory()) {
+				continue;
+			}
+
+			// フォルダの名前を取得する
+			const std::string folderName = dirEntry.path().filename().string();
+
+			// モデルファイル名
+			std::string modelFileName;
+			// モデルファイルの取得を判断
+			bool modelFound = false;
+
+			// フォルダの中からモデルファイルを検索する
+			for (const auto& fileEntry : std::filesystem::directory_iterator(dirEntry.path())) {
+
+				if (!fileEntry.is_regular_file()) {
+					continue;
+				}
+
+				// 登録している拡張子か確認する
+				std::string extension = fileEntry.path().extension().string();
+				for (const auto& ext : allowedExtensions) {
+					if (extension == ext) {
+						// モデルのファイルを取得する
+						modelFileName = fileEntry.path().filename().string();
+						modelFound = true;
+						break;
+					}
+				}
+
+				// ファイル検索を終了する
+				if (modelFound) {
+					break;
+				}
+			}
+
+			// モデルが存在している場合、登録する
+			if (modelFound) {
+				RegisterMode(folderName, modelFileName);
+			}
+		}
+	}
+	catch (std::filesystem::filesystem_error& e) {
+		// ファイルシステム関連のエラー処理
+		std::cerr << "Filesystem error while loading models: " << e.what() << std::endl;
+	}
 }
