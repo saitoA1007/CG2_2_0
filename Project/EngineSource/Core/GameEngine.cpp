@@ -126,7 +126,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneManager_->Initialize(&sceneContext);
 
 	// エディターの初期化
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	// シーン切り替えの通知を管理する機能を初期化
 	sceneChangeRequest_ = std::make_unique<SceneChangeRequest>();
 	sceneChangeRequest_->SetCurrentSceneState(sceneManager_->GetCurrentSceneState());
@@ -186,7 +186,7 @@ void Engine::PreUpdate() {
 	// ImGuiにフレームが始まる旨を伝える
 	imGuiManager_->BeginFrame();
 
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 
 	// エディターの処理
 	editorCore_->Run();
@@ -241,7 +241,7 @@ void Engine::PostDraw() {
 void Engine::Finalize() {
 
 	// エディターの終了処理
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	editorCore_->Finalize();
 #endif
 	
