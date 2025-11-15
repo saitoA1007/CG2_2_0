@@ -14,7 +14,7 @@ namespace GameEngine {
 	private:
 		SceneState sceneState_ = SceneState::GE;
 		SceneChangeRequest* sceneChangeRequest_ = nullptr;
-		static inline const char* sceneNames_[] = { "Title", "Game", "GE" };
+		static inline const char* sceneNames_[] = { "Title", "Game", "GE","TDGame"};
 	};
 }
 

@@ -1,19 +1,37 @@
 #include"Player.h"
 #include<algorithm>
-
+#include"GameParamEditor.h"
 #include"EasingManager.h"
 #include"MyMath.h"
 #include"FPSCounter.h"
-
 using namespace GameEngine;
 
 void Player::Initialize() {
 
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
+
+#ifdef _DEBUG
+	//===========================================================
+	// 
+	// 現在、saveを押していないので、Playerのjsonファイルは存在していません
+	// 
+	//===========================================================
+
+	// 値を登録する
+	RegisterBebugParam();
+#else
+	// jsonファイルが作られていない状態で値の適応をおこなうとリリース版でバクります
+	// 値を適応させる
+	ApplyDebugParam();
+#endif
 }
 
 void Player::Update(GameEngine::InputCommand* inputCommand) {
+#ifdef _DEBUG
+	// 値を適応
+	ApplyDebugParam();
+#endif
 
 	// プレイヤーの入力処理
 	ProcessMoveInput(inputCommand);
@@ -60,7 +78,7 @@ void Player::JumpUpdate() {
 	// フラグが立っていなければ早期リターン
 	if (!isJump_) { return; }
 
-	jumpTimer_ += 1.0f / (FpsCounter::maxFrameCount * kJumpTime_);
+	jumpTimer_ += 1.0f / (FpsCounter::maxFrameCount * kJumpMaxTime_);
 
 	// ジャンプ処理
 	if (jumpTimer_ <= 0.5f) {
@@ -77,4 +95,18 @@ void Player::JumpUpdate() {
 	if (jumpTimer_ >= 1.0f) {
 		isJump_ = false;
 	}
+}
+
+void Player::RegisterBebugParam() {
+	// 値の登録
+	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxHeight", kJumpHeight_);
+	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxTime", kJumpMaxTime_);
+	GameParamEditor::GetInstance()->AddItem("Player", "MoveSpeed", kMoveSpeed_);
+}
+
+void Player::ApplyDebugParam() {
+	// 値の適応
+	kJumpHeight_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "JumpMaxHeight");
+	kJumpMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "JumpMaxTime");
+	kMoveSpeed_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "MoveSpeed");
 }

@@ -17,6 +17,10 @@ public:
 	/// <param name="inputCommand"></param>
 	void Update(GameEngine::InputCommand* inputCommand);
 
+	/// <summary>
+	/// ワールド行列を取得
+	/// </summary>
+	/// <returns></returns>
 	GameEngine::WorldTransform& GetWorldTransform() { return worldTransform_; }
 
 	/// <summary>
@@ -27,18 +31,22 @@ public:
 
 private:
 
+	// ジャンプの高さ
+	float kJumpHeight_ = 4.0f;
+	// ジャンプする時間
+	float kJumpMaxTime_ = 0.65f;
+
+	// 移動速度
+	float kMoveSpeed_ = 0.2f;
+
+private:
+
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
 
-	// 移動速度
-	static inline const float kMoveSpeed_ = 0.2f;
-
 	// ジャンプフラグ
 	bool isJump_ = false;
-	// ジャンプの高さ
-	static inline const float kJumpHeight_ = 4.0f;
-	// ジャンプする時間
-	static inline const float kJumpTime_ = 0.65f;
+	
 	// ジャンプタイマー
 	float jumpTimer_ = 0.0f;
 
@@ -54,4 +62,14 @@ private:
 	/// ジャンプする処理
 	/// </summary>
 	void JumpUpdate();
+
+	/// <summary>
+	/// 値を登録する
+	/// </summary>
+	void RegisterBebugParam();
+
+	/// <summary>
+	/// 値を適応する
+	/// </summary>
+	void ApplyDebugParam();
 };
