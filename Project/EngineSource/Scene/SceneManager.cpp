@@ -33,6 +33,13 @@ void SceneManager::Initialize(SceneContext* context) {
 	// グリッドの初期化
 	gridModel_ = context_->modelManager->GetNameByModel("Grid");
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+
+	// 使用するカメラのフラグ
+#ifdef _DEBUG
+	isDebugView_ = true;
+#else
+	isDebugView_ = false;
+#endif
 	
 	// シーンの初期化。
 	ChangeScene(SceneState::GE);
