@@ -187,3 +187,42 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(ID3D12R
 std::string TextureManager::GetFileName(const std::string& fullPath) {
 	return std::filesystem::path(fullPath).filename().string();
 }
+
+void TextureManager::LoadAllTexture() {
+	namespace fs = std::filesystem;
+	const std::string kDirectoryPath = "Resources/Textures/";
+
+	// デバックで使用する画像は読み込みの対象に含めない
+	const fs::path excludePath = fs::absolute("Resources/Textures/DebugImages");
+	const std::string excludePathStr = excludePath.string();
+
+	// Texturesのフォルダが存在するか確認する
+	if (!fs::exists(kDirectoryPath)) {
+		LogManager::GetInstance().Log("Texture directory not found, skipping LoadAllTexture: " + kDirectoryPath);
+		return;
+	}
+
+	LogManager::GetInstance().Log("Start Loading All Textures from: " + kDirectoryPath);
+
+	// Texturesのフォルダになる画像ファイルとフォルダを検索
+	for (const auto& entry : fs::recursive_directory_iterator(kDirectoryPath)) {
+
+		// 現在のファイル/ディレクトリの絶対パスを取得
+		fs::path currentPath = fs::absolute(entry.path());
+
+		// 読み込んだパスが除外対象か確認すうｒ
+		if (currentPath.string().find(excludePathStr) == 0) {
+			continue;
+		}
+
+		// 画像を登録、ロードする
+		if (entry.is_regular_file()) {
+			// ファイルパスを取得する
+			std::string filePath = entry.path().string();
+			// 登録
+			RegisterTexture(filePath);
+		}
+	}
+
+	LogManager::GetInstance().Log("End Loading All Textures");
+}

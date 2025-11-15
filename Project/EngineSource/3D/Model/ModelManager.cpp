@@ -1,6 +1,7 @@
 #include"ModelManager.h"
 #include <filesystem>
 #include <iostream>
+#include"LogManager.h"
 using namespace GameEngine;
 
 ModelManager::~ModelManager() {
@@ -123,6 +124,8 @@ void ModelManager::LoadAllModel() {
 	// 登録する拡張子
 	const std::vector<std::string> allowedExtensions = { ".obj", ".gltf" };
 
+	LogManager::GetInstance().Log("Start Loading All Models from: " + kDirectoryPath);
+
 	try {
 		// "Resources/Models/" の中を検索する
 		for (const auto& dirEntry : std::filesystem::directory_iterator(kDirectoryPath)) {
@@ -174,4 +177,6 @@ void ModelManager::LoadAllModel() {
 		// ファイルシステム関連のエラー処理
 		std::cerr << "Filesystem error while loading models: " << e.what() << std::endl;
 	}
+
+	LogManager::GetInstance().Log("End Loading All Models");
 }

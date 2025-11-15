@@ -18,16 +18,10 @@ public:
 	void Update(GameEngine::InputCommand* inputCommand,const Vector3& targetPos);
 
 	/// <summary>
-	/// VP行列を取得
+	/// カメラデータ
 	/// </summary>
 	/// <returns></returns>
-	Matrix4x4 GetVPMatirx() { return camera_->GetVPMatrix(); }
-
-	/// <summary>
-	/// ワールド行列を取得
-	/// </summary>
-	/// <returns></returns>
-	Matrix4x4 GetWorldMatrix() { return camera_->GetWorldMatrix(); }
+	GameEngine::Camera& GetCamera() const { return *camera_.get(); }
 
 private:
 

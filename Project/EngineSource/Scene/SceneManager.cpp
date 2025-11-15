@@ -116,11 +116,14 @@ void SceneManager::LoadModelData() {
 void SceneManager::LoadSpriteData() {
 
 	// white2x2の画像を登録する
-	context_->textureManager->RegisterTexture("Resources/Textures/white2x2.png");
-	// uvCheckerの画像を登録する
-	context_->textureManager->RegisterTexture("Resources/Textures/uvChecker.png");
-	// 草原の画像を登録する
-	context_->textureManager->RegisterTexture("Resources/Models/Terrain/grass.png");
+	//context_->textureManager->RegisterTexture("Resources/Textures/white2x2.png");
+	//// uvCheckerの画像を登録する
+	//context_->textureManager->RegisterTexture("Resources/Textures/uvChecker.png");
+	//// 草原の画像を登録する
+	//context_->textureManager->RegisterTexture("Resources/Models/Terrain/grass.png");
+
+	// テクスチャのリソースを全てロードする
+	context_->textureManager->LoadAllTexture();
 }
 
 void SceneManager::ChangeScene(SceneState nextSceneState) {
