@@ -25,6 +25,7 @@ namespace GameEngine {
             RadialBlur, // 中心に集中するぼかし
         };
 
+        // ポストエフェクトデータ
         struct EffectData {
             Microsoft::WRL::ComPtr<ID3D12Resource> resource;
             D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle{};
@@ -153,52 +154,17 @@ namespace GameEngine {
         Microsoft::WRL::ComPtr<ID3D12Resource> bloomResultResource_;     // 最終敵なもの
         Microsoft::WRL::ComPtr<ID3D12Resource> bloomCompositeResource_;  // 合成用
 
-    private:
-
-         // ライン用のRTVハンドル
-        D3D12_CPU_DESCRIPTOR_HANDLE scanLineRTVHandle_{};
-
-        // SRVハンドル
-        CD3DX12_GPU_DESCRIPTOR_HANDLE scanLineSRVHandle_;
-
-        // 線を描画するためのリソース
-        Microsoft::WRL::ComPtr<ID3D12Resource> scanLineResource_;
-
         // スキャンラインのデータ
         EffectData scanLineData_;
 
-    private:
+        // ヴィネットのデータ
+        EffectData vignettingData_;    
 
-        // ヴィネット用のRTVハンドル
-        D3D12_CPU_DESCRIPTOR_HANDLE vignettingRTVHandle_{};
-
-        // SRVハンドル
-        CD3DX12_GPU_DESCRIPTOR_HANDLE vignettingSRVHandle_;
-
-        // ヴィネットを描画するためのリソース
-        Microsoft::WRL::ComPtr<ID3D12Resource> vignettingResource_;
-
-    private:
-
-        // ラジアルブラー用のRTVハンドル
-        D3D12_CPU_DESCRIPTOR_HANDLE radialBlurRTVHandle_{};
-
-        // SRVハンドル
-        CD3DX12_GPU_DESCRIPTOR_HANDLE radialBlurSRVHandle_;
-
-        // ラジアルブラーを描画するためのリソース
-        Microsoft::WRL::ComPtr<ID3D12Resource> radialBlurResource_;
-
-    private:
-
-        // ラジアルブラー用のRTVハンドル
-        D3D12_CPU_DESCRIPTOR_HANDLE outLineRTVHandle_{};
-
-        // SRVハンドル
-        CD3DX12_GPU_DESCRIPTOR_HANDLE outLineSRVHandle_;
-
-        // ラジアルブラーを描画するためのリソース
-        Microsoft::WRL::ComPtr<ID3D12Resource> outLineResource_;
+        // ラジアルブラーのデータ
+        EffectData radialBlurData_;
+     
+        // アウトラインのデータ
+        EffectData outLineData_;
 
     private:
 
@@ -220,13 +186,12 @@ namespace GameEngine {
         void DrawBloom(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv, const D3D12_VIEWPORT& baseViewport, const D3D12_RECT& baseScissorRect);
 
         /// <summary>
-        /// ラインの描画するためのRTVを設定
+        /// ポストエフェクトのデータを初期化する
         /// </summary>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        /// <param name="descriptorSizeSRV"></param>
         /// <param name="descriptorSizeRTV"></param>
-        void InitializeScanLine(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV);
+        void InitializePostEffectData(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV);
 
         /// <summary>
         /// ラインの描画処理
@@ -235,43 +200,16 @@ namespace GameEngine {
         void DrawScanLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
 
         /// <summary>
-        /// ヴィネットの描画するためのRTVを設定
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="descriptorSizeSRV"></param>
-        /// <param name="descriptorSizeRTV"></param>
-        void InitializeVignetting(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV);
-
-        /// <summary>
         /// ヴィネットの描画処理
         /// </summary>
         /// <param name="commandList"></param>
         void DrawVignetting(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
 
         /// <summary>
-        /// ラジアルブルーの描画するためのRTVを設定
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="descriptorSizeSRV"></param>
-        /// <param name="descriptorSizeRTV"></param>
-        void InitializeRadialBlur(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV);
-
-        /// <summary>
         /// ラジアルブルーの描画処理
         /// </summary>
         /// <param name="commandList"></param>
         void DrawRadialBlur(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
-
-        /// <summary>
-        /// アウトラインの描画するためのRTVを設定
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="descriptorSizeSRV"></param>
-        /// <param name="descriptorSizeRTV"></param>
-        void InitializeOutLine(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV);
 
         /// <summary>
         /// アウトラインの描画
