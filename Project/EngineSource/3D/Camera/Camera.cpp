@@ -55,7 +55,7 @@ void Camera::SetViewMatrix(const Matrix4x4& viewMatrix) {
 	this->viewMatrix_ = viewMatrix;
 }
 
-Vector3 Camera::GetWorldPosition() {
+Vector3 Camera::GetWorldPosition() const {
 	// ワールド座標を入れる変数
 	Vector3 worldPos;
 	// ワールド行列の平行移動成分を取得
@@ -63,4 +63,13 @@ Vector3 Camera::GetWorldPosition() {
 	worldPos.y = worldMatrix_.m[3][1];
 	worldPos.z = worldMatrix_.m[3][2];
 	return worldPos;
+}
+
+void Camera::SetCamera(const Camera& camera) {
+	worldMatrix_ = camera.GetWorldMatrix();
+	VPMatrix_ = camera.GetVPMatrix();
+
+	if (cameraForGPU_) {
+		cameraForGPU_->worldPosition = camera.GetWorldPosition();
+	}
 }

@@ -33,6 +33,7 @@ std::unique_ptr<Sprite> Sprite::Create(const Vector2& position,const Vector2& si
 	sprite->CreateMesh();
 
 	// マテリアルを作成
+	sprite->color_ = color;
 	sprite->CreateConstBufferData(color);
 
 	return sprite;
@@ -45,6 +46,8 @@ void Sprite::Update() {
 
 	// 大きさの更新
 	SetSize(size_);
+
+	constBufferData_->color = color_;
 
 	// 座標を元にワールド行列の生成
 	worldMatrix_ = MakeAffineMatrix(Vector3(scale_.x, scale_.y, 0.0f), Vector3(0.0f,0.0f,rotate_), Vector3(position_.x, position_.y, 0.0f));
@@ -76,6 +79,7 @@ void Sprite::SetSize(const Vector2& size) {
 }
 
 void Sprite::SetColor(const Vector4& color) {
+	color_ = color;
 	// 色の設定
 	constBufferData_->color = color;
 }

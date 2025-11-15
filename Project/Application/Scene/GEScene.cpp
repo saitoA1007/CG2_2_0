@@ -41,7 +41,7 @@ void GEScene::Initialize(SceneContext* context) {
 	// 画像
 	sprite_ = Sprite::Create({0.0f,0.0f},{256.0f,256.0f},{0.0f,0.0f});
 	// uvCheckerの画像を取得
-	uvCheckerGH_ = context_->textureManager->GetHandleByName("uvChecker");
+	uvCheckerGH_ = context_->textureManager->GetHandleByName("uvChecker.png");
 
 	// パーティクルのシステムを初期化
 	testParticle_ = std::make_unique<ParticleBehavior>();

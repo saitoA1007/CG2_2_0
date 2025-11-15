@@ -38,7 +38,7 @@ namespace GameEngine {
 		/// カメラのワールド位置を取得する
 		/// </summary>
 		/// <returns></returns>
-		Vector3 GetWorldPosition();
+		Vector3 GetWorldPosition() const;
 
 		/// <summary>
 		/// ワールド行列を設定する
@@ -91,6 +91,12 @@ namespace GameEngine {
 		/// <param name="worldMatrix"></param>
 		/// <returns></returns>
 		Matrix4x4 MakeWVPMatrix(Matrix4x4 worldMatrix);
+
+		/// <summary>
+		/// 別のカメラの内容を受け取る
+		/// </summary>
+		/// <param name="camera">別のカメラ</param>
+		void SetCamera(const Camera& camera);
 
 	public:
 

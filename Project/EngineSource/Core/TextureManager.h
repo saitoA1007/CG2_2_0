@@ -49,7 +49,7 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="registerName"></param>
 		/// <param name="fileName"></param>
-		void RegisterTexture(const std::string& registerName,const std::string& fileName);
+		void RegisterTexture(const std::string& fileName);
 
 		/// <summary>
 		/// 名前からハンドルを取得

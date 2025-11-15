@@ -41,6 +41,9 @@ namespace GameEngine {
 		/// <param name="size">サイズ</param>
 		/// <param name="anchorPoint">アンカーポイント</param>
 		/// <param name="color">色</param>
+		/// <param name="leftTop">画像の描画する左上の位置</param>
+		/// <param name="textureSize">画像の描画したい範囲</param>
+		/// <param name="textureMaxSize">画像のサイズ</param>
 		/// <returns></returns>
 		static std::unique_ptr<Sprite> Create(const Vector2& position,const Vector2& size,const Vector2& anchorPoint,const Vector4& color = { 1, 1, 1, 1 },
 			const Vector2& leftTop={0.0f,0.0f}, const Vector2& textureSize={1.0f,1.0f}, const Vector2& textureMaxSize={1.0f,1.0f});
@@ -59,34 +62,16 @@ namespace GameEngine {
 		void SetPosition(const Vector2& position);
 
 		/// <summary>
-		/// 座標を取得
-		/// </summary>
-		/// <returns></returns>
-		const Vector2& GetPosition() const { return position_; }
-
-		/// <summary>
 		/// サイズの設定
 		/// </summary>
 		/// <param name="size">サイズ</param>
 		void SetSize(const Vector2& size);
 
 		/// <summary>
-		/// 大きさを取得
-		/// </summary>
-		/// <returns></returns>
-		const Vector2& GetSize() const { return size_; }
-
-		/// <summary>
 		/// 色の設定
 		/// </summary>
 		/// <param name="color">色</param>
 		void SetColor(const Vector4& color);
-
-		/// <summary>
-		/// 色を取得
-		/// </summary>
-		/// <returns></returns>
-		const Vector4& GetColor() const { return constBufferData_->color; }
 
 		/// <summary>
 		/// 透明度の設定
@@ -115,6 +100,9 @@ namespace GameEngine {
 		Vector2 scale_ = { 1.0f,1.0f };
 		// スプライト幅、高さ
 		Vector2 size_ = { 100.0f, 100.0f };
+
+		// 色
+		Vector4 color_;
 
 		Vector2 textureLeftTop_ = { 0.0f,0.0f };
 		Vector2 textureSize_ = { 100.0f,100.0f };

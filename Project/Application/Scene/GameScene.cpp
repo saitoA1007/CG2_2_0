@@ -38,13 +38,13 @@ void GameScene::Initialize(SceneContext* context) {
 	// 地面モデルを生成
 	terrainModel_ = context_->modelManager->GetNameByModel("Terrain");
 	terrainModel_->SetDefaultIsEnableLight(true);
-	grassGH_ = context_->textureManager->GetHandleByName("grass");
+	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 平面モデルを生成
 	planeModel_ = context_->modelManager->GetNameByModel("Plane");
 	planeModel_->SetDefaultIsEnableLight(true);
-	uvCheckerGH_ = context_->textureManager->GetHandleByName("uvChecker");
+	uvCheckerGH_ = context_->textureManager->GetHandleByName("uvChecker.png");
 	planeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,0.0f} });
 
 	// ボーンアニメーションを生成する
@@ -120,9 +120,6 @@ void GameScene::Draw(const bool& isDebugView) {
 	// 地面を描画
 	ModelRenderer::DrawLight(lightManager_->GetResource());
 	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_, grassGH_);
-
-	// 平面描画
-	//planeModel_->Draw(planeWorldTransform_, uvCheckerGH_, camera_->GetVPMatrix());
 
 	// アニメーションの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
