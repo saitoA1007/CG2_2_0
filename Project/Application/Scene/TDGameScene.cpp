@@ -59,6 +59,12 @@ void TDGameScene::Initialize(SceneContext* context) {
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
 
+	// 壁を生成する
+	wallModel_ = context_->modelManager->GetNameByModel("Wall");
+	// ステージを生成を初期化
+	stageManager_ = std::make_unique<StageManager>();
+	stageManager_->Initialize();
+
 	// 入力コマンドを設定する
 	InputRegisterCommand();
 }
@@ -108,6 +114,9 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// 地面を描画
 	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_, grassGH_);
 
+	// ステージを描画する
+	stageManager_->Draw(wallModel_);
+
 	// プレイヤーを描画
 	uint32_t DefaultWhiteGH = 0;
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
@@ -150,4 +159,13 @@ void TDGameScene::UpdateCollision() {
 
 	// 衝突判定
 	collisionManager_->CheckAllCollisions();
+}
+
+void TDGameScene::DebugUpdate() {
+#ifdef _DEBUG
+
+	// ステージ作成のデバック用
+	stageManager_->DebugUpdate();
+
+#endif
 }

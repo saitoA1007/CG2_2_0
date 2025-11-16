@@ -288,6 +288,8 @@
     <ClCompile Include="EngineSource\Graphics\RenderPipeline.cpp" />
     <ClCompile Include="Application\Scene\TDGameScene.cpp" />
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
+    <ClCompile Include="Application\Stage\Wall.cpp" />
+    <ClCompile Include="Application\Stage\StageManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -570,6 +572,8 @@
     <ClInclude Include="EngineSource\Collision\CollisionResult.h" />
     <ClInclude Include="EngineSource\Collision\ColliderData.h" />
     <ClInclude Include="EngineSource\Collision\UserData.h" />
+    <ClInclude Include="Application\Stage\Wall.h" />
+    <ClInclude Include="Application\Stage\StageManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

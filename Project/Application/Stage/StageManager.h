@@ -1,0 +1,78 @@
+#pragma once
+#include"Model.h"
+#include"Wall.h"
+
+
+class StageManager {
+public:
+
+	/// <summary>
+	/// 初期化処理
+	/// </summary>
+	void Initialize();
+
+	/// <summary>
+	/// 更新処理
+	/// </summary>
+	void Update();
+
+	/// <summary>
+	/// 描画処理
+	/// </summary>
+	/// <param name="wallModel"></param>
+	void Draw(GameEngine::Model* wallModel);
+
+	/// <summary>
+	/// デバック用の更新処理
+	/// </summary>
+	void DebugUpdate();
+
+private:
+
+	// 生成位置
+	Vector3 centerPosition_ = { 0.0f,1.0f,0.0f };
+
+	// 半径
+	float radius_ = 20.0f;
+
+	// 辺の数
+	uint32_t maxSideNumber_ = 6;
+
+	// 復活するまでの時間
+	float respawnTime_ = 3.0f;
+
+	// 最大hp
+	uint32_t maxHp_ = 2;
+
+	// 壁の奥行(1.0f = 1m)
+	float wallDepth_ = 1.0f;
+	// 壁の縦幅(1.0f = 1m)
+	float wallHeight_ = 2.0f;
+
+	// 壁の横幅の余剰分
+	float offsetWallWidth_ = 2.0f;
+
+	// 生成する
+	bool isCreate_ = false;
+	bool created_ = false;
+
+	// 壁
+	std::vector<std::unique_ptr<Wall>> walls_;
+
+private:
+
+	/// <summary>
+	/// ステージを生成する処理
+	/// </summary>
+	void GenerateWalls();
+
+	/// <summary>
+	/// 値を登録する
+	/// </summary>
+	void RegisterBebugParam();
+
+	/// <summary>
+	/// 値を適応する
+	/// </summary>
+	void ApplyDebugParam();
+};
