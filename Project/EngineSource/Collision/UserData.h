@@ -1,4 +1,5 @@
 #pragma once
+#include<cstdint>
 
 namespace GameEngine {
 
@@ -9,6 +10,8 @@ namespace GameEngine {
 
 	// 受け渡すデータ
 	struct UserData {
+		// オブジェクトを識別するID
+		uint32_t typeID = 0;
 		// 基底クラスポインタ
 		GameObject* object = nullptr;
 
