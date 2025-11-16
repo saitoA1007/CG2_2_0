@@ -11,40 +11,40 @@ namespace GameEngine {
 	struct CollisionVisitor {
 
 		// 球と球の当たり判定
-		bool operator()(const Sphere& a, const Sphere& b) const {
+		CollisionResult operator()(const Sphere& a, const Sphere& b) const {
 			return IsSpheresCollision(a, b);
 		}
 
 		// AABBとAABBの当たり判定
-		bool operator()(const AABB& a, const AABB& b) const {
+		CollisionResult operator()(const AABB& a, const AABB& b) const {
 			return IsAABBCollision(a, b);
 		}
 
 		// 球とAABBの当たり判定
-		bool operator()(const Sphere& a, const AABB& b) const {
-			return IsAABBSphereCollision(b, a);
+		CollisionResult operator()(const Sphere& a, const AABB& b) const {
+			return IsAABBSphereCollision(b,a);
 		}
 
-		bool operator()(const AABB& a, const Sphere& b) const {
+		CollisionResult operator()(const AABB& a, const Sphere& b) const {
 			return IsAABBSphereCollision(a, b);
 		}
 
 		// AABBと線分の当たり判定
-		bool operator()(const AABB& a, const Segment& b) const {
+		CollisionResult operator()(const AABB& a, const Segment& b) const {
 			return IsAABBSegmentCollision(a, b);
 		}
 
-		bool operator()(const Segment& a, const AABB& b) const {
+		CollisionResult operator()(const Segment& a, const AABB& b) const {
 			return IsAABBSegmentCollision(b, a);
 		}
 
 		// obbと球の当たり判定
-		bool operator()(const OBB& a, const Sphere& b) const {
+		CollisionResult operator()(const OBB& a, const Sphere& b) const {
 			return IsOBBSphereCollision(a, b);
 		}
 
 		// obbと線の当たり判定
-		bool operator()(const OBB& a, const Segment& b) const {
+		CollisionResult operator()(const OBB& a, const Segment& b) const {
 			return IsOBBSegmentCollision(a, b);
 		}
 

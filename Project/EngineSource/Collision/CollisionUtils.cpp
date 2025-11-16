@@ -4,44 +4,72 @@
 #include<cmath>
 #include<algorithm>
 
-bool GameEngine::IsSpheresCollision(const Sphere& s1, const Sphere& s2) {
+using namespace GameEngine;
+
+// 衝突フラグしか値を返さないものが存在している
+// IsSpherePlaneCollision, IsSegmentPlaneCollision, IsSegmentTriangleCollision, 
+// IsAABBSegmentCollision,IsOBBSegmentCollision,
+
+CollisionResult GameEngine::IsSpheresCollision(const Sphere& s1, const Sphere& s2) {
+	CollisionResult result;
+
+	Vector3 diff = s2.center - s1.center;
+	float distance = Length(diff);
+
 	// 半径の合計より短ければ衝突
-	if (Length(Subtract(s1.center, s2.center)) < s1.radius + s2.radius) {
-		return true;
-	} else {
-		return false;
-	}
+	if (distance < s1.radius + s2.radius) {
+		result.isHit = true;
+		// 接触法線
+		if (distance > 0.0f) {
+			result.contactNormal = diff / distance;
+		} else {
+			// 完全に重なっている場合
+			result.contactNormal = { 1.0f, 0.0f, 0.0f };
+		}
+
+		// 接触点
+		result.contactPosition = s1.center + result.contactNormal * s1.radius;
+
+		// 侵入深度
+		result.penetrationDepth = s1.radius + s2.radius - distance;
+	} 
+	return result;
 }
 
-bool GameEngine::IsSpherePlaneCollision(const Sphere& sphere, const Plane& plane) {
+CollisionResult GameEngine::IsSpherePlaneCollision(const Sphere& sphere, const Plane& plane) {
+	CollisionResult result;
+
 	// 球の半径より短ければ衝突
 	if (std::fabs(Dot(plane.normal, sphere.center) - plane.distance) <= sphere.radius) {
-		return true;
-	} else {
-		return false;
+		result.isHit = true;
 	}
+
+	return result;
 }
 
-bool GameEngine::IsSegmentPlaneCollision(const Segment& segment, const Plane& plane) {
+CollisionResult GameEngine::IsSegmentPlaneCollision(const Segment& segment, const Plane& plane) {
+	CollisionResult result;
+
 	// 垂直判定を行うために、法線と線の内積を求める
 	float dot = Dot(plane.normal, segment.diff);
 
 	// 垂直の時は衝突していないのでfalseを返す
 	if (dot == 0.0f) {
-		return false;
+		return result;
 	}
 
 	// tを求める
 	float t = (plane.distance - Dot(plane.normal, segment.origin)) / dot;
 
 	if (t >= 0.0f && t <= 1.0f) {
-		return true;
-	} else {
-		return false;
-	}
+		result.isHit = true;
+	} 
+
+	return result;
 }
 
-bool GameEngine::IsSegmentTriangleCollision(const Triangle& triangle, const Segment& segment) {
+CollisionResult GameEngine::IsSegmentTriangleCollision(const Triangle& triangle, const Segment& segment) {
+	CollisionResult result;
 
 	// 三角形の3つの頂点を使って平面を求める
 	Plane plane;
@@ -74,25 +102,62 @@ bool GameEngine::IsSegmentTriangleCollision(const Triangle& triangle, const Segm
 	if (Dot(cross01, plane.normal) >= 0.0f &&
 		Dot(cross12, plane.normal) >= 0.0f &&
 		Dot(cross20, plane.normal) >= 0.0f) {
-		return true;
-	} else {
-		return false;
+		result.isHit = true;
 	}
+
+	return result;
 }
 
-bool GameEngine::IsAABBCollision(const AABB& aabb1, const AABB& aabb2) {
+CollisionResult GameEngine::IsAABBCollision(const AABB& aabb1, const AABB& aabb2) {
+	CollisionResult result;
 
-	// 衝突判定
-	if ((aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x) &&  // x軸
-		(aabb1.min.y <= aabb2.max.y && aabb1.max.y >= aabb2.min.y) &&  // y軸
-		(aabb1.min.z <= aabb2.max.z && aabb1.max.z >= aabb2.min.z)) {  // z軸
-		return true;
-	} else {
-		return false;
+	// 各軸での重なりをチェック
+	bool overlapX = aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x;
+	bool overlapY = aabb1.min.y <= aabb2.max.y && aabb1.max.y >= aabb2.min.y;
+	bool overlapZ = aabb1.min.z <= aabb2.max.z && aabb1.max.z >= aabb2.min.z;
+
+	if (overlapX && overlapY && overlapZ) {
+		result.isHit = true;
+
+		// 各軸の重なり量を計算
+		float overlapXAmount = std::min(aabb1.max.x - aabb2.min.x, aabb2.max.x - aabb1.min.x);
+		float overlapYAmount = std::min(aabb1.max.y - aabb2.min.y, aabb2.max.y - aabb1.min.y);
+		float overlapZAmount = std::min(aabb1.max.z - aabb2.min.z, aabb2.max.z - aabb1.min.z);
+
+		// 最も重なりが少ない軸を見つける
+		if (overlapXAmount < overlapYAmount && overlapXAmount < overlapZAmount) {
+			// X軸が最小の重なり
+			result.penetrationDepth = overlapXAmount;
+			result.contactNormal = { (aabb1.max.x + aabb1.min.x) > (aabb2.max.x + aabb2.min.x) ? 1.0f : -1.0f, 0.0f, 0.0f };
+		} else if (overlapYAmount < overlapZAmount) {
+			// Y軸が最小の重なり
+			result.penetrationDepth = overlapYAmount;
+			result.contactNormal = { 0.0f, (aabb1.max.y + aabb1.min.y) > (aabb2.max.y + aabb2.min.y) ? 1.0f : -1.0f, 0.0f };
+		} else {
+			// Z軸が最小の重なり
+			result.penetrationDepth = overlapZAmount;
+			result.contactNormal = { 0.0f, 0.0f, (aabb1.max.z + aabb1.min.z) > (aabb2.max.z + aabb2.min.z) ? 1.0f : -1.0f };
+		}
+
+		// 接触点
+		Vector3 contactMin = {
+			std::max(aabb1.min.x, aabb2.min.x),
+			std::max(aabb1.min.y, aabb2.min.y),
+			std::max(aabb1.min.z, aabb2.min.z)
+		};
+		Vector3 contactMax = {
+			std::min(aabb1.max.x, aabb2.max.x),
+			std::min(aabb1.max.y, aabb2.max.y),
+			std::min(aabb1.max.z, aabb2.max.z)
+		};
+		result.contactPosition = (contactMin + contactMax) * 0.5f;
 	}
+
+	return result;
 }
 
-bool GameEngine::IsAABBSphereCollision(const AABB& aabb, const Sphere& sphere) {
+CollisionResult GameEngine::IsAABBSphereCollision(const AABB& aabb, const Sphere& sphere) {
+	CollisionResult result;
 
 	// 最近接点を求める
 	Vector3 closestPoint = {
@@ -101,15 +166,30 @@ bool GameEngine::IsAABBSphereCollision(const AABB& aabb, const Sphere& sphere) {
 		std::clamp(sphere.center.z,aabb.min.z,aabb.max.z)
 	};
 
+	Vector3 diff =  sphere.center - closestPoint;
+	float distance = Length(diff);
+
 	// 距離が半径よりも小さければ衝突
-	if (Length(closestPoint - sphere.center) <= sphere.radius) {
-		return true;
-	} else {
-		return false;
-	}
+	if (distance <= sphere.radius) {
+		result.isHit = true;
+
+		// 接触点
+		result.contactPosition = closestPoint;
+
+		// 接触法線
+		if (distance > 0.0f) {	
+			result.contactNormal = diff / distance;
+			result.penetrationDepth = sphere.radius - distance;
+		} else {
+			result.contactNormal = {0.0f,0.0f,1.0f};
+			result.penetrationDepth = sphere.radius;
+		}
+	} 
+	return result;
 }
 
-bool GameEngine::IsAABBSegmentCollision(const AABB& aabb, const Segment& segment) {
+CollisionResult GameEngine::IsAABBSegmentCollision(const AABB& aabb, const Segment& segment) {
+	CollisionResult result;
 
 	// 各軸のnear,farを求める
 	Vector3 tNear = Min({ (aabb.min.x - segment.origin.x) / segment.diff.x,(aabb.min.y - segment.origin.y) / segment.diff.y,(aabb.min.z - segment.origin.z) / segment.diff.z },
@@ -124,18 +204,18 @@ bool GameEngine::IsAABBSegmentCollision(const AABB& aabb, const Segment& segment
 
 	// 範囲の外を出ていたらfalse
 	if (tMin > 1.0f || tMax < 0.0f) {
-		return false;
+		return result;
 	}
 
 	// 衝突した時
 	if (tMin <= tMax) {
-		return true;
-	} else {
-		return false;
-	}
+		result.isHit = true;
+	} 
+	return result;
 }
 
-bool GameEngine::IsOBBSphereCollision(const OBB& obb, const Sphere& sphere) {
+CollisionResult GameEngine::IsOBBSphereCollision(const OBB& obb, const Sphere& sphere) {
+	CollisionResult result;
 
 	// 球からobbの中心へのベクトル
 	Vector3 v = sphere.center - obb.center;
@@ -153,18 +233,58 @@ bool GameEngine::IsOBBSphereCollision(const OBB& obb, const Sphere& sphere) {
 	sphereOBBLocal.radius = sphere.radius;
 
 	// obbのローカル空間の大きさを求める
-	AABB aabbOBBLocal;
-	aabbOBBLocal.min = obb.size * -1.0f;
-	aabbOBBLocal.max = obb.size;
+	AABB aabbLocal;
+	aabbLocal.min = obb.size * -1.0f;
+	aabbLocal.max = obb.size;
 
-	// ローカル空間での衝突判定の結果を返す
-	return IsAABBSphereCollision(aabbOBBLocal, sphereOBBLocal);
+	// ローカル空間での最近接点を求める
+	Vector3 closestPointLocal = {
+		std::clamp(centerInOBBLocalSpace.x, aabbLocal.min.x, aabbLocal.max.x),
+		std::clamp(centerInOBBLocalSpace.y, aabbLocal.min.y, aabbLocal.max.y),
+		std::clamp(centerInOBBLocalSpace.z, aabbLocal.min.z, aabbLocal.max.z)
+	};
+
+	// ローカル空間での距離を計算
+	Vector3 diffLocal = centerInOBBLocalSpace - closestPointLocal;
+	float distanceSquared = Dot(diffLocal, diffLocal);
+	float radiusSquared = sphere.radius * sphere.radius;
+
+	if (distanceSquared <= radiusSquared) {
+		result.isHit = true;
+
+		float distance = std::sqrt(distanceSquared);
+
+		// 最近接点をワールド座標に変換
+		result.contactPosition = obb.center +
+			obb.orientations[0] * closestPointLocal.x +
+			obb.orientations[1] * closestPointLocal.y +
+			obb.orientations[2] * closestPointLocal.z;
+
+		if (distance > 0.0f) {
+			// ローカル空間での法線を計算
+			Vector3 normalLocal = diffLocal / distance;
+
+			// 法線をワールド座標に変換
+			result.contactNormal =
+				obb.orientations[0] * normalLocal.x +
+				obb.orientations[1] * normalLocal.y +
+				obb.orientations[2] * normalLocal.z;
+
+			result.contactNormal = Normalize(result.contactNormal);
+			result.penetrationDepth = sphere.radius - distance;
+		} else {
+			result.contactNormal = {0.0f,0.0f,1.0f};
+			result.penetrationDepth = sphere.radius;
+		}
+	}
+	return result;
 }
 
-bool GameEngine::IsOBBSegmentCollision(const OBB& obb, const Segment& segment) {
+CollisionResult GameEngine::IsOBBSegmentCollision(const OBB& obb, const Segment& segment) {
+	CollisionResult result;
 
 	// ワールド座標での線の終点を求める
-	Vector3 worldEnd = segment.origin + segment.diff;
+	Vector3 segmentEnd = segment.origin + segment.diff;
 
 	// 線の始点をOBBのローカル座標系に変換
 	Vector3 vOrigin = segment.origin - obb.center;
@@ -175,7 +295,7 @@ bool GameEngine::IsOBBSegmentCollision(const OBB& obb, const Segment& segment) {
 	};
 
 	// 線の終点をOBBのローカル座標系に変換
-	Vector3 vEnd = worldEnd - obb.center;
+	Vector3 vEnd = segmentEnd - obb.center;
 	Vector3 localEnd = {
 		Dot(vEnd, obb.orientations[0]),
 		Dot(vEnd, obb.orientations[1]),

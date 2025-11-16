@@ -31,7 +31,7 @@ namespace GameEngine {
 		virtual CollisionType GetCollisionType() const = 0;
 
 		// 衝突時に呼ばれる関数
-		virtual void OnCollision() = 0;
+		virtual void OnCollision(const CollisionResult& collisionInfo) = 0;
 
 		// 衝突属性を取得
 		uint32_t GetCollisionAttribute() const { return collisionAttribute_; }

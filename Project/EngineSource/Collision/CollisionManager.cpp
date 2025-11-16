@@ -36,12 +36,15 @@ void  CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collid
 	CollisionType typeB = colliderB->GetCollisionType();
 
 	// 各形状に応じた当たり判定を取得
-	bool isHit = CheckCollisionType(typeA, typeB);
+	CollisionResult result = CheckCollisionType(typeA, typeB);
 
-	if (isHit) {
+	if (result.isHit) {
 		// コライダーの衝突時コールバックを呼び出す
-		colliderA->OnCollision();
-		colliderB->OnCollision();
+		colliderA->OnCollision(result);
+		// 反対側の法線情報を渡す
+		CollisionResult resultB = result;
+		resultB.contactNormal = result.contactNormal * -1.0f;
+		colliderB->OnCollision(resultB);
 	}
 }
 
@@ -49,7 +52,7 @@ bool CollisionManager::IsActiveCollision(Collider* a, Collider* b) {
 	return (a->GetCollisionAttribute() & b->GetCollisionMask()) == 0 || (b->GetCollisionAttribute() & a->GetCollisionMask()) == 0;
 }
 
-bool CollisionManager::CheckCollisionType(const CollisionType& typeA, const CollisionType& typeB) {
+CollisionResult CollisionManager::CheckCollisionType(const CollisionType& typeA, const CollisionType& typeB) {
 	// 各形状の当たり判定を取得する
 	return std::visit(CollisionVisitor{}, typeA.type, typeB.type);
 }

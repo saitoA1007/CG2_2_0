@@ -51,6 +51,6 @@ namespace GameEngine {
 		/// <param name="typeA"></param>
 		/// <param name="typeB"></param>
 		/// <returns></returns>
-		bool CheckCollisionType(const CollisionType& typeA, const CollisionType& typeB);
+		CollisionResult CheckCollisionType(const CollisionType& typeA, const CollisionType& typeB);
 	};
 }
