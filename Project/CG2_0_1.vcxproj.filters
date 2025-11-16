@@ -287,6 +287,7 @@
     <ClCompile Include="EngineSource\Graphics\DirectX\DXViewportState.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPipeline.cpp" />
     <ClCompile Include="Application\Scene\TDGameScene.cpp" />
+    <ClCompile Include="Application\Light\SceneLightingController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -565,6 +566,7 @@
     <ClInclude Include="EngineSource\Graphics\RenderPipeline.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\IPostEffect.h" />
     <ClInclude Include="Application\Scene\TDGameScene.h" />
+    <ClInclude Include="Application\Light\SceneLightingController.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

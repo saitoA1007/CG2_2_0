@@ -11,6 +11,7 @@
 // アプリ機能をインクルード
 #include"Application/Player/Player.h"
 #include"Application/Camera/CameraController.h"
+#include"Application/Light/SceneLightingController.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -62,6 +63,13 @@ private: // シーン機能
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
+
+	// 天球
+	GameEngine::Model* skyDomeModel_;
+	GameEngine::WorldTransform skyDomeWorldTransform_;
+
+	// ライト
+	std::unique_ptr<SceneLightingController> sceneLightingController_;
 
 	// 自キャラのモデル
 	GameEngine::Model* playerModel_;

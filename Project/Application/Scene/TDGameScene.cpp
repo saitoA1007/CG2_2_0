@@ -31,8 +31,17 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 #pragma endregion
 
+	// 天球モデルを生成
+	skyDomeModel_ = context_->modelManager->GetNameByModel("SkyDome");;
+	skyDomeWorldTransform_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}});
+
+	// ライトの生成
+	sceneLightingController_ = std::make_unique<SceneLightingController>();
+	sceneLightingController_->Initialize(context_->graphicsDevice->GetDevice());
+
 	// プレイヤーモデルを生成
-	playerModel_ = context_->modelManager->GetNameByModel("Cube");
+	playerModel_ = context_->modelManager->GetNameByModel("Triangular");
+	playerModel_->SetDefaultIsEnableLight(true);
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
@@ -49,6 +58,9 @@ void TDGameScene::Update() {
 
 	// デバックリストを削除
 	debugRenderer_->Clear();
+
+	// ライトの更新処理
+	sceneLightingController_->Update();
 
 	// プレイヤーの更新処理
 	player_->Update(context_->inputCommand);
@@ -75,14 +87,15 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// 3D描画
 	//===========================================================
 
-	// 複数モデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::Instancing);
-
 	// 3Dモデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
+	// 天球の描画
+	ModelRenderer::Draw(skyDomeModel_, skyDomeWorldTransform_);
+
 	// プレイヤーを描画
 	uint32_t DefaultWhiteGH = 0;
+	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform(), DefaultWhiteGH);
 
 #ifdef _DEBUG
