@@ -74,6 +74,9 @@ void TDGameScene::Update() {
 
 	// カメラの更新処理
 	mainCamera_->SetCamera(cameraController_->GetCamera());
+
+	// 当たり判定の更新処理
+	UpdateCollision();
 }
 
 void TDGameScene::Draw(const bool& isDebugView) {
@@ -132,4 +135,11 @@ void TDGameScene::InputRegisterCommand() {
 	// カメラ操作のコマンドを登録する
 	context_->inputCommand->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
 	context_->inputCommand->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
+}
+
+void TDGameScene::UpdateCollision() {
+
+
+	// 衝突判定
+	collisionManager_->CheckAllCollisions();
 }
