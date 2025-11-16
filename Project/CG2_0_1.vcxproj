@@ -360,6 +360,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Collision\CollisionResult.h" />
     <ClInclude Include="EngineSource\Collision\CollisionUtils.h" />
     <ClInclude Include="EngineSource\Collision\CollisionVisitor.h" />
+    <ClInclude Include="EngineSource\Collision\UserData.h" />
     <ClInclude Include="EngineSource\Common\ConvertString.h" />
     <ClInclude Include="EngineSource\Common\CrashHandle.h" />
     <ClInclude Include="EngineSource\Common\CreateBufferResource.h" />
