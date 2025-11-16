@@ -7,6 +7,7 @@
 #include"WorldTransform.h"
 #include"Sprite.h"
 #include"DebugRenderer.h"
+#include"CollisionManager.h"
 
 // アプリ機能をインクルード
 #include"Application/Player/Player.h"
@@ -55,6 +56,9 @@ private: // エンジンの低レイヤー機能を取得
 
 	// デバック描画するリスト
 	std::unique_ptr<GameEngine::DebugRenderer> debugRenderer_;
+
+	// 当たり判定の管理
+	std::unique_ptr<GameEngine::CollisionManager> collisionManager_;
 
 private: // シーン機能
 
