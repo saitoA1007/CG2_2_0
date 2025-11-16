@@ -2,6 +2,7 @@
 #include<list>
 
 #include"Collider.h"
+#include"CollisionResult.h"
 
 namespace GameEngine {
 

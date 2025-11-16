@@ -3,6 +3,8 @@
 #include<cstdint>
 #include"Geometry.h"
 #include<variant>
+#include <functional>
+#include"CollisionResult.h"
 
 namespace GameEngine {
 
@@ -23,15 +25,28 @@ namespace GameEngine {
 	/// </summary>
 	class Collider {
 	public:
-
-		// ワールド座標を取得
-		virtual Vector3 GetWorldPosition() const = 0;
+		Collider() = default;
+		virtual ~Collider() = default;
 
 		// 衝突形状を取得
 		virtual CollisionType GetCollisionType() const = 0;
 
+		// ワールド座標を取得
+		Vector3 GetWorldPosition() const { return worldPosition_; }
+		void SetWorldPosition(const Vector3& position) { worldPosition_ = position; }
+
+		// コールバック関数を登録する
+		void SetOnCollisionCallback(std::function<void(const CollisionResult&)> callback) {
+			onCollisionCallback_ = callback;
+		}
+
 		// 衝突時に呼ばれる関数
-		virtual void OnCollision(const CollisionResult& collisionInfo) = 0;
+		void OnCollision(const CollisionResult& collisionInfo) {
+			// コールバックを実行する
+			if (onCollisionCallback_) {
+				onCollisionCallback_(collisionInfo);
+			}
+		}
 
 		// 衝突属性を取得
 		uint32_t GetCollisionAttribute() const { return collisionAttribute_; }
@@ -47,13 +62,17 @@ namespace GameEngine {
 		bool IsActive() const { return isActive_; }
 		void SetActive(const bool& isActive) { isActive_ = isActive; }
 
-	private:
+	protected:
 		// 衝突属性(自分)
 		uint32_t collisionAttribute_ = 0xffffffff;
 		// 衝突マスク(相手)
 		uint32_t collisionMask_ = 0xffffffff;
 		// 当たり判定の有効化
 		bool isActive_ = true;
+		// ワールド座標
+		Vector3 worldPosition_ = { 0.0f, 0.0f, 0.0f };
+		// コールバック関数
+		std::function<void(const CollisionResult&)> onCollisionCallback_;
 	};
 
 	/// <summary>
@@ -65,7 +84,7 @@ namespace GameEngine {
 		// 球の当たり判定を登録
 		CollisionType GetCollisionType() const override {
 			CollisionType collisiontype;
-			collisiontype.type = Sphere{ GetWorldPosition(),radius_ };
+			collisiontype.type = Sphere{ worldPosition_,radius_ };
 			return collisiontype;
 		}
 
@@ -86,7 +105,7 @@ namespace GameEngine {
 		// AABBの当たり判定を登録する
 		CollisionType GetCollisionType() const override {
 			CollisionType collisiontype;
-			Vector3 pos = GetWorldPosition();
+			Vector3 pos = worldPosition_;
 			Vector3 halfSize = size_ * 0.5f;
 			collisiontype.type = AABB{ pos - halfSize,pos + halfSize };
 			return collisiontype;
@@ -110,7 +129,7 @@ namespace GameEngine {
 		// 線分の当たり判定を登録する
 		CollisionType GetCollisionType() const override {
 			CollisionType collisiontype;
-			Vector3 pos = GetWorldPosition();
+			Vector3 pos = worldPosition_;
 			collisiontype.type = Segment{ pos,diff_ };
 			return collisiontype;
 		}
@@ -132,7 +151,7 @@ namespace GameEngine {
 		CollisionType GetCollisionType() const override {
 			CollisionType collisiontype;
 			OBB tmpOBB;
-			tmpOBB.center = GetWorldPosition();
+			tmpOBB.center = worldPosition_;
 			tmpOBB.size = size_;
 			std::memcpy(tmpOBB.orientations, orientations_, sizeof(Vector3) * 3);
 			collisiontype.type = tmpOBB;
@@ -154,3 +173,45 @@ namespace GameEngine {
 		Vector3 size_;
 	};
 }
+
+//========================================
+// 使用例
+//========================================
+//class Player {
+//public:
+//	Player() {
+//
+//		// コライダーを作成
+//		collider_ = std::make_unique<SphereCollider>(0.5f);
+//		collider_->SetCollisionAttribute(kCollisionAttributePlayer);
+//		collider_->SetCollisionMask(kCollisionAttributeEnemy | kCollisionAttributeTerrain);
+//
+//		// コールバック関数を登録
+//		collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
+//			this->OnCollision(result);
+//			});
+//	}
+//
+//	void Update() {
+//		position_ += velocity_;
+//
+//		// コライダーの位置を更新
+//		collider_->SetWorldPosition(position_);
+//	}
+//
+//	// 衝突時の処理
+//	void OnCollision(const CollisionResult& result) {
+//		// 押し戻し
+//		position_ += result.contactNormal * result.penetrationDepth;
+//		collider_->SetWorldPosition(position_);
+//	}
+//
+//	// コライダーを取得（CollisionManagerに登録するため）
+//	Collider* GetCollider() { return collider_.get(); }
+//	Vector3 GetPosition() const { return position_; }
+// 
+//private:
+//	Vector3 position_;
+//	Vector3 velocity_;
+//	std::unique_ptr<SphereCollider> collider_;
+//};
