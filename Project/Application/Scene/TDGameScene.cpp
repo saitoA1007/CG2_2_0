@@ -36,8 +36,13 @@ void TDGameScene::Initialize(SceneContext* context) {
 #pragma endregion
 
 	// 天球モデルを生成
-	skyDomeModel_ = context_->modelManager->GetNameByModel("SkyDome");;
+	skyDomeModel_ = context_->modelManager->GetNameByModel("SkyDome");
 	skyDomeWorldTransform_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}});
+
+	// 地面を生成
+	terrainModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
+	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
+	terrainWorldTransform_.Initialize({ {30.0f,30.0f,30.0f},{0.0f,0.0f,0.0f},{0.0f,-0.2f,0.0f} });
 
 	// ライトの生成
 	sceneLightingController_ = std::make_unique<SceneLightingController>();
@@ -99,6 +104,9 @@ void TDGameScene::Draw(const bool& isDebugView) {
 
 	// 天球の描画
 	ModelRenderer::Draw(skyDomeModel_, skyDomeWorldTransform_);
+
+	// 地面を描画
+	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_, grassGH_);
 
 	// プレイヤーを描画
 	uint32_t DefaultWhiteGH = 0;
