@@ -62,6 +62,10 @@ namespace GameEngine {
 		bool IsActive() const { return isActive_; }
 		void SetActive(const bool& isActive) { isActive_ = isActive; }
 
+		// ユーザーデータを設定
+		void SetUserData(const UserData& data) { userData_ = data; }
+		const UserData& GetUserData() const { return userData_; }
+
 	protected:
 		// 衝突属性(自分)
 		uint32_t collisionAttribute_ = 0xffffffff;
@@ -73,6 +77,8 @@ namespace GameEngine {
 		Vector3 worldPosition_ = { 0.0f, 0.0f, 0.0f };
 		// コールバック関数
 		std::function<void(const CollisionResult&)> onCollisionCallback_;
+		// ユーザーデータ
+		UserData userData_;
 	};
 
 	/// <summary>

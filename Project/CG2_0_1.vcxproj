@@ -354,6 +354,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Model\WorldTransforms.h" />
     <ClInclude Include="EngineSource\Audio\AudioManager.h" />
     <ClInclude Include="EngineSource\Collision\Collider.h" />
+    <ClInclude Include="EngineSource\Collision\ColliderData.h" />
     <ClInclude Include="EngineSource\Collision\CollisionConfig.h" />
     <ClInclude Include="EngineSource\Collision\CollisionManager.h" />
     <ClInclude Include="EngineSource\Collision\CollisionResult.h" />
