@@ -41,10 +41,10 @@ namespace GameEngine {
 		}
 
 		// 衝突時に呼ばれる関数
-		void OnCollision(const CollisionResult& collisionInfo) {
+		void OnCollision(const CollisionResult& result) {
 			// コールバックを実行する
 			if (onCollisionCallback_) {
-				onCollisionCallback_(collisionInfo);
+				onCollisionCallback_(result);
 			}
 		}
 
@@ -177,14 +177,16 @@ namespace GameEngine {
 //========================================
 // 使用例
 //========================================
+//#include<memory>
+//#include"CollisionConfig.h"
 //class Player {
 //public:
 //	Player() {
 //
 //		// コライダーを作成
-//		collider_ = std::make_unique<SphereCollider>(0.5f);
+//		collider_ = std::make_unique<SphereCollider>();
 //		collider_->SetCollisionAttribute(kCollisionAttributePlayer);
-//		collider_->SetCollisionMask(kCollisionAttributeEnemy | kCollisionAttributeTerrain);
+//		collider_->SetCollisionMask(~kCollisionAttributePlayer);
 //
 //		// コールバック関数を登録
 //		collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
