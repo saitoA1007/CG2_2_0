@@ -567,6 +567,7 @@
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\IPostEffect.h" />
     <ClInclude Include="Application\Scene\TDGameScene.h" />
     <ClInclude Include="Application\Light\SceneLightingController.h" />
+    <ClInclude Include="EngineSource\Collision\CollisionResult.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
