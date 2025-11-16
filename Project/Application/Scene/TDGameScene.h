@@ -89,4 +89,9 @@ private:
 	/// 入力のコマンドを設定する
 	/// </summary>
 	void InputRegisterCommand();
+
+	/// <summary>
+	/// 当たり判定の更新処理
+	/// </summary>
+	void UpdateCollision();
 };

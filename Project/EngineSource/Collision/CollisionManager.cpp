@@ -4,6 +4,11 @@ using namespace GameEngine;
 
 void CollisionManager::CheckAllCollisions() {
 
+	// 何も無ければ早期リターン
+	if (colliders_.empty()) {
+		return;
+	}
+
 	// リスト内のペアを総当たり
 	std::list<Collider*>::iterator itrA = colliders_.begin();
 	for (; itrA != colliders_.end(); ++itrA) {
