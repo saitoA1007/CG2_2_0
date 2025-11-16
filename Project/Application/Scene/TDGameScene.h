@@ -72,6 +72,11 @@ private: // シーン機能
 	GameEngine::Model* skyDomeModel_;
 	GameEngine::WorldTransform skyDomeWorldTransform_;
 
+	// 地面
+	GameEngine::Model* terrainModel_;
+	uint32_t grassGH_ = 0u;
+	GameEngine::WorldTransform terrainWorldTransform_;
+
 	// ライト
 	std::unique_ptr<SceneLightingController> sceneLightingController_;
 
