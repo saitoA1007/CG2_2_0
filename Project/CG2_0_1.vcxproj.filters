@@ -569,6 +569,7 @@
     <ClInclude Include="Application\Light\SceneLightingController.h" />
     <ClInclude Include="EngineSource\Collision\CollisionResult.h" />
     <ClInclude Include="EngineSource\Collision\ColliderData.h" />
+    <ClInclude Include="EngineSource\Collision\UserData.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
