@@ -151,10 +151,10 @@ void Engine::Update() {
 		PreUpdate();
 
 		// シーンの更新処理
-		if (isActiveUpdate_) {
-			if (!isPause_) {
-				sceneManager_->Update();
-			}
+		if (isActiveUpdate_ && !isPause_) {
+			sceneManager_->Update();
+		} else {
+			sceneManager_->DebugSceneUpdate();
 		}
 
 		// 更新後処理

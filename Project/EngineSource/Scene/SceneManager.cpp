@@ -90,6 +90,11 @@ void SceneManager::DebugUpdate() {
 	gridWorldTransform_.UpdateTransformMatrix();
 }
 
+void SceneManager::DebugSceneUpdate() {
+	//　停止中でも適応される処理
+	currentScene_->DebugUpdate();
+}
+
 void SceneManager::Draw() {
 	// デバック用のグリッドを描画
 #ifdef _DEBUG

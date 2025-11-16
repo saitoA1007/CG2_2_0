@@ -23,6 +23,11 @@ public:
 	void Update();
 
 	/// <summary>
+	/// デバック中でも動かせるようにするシーンの更新処理
+	/// </summary>
+	void DebugSceneUpdate();
+
+	/// <summary>
 	/// デバック時の更新処理
 	/// </summary>
 	void DebugUpdate();
