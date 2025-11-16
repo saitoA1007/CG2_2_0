@@ -8,7 +8,6 @@
 using namespace GameEngine;
 
 GameScene::~GameScene() {
-
 }
 
 void GameScene::Initialize(SceneContext* context) {
