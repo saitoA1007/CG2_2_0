@@ -66,6 +66,7 @@ Vector3 Camera::GetWorldPosition() const {
 }
 
 void Camera::SetCamera(const Camera& camera) {
+	transform_ = camera.transform_;
 	worldMatrix_ = camera.GetWorldMatrix();
 	VPMatrix_ = camera.GetVPMatrix();
 
