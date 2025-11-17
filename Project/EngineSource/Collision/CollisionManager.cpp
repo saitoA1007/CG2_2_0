@@ -44,20 +44,13 @@ void  CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collid
 	CollisionResult result = CheckCollisionType(typeA, typeB);
 
 	if (result.isHit) {
-		// ユーザー情報が存在していれば入れる
-		if (colliderB->GetUserData().IsActive()) {
-			result.userData = colliderB->GetUserData();
-		}
+		result.userData = colliderB->GetUserData();
 		// コライダーの衝突時コールバックを呼び出す
 		colliderA->OnCollision(result);
 		// 反対側の法線情報を渡す
 		CollisionResult resultB = result;
 		resultB.contactNormal = result.contactNormal * -1.0f;
-
-		// ユーザー情報があれば入れる
-		if (colliderA->GetUserData().IsActive()) {
-			resultB.userData = colliderA->GetUserData();
-		}
+		resultB.userData = colliderA->GetUserData();
 		colliderB->OnCollision(resultB);
 	}
 }
