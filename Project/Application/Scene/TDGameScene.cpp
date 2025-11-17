@@ -157,9 +157,10 @@ void TDGameScene::InputRegisterCommand() {
 
 void TDGameScene::UpdateCollision() {
 
-	// 壁の要素を取得する
-	const std::vector<std::unique_ptr<Wall>>& walls =  stageManager_->GetWalls();
-	for (auto& wall : walls) {
+	// 生存している壁の要素を取得する
+	const std::vector<Wall*> aliveWalls =  stageManager_->GetAliveWalls();
+	for (auto& wall : aliveWalls) {
+		// 当たり判定を追加
 		collisionManager_->AddCollider(wall->GetCollider());
 #ifdef _DEBUG
 		// デバック描画に追加

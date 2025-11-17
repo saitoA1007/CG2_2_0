@@ -28,10 +28,16 @@ public:
 	void DebugUpdate();
 
 	/// <summary>
-	/// 壁の要素を取得する
+	/// 壁の要素を取得
 	/// </summary>
 	/// <returns></returns>
 	std::vector<std::unique_ptr<Wall>>& GetWalls() { return walls_; }
+
+	/// <summary>
+	/// 生存している壁の要素を取得
+	/// </summary>
+	/// <returns></returns>
+	std::vector<Wall*>& GetAliveWalls() { return aliveWalls_; }
 
 private:
 
@@ -62,8 +68,11 @@ private:
 	bool isCreate_ = false;
 	bool created_ = false;
 
-	// 壁
+	// 生成する壁
 	std::vector<std::unique_ptr<Wall>> walls_;
+
+	// 生存状態の壁のデータ
+	std::vector<Wall*> aliveWalls_;
 
 private:
 

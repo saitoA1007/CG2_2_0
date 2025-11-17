@@ -58,13 +58,19 @@ public:
 	/// <returns></returns>
 	OBB GetOBBData();
 
+	/// <summary>
+	/// 生存フラグを取得する
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsAlive() const { return isAlive_; }
+
 private: // 固定値
 
 	// 復活までの時間
-	float respawnTime_ = 0.0f;
+	float respawnTime_ = 1.0f;
 
 	// 壁の耐久地
-	uint32_t maxHp_ = 0;
+	uint32_t maxHp_ = 1;
 
 private:
 	// ワールド行列
@@ -79,7 +85,7 @@ private:
 	float respawnTimer_ = 0.0f;
 
 	// 現在のhp
-	uint32_t currentHp_ = 0;
+	uint32_t currentHp_ = 1;
 
 	// 生存フラグ
 	bool isAlive_ = true;
