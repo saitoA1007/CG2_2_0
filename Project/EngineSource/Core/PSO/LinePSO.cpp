@@ -72,7 +72,7 @@ void LinePSO::Initialize(const std::wstring& vsPath, const std::wstring& psPath,
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	// 線には不要なのでNone
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-	rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 	// Zクリップを有効
 	rasterizerDesc.DepthClipEnable = TRUE;
 
