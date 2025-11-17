@@ -35,6 +35,18 @@ namespace GameEngine {
 		Vector3 GetWorldPosition() const { return worldPosition_; }
 		void SetWorldPosition(const Vector3& position) { worldPosition_ = position; }
 
+		// 触れた瞬間を取得するコールバック関数を登録する
+		void SetOnCollisionEnterCallback(std::function<void(const CollisionResult&)> callback) {
+			onCollisionEnterCallback_ = callback;
+		}
+
+		// 衝突開始時に呼ばれる関数
+		void OnCollisionEnter(const CollisionResult& result) {
+			if (onCollisionEnterCallback_) {
+				onCollisionEnterCallback_(result);
+			}
+		}
+
 		// コールバック関数を登録する
 		void SetOnCollisionCallback(std::function<void(const CollisionResult&)> callback) {
 			onCollisionCallback_ = callback;
@@ -75,7 +87,9 @@ namespace GameEngine {
 		bool isActive_ = true;
 		// ワールド座標
 		Vector3 worldPosition_ = { 0.0f, 0.0f, 0.0f };
-		// コールバック関数
+		// コールバック関数(触れた時)
+		std::function<void(const CollisionResult&)> onCollisionEnterCallback_;
+		// コールバック関数(触れている間)
 		std::function<void(const CollisionResult&)> onCollisionCallback_;
 		// ユーザーデータ
 		UserData userData_;

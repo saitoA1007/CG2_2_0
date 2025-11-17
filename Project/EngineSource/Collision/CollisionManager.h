@@ -1,10 +1,22 @@
 #pragma once
 #include<list>
+#include<unordered_set>
 
 #include"Collider.h"
 #include"CollisionResult.h"
 
 namespace GameEngine {
+
+	// ペアのハッシュ関数
+	struct PairHash {
+		std::size_t operator()(const std::pair<Collider*, Collider*>& p) const {
+			// ポインタのアドレスをハッシュ化
+			auto h1 = std::hash<Collider*>{}(p.first);
+			auto h2 = std::hash<Collider*>{}(p.second);
+			// 2つのハッシュ値を組み合わせる
+			return h1 ^ (h2 << 1);
+		}
+	};
 
 	class CollisionManager {
 	public:
@@ -28,6 +40,10 @@ namespace GameEngine {
 	private:
 		// コライダーリスト
 		std::list<Collider*> colliders_;
+
+		// 衝突ペアの履歴
+		std::unordered_set<std::pair<Collider*, Collider*>, PairHash> preCollisions_;
+		std::unordered_set<std::pair<Collider*, Collider*>, PairHash> currentCollisions_;
 
 	private:
 
@@ -53,5 +69,15 @@ namespace GameEngine {
 		/// <param name="typeB"></param>
 		/// <returns></returns>
 		CollisionResult CheckCollisionType(const CollisionType& typeA, const CollisionType& typeB);
+
+		/// <summary>
+		/// 衝突ペアを作成
+		/// </summary>
+		std::pair<Collider*, Collider*> MakeCollisionPair(Collider* a, Collider* b);
+
+		/// <summary>
+		/// 前フレームで衝突していたか確認
+		/// </summary>
+		bool WasCollidingLastFrame(Collider* a, Collider* b);
 	};
 }
