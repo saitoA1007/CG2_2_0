@@ -23,6 +23,12 @@ public:
 	/// <returns></returns>
 	GameEngine::Camera& GetCamera() const { return *camera_.get(); }
 
+	/// <summary>
+	/// vpMatrixを取得
+	/// </summary>
+	/// <returns></returns>
+	Matrix4x4 GetRotateMatrix() const { return rotateMatrix_; }
+
 private:
 
 	// カメラ
@@ -34,6 +40,9 @@ private:
 
 	// 回転の移動量
 	Vector2 rotateMove_ = { 3.1f,1.0f };
+
+	// 回転行列
+	Matrix4x4 rotateMatrix_;
 
 private:
 

@@ -66,17 +66,20 @@ void ALGameScene::Initialize(SceneContext* context) {
 
 void ALGameScene::Update() {
 
+	// 当たり判定のリストを削除
+	collisionManager_->ClearList();
 	// デバックリストを削除
 	debugRenderer_->Clear();
 
 	// ライトの更新処理
 	sceneLightingController_->Update();
 
-	// プレイヤーの更新処理
-	player_->Update(context_->inputCommand);
-
 	// カメラコントロールの更新処理
 	cameraController_->Update(context_->inputCommand, player_->GetPlayerPos());
+
+	// プレイヤーの更新処理
+	player_->SetRotateMatrix(cameraController_->GetRotateMatrix());
+	player_->Update(context_->inputCommand);
 
 	// カメラの更新処理
 	mainCamera_->SetCamera(cameraController_->GetCamera());
