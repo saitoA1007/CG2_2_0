@@ -12,6 +12,8 @@ namespace GameEngine {
 
 	class Camera {
 	public:
+		Camera() = default;
+		~Camera();
 
 		/// <summary>
 		/// 初期化

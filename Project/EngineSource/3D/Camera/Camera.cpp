@@ -4,6 +4,13 @@
 
 using namespace GameEngine;
 
+Camera::~Camera() {
+	if (cameraForGPU_) {
+		cameraResource_->Unmap(0, nullptr);
+		cameraForGPU_ = nullptr;
+	}
+}
+
 void Camera::Initialize(const Transform& transform, int kClientWidth, int kClientHeight, ID3D12Device* device) {
 	// Matrixの初期化
 	transform_ = transform;
