@@ -3,6 +3,13 @@
 #include"EngineSource/Math/MyMath.h"
 using namespace GameEngine;
 
+LightManager::~LightManager() {
+    if (lightGroupData_) {
+        lightGroupResource_->Unmap(0, nullptr);
+        lightGroupData_ = nullptr;
+    }
+}
+
 void LightManager::Initialize(ID3D12Device* device, const bool& isDirectionalActive, const bool& isPointActive, const bool& isSpotActive) {
     // 平行光源
     directionalLight_ = std::make_unique<DirectionalLight>();
