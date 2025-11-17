@@ -4,10 +4,19 @@
 
 #include"VertexData.h"
 
+//==================================================================
+// 
+// デバック用のグリッド生成システムだけここじゃない感強いので後で変更する。
+// それか削除してもいいかもしれない
+//
+//==================================================================
+
 namespace GameEngine {
 
 	class Mesh final {
 	public:
+		Mesh() = default;
+		~Mesh();
 
 		/// <summary>
 		/// 三角形の平面メッシュを作成
@@ -100,6 +109,9 @@ namespace GameEngine {
 
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 		D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
+
+		// メッシュデータ
+		VertexData* vertexData_ = nullptr;
 
 		uint32_t totalVertices_ = 0;
 		uint32_t totalIndices_ = 0;
