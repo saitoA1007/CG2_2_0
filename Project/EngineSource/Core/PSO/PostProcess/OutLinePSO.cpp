@@ -152,5 +152,6 @@ void OutLinePSO::Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPT
     commandList->SetGraphicsRootDescriptorTable(0, inputSRV);
     commandList->SetGraphicsRootConstantBufferView(1, parameterResource_->GetGPUVirtualAddress());
     commandList->SetGraphicsRootDescriptorTable(2, depthSRV);
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     commandList->DrawInstanced(3, 1, 0, 0);
 }

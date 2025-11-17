@@ -121,13 +121,13 @@ void DebugRenderer::AddBox(const OBB& obb, const Vector4& color) {
     corners[5] = {
         obb.center.x + scaledX.x - scaledY.x + scaledZ.x,
         obb.center.y + scaledX.y - scaledY.y + scaledZ.y,
-        obb.center.z + scaledX.z - scaledY.y + scaledZ.z
+        obb.center.z + scaledX.z - scaledY.z + scaledZ.z
     };
     // v6(-x, +y, +z)
     corners[6] = {
         obb.center.x - scaledX.x + scaledY.x + scaledZ.x,
         obb.center.y - scaledX.y + scaledY.y + scaledZ.y,
-        obb.center.z - scaledX.z + scaledY.y + scaledZ.z
+        obb.center.z - scaledX.z + scaledY.z + scaledZ.z
     };
     // v7(+x, +y, +z)
     corners[7] = {
