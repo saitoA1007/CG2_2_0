@@ -29,6 +29,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	collisionManager_ = std::make_unique<CollisionManager>();
 	collisionManager_->ClearList();
 
+
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
