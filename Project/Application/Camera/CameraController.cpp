@@ -29,7 +29,7 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand, const Vect
 	position_.z = target.z + kDistance_ * std::sinf(rotateMove_.y) * std::cosf(rotateMove_.x);
 
 	// 回転行列に変換
-	Matrix4x4 rotateMatrix_ = LookAt(position_, target, { 0.0f,1.0f,0.0f });
+	rotateMatrix_ = LookAt(position_, target, { 0.0f,1.0f,0.0f });
 
 	// ワールド行列
 	Matrix4x4 worldMatrix_ = rotateMatrix_;

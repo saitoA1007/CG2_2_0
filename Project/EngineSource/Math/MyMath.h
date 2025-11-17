@@ -53,6 +53,9 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2);
 // ベクトル変換
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
+// 最短角度補間
+float LerpShortAngle(float a, float b, float t);
+
 // ワールドスクリーン座標変換(ワールド->スクリーン変換)
 Vector3 Project(const Vector3 & worldPosition, const Vector2 & viewport, const float& viewportWidth, const float& viewportHeight, const Matrix4x4 & viewProjection);
 

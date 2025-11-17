@@ -12,16 +12,10 @@ void Player::Initialize() {
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
 
 #ifdef _DEBUG
-	//===========================================================
-	// 
-	// 現在、saveを押していないので、Playerのjsonファイルは存在していません
-	// 
-	//===========================================================
-
 	// 値を登録する
 	RegisterBebugParam();
+	ApplyDebugParam();
 #else
-	// jsonファイルが作られていない状態で値の適応をおこなうとリリース版でバクります
 	// 値を適応させる
 	ApplyDebugParam();
 #endif
@@ -33,37 +27,47 @@ void Player::Update(GameEngine::InputCommand* inputCommand) {
 	ApplyDebugParam();
 #endif
 
+	// プレイヤー情報
+	playerInfo playerInfo;
+
 	// プレイヤーの入力処理
-	ProcessMoveInput(inputCommand);
+	ProcessMoveInput(inputCommand, playerInfo);
+
+	// 移動処理
+	Move(playerInfo);
 
 	// プレイヤーのジャンプ処理
 	JumpUpdate();
 
 	// プレイヤーを移動範囲に制限
-	worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x,-9.0f,9.0f);
-	worldTransform_.transform_.translate.z = std::clamp(worldTransform_.transform_.translate.z, -9.0f, 9.0f);
+	//worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x,-9.0f,9.0f);
+	//worldTransform_.transform_.translate.z = std::clamp(worldTransform_.transform_.translate.z, -9.0f, 9.0f);
 
 	// 行列の更新
 	worldTransform_.UpdateTransformMatrix();
 }
 
-void Player::ProcessMoveInput(GameEngine::InputCommand* inputCommand) {
+void Player::ProcessMoveInput(GameEngine::InputCommand* inputCommand, playerInfo& playerInfo) {
 
 	// プレイヤーの移動操作
 	if (inputCommand->IsCommandAcitve("MoveUp")) {
-		worldTransform_.transform_.translate.z += kMoveSpeed_;
+		playerInfo.move.z = 1.0f;
+		playerInfo.isMove = true;
 	}
 
 	if (inputCommand->IsCommandAcitve("MoveDown")) {
-		worldTransform_.transform_.translate.z -= kMoveSpeed_;
+		playerInfo.move.z = -1.0f;
+		playerInfo.isMove = true;
 	}
 
 	if (inputCommand->IsCommandAcitve("MoveLeft")) {
-		worldTransform_.transform_.translate.x -= kMoveSpeed_;
+		playerInfo.move.x = -1.0f;
+		playerInfo.isMove = true;
 	}
 
 	if (inputCommand->IsCommandAcitve("MoveRight")) {
-		worldTransform_.transform_.translate.x += kMoveSpeed_;
+		playerInfo.move.x = 1.0f;
+		playerInfo.isMove = true;
 	}
 
 	// ジャンプ操作
@@ -71,6 +75,35 @@ void Player::ProcessMoveInput(GameEngine::InputCommand* inputCommand) {
 		if (isJump_) { return; }
 		isJump_ = true;
 		jumpTimer_ = 0.0f;
+	}
+}
+
+void Player::Move(playerInfo& playerInfo) {
+	// 移動
+	if (playerInfo.isMove) {
+		// 正規化する
+		playerInfo.move = Normalize(playerInfo.move);
+		playerInfo.move = TransformNormal(playerInfo.move, rotateMatrix_);
+		playerInfo.move.y = 0.0f;
+		playerInfo.move = Normalize(playerInfo.move);
+		// 移動する
+		worldTransform_.transform_.translate += playerInfo.move * kMoveSpeed_ * FpsCounter::deltaTime;
+
+		// 角度を設定する
+		float tmpRotateY = std::atan2f(playerInfo.move.x, playerInfo.move.z);
+
+		// 角度が変化していれば更新
+		if (tmpRotateY != targetRotateY_) {
+			targetRotateY_ = tmpRotateY;
+			turnTimer_ = 0.0f;
+		}
+	}
+
+	// 旋回処理
+	if (turnTimer_ < 1.0f) {
+		turnTimer_ += FpsCounter::deltaTime / kTurnTime_;
+		// Y軸周りの角度
+		worldTransform_.transform_.rotate.y = LerpShortAngle(worldTransform_.transform_.rotate.y, targetRotateY_, turnTimer_);
 	}
 }
 
@@ -102,6 +135,7 @@ void Player::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxHeight", kJumpHeight_);
 	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxTime", kJumpMaxTime_);
 	GameParamEditor::GetInstance()->AddItem("Player", "MoveSpeed", kMoveSpeed_);
+	GameParamEditor::GetInstance()->AddItem("Player", "TurnTime", kTurnTime_);
 }
 
 void Player::ApplyDebugParam() {
@@ -109,4 +143,5 @@ void Player::ApplyDebugParam() {
 	kJumpHeight_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "JumpMaxHeight");
 	kJumpMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "JumpMaxTime");
 	kMoveSpeed_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "MoveSpeed");
+	kTurnTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "TurnTime");
 }
