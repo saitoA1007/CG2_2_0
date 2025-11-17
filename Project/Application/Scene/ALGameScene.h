@@ -13,6 +13,7 @@
 #include"Application/Player/Player.h"
 #include"Application/Camera/CameraController.h"
 #include"Application/Light/SceneLightingController.h"
+#include"Application/Enemy/BossEnemy.h"
 
 class ALGameScene : public BaseScene {
 public:
@@ -87,6 +88,11 @@ private: // シーン機能
 
 	// カメラコントローラークラス
 	std::unique_ptr<CameraController> cameraController_;
+
+	// ボスキャラのモデル
+	GameEngine::Model* bossEnemyModel_;
+	// ボス敵キャラのモデル
+	std::unique_ptr<BossEnemy> bossEnemy_;
 
 private:
 

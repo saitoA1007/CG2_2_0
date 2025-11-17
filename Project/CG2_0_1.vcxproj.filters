@@ -289,6 +289,7 @@
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
     <ClCompile Include="Application\Scene\ALGameScene.cpp" />
     <ClCompile Include="Application\Scene\ResultScene.cpp" />
+    <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -572,6 +573,7 @@
     <ClInclude Include="EngineSource\Collision\UserData.h" />
     <ClInclude Include="Application\Scene\ALGameScene.h" />
     <ClInclude Include="Application\Scene\ResultScene.h" />
+    <ClInclude Include="Application\Enemy\BossEnemy.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
