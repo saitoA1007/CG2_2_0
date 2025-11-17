@@ -12,6 +12,8 @@ namespace GameEngine {
 
 	class DebugCamera {
 	public:
+		DebugCamera() = default;
+		~DebugCamera();
 
 		/// <summary>
 		/// 初期化

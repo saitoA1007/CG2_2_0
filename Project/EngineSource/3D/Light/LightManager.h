@@ -19,7 +19,7 @@ namespace GameEngine {
 
     public:
         LightManager() = default;
-        ~LightManager() = default;
+        ~LightManager();
 
         /// <summary>
         /// 初期化

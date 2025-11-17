@@ -5,6 +5,13 @@
 
 using namespace GameEngine;
 
+DebugCamera::~DebugCamera() {
+	if (cameraForGPU_) {
+		cameraResource_->Unmap(0, nullptr);
+		cameraForGPU_ = nullptr;
+	}
+}
+
 void DebugCamera::Initialize(const Vector3& translate,int width, int height, ID3D12Device* device) {
 	translate_ = translate;
 	viewMatrix_ = InverseMatrix(MakeAffineMatrix(scale_, rotate_, translate_));
