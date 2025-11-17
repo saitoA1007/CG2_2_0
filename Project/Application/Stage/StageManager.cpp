@@ -23,6 +23,10 @@ void StageManager::Initialize() {
 
 void StageManager::Update() {
 
+	// 更新処理
+	for (auto& wall : walls_) {
+		wall->Update();
+	}
 }
 
 void StageManager::Draw(GameEngine::Model* wallModel) {

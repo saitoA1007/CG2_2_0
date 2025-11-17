@@ -1,5 +1,6 @@
 #pragma once
 #include"WorldTransform.h"
+#include"Collider.h"
 
 // 壁の状態
 enum class WallState {
@@ -24,11 +25,31 @@ public:
 	/// </summary>
 	void Update();
 
+public:
+
 	/// <summary>
 	/// ワールド行列を取得
 	/// </summary>
 	/// <returns></returns>
 	GameEngine::WorldTransform& GetWorldTransform() { return worldTransform_; }
+
+	/// <summary>
+	/// 当たり判定を取得
+	/// </summary>
+	/// <returns></returns>
+	GameEngine::Collider* GetCollider() { return collider_.get(); }
+
+	/// <summary>
+	/// 現在の壁の状態を取得
+	/// </summary>
+	/// <returns></returns>
+	WallState GetWallState() const { return wallState_; }
+
+	/// <summary>
+	/// OBBのデータを取得
+	/// </summary>
+	/// <returns></returns>
+	OBB GetOBBData();
 
 private: // 固定値
 
@@ -53,4 +74,15 @@ private:
 
 	// 生存フラグ
 	bool isAlive_ = true;
+
+	// obbの当たり判定
+	std::unique_ptr<GameEngine::OBBCollider> collider_;
+
+private:
+
+	/// <summary>
+	/// 当たり判定
+	/// </summary>
+	void OnCollision([[maybe_unused]] const GameEngine::CollisionResult& result);
+
 };
