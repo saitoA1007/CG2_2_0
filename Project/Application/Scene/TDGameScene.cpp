@@ -74,6 +74,9 @@ void TDGameScene::Update() {
 	// デバックリストを削除
 	debugRenderer_->Clear();
 
+	// 当たり判定をリセット
+	collisionManager_->ClearList();
+
 	// ライトの更新処理
 	sceneLightingController_->Update();
 
@@ -125,9 +128,7 @@ void TDGameScene::Draw(const bool& isDebugView) {
 #ifdef _DEBUG
 
 	// デバック描画
-	if (isDebugView) {
-		debugRenderer_->DrawAll(isDebugView ? context_->debugCamera_->GetVPMatrix() : mainCamera_->GetVPMatrix());
-	}
+	debugRenderer_->DrawAll(isDebugView ? context_->debugCamera_->GetVPMatrix() : mainCamera_->GetVPMatrix());
 #endif
 
 	//========================================================================
@@ -158,10 +159,12 @@ void TDGameScene::UpdateCollision() {
 
 	// 壁の要素を取得する
 	const std::vector<std::unique_ptr<Wall>>& walls =  stageManager_->GetWalls();
-
 	for (auto& wall : walls) {
 		collisionManager_->AddCollider(wall->GetCollider());
-		//debugRenderer_->AddBox(wall->GetOBBData());
+#ifdef _DEBUG
+		// デバック描画に追加
+		debugRenderer_->AddBox(wall->GetOBBData());
+#endif
 	}
 
 	// 衝突判定
@@ -174,5 +177,10 @@ void TDGameScene::DebugUpdate() {
 	// ステージ作成のデバック用
 	stageManager_->DebugUpdate();
 
+	// 当たり判定の表示管理
+	ImGui::Begin("DebugCollision");
+	ImGui::Checkbox("IsDrawCollision", &isDrawCollision_);
+	debugRenderer_->SetEnabled(isDrawCollision_);
+	ImGui::End();
 #endif
 }

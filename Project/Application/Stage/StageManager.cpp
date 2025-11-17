@@ -33,7 +33,7 @@ void StageManager::Draw(GameEngine::Model* wallModel) {
 
 	// 壁を描画
 	for (auto& wall : walls_) {
-		ModelRenderer::Draw(wallModel, wall->GetWorldTransform());
+		ModelRenderer::Draw(wallModel, wall->GetWorldTransform(),&wall->GetMaterial());
 	}
 }
 
