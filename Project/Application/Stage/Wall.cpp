@@ -17,7 +17,7 @@ void Wall::Initialilze(const Transform& transform, float respawnTime, uint32_t m
 	worldTransform_.Initialize(transform);
 
 	// マテリアルを初期化
-	material_.Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 250.0f, false);
+	material_.Initialize({ 0.8f,0.8f,0.8f,1.0f }, { 1.0f,1.0f,1.0f }, 250.0f, false);
 
 	// 壁のデータを入れる
 	/*UserData userData;
@@ -80,11 +80,11 @@ void Wall::ChangeWallState() {
 	switch (wallState_)
 	{
 	case WallState::Normal:
-		material_.SetColor({ 1.0f,1.0f,1.0f,1.0f });
+		material_.SetColor({ 0.8f,0.8f,0.8f,1.0f });
 		break;
 
 	case WallState::Strengthen:
-		material_.SetColor({ 1.0f,1.0f,0.0f,1.0f });
+		material_.SetColor({ 0.7f,0.7f,0.0f,1.0f });
 		break;
 
 	case WallState::None:
