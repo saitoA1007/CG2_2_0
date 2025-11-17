@@ -6,6 +6,14 @@
 
 using namespace GameEngine;
 
+Mesh::~Mesh() {
+	// マッピングを解除する
+	if (vertexData_) {
+		vertexResource_->Unmap(0, nullptr);
+		vertexData_ = nullptr;
+	}
+}
+
 void Mesh::CreateTrianglePlaneMesh(ID3D12Device* device) {
 	// 頂点数とインデックス数を計算
 	totalVertices_ = 3;
@@ -22,25 +30,23 @@ void Mesh::CreateTrianglePlaneMesh(ID3D12Device* device) {
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 	// 頂点データを生成
-	// 頂点リソースにデータを書き込む
-	VertexData* vertexData = nullptr;
 	// 書き込むためのアドレスを取得
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	// 左下
-	vertexData[0].position = { -0.5f,-0.5f,0.0f,1.0f };
-	vertexData[0].position.w = 1.0f;
-	vertexData[0].texcoord = { 0.0f,1.0f };
-	vertexData[0].normal = { vertexData[0].position.x, vertexData[0].position.y, vertexData[0].position.z };
+	vertexData_[0].position = { -0.5f,-0.5f,0.0f,1.0f };
+	vertexData_[0].position.w = 1.0f;
+	vertexData_[0].texcoord = { 0.0f,1.0f };
+	vertexData_[0].normal = { vertexData_[0].position.x, vertexData_[0].position.y, vertexData_[0].position.z };
 	// 上
-	vertexData[1].position = { 0.0f,0.5f,0.0f,1.0f };
-	vertexData[1].position.w = 1.0f;
-	vertexData[1].texcoord = { 0.5f,0.0f };
-	vertexData[1].normal = { vertexData[1].position.x, vertexData[1].position.y, vertexData[1].position.z };
+	vertexData_[1].position = { 0.0f,0.5f,0.0f,1.0f };
+	vertexData_[1].position.w = 1.0f;
+	vertexData_[1].texcoord = { 0.5f,0.0f };
+	vertexData_[1].normal = { vertexData_[1].position.x, vertexData_[1].position.y, vertexData_[1].position.z };
 	// 右下
-	vertexData[2].position = { 0.5f,-0.5f,0.0f,1.0f };
-	vertexData[2].position.w = 1.0f;
-	vertexData[2].texcoord = { 1.0f,1.0f };
-	vertexData[2].normal = { vertexData[2].position.x, vertexData[2].position.y, vertexData[2].position.z };
+	vertexData_[2].position = { 0.5f,-0.5f,0.0f,1.0f };
+	vertexData_[2].position.w = 1.0f;
+	vertexData_[2].texcoord = { 1.0f,1.0f };
+	vertexData_[2].normal = { vertexData_[2].position.x, vertexData_[2].position.y, vertexData_[2].position.z };
 }
 
 void Mesh::CreateGridPlaneMesh(ID3D12Device* device, const Vector2& size) {
@@ -78,6 +84,10 @@ void Mesh::CreateGridPlaneMesh(ID3D12Device* device, const Vector2& size) {
 	// 右下
 	vertexData[3].position = { right,0.0f,bottom,1.0f }; // 左上
 
+	// UnMapする
+	vertexResource_->Unmap(0, nullptr);
+	vertexData = nullptr;
+
 	// インデックスバッファを作成
 	// 球用の頂点インデックスのリソースを作る
 	indexResource_ = CreateBufferResource(device, sizeof(uint32_t) * totalIndices_);
@@ -96,6 +106,10 @@ void Mesh::CreateGridPlaneMesh(ID3D12Device* device, const Vector2& size) {
 	indexData[0] = 0;  indexData[1] = 1;  indexData[2] = 2;
 	// 三角形2
 	indexData[3] = 1;  indexData[4] = 3;  indexData[5] = 2;
+
+	// UnMapする
+	indexResource_->Unmap(0, nullptr);
+	indexData = nullptr;
 }
 
 void Mesh::CreatePlaneMesh(ID3D12Device* device, const Vector2& size) {
@@ -114,10 +128,8 @@ void Mesh::CreatePlaneMesh(ID3D12Device* device, const Vector2& size) {
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 	// 頂点データを生成
-	// 頂点リソースにデータを書き込む
-	VertexData* vertexData = nullptr;
 	// 書き込むためのアドレスを取得
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
 	float left = -size.x / 2.0f;
 	float right = size.x / 2.0f;
@@ -125,21 +137,21 @@ void Mesh::CreatePlaneMesh(ID3D12Device* device, const Vector2& size) {
 	float bottom = -size.y / 2.0f;
 
 	// 左上
-	vertexData[0].position = { left,top,0.0f,1.0f };
-	vertexData[0].texcoord = { 0.0f,0.0f };
-	vertexData[0].normal = { 0.0f,0.0f,-1.0f };
+	vertexData_[0].position = { left,top,0.0f,1.0f };
+	vertexData_[0].texcoord = { 0.0f,0.0f };
+	vertexData_[0].normal = { 0.0f,0.0f,-1.0f };
 	// 右上
-	vertexData[1].position = { right,top,0.0f,1.0f };
-	vertexData[1].texcoord = { 0.0f,0.0f };
-	vertexData[1].normal = { 0.0f,0.0f,-1.0f };
+	vertexData_[1].position = { right,top,0.0f,1.0f };
+	vertexData_[1].texcoord = { 0.0f,0.0f };
+	vertexData_[1].normal = { 0.0f,0.0f,-1.0f };
 	// 左下
-	vertexData[2].position = { left,bottom,0.0f,1.0f };
-	vertexData[2].texcoord = { 0.0f,0.0f };
-	vertexData[2].normal = { 0.0f,0.0f,-1.0f };
+	vertexData_[2].position = { left,bottom,0.0f,1.0f };
+	vertexData_[2].texcoord = { 0.0f,0.0f };
+	vertexData_[2].normal = { 0.0f,0.0f,-1.0f };
 	// 右下
-	vertexData[3].position = { right,bottom,0.0f,1.0f };
-	vertexData[3].texcoord = { 0.0f,0.0f };
-	vertexData[3].normal = { 0.0f,0.0f,-1.0f };
+	vertexData_[3].position = { right,bottom,0.0f,1.0f };
+	vertexData_[3].texcoord = { 0.0f,0.0f };
+	vertexData_[3].normal = { 0.0f,0.0f,-1.0f };
 
 	// インデックスバッファを作成
 	// 球用の頂点インデックスのリソースを作る
@@ -159,6 +171,10 @@ void Mesh::CreatePlaneMesh(ID3D12Device* device, const Vector2& size) {
 	indexData[0] = 0;  indexData[1] = 1;  indexData[2] = 2;
 	// 三角形2
 	indexData[3] = 1;  indexData[4] = 3;  indexData[5] = 2;
+
+	// UnMapする
+	indexResource_->Unmap(0, nullptr);
+	indexData = nullptr;
 }
 
 void Mesh::CreateSphereMesh(ID3D12Device* device, uint32_t subdivision) {
@@ -177,10 +193,8 @@ void Mesh::CreateSphereMesh(ID3D12Device* device, uint32_t subdivision) {
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 	// 頂点データを生成
-	// 頂点リソースにデータを書き込む
-	VertexData* vertexData = nullptr;
 	// 書き込むためのアドレスを取得
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	// 緯度分割1つ分の角度
 	const float kLatEvery = std::numbers::pi_v<float> / static_cast<float>(subdivision);
 	// 経度分割1つ分の角度
@@ -193,12 +207,12 @@ void Mesh::CreateSphereMesh(ID3D12Device* device, uint32_t subdivision) {
 			float u = static_cast<float>(lonIndex) / static_cast<float>(subdivision);
 			uint32_t start = latIndex * (subdivision + 1) + lonIndex;
 
-			vertexData[start].position.x = cos(lat) * cos(lon);
-			vertexData[start].position.y = sin(lat);
-			vertexData[start].position.z = cos(lat) * sin(lon);
-			vertexData[start].position.w = 1.0f;
-			vertexData[start].texcoord = { u, v };
-			vertexData[start].normal = { vertexData[start].position.x, vertexData[start].position.y, vertexData[start].position.z };
+			vertexData_[start].position.x = cos(lat) * cos(lon);
+			vertexData_[start].position.y = sin(lat);
+			vertexData_[start].position.z = cos(lat) * sin(lon);
+			vertexData_[start].position.w = 1.0f;
+			vertexData_[start].texcoord = { u, v };
+			vertexData_[start].normal = { vertexData_[start].position.x, vertexData_[start].position.y, vertexData_[start].position.z };
 		}
 	}
 
@@ -241,6 +255,10 @@ void Mesh::CreateSphereMesh(ID3D12Device* device, uint32_t subdivision) {
 			index++;
 		}
 	}
+
+	// UnMapする
+	indexResource_->Unmap(0, nullptr);
+	indexData = nullptr;
 }
 
 void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData, const uint32_t& index) {
@@ -263,9 +281,8 @@ void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData, const uint3
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);// 1頂点あたりのサイズ
 
 	// 頂点リソースにデータを書き込む
-	VertexData* vertexData = nullptr;
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));// 書き込むためのアドレスを取得
-	std::memcpy(vertexData, modelData.meshes[index].vertices.data(), sizeof(VertexData) * modelData.meshes[index].vertices.size());// 頂点データをリソースにコピー
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));// 書き込むためのアドレスを取得
+	std::memcpy(vertexData_, modelData.meshes[index].vertices.data(), sizeof(VertexData) * modelData.meshes[index].vertices.size());// 頂点データをリソースにコピー
 
 	// インデックスバッファを作成
 	// 球用の頂点インデックスのリソースを作る
@@ -282,6 +299,10 @@ void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData, const uint3
 	uint32_t* indexData = nullptr;
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 	std::memcpy(indexData, modelData.meshes[index].indices.data(), sizeof(uint32_t) * modelData.meshes[index].indices.size());
+
+	// UnMapする
+	indexResource_->Unmap(0, nullptr);
+	indexData = nullptr;
 }
 
 void Mesh::CreateRingMesh(ID3D12Device* device,const uint32_t& subdivision,const float& outerRadius,const float& innerRadius) {
@@ -291,19 +312,17 @@ void Mesh::CreateRingMesh(ID3D12Device* device,const uint32_t& subdivision,const
 
 	// 頂点バッファを作成
 	// vertexResourceを作成
-	vertexResource_ = CreateBufferResource(device, sizeof(GridVertexData) * totalVertices_);
+	vertexResource_ = CreateBufferResource(device, sizeof(VertexData) * totalVertices_);
 	// リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズは頂点3つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(GridVertexData) * totalVertices_;
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * totalVertices_;
 	// 1頂点あたりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(GridVertexData);
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 	// 頂点データを生成
-	// 頂点リソースにデータを書き込む
-	VertexData* vertexData = nullptr;
 	// 書き込むためのアドレスを取得
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
 	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / static_cast<float>(subdivision);
 
@@ -314,13 +333,13 @@ void Mesh::CreateRingMesh(ID3D12Device* device,const uint32_t& subdivision,const
 		float u = static_cast<float>(index) / static_cast<float>(subdivision);
 
 		 // 外周の頂点
-		vertexData[index * 2 + 0].position = { cos * outerRadius, 0.0f, sin * outerRadius };
-		vertexData[index * 2 + 0].texcoord = { u, 0.0f };
-		vertexData[index * 2 + 0].normal = {0.0f,0.0f,1.0f};
+		vertexData_[index * 2 + 0].position = { cos * outerRadius, 0.0f, sin * outerRadius };
+		vertexData_[index * 2 + 0].texcoord = { u, 0.0f };
+		vertexData_[index * 2 + 0].normal = {0.0f,0.0f,1.0f};
 		// 内周の頂点
-		vertexData[index * 2 + 1].position = { cos * innerRadius, 0.0f, sin * innerRadius };
-		vertexData[index * 2 + 1].texcoord = { u, 1.0f };
-		vertexData[index * 2 + 1].normal = { 0.0f,0.0f,1.0f };
+		vertexData_[index * 2 + 1].position = { cos * innerRadius, 0.0f, sin * innerRadius };
+		vertexData_[index * 2 + 1].texcoord = { u, 1.0f };
+		vertexData_[index * 2 + 1].normal = { 0.0f,0.0f,1.0f };
 	}
 
 	// インデックスバッファを作成
@@ -353,6 +372,10 @@ void Mesh::CreateRingMesh(ID3D12Device* device,const uint32_t& subdivision,const
 		indexData[index * 6 + 4] = p1;
 		indexData[index * 6 + 5] = p3;
 	}
+
+	// UnMapする
+	indexResource_->Unmap(0, nullptr);
+	indexData = nullptr;
 }
 
 void Mesh::CreateCylinderMesh(ID3D12Device* device, const uint32_t& subdivision, const float& topRadius, const float& bottomRadius, const float& height) {
@@ -362,19 +385,17 @@ void Mesh::CreateCylinderMesh(ID3D12Device* device, const uint32_t& subdivision,
 
 	// 頂点バッファを作成
 	// vertexResourceを作成
-	vertexResource_ = CreateBufferResource(device, sizeof(GridVertexData) * totalVertices_);
+	vertexResource_ = CreateBufferResource(device, sizeof(VertexData) * totalVertices_);
 	// リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズは頂点3つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(GridVertexData) * totalVertices_;
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * totalVertices_;
 	// 1頂点あたりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(GridVertexData);
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 	// 頂点データを生成
-	// 頂点リソースにデータを書き込む
-	VertexData* vertexData = nullptr;
 	// 書き込むためのアドレスを取得
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
 	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / static_cast<float>(subdivision);
 	const float halfHeight = height * 0.5f;
@@ -386,13 +407,13 @@ void Mesh::CreateCylinderMesh(ID3D12Device* device, const uint32_t& subdivision,
 		float u = static_cast<float>(index) / static_cast<float>(subdivision);
 
 		// 上面の頂点
-		vertexData[index * 2 + 0].position = { cos * topRadius, +halfHeight, sin * topRadius };
-		vertexData[index * 2 + 0].texcoord = { u, 0.0f };
-		vertexData[index * 2 + 0].normal = {cos,0.0f,sin};
+		vertexData_[index * 2 + 0].position = { cos * topRadius, +halfHeight, sin * topRadius };
+		vertexData_[index * 2 + 0].texcoord = { u, 0.0f };
+		vertexData_[index * 2 + 0].normal = {cos,0.0f,sin};
 		// 下面の頂点
-		vertexData[index * 2 + 1].position = { cos * bottomRadius, -halfHeight, sin * bottomRadius };
-		vertexData[index * 2 + 1].texcoord = { u, 1.0f };
-		vertexData[index * 2 + 1].normal = {cos,0.0f,sin};
+		vertexData_[index * 2 + 1].position = { cos * bottomRadius, -halfHeight, sin * bottomRadius };
+		vertexData_[index * 2 + 1].texcoord = { u, 1.0f };
+		vertexData_[index * 2 + 1].normal = {cos,0.0f,sin};
 	}
 
 	// インデックスバッファを作成
@@ -425,4 +446,8 @@ void Mesh::CreateCylinderMesh(ID3D12Device* device, const uint32_t& subdivision,
 		indexData[index * 6 + 4] = p1;
 		indexData[index * 6 + 5] = p3;
 	}
+
+	// UnMapする
+	indexResource_->Unmap(0, nullptr);
+	indexData = nullptr;
 }

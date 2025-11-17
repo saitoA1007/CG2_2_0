@@ -21,6 +21,8 @@ namespace GameEngine {
 		};
 
 	public:
+		Material() = default;
+		~Material();
 
 		/// <summary>
 		/// 静的初期化

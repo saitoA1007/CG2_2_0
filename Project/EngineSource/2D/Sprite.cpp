@@ -6,6 +6,19 @@ using namespace GameEngine;
 ID3D12Device* Sprite::device_ = nullptr;
 Matrix4x4 Sprite::orthoMatrix_;
 
+Sprite::~Sprite() {
+	// マッピングを解除する
+	if (vertexData_) {
+		vertexResource_->Unmap(0, nullptr);
+		vertexData_ = nullptr;
+	}
+
+	if (constBufferData_) {
+		constBufferResource_->Unmap(0, nullptr);
+		constBufferData_ = nullptr;
+	}
+}
+
 void Sprite::StaticInitialize(ID3D12Device* device, int32_t width, int32_t height) {
 	device_ = device;
 	orthoMatrix_ = Multiply(MakeIdentity4x4(), MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 100.0f));
@@ -140,6 +153,10 @@ void Sprite::CreateMesh() {
 	indexDataSprite[0] = 0;  indexDataSprite[1] = 1;  indexDataSprite[2] = 2;
 	// 三角形2
 	indexDataSprite[3] = 1;  indexDataSprite[4] = 3;  indexDataSprite[5] = 2;
+
+	// マッピングを解除する
+	indexResource_->Unmap(0, nullptr);
+	indexDataSprite = nullptr;
 }
 
 void Sprite::CreateConstBufferData(const Vector4& color) {
