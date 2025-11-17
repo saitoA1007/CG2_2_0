@@ -178,6 +178,17 @@ void TDGameScene::DebugUpdate() {
 	// ステージ作成のデバック用
 	stageManager_->DebugUpdate();
 
+	// デバックリストを削除
+	debugRenderer_->Clear();
+	// 生存している壁の要素を取得する
+	const std::vector<Wall*> aliveWalls = stageManager_->GetAliveWalls();
+	for (auto& wall : aliveWalls) {
+#ifdef _DEBUG
+		// デバック描画に追加
+		debugRenderer_->AddBox(wall->GetOBBData());
+#endif
+	}
+
 	// 当たり判定の表示管理
 	ImGui::Begin("DebugCollision");
 	ImGui::Checkbox("IsDrawCollision", &isDrawCollision_);
