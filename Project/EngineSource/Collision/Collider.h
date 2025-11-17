@@ -5,7 +5,7 @@
 #include<variant>
 #include <functional>
 #include"CollisionResult.h"
-
+#include"MyMath.h"
 namespace GameEngine {
 
 	// 当たり判定の形状
@@ -167,6 +167,14 @@ namespace GameEngine {
 		// 座標軸
 		void SetOrientations(Vector3 orientations[3]) { std::memcpy(orientations_, orientations, sizeof(Vector3) * 3); }
 		const Vector3* GetOrientations() const { return orientations_; }
+
+		// オイラー角から座標軸を取得する
+		void UpdateOrientationsFromRotate(const Vector3& rotate) {
+			Matrix4x4 rotationMatrix = Multiply(MakeRotateXMatrix(rotate.x), Multiply(MakeRotateYMatrix(rotate.y), MakeRotateZMatrix(rotate.z)));
+			orientations_[0] = { rotationMatrix.m[0][0], rotationMatrix.m[0][1], rotationMatrix.m[0][2] };
+			orientations_[1] = { rotationMatrix.m[1][0], rotationMatrix.m[1][1], rotationMatrix.m[1][2] };
+			orientations_[2] = { rotationMatrix.m[2][0], rotationMatrix.m[2][1], rotationMatrix.m[2][2] };
+		}
 
 		// サイズ
 		void SetSize(const Vector3& size) { size_ = size; }

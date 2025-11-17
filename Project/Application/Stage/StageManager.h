@@ -27,6 +27,12 @@ public:
 	/// </summary>
 	void DebugUpdate();
 
+	/// <summary>
+	/// 壁の要素を取得する
+	/// </summary>
+	/// <returns></returns>
+	std::vector<std::unique_ptr<Wall>>& GetWalls() { return walls_; }
+
 private:
 
 	// 生成位置

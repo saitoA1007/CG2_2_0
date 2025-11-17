@@ -574,6 +574,7 @@
     <ClInclude Include="EngineSource\Collision\UserData.h" />
     <ClInclude Include="Application\Stage\Wall.h" />
     <ClInclude Include="Application\Stage\StageManager.h" />
+    <ClInclude Include="Application\CollisionTypeID.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

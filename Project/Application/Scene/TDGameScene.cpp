@@ -126,7 +126,7 @@ void TDGameScene::Draw(const bool& isDebugView) {
 
 	// デバック描画
 	if (isDebugView) {
-		debugRenderer_->DrawAll(context_->debugCamera_->GetVPMatrix());
+		debugRenderer_->DrawAll(isDebugView ? context_->debugCamera_->GetVPMatrix() : mainCamera_->GetVPMatrix());
 	}
 #endif
 
@@ -156,6 +156,13 @@ void TDGameScene::InputRegisterCommand() {
 
 void TDGameScene::UpdateCollision() {
 
+	// 壁の要素を取得する
+	const std::vector<std::unique_ptr<Wall>>& walls =  stageManager_->GetWalls();
+
+	for (auto& wall : walls) {
+		collisionManager_->AddCollider(wall->GetCollider());
+		//debugRenderer_->AddBox(wall->GetOBBData());
+	}
 
 	// 衝突判定
 	collisionManager_->CheckAllCollisions();
