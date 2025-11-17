@@ -56,7 +56,7 @@ void  CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collid
 }
 
 bool CollisionManager::IsActiveCollision(Collider* a, Collider* b) {
-	return (a->GetCollisionAttribute() & b->GetCollisionMask()) == 0 || (b->GetCollisionAttribute() & a->GetCollisionMask()) == 0;
+	return (a->GetCollisionAttribute() & b->GetCollisionMask()) != 0 && (b->GetCollisionAttribute() & a->GetCollisionMask()) != 0;
 }
 
 CollisionResult CollisionManager::CheckCollisionType(const CollisionType& typeA, const CollisionType& typeB) {
