@@ -57,6 +57,8 @@ private: // エンジンの低レイヤー機能を取得
 
 	// デバック描画するリスト
 	std::unique_ptr<GameEngine::DebugRenderer> debugRenderer_;
+	// デバックの表示管理
+	bool isDrawCollision_ = true;
 
 	// 当たり判定の管理
 	std::unique_ptr<GameEngine::CollisionManager> collisionManager_;

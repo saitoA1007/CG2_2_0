@@ -1,5 +1,6 @@
 #pragma once
 #include"WorldTransform.h"
+#include"Material.h"
 #include"Collider.h"
 
 // 壁の状態
@@ -34,6 +35,12 @@ public:
 	GameEngine::WorldTransform& GetWorldTransform() { return worldTransform_; }
 
 	/// <summary>
+	/// マテリアルを取得
+	/// </summary>
+	/// <returns></returns>
+	GameEngine::Material& GetMaterial() { return material_; }
+
+	/// <summary>
 	/// 当たり判定を取得
 	/// </summary>
 	/// <returns></returns>
@@ -62,6 +69,8 @@ private: // 固定値
 private:
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
+	// マテリアル
+	GameEngine::Material material_;
 
 	// 壁の状態
 	WallState wallState_ = WallState::Normal;
@@ -85,4 +94,8 @@ private:
 	/// </summary>
 	void OnCollision([[maybe_unused]] const GameEngine::CollisionResult& result);
 
+	/// <summary>
+	/// 壁の状態に応じてステータスを変える
+	/// </summary>
+	void ChangeWallState();
 };

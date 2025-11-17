@@ -174,6 +174,10 @@ namespace GameEngine {
 			orientations_[0] = { rotationMatrix.m[0][0], rotationMatrix.m[0][1], rotationMatrix.m[0][2] };
 			orientations_[1] = { rotationMatrix.m[1][0], rotationMatrix.m[1][1], rotationMatrix.m[1][2] };
 			orientations_[2] = { rotationMatrix.m[2][0], rotationMatrix.m[2][1], rotationMatrix.m[2][2] };
+			// 正規化
+			orientations_[0] = Normalize(orientations_[0]);
+			orientations_[1] = Normalize(orientations_[1]);
+			orientations_[2] = Normalize(orientations_[2]);
 		}
 
 		// サイズ
