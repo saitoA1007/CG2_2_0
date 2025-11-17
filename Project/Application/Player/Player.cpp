@@ -4,12 +4,26 @@
 #include"EasingManager.h"
 #include"MyMath.h"
 #include"FPSCounter.h"
+#include"CollisionConfig.h"
+#include"LogManager.h"
 using namespace GameEngine;
 
 void Player::Initialize() {
 
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
+
+	// 当たり判定を設定
+	collider_ = std::make_unique<SphereCollider>();
+	collider_->SetWorldPosition(worldTransform_.transform_.translate);
+	collider_->SetRadius(collisionRadius_);
+	collider_->SetCollisionAttribute(kCollisionAttributePlayer);
+	collider_->SetCollisionMask(~kCollisionAttributePlayer);
+
+	// コールバック関数を登録する
+	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
+		this->OnCollisionEnter(result);
+	});
 
 #ifdef _DEBUG
 	// 値を登録する
@@ -45,6 +59,9 @@ void Player::Update(GameEngine::InputCommand* inputCommand) {
 
 	// 行列の更新
 	worldTransform_.UpdateTransformMatrix();
+
+	// 当たり判定の位置を更新
+	collider_->SetWorldPosition(worldTransform_.transform_.translate);
 }
 
 void Player::ProcessMoveInput(GameEngine::InputCommand* inputCommand, playerInfo& playerInfo) {
@@ -128,6 +145,15 @@ void Player::JumpUpdate() {
 	if (jumpTimer_ >= 1.0f) {
 		isJump_ = false;
 	}
+}
+
+void Player::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
+	// ヒットログを出す
+	Log("IsPlayerHit", "Player");
+}
+
+Sphere Player::GetSphereData() {
+	return Sphere{ collider_->GetWorldPosition(),collider_->GetRadius() };
 }
 
 void Player::RegisterBebugParam() {

@@ -1,6 +1,7 @@
 #pragma once
 #include"WorldTransform.h"
 #include"InputCommand.h"
+#include"Collider.h"
 
 class Player {
 public:
@@ -43,6 +44,18 @@ public:
 	/// <param name="vpMatrix"></param>
 	void SetRotateMatrix(const Matrix4x4& rotateMatrix) { rotateMatrix_ = rotateMatrix; }
 
+	/// <summary>
+	/// 当たり判定を取得
+	/// </summary>
+	/// <returns></returns>
+	GameEngine::Collider* GetCollider() { return collider_.get(); }
+
+	/// <summary>
+	/// 球のデータを取得
+	/// </summary>
+	/// <returns></returns>
+	Sphere GetSphereData();
+
 private:
 
 	// ジャンプの高さ
@@ -56,10 +69,16 @@ private:
 	// 旋回時間
 	float kTurnTime_ = 1.0f;
 
+	// 当たり判定の半径
+	float collisionRadius_ = 1.0f;
+
 private:
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
+
+	// 生存フラグ
+	bool isAlive_ = true;
 
 	// ジャンプフラグ
 	bool isJump_ = false;
@@ -73,6 +92,9 @@ private:
 	// 旋回するために必要な変数
 	float turnTimer_ = 0.0f;
 	float targetRotateY_ = 0.0f;
+
+	// 球の当たり判定
+	std::unique_ptr<GameEngine::SphereCollider> collider_;
 
 private:
 
@@ -91,6 +113,12 @@ private:
 	/// ジャンプする処理
 	/// </summary>
 	void JumpUpdate();
+
+	/// <summary>
+	/// 当たり判定
+	/// </summary>
+	/// <param name="result"></param>
+	void OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result);
 
 	/// <summary>
 	/// 値を登録する

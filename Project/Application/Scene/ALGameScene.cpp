@@ -60,6 +60,13 @@ void ALGameScene::Initialize(SceneContext* context) {
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
 
+	// ボスモデルを生成
+	bossEnemyModel_ = context_->modelManager->GetNameByModel("Cube");
+	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
+	// ボス敵クラスを初期化
+	bossEnemy_ = std::make_unique<BossEnemy>();
+	bossEnemy_->Initialize();
+
 	// 入力コマンドを設定する
 	InputRegisterCommand();
 }
@@ -80,6 +87,9 @@ void ALGameScene::Update() {
 	// プレイヤーの更新処理
 	player_->SetRotateMatrix(cameraController_->GetRotateMatrix());
 	player_->Update(context_->inputCommand);
+
+	// ボス敵の更新処理
+	bossEnemy_->Update();
 
 	// カメラの更新処理
 	mainCamera_->SetCamera(cameraController_->GetCamera());
@@ -117,12 +127,14 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform(), DefaultWhiteGH);
 
+	// ボス敵を描画
+	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
+
 #ifdef _DEBUG
 
 	// デバック描画
-	if (isDebugView) {
-		debugRenderer_->DrawAll(context_->debugCamera_->GetVPMatrix());
-	}
+	debugRenderer_->DrawAll(isDebugView ? context_->debugCamera_->GetVPMatrix() : mainCamera_->GetVPMatrix());
 #endif
 
 	//========================================================================
@@ -151,6 +163,15 @@ void ALGameScene::InputRegisterCommand() {
 
 void ALGameScene::UpdateCollision() {
 
+	// プレイヤーの当たり判定を登録する
+	collisionManager_->AddCollider(player_->GetCollider());
+	// デバックデータを取得する
+	debugRenderer_->AddSphere(player_->GetSphereData());
+
+	// ボス敵の当たり判定を登録する
+	collisionManager_->AddCollider(bossEnemy_->GetCollider());
+	// デバックデータを取得する
+	debugRenderer_->AddSphere(bossEnemy_->GetSphereData());
 
 	// 衝突判定
 	collisionManager_->CheckAllCollisions();
