@@ -7,6 +7,14 @@ using namespace GameEngine;
 
 ID3D12Device* WorldTransform::device_ = nullptr;
 
+WorldTransform::~WorldTransform() {
+	// マッピングを解除する
+	if (transformationMatrixData_) {
+		transformationMatrixResource_->Unmap(0, nullptr);
+		transformationMatrixData_ = nullptr;
+	}
+}
+
 void WorldTransform::StaticInitialize(ID3D12Device* device) {
 	device_ = device;
 }

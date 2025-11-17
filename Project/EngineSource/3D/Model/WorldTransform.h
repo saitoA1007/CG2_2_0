@@ -14,7 +14,7 @@ namespace GameEngine {
 	class WorldTransform final {
 	public:
 		WorldTransform() = default;
-		~WorldTransform() = default;
+		~WorldTransform();
 
 		/// <summary>
 		/// 静的初期化

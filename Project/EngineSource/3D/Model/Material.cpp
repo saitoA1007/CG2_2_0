@@ -5,6 +5,14 @@ using namespace GameEngine;
 
 ID3D12Device* Material::device_ = nullptr;
 
+Material::~Material() {
+	// マッピングを解除する
+	if (materialData_) {
+		materialResource_->Unmap(0, nullptr);
+		materialData_ = nullptr;
+	}
+}
+
 void Material::StaticInitialize(ID3D12Device* device) {
 	device_ = device;
 }
