@@ -23,23 +23,34 @@ void StageManager::Initialize() {
 
 void StageManager::Update() {
 
+	// 生存リストをクリア
+	aliveWalls_.clear();
+
 	// 更新処理
 	for (auto& wall : walls_) {
+		// 壁の更新処理
 		wall->Update();
+
+		// 生存している壁をリストに追加する
+		if (wall->GetIsAlive()) {
+			aliveWalls_.push_back(wall.get());
+		}
 	}
 }
 
 void StageManager::Draw(GameEngine::Model* wallModel) {
 
-	// 壁を描画
-	for (auto& wall : walls_) {
-		ModelRenderer::Draw(wallModel, wall->GetWorldTransform(),&wall->GetMaterial());
+	// 生存している壁を描画
+	for (auto& wall : aliveWalls_) {
+		ModelRenderer::Draw(wallModel, wall->GetWorldTransform(), &wall->GetMaterial());
 	}
 }
 
 void StageManager::GenerateWalls() {
 	walls_.clear();
 	walls_.reserve(maxSideNumber_);
+	aliveWalls_.clear();
+	aliveWalls_.reserve(maxSideNumber_);
 
 	// 等分した角度を求める
 	float centralAngle = std::numbers::pi_v<float> *2.0f / static_cast<float>(maxSideNumber_);
@@ -115,5 +126,14 @@ void StageManager::DebugUpdate() {
 		}
 	} else {
 		created_ = false;
+	}
+
+	// 生存リストをクリア
+	aliveWalls_.clear();
+	// 生存している壁をリストに追加する
+	for (auto& wall : walls_) {
+		if (wall->GetIsAlive()) {
+			aliveWalls_.push_back(wall.get());
+		}
 	}
 }

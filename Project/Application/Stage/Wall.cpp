@@ -49,12 +49,16 @@ void Wall::Update() {
 	if (respawnTimer_ >= respawnTime_) {
 		isAlive_ = true;
 		respawnTimer_ = 0.0f;
+		currentHp_ = maxHp_;
 		// 壁の状態に応じてステータスを変更する
 		ChangeWallState();
 	}
 }
 
 void Wall::OnCollision([[maybe_unused]] const GameEngine::CollisionResult& result) {
+
+	// 生存フラグがfalseなら早期リターン
+	if (!isAlive_) { return; }
 
 	// hpを削る
 	if (currentHp_ > 0) {
