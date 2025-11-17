@@ -170,9 +170,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="Application\Camera\CameraController.cpp" />
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
+    <ClCompile Include="Application\Scene\ALGameScene.cpp" />
     <ClCompile Include="Application\Scene\GEScene.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
-    <ClCompile Include="Application\Scene\TDGameScene.cpp" />
+    <ClCompile Include="Application\Scene\ResultScene.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
@@ -325,9 +326,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="Application\Camera\CameraController.h" />
     <ClInclude Include="Application\Light\SceneLightingController.h" />
+    <ClInclude Include="Application\Scene\ALGameScene.h" />
     <ClInclude Include="Application\Scene\GEScene.h" />
     <ClInclude Include="Application\Player\Player.h" />
-    <ClInclude Include="Application\Scene\TDGameScene.h" />
+    <ClInclude Include="Application\Scene\ResultScene.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />

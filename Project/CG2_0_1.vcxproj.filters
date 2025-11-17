@@ -286,8 +286,9 @@
     <ClCompile Include="EngineSource\Graphics\FrameRateController.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\DXViewportState.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPipeline.cpp" />
-    <ClCompile Include="Application\Scene\TDGameScene.cpp" />
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
+    <ClCompile Include="Application\Scene\ALGameScene.cpp" />
+    <ClCompile Include="Application\Scene\ResultScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -565,11 +566,12 @@
     <ClInclude Include="EngineSource\Graphics\DirectX\DXViewportState.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPipeline.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\IPostEffect.h" />
-    <ClInclude Include="Application\Scene\TDGameScene.h" />
     <ClInclude Include="Application\Light\SceneLightingController.h" />
     <ClInclude Include="EngineSource\Collision\CollisionResult.h" />
     <ClInclude Include="EngineSource\Collision\ColliderData.h" />
     <ClInclude Include="EngineSource\Collision\UserData.h" />
+    <ClInclude Include="Application\Scene\ALGameScene.h" />
+    <ClInclude Include="Application\Scene\ResultScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

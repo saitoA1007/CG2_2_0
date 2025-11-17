@@ -14,10 +14,10 @@
 #include"Application/Camera/CameraController.h"
 #include"Application/Light/SceneLightingController.h"
 
-class TDGameScene : public BaseScene {
+class ALGameScene : public BaseScene {
 public:
 
-	~TDGameScene();
+	~ALGameScene();
 
 	/// <summary>
 	/// 初期化
