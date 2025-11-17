@@ -26,6 +26,9 @@ namespace GameEngine {
 		};
 
 	public:
+		Sprite() = default;
+		~Sprite();
+
 		/// <summary>
 		/// 静的初期化
 		/// </summary>
