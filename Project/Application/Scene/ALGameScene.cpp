@@ -1,4 +1,4 @@
-#include"TDGameScene.h"
+#include"ALGameScene.h"
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
 #include"SpriteRenderer.h"
@@ -7,20 +7,20 @@
 #include<numbers>
 using namespace GameEngine;
 
-TDGameScene::~TDGameScene() {
+ALGameScene::~ALGameScene() {
 }
 
-void TDGameScene::Initialize(SceneContext* context) {
+void ALGameScene::Initialize(SceneContext* context) {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem 
 	// エンジン機能を取得
 	context_ = context;
 
 	// 登録するパラメータを設定
-	GameParamEditor::GetInstance()->SetActiveScene("TDGameScene");
+	GameParamEditor::GetInstance()->SetActiveScene("ALGameScene");
 
 	// 初期化されたことのログを出す
-	Log("Initialize : TDGameScene", "TDGameScene");
+	Log("Initialize : ALGameScene", "TDGameScene");
 
 	// デバック用描画の初期化
 	debugRenderer_ = DebugRenderer::Create();
@@ -38,7 +38,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// 天球モデルを生成
 	skyDomeModel_ = context_->modelManager->GetNameByModel("SkyDome");
-	skyDomeWorldTransform_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}});
+	skyDomeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 地面を生成
 	terrainModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
@@ -64,7 +64,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	InputRegisterCommand();
 }
 
-void TDGameScene::Update() {
+void ALGameScene::Update() {
 
 	// デバックリストを削除
 	debugRenderer_->Clear();
@@ -85,7 +85,7 @@ void TDGameScene::Update() {
 	UpdateCollision();
 }
 
-void TDGameScene::Draw(const bool& isDebugView) {
+void ALGameScene::Draw(const bool& isDebugView) {
 
 	// 描画に使用するカメラを設定
 	if (isDebugView) {
@@ -132,7 +132,7 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	//SpriteRenderer::Draw(sprite_.get(), uvCheckerGH_);
 }
 
-void TDGameScene::InputRegisterCommand() {
+void ALGameScene::InputRegisterCommand() {
 	// 移動の入力コマンドを登録する
 	context_->inputCommand->RegisterCommand("MoveUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
 	context_->inputCommand->RegisterCommand("MoveDown", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });
@@ -146,7 +146,7 @@ void TDGameScene::InputRegisterCommand() {
 	context_->inputCommand->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
 }
 
-void TDGameScene::UpdateCollision() {
+void ALGameScene::UpdateCollision() {
 
 
 	// 衝突判定
