@@ -8,12 +8,14 @@
 #include"Sprite.h"
 #include"DebugRenderer.h"
 #include"CollisionManager.h"
+#include"ParticleSystem/ParticleBehavior.h"
 
 // アプリ機能をインクルード
 #include"Application/Player/Player.h"
 #include"Application/Camera/FollowCameraController.h"
 #include"Application/Light/SceneLightingController.h"
 #include"Application/Enemy/BossEnemy.h"
+
 
 class ALGameScene : public BaseScene {
 public:
@@ -51,7 +53,7 @@ public:
 	/// 次のシーン遷移する場面の値を取得
 	/// </summary>
 	/// <returns></returns>
-	SceneState NextSceneState() override { return SceneState::Title; }
+	SceneState NextSceneState() override { return SceneState::Result; }
 
 private: // エンジンの低レイヤー機能を取得
 
@@ -85,6 +87,12 @@ private: // シーン機能
 	GameEngine::Model* playerModel_;
 	// プレイヤー
 	std::unique_ptr<Player> player_;
+
+	// 平面モデル
+	GameEngine::Model* planeModel_;
+	// プレイやーの移動パーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> playerMoveParticle_;
+	uint32_t smokeGH_ = 0;
 
 	// カメラコントローラークラス
 	std::unique_ptr<FollowCameraController> followCameraController_;

@@ -10,7 +10,7 @@
 // 武器
 #include"Application/Weapon/IWeapon.h"
 
-class Player {
+class Player : public GameEngine::GameObject {
 public:
 
 	// プレイヤーの行動パターン
@@ -74,6 +74,12 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	Sphere GetSphereData();
+
+	/// <summary>
+	/// プレイヤーの現在の振る舞い
+	/// </summary>
+	/// <returns></returns>
+	Behavior GetPlayerBehavior() const { return behavior_; }
 
 private:
 
