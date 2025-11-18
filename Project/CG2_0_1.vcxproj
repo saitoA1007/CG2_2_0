@@ -168,7 +168,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Application\Camera\CameraController.cpp" />
     <ClCompile Include="Application\Camera\FollowCameraController.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
@@ -326,7 +325,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application\Camera\CameraController.h" />
     <ClInclude Include="Application\Camera\FollowCameraController.h" />
     <ClInclude Include="Application\Enemy\BossEnemy.h" />
     <ClInclude Include="Application\Light\SceneLightingController.h" />

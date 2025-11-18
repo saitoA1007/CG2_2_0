@@ -125,7 +125,7 @@ void Player::ProcessMoveInput() {
 
 	// ダッシュ操作
 	if (inputCommand_->IsCommandAcitve("Dush")) {
-		if (behavior_ != Behavior::Dush) {
+		if (behavior_ != Behavior::Dush && behavior_ != Behavior::Jump) {
 			behaviorRequest_ = Behavior::Dush;
 
 			// ダッシュの向く方向を設定する
