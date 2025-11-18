@@ -5,6 +5,7 @@
 #include"Camera.h"
 #include"DebugCamera.h"
 #include"Model.h"
+#include"Sprite.h"
 #include"WorldTransform.h"
 
 class TitleScene : public BaseScene {
@@ -43,7 +44,7 @@ public:
 	/// 次のシーン遷移する場面の値を取得
 	/// </summary>
 	/// <returns></returns>
-	SceneState NextSceneState() override { return SceneState::Game; }
+	SceneState NextSceneState() override { return SceneState::ALGame; }
 
 private: // シーン機能
 
@@ -52,4 +53,16 @@ private: // シーン機能
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
+
+	// 天球
+	GameEngine::Model* skyDomeModel_;
+	GameEngine::WorldTransform skyDomeWorldTransform_;
+
+	// タイトル画像
+	std::unique_ptr<GameEngine::Sprite> titleSprite_;
+	uint32_t titleGH_ = 0;
+
+	// スペース画像
+	std::unique_ptr<GameEngine::Sprite> spaceSprite_;
+	uint32_t spaceGH_ = 0;
 };
