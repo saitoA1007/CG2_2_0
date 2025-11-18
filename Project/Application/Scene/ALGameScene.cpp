@@ -156,6 +156,8 @@ void ALGameScene::InputRegisterCommand() {
 	context_->inputCommand->RegisterCommand("MoveRight", { {InputState::KeyPush, DIK_D },{InputState::PadLeftStick,0,{1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_RIGHT } });
 	// ジャンプコマンドを登録する
 	context_->inputCommand->RegisterCommand("Jump", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
+	context_->inputCommand->RegisterCommand("Attack", { {InputState::KeyTrigger, DIK_K},{InputState::PadTrigger, XINPUT_GAMEPAD_B} });
+	context_->inputCommand->RegisterCommand("Dush", { {InputState::KeyTrigger, DIK_J},{InputState::PadTrigger, XINPUT_GAMEPAD_X} });
 
 	// カメラ操作のコマンドを登録する
 	context_->inputCommand->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
