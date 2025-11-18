@@ -34,8 +34,8 @@ void Wall::Initialilze(const Transform& transform, float respawnTime, uint32_t m
 	collider_->SetCollisionMask(~kCollisionAttributeTerrain);
 
 	// コールバック関数に登録する
-	collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
-		this->OnCollision(result);
+	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
+		this->OnCollisionEnter(result);
 	});
 }
 
@@ -56,9 +56,9 @@ void Wall::Update() {
 	}
 }
 
-void Wall::OnCollision([[maybe_unused]] const GameEngine::CollisionResult& result) {
+void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
 
-	Log("is hit.");
+	Log("is hit Wall");
 
 	// 生存フラグがfalseなら早期リターン
 	if (!isAlive_) { return; }
