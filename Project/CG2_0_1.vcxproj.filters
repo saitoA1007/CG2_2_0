@@ -239,7 +239,6 @@
     </ClCompile>
     <ClCompile Include="EngineSource\3D\Model\Animation.cpp" />
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
-    <ClCompile Include="Application\Scene\GEScene.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\SrvManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
@@ -508,7 +507,6 @@
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\Animation.h" />
     <ClInclude Include="EngineSource\Input\InputCommand.h" />
-    <ClInclude Include="Application\Scene\GEScene.h" />
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\SrvManager.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />

@@ -155,6 +155,14 @@ private:
 	// ダッシュする方向を設定する
 	Vector3 dushDirection_ = { 0.0f,0.0f,0.0f };
 
+	// ダメージを受けた時の挙動に使用する変数 =============================
+
+	// 当たった方向
+	Vector3 hitDirection_ = {};
+
+	// ノックバックするスピード
+	float knockbackSpeed_ = 0.0f;
+
 private: // プレイヤーの行動関数
 
 	/// <summary>

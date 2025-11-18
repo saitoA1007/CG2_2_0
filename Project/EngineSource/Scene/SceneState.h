@@ -5,7 +5,6 @@ enum class SceneState {
 
 	Title,       // タイトルシーン
 	Game,        // ゲームシーン
-	GE,          // GEシーン
 	ALGame,      // TDのゲームシーン
 	Result,      // クリアシーン
 

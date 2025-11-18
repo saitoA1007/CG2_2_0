@@ -89,11 +89,17 @@ void Player::Update() {
 	behaviorsTable_[static_cast<size_t>(behavior_)]();
 
 	// プレイヤーを移動範囲に制限
-	//worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x,-9.0f,9.0f);
-	//worldTransform_.transform_.translate.z = std::clamp(worldTransform_.transform_.translate.z, -9.0f, 9.0f);
+	worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x,-29.0f,29.0f);
+	worldTransform_.transform_.translate.z = std::clamp(worldTransform_.transform_.translate.z, -29.0f, 29.0f);
 
+	// ダメージを受けた時のノックバック処理
+	if (knockbackSpeed_ > 0.0f) {
+		knockbackSpeed_ -= 30.0f * FpsCounter::deltaTime / 0.5f;
+		velocity_ += hitDirection_* -knockbackSpeed_;
+	}
+	
 	// 行列の更新
-	worldTransform_.transform_.translate += velocity_;
+	worldTransform_.transform_.translate += velocity_ * FpsCounter::deltaTime;
 	worldTransform_.UpdateTransformMatrix();
 
 	// 当たり判定の位置を更新
@@ -125,14 +131,14 @@ void Player::ProcessMoveInput() {
 
 	// ジャンプ操作
 	if (inputCommand_->IsCommandAcitve("Jump")) {
-		if (behavior_ != Behavior::Jump) {
+		if (behavior_ == Behavior::Normal) {
 			behaviorRequest_ = Behavior::Jump;
 		}
 	}
 
 	// ダッシュ操作
 	if (inputCommand_->IsCommandAcitve("Dush")) {
-		if (behavior_ != Behavior::Dush && behavior_ != Behavior::Jump) {
+		if (behavior_ == Behavior::Normal) {
 			behaviorRequest_ = Behavior::Dush;
 
 			// ダッシュの向く方向を設定する
@@ -146,11 +152,11 @@ void Player::ProcessMoveInput() {
 	}
 
 	// 攻撃操作
-	if (inputCommand_->IsCommandAcitve("Attack")) {
+	/*if (inputCommand_->IsCommandAcitve("Attack")) {
 		if (behavior_ == Behavior::Normal) {
 			behaviorRequest_ = Behavior::Attack;
 		}
-	}
+	}*/
 }
 
 void Player::Move() {
@@ -162,7 +168,7 @@ void Player::Move() {
 		move.y = 0.0f;
 		move = Normalize(move);
 		// 移動する
-		velocity_ = move * kMoveSpeed_ * FpsCounter::deltaTime;
+		velocity_ = move * kMoveSpeed_;
 
 		// 角度を設定する
 		float tmpRotateY = std::atan2f(move.x, move.z);
@@ -222,7 +228,7 @@ void Player::DushUpdate() {
 	dushTimer_ += FpsCounter::deltaTime / kDushMaxTime_;
 
 	// 移動
-	velocity_ = dushDirection_ * kDushSpeed_ * FpsCounter::deltaTime;
+	velocity_ = dushDirection_ * kDushSpeed_;
 
 	// 時間がたったら通常状態へ遷移
 	if (dushTimer_ >= kDushMaxTime_) {
@@ -233,6 +239,9 @@ void Player::DushUpdate() {
 void Player::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
 	// ヒットログを出す
 	Log("IsPlayerHit", "Player");
+
+	knockbackSpeed_ = 30.0f;
+	hitDirection_ = Vector3(result.contactNormal.x, 0.0f, result.contactNormal.z);
 }
 
 Sphere Player::GetSphereData() {
