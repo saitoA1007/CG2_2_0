@@ -1,11 +1,14 @@
 #include"BossEnemy.h"
 #include"CollisionConfig.h"
+#include"Application/Player/Player.h"
+#include"Application/CollisionTypeID.h"
+#include"LogManager.h"
 using namespace GameEngine;
 
 void BossEnemy::Initialize() {
 
 	// ワールド行列を初期化
-	worldTransform_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,10.0f} });
+	worldTransform_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,10.0f} });
 
 	// 当たり判定を設定
 	collider_ = std::make_unique<SphereCollider>();
@@ -44,6 +47,18 @@ void BossEnemy::Update() {
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
 
+	if (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Player)) {
+		Player* player = result.userData.As<Player>();
+
+		if (player->GetPlayerBehavior() == Player::Behavior::Jump) {
+			Log("isHitBoss");
+			hp_ -= 1;
+
+			if (hp_ <= 0) {
+				isAlive_ = false;
+			}
+		}
+	}
 }
 
 Sphere BossEnemy::GetSphereData() {

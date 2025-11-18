@@ -59,6 +59,14 @@ void ALGameScene::Initialize(SceneContext* context) {
 	player_ = std::make_unique<Player>();
 	player_->Initialize(context_->inputCommand);
 
+	// パーティクルのシステムを初期化
+	smokeGH_ = context_->textureManager->GetHandleByName("circle.png");
+	playerMoveParticle_ = std::make_unique<ParticleBehavior>();
+	playerMoveParticle_->Initialize("PlayerSmokeParticle", 16, smokeGH_);
+	playerMoveParticle_->Emit({ 0.0f,0.0f,0.0f });
+	// 平面モデル
+	planeModel_ = context_->modelManager->GetNameByModel("Plane");
+
 	// カメラをコントロールするクラスを初期化
 	followCameraController_ = std::make_unique<FollowCameraController>();
 	followCameraController_->Initialize();
@@ -74,6 +82,11 @@ void ALGameScene::Initialize(SceneContext* context) {
 
 void ALGameScene::Update() {
 
+	// ボスの体力がなくなったらシーンを切り替える
+	if (!bossEnemy_->GetIsAlive()) {
+		isFinished_ = true;
+	}
+
 	// 当たり判定のリストを削除
 	collisionManager_->ClearList();
 	// デバックリストを削除
@@ -85,6 +98,9 @@ void ALGameScene::Update() {
 	// プレイヤーの更新処理
 	player_->SetRotateMatrix(followCameraController_->GetRotateMatrix());
 	player_->Update();
+	// パーティクルの更新処理
+	playerMoveParticle_->Emit(player_->GetPlayerPos());
+	playerMoveParticle_->Update(mainCamera_->GetWorldMatrix());
 
 	// カメラコントロールの更新処理
 	followCameraController_->Update(context_->inputCommand);
@@ -133,6 +149,11 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// ボス敵を描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
+
+	// 複数モデルの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::Instancing);
+	// パーティクルを描画
+	ModelRenderer::DrawInstancing(planeModel_, playerMoveParticle_->GetCurrentNumInstance(), *playerMoveParticle_->GetWorldTransforms(), playerMoveParticle_->GetTexture());
 
 #ifdef _DEBUG
 

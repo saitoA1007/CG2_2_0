@@ -27,7 +27,7 @@ void Player::Initialize(GameEngine::InputCommand* inputCommand) {
 	// 当たり判定システムにプレイヤーのデータを設定する
 	UserData userData;
 	userData.typeID = static_cast<uint32_t>(CollisionTypeID::Player);
-	//userData.object = this;
+	userData.object = this;
 	collider_->SetUserData(userData);
 
 	// コールバック関数を登録する

@@ -33,10 +33,16 @@ public:
 	/// <returns></returns>
 	Sphere GetSphereData();
 
+	/// <summary>
+	/// 生存フラグを取得する
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsAlive() const { return isAlive_; }
+
 private:
 
 	// 最大hp
-	uint32_t maxHp_ = 10;
+	uint32_t maxHp_ = 3;
 
 	// 当たり判定の大きさ
 	float collisionRadius_ = 4.0f;
@@ -45,6 +51,9 @@ private:
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
+
+	// hp
+	uint32_t hp_ = 3;
 
 	// 生存フラグ
 	bool isAlive_ = true;
