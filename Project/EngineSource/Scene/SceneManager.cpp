@@ -3,8 +3,8 @@
 // 各シーン
 #include"Application/Scene/TitleScene.h"
 #include"Application/Scene/GameScene.h"
-#include"Application/Scene/GEScene.h"
 #include"Application/Scene/TDGameScene.h"
+#include"Application/Scene/ResultScene.h"
 
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
@@ -171,12 +171,12 @@ std::unique_ptr<BaseScene> SceneManager::CreateScene(SceneState sceneState) {
 		return std::make_unique<GameScene>();
 		break;
 
-	case SceneState::GE:
-		return std::make_unique<GEScene>();
-		break;
-
 	case SceneState::TDGame:
 		return std::make_unique<TDGameScene>();
+		break;
+
+	case SceneState::Result:
+		return std::make_unique<ResultScene>();
 		break;
 
 	default:
