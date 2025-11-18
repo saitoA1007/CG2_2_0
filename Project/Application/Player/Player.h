@@ -7,6 +7,9 @@
 #include"InputCommand.h"
 #include"Collider.h"
 
+// 武器
+#include"Application/Weapon/IWeapon.h"
+
 class Player {
 public:
 
@@ -21,6 +24,8 @@ public:
 	};
 
 public:
+	Player() = default;
+	~Player() = default;
 
 	/// <summary>
 	/// 初期化処理
@@ -104,6 +109,9 @@ private:
 
 	// 生存フラグ
 	bool isAlive_ = true;
+
+	// 武器を取得
+	IWeapon* weapon_ = nullptr;
 
 	// 球の当たり判定
 	std::unique_ptr<GameEngine::SphereCollider> collider_;

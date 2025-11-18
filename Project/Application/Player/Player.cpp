@@ -6,6 +6,7 @@
 #include"FPSCounter.h"
 #include"CollisionConfig.h"
 #include"LogManager.h"
+#include"Application/CollisionTypeID.h"
 using namespace GameEngine;
 
 void Player::Initialize(GameEngine::InputCommand* inputCommand) {
@@ -22,6 +23,12 @@ void Player::Initialize(GameEngine::InputCommand* inputCommand) {
 	collider_->SetRadius(kCollisionRadius_);
 	collider_->SetCollisionAttribute(kCollisionAttributePlayer);
 	collider_->SetCollisionMask(~kCollisionAttributePlayer);
+
+	// 当たり判定システムにプレイヤーのデータを設定する
+	UserData userData;
+	userData.typeID = static_cast<uint32_t>(CollisionTypeID::Player);
+	//userData.object = this;
+	collider_->SetUserData(userData);
 
 	// コールバック関数を登録する
 	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
@@ -135,6 +142,13 @@ void Player::ProcessMoveInput() {
 			worldMatrix.m[3][1] = 0.0f;
 			worldMatrix.m[3][2] = 0.0f;
 			dushDirection_ = TransformNormal(dushDirection_, worldMatrix);
+		}
+	}
+
+	// 攻撃操作
+	if (inputCommand_->IsCommandAcitve("Attack")) {
+		if (behavior_ == Behavior::Normal) {
+			behaviorRequest_ = Behavior::Attack;
 		}
 	}
 }
