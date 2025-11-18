@@ -98,7 +98,7 @@ private:
 	/// <summary>
 	/// 当たり判定
 	/// </summary>
-	void OnCollision([[maybe_unused]] const GameEngine::CollisionResult& result);
+	void OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result);
 
 	/// <summary>
 	/// 壁の状態に応じてステータスを変える
