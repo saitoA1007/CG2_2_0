@@ -48,6 +48,10 @@ namespace GameEngine {
 			return IsOBBSphereCollision(a, b);
 		}
 
+		CollisionResult operator()(const Sphere& b,const OBB& a) const {
+			return IsOBBSphereCollision(a, b);
+		}
+
 		// obbと線の当たり判定
 		CollisionResult operator()(const OBB& a, const Segment& b) const {
 			return IsOBBSegmentCollision(a, b);
