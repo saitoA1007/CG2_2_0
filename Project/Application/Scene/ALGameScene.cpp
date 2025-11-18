@@ -36,6 +36,9 @@ void ALGameScene::Initialize(SceneContext* context) {
 
 #pragma endregion
 
+	// 入力コマンドを設定する
+	InputRegisterCommand();
+
 	// 天球モデルを生成
 	skyDomeModel_ = context_->modelManager->GetNameByModel("SkyDome");
 	skyDomeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
@@ -54,7 +57,7 @@ void ALGameScene::Initialize(SceneContext* context) {
 	playerModel_->SetDefaultIsEnableLight(true);
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();
-	player_->Initialize();
+	player_->Initialize(context_->inputCommand);
 
 	// カメラをコントロールするクラスを初期化
 	cameraController_ = std::make_unique<CameraController>();
@@ -67,8 +70,6 @@ void ALGameScene::Initialize(SceneContext* context) {
 	bossEnemy_ = std::make_unique<BossEnemy>();
 	bossEnemy_->Initialize();
 
-	// 入力コマンドを設定する
-	InputRegisterCommand();
 }
 
 void ALGameScene::Update() {
@@ -86,7 +87,7 @@ void ALGameScene::Update() {
 
 	// プレイヤーの更新処理
 	player_->SetRotateMatrix(cameraController_->GetRotateMatrix());
-	player_->Update(context_->inputCommand);
+	player_->Update();
 
 	// ボス敵の更新処理
 	bossEnemy_->Update();
