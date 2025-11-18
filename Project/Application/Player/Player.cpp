@@ -25,7 +25,7 @@ void Player::Initialize() {
 	UserData userData; userData.typeID = static_cast<uint32_t>(CollisionTypeID::Player); userData.object = nullptr; // object設定は必要なら後で
 	collider_->SetUserData(userData);
 	// コールバック登録
-	collider_->SetOnCollisionCallback([this](const CollisionResult& result) { this->OnCollision(result); });
+	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) { this->OnCollision(result); });
 
 #ifdef _DEBUG
 	//===========================================================
@@ -132,7 +132,7 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 			velocity_.y = -kAttackDownSpeed_;
             isAttackDown_ = true;
 		} else {
-			StartCharge({ 0.0f,0.0f,1.0f });
+			StartCharge(velocity_);
 		}
 	}
 }
@@ -143,9 +143,9 @@ void Player::StartCharge(const Vector3& direction) {
 	isCharging_ = false;
 	chargeTimer_ = 0.0f;
 	chargeActiveTimer_ = 0.0f;
-    velocity_ = { 0.0f,0.0f,0.0f };
 	// 方向を設定（正規化）
 	chargeDirection_ = Normalize(direction);
+	velocity_ = { 0.0f,0.0f,0.0f };
 }
 
 void Player::ChargeUpdate() {
@@ -219,21 +219,17 @@ void Player::ChargeWallBounce(const Vector3 &bounceDirection, bool isGreatWall) 
 }
 
 void Player::OnCollision(const CollisionResult &result) {
-
-	Log("is hit.");
-
 	// 壁との衝突から跳ね返りを誘発（突進中のみ）
 	if (!result.isHit) {
 		return;
 	}
-
 	
 	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss)) == false;
 	if (isCharging_ && isWall) {
 		// 接触法線を利用して跳ね返り
 		Vector3 normal = result.contactNormal;
 		// XZ成分で跳ね返り方向作成
-		Vector3 bounceDir = { normal.x, 0.0f, normal.z };
+		Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
 		if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
 		// 強化壁判定 (例: penetrationDepthが大きい場合など仮)
 		bool isGreat = false; // 今後必要なら result.userData から判定

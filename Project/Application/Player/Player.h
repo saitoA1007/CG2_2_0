@@ -114,7 +114,7 @@ private:
 	GameEngine::WorldTransform worldTransform_;
 
     // プレイヤーの当たり判定用の球データ
-    Sphere sphereData_ = { {0.0f,0.0f,0.0f}, 2.f };
+    Sphere sphereData_ = { {0.0f,0.0f,0.0f}, 1.f };
 
     // 速度ベクトル
 	Vector3 velocity_ = {0.0f,0.0f,0.0f};
