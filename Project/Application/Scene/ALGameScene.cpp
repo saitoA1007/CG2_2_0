@@ -20,7 +20,7 @@ void ALGameScene::Initialize(SceneContext* context) {
 	GameParamEditor::GetInstance()->SetActiveScene("ALGameScene");
 
 	// 初期化されたことのログを出す
-	Log("Initialize : ALGameScene", "TDGameScene");
+	Log("Initialize : ALGameScene", "ALGameScene");
 
 	// デバック用描画の初期化
 	debugRenderer_ = DebugRenderer::Create();
@@ -151,7 +151,7 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
 
 	// 複数モデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::Instancing);
+	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
 	// パーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, playerMoveParticle_->GetCurrentNumInstance(), *playerMoveParticle_->GetWorldTransforms(), playerMoveParticle_->GetTexture());
 
