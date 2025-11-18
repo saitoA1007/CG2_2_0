@@ -19,7 +19,7 @@ void Player::Initialize(GameEngine::InputCommand* inputCommand) {
 	// 当たり判定を設定
 	collider_ = std::make_unique<SphereCollider>();
 	collider_->SetWorldPosition(worldTransform_.transform_.translate);
-	collider_->SetRadius(collisionRadius_);
+	collider_->SetRadius(kCollisionRadius_);
 	collider_->SetCollisionAttribute(kCollisionAttributePlayer);
 	collider_->SetCollisionMask(~kCollisionAttributePlayer);
 
@@ -32,7 +32,16 @@ void Player::Initialize(GameEngine::InputCommand* inputCommand) {
 	behaviorsTable_ = {
 		[this]() { NormalUpdate(); },
 		[this]() { AttackUpdate(); },
-		[this]() { JumpUpdate(); }
+		[this]() { JumpUpdate(); },
+		[this]() { DushUpdate(); }
+	};
+
+	// プレイヤーの各状態のリセット処理を設定する
+	resetBehaviorParamTable_ = {
+		[this]() {}, // 通常
+		[this]() {}, // 攻撃
+		[this]() { jumpTimer_ = 0.0f; }, // ジャンプ
+		[this]() { dushTimer_ = 0.0f; }, // ダッシュ
 	};
 
 #ifdef _DEBUG
@@ -51,29 +60,19 @@ void Player::Update() {
 	ApplyDebugParam();
 #endif
 
+	// 状態遷移のリクエストがあった場合、切り替える処理
 	if (behaviorRequest_) {
 		// 状態を変更
 		behavior_ = behaviorRequest_.value();
-
-		// 振る舞いによる初期化を呼び出す
-		switch (behavior_)
-		{
-		case Player::Behavior::Normal:
-			break;
-		case Player::Behavior::Attack:
-			break;
-		case Player::Behavior::Jump:
-			jumpTimer_ = 0.0f;
-			break;
-		default:
-			break;
-		}
+		// 振る舞いによるリセットを呼び出す
+		resetBehaviorParamTable_[static_cast<size_t>(behavior_)]();
 		// 振る舞いのリクエストをクリア
 		behaviorRequest_ = std::nullopt;
 	}
 
 	// 移動のリセット
 	move = {0.0f,0.0f,0.0f};
+	velocity_ = { 0.0f,0.0f,0.0f };
 	isMove = false;
 
 	// プレイヤーの入力処理
@@ -87,6 +86,7 @@ void Player::Update() {
 	//worldTransform_.transform_.translate.z = std::clamp(worldTransform_.transform_.translate.z, -9.0f, 9.0f);
 
 	// 行列の更新
+	worldTransform_.transform_.translate += velocity_;
 	worldTransform_.UpdateTransformMatrix();
 
 	// 当たり判定の位置を更新
@@ -122,6 +122,21 @@ void Player::ProcessMoveInput() {
 			behaviorRequest_ = Behavior::Jump;
 		}
 	}
+
+	// ダッシュ操作
+	if (inputCommand_->IsCommandAcitve("Dush")) {
+		if (behavior_ != Behavior::Dush) {
+			behaviorRequest_ = Behavior::Dush;
+
+			// ダッシュの向く方向を設定する
+			dushDirection_ = { 0.0f,0.0f,1.0f };
+			Matrix4x4 worldMatrix = worldTransform_.GetWorldMatrix();
+			worldMatrix.m[3][0] = 0.0f;
+			worldMatrix.m[3][1] = 0.0f;
+			worldMatrix.m[3][2] = 0.0f;
+			dushDirection_ = TransformNormal(dushDirection_, worldMatrix);
+		}
+	}
 }
 
 void Player::Move() {
@@ -133,7 +148,7 @@ void Player::Move() {
 		move.y = 0.0f;
 		move = Normalize(move);
 		// 移動する
-		worldTransform_.transform_.translate += move * kMoveSpeed_ * FpsCounter::deltaTime;
+		velocity_ = move * kMoveSpeed_ * FpsCounter::deltaTime;
 
 		// 角度を設定する
 		float tmpRotateY = std::atan2f(move.x, move.z);
@@ -177,7 +192,7 @@ void Player::JumpUpdate() {
 		worldTransform_.transform_.translate.y = Lerp(kJumpHeight_, 1.0f, EaseIn(jumpDownTimer_));
 	}
 
-	// 時間がたったらフラグをfalse
+	// 時間がたったら通常状態へ遷移
 	if (jumpTimer_ >= 1.0f) {
 		behaviorRequest_ = Behavior::Normal;
 	}
@@ -185,6 +200,20 @@ void Player::JumpUpdate() {
 
 void Player::AttackUpdate() {
 
+}
+
+void Player::DushUpdate() {
+
+	// ダッシュ移動処理
+	dushTimer_ += FpsCounter::deltaTime / kDushMaxTime_;
+
+	// 移動
+	velocity_ = dushDirection_ * kDushSpeed_ * FpsCounter::deltaTime;
+
+	// 時間がたったら通常状態へ遷移
+	if (dushTimer_ >= kDushMaxTime_) {
+		behaviorRequest_ = Behavior::Normal;
+	}
 }
 
 void Player::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
@@ -202,6 +231,8 @@ void Player::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxTime", kJumpMaxTime_);
 	GameParamEditor::GetInstance()->AddItem("Player", "MoveSpeed", kMoveSpeed_);
 	GameParamEditor::GetInstance()->AddItem("Player", "TurnTime", kTurnTime_);
+	GameParamEditor::GetInstance()->AddItem("Player", "DushSpeed", kDushSpeed_);
+	GameParamEditor::GetInstance()->AddItem("Player", "DushMaxTime", kDushMaxTime_);
 }
 
 void Player::ApplyDebugParam() {
@@ -210,4 +241,6 @@ void Player::ApplyDebugParam() {
 	kJumpMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "JumpMaxTime");
 	kMoveSpeed_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "MoveSpeed");
 	kTurnTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "TurnTime");
+	kDushSpeed_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "DushSpeed");
+	kDushMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "DushMaxTime");
 }

@@ -15,6 +15,7 @@ public:
 		Normal, // 通常状態
 		Attack, // 攻撃状態
 		Jump,   // ジャンプ状態
+		Dush,   // ダッシュ状態
 
 		MaxCount // 状態の数
 	};
@@ -65,19 +66,24 @@ public:
 
 private:
 
-	// ジャンプの高さ
-	float kJumpHeight_ = 4.0f;
-	// ジャンプする時間
-	float kJumpMaxTime_ = 0.65f;
-
 	// 移動速度
 	float kMoveSpeed_ = 0.2f;
 
 	// 旋回時間
 	float kTurnTime_ = 1.0f;
 
+	// ジャンプの高さ
+	float kJumpHeight_ = 4.0f;
+	// ジャンプする時間
+	float kJumpMaxTime_ = 0.65f;
+
+	// ダッシュする速さ
+	float kDushSpeed_ = 10.0f;
+	// ダッシュする時間
+	float kDushMaxTime_ = 2.0f;
+
 	// 当たり判定の半径
-	float collisionRadius_ = 1.0f;
+	float kCollisionRadius_ = 1.0f;
 
 private:
 
@@ -87,26 +93,11 @@ private:
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
 
-	// 移動処理
-	Vector3 move = { 0.0f,0.0f,0.0f };
-
 	// 速度
 	Vector3 velocity_ = {};
-	
-	// 移動フラグ
-	bool isMove = false;  
+
 	// 生存フラグ
 	bool isAlive_ = true;
-	
-	// ジャンプタイマー
-	float jumpTimer_ = 0.0f;
-
-	// 旋回するために必要な変数
-	float turnTimer_ = 0.0f;
-	float targetRotateY_ = 0.0f;
-
-	// ベクトル変換用の行列
-	Matrix4x4 rotateMatrix_;
 
 	// 球の当たり判定
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
@@ -117,6 +108,32 @@ private:
 	std::optional<Behavior> behaviorRequest_ = std::nullopt;
 	// プレイヤーの状態テーブル
 	std::array<std::function<void()>, static_cast<size_t>(Behavior::MaxCount)> behaviorsTable_;
+	// プレイヤーが指定した状態を行うためのリセット処理
+	std::array<std::function<void()>, static_cast<size_t>(Behavior::MaxCount)> resetBehaviorParamTable_;
+
+	// 移動で使用する変数 ============================
+
+	// 移動処理
+	Vector3 move = { 0.0f,0.0f,0.0f };
+	// 移動フラグ
+	bool isMove = false;
+
+	// 旋回処理で使用する変数 =============================
+
+	float turnTimer_ = 0.0f;
+	float targetRotateY_ = 0.0f;
+	// ベクトル変換用の行列
+	Matrix4x4 rotateMatrix_;
+
+	// ジャンプで使用する変数 ===========================
+
+	// ジャンプタイマー
+	float jumpTimer_ = 0.0f;
+
+	// ダッシュで使用する変数 ==================================
+	float dushTimer_ = 0.0f;
+	// ダッシュする方向を設定する
+	Vector3 dushDirection_ = { 0.0f,0.0f,0.0f };
 
 private: // プレイヤーの行動関数
 
@@ -145,6 +162,11 @@ private: // プレイヤーの行動関数
 	/// 攻撃する処理
 	/// </summary>
 	void AttackUpdate();
+
+	/// <summary>
+	/// ダッシュの更新処理
+	/// </summary>
+	void DushUpdate();
 
 private: // プレイヤーの他の関数
 

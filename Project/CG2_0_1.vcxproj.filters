@@ -290,6 +290,7 @@
     <ClCompile Include="Application\Scene\ALGameScene.cpp" />
     <ClCompile Include="Application\Scene\ResultScene.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
+    <ClCompile Include="Application\Camera\FollowCameraController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -574,6 +575,7 @@
     <ClInclude Include="Application\Scene\ALGameScene.h" />
     <ClInclude Include="Application\Scene\ResultScene.h" />
     <ClInclude Include="Application\Enemy\BossEnemy.h" />
+    <ClInclude Include="Application\Camera\FollowCameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
