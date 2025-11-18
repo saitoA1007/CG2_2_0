@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include"Player.h"
 #include<algorithm>
 #include"GameParamEditor.h"
@@ -33,11 +34,38 @@ void Player::Update(GameEngine::InputCommand* inputCommand) {
 	ApplyDebugParam();
 #endif
 
-	// プレイヤーの入力処理
-	ProcessMoveInput(inputCommand);
+	// フレーム開始時に入力方向をリセット
+	bounceAwayDir_ = bounceAwayDir_; // NOP to avoid unused warnings if any macros
 
-	// プレイヤーのジャンプ処理
-	JumpUpdate();
+    // XZの目標速度リセット
+    desiredVelXZ_ = { 0.0f, 0.0f, 0.0f };
+
+	// 跳ね返り（硬直）中の更新を最優先
+	BounceUpdate();
+
+	// 入力・突進状態更新（硬直中は無効）
+	if (!isBounceLock_) {
+		ProcessMoveInput(inputCommand);
+		ChargeUpdate();
+	}
+
+	// 重力（常時適応）
+	velocity_.y += kFallAcceleration_ * FpsCounter::deltaTime;
+	// 縦方向の上限（落下最大速度）
+    velocity_.y = std::max(velocity_.y, (isAttackDown_ ? -kAttackDownSpeed_ : -MaxFallSpeed_));
+
+	// 速度を適応
+	worldTransform_.transform_.translate.x += velocity_.x * FpsCounter::deltaTime;
+	worldTransform_.transform_.translate.y += velocity_.y * FpsCounter::deltaTime;
+	worldTransform_.transform_.translate.z += velocity_.z * FpsCounter::deltaTime;
+
+	// 地面との当たり（仮）
+	if (worldTransform_.transform_.translate.y <= 0.0f) {
+		worldTransform_.transform_.translate.y = 0.0f;
+		if (velocity_.y < 0.0f) { velocity_.y = 0.0f; }
+		isJump_ = false;
+        isAttackDown_ = false;
+	}
 
 	// プレイヤーを移動範囲に制限
 	worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x,-9.0f,9.0f);
@@ -47,66 +75,198 @@ void Player::Update(GameEngine::InputCommand* inputCommand) {
 	worldTransform_.UpdateTransformMatrix();
 }
 
-void Player::ProcessMoveInput(GameEngine::InputCommand* inputCommand) {
-
-	// プレイヤーの移動操作
-	if (inputCommand->IsCommandAcitve("MoveUp")) {
-		worldTransform_.transform_.translate.z += kMoveSpeed_;
+void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
+	if (isPreCharging_ || isCharging_ || isBounceLock_) {
+		return;
 	}
 
-	if (inputCommand->IsCommandAcitve("MoveDown")) {
-		worldTransform_.transform_.translate.z -= kMoveSpeed_;
+	// 入力から方向を決める
+	Vector3 dir = { 0.0f, 0.0f, 0.0f };
+	// MoveUp/Down/Left/Rightの押下状態を確認
+	if (inputCommand->IsCommandAcitve("MoveUp")) { dir.z += 1.0f; }
+	if (inputCommand->IsCommandAcitve("MoveDown")) { dir.z -= 1.0f; }
+	if (inputCommand->IsCommandAcitve("MoveLeft")) { dir.x -= 1.0f; }
+	if (inputCommand->IsCommandAcitve("MoveRight")) { dir.x += 1.0f; }
+	// 正規化（斜め速度の過剰上昇を防ぐ）
+	if (dir.x != 0.0f || dir.z != 0.0f) {
+		dir = Normalize(dir);
 	}
+	float maxSpeed = (isJump_ ? kAirMoveSpeed_ : kMoveSpeed_);
+	desiredVelXZ_.x = dir.x * maxSpeed;
+	desiredVelXZ_.z = dir.z * maxSpeed;
 
-	if (inputCommand->IsCommandAcitve("MoveLeft")) {
-		worldTransform_.transform_.translate.x -= kMoveSpeed_;
-	}
+	// 加減速（地上/空中で異なるレート）
+	const float accel = (isJump_ ? kAirDeceleration_ : kGroundAcceleration_);
+	auto approach = [](float current, float target, float delta) {
+		if (current < target) {
+			current = std::min(current + delta, target);
+		} else if (current > target) {
+			current = std::max(current - delta, target);
+		}
+		return current;
+	};
+	velocity_.x = approach(velocity_.x, desiredVelXZ_.x, accel);
+	velocity_.z = approach(velocity_.z, desiredVelXZ_.z, accel);
 
-	if (inputCommand->IsCommandAcitve("MoveRight")) {
-		worldTransform_.transform_.translate.x += kMoveSpeed_;
-	}
-
-	// ジャンプ操作
-	if (inputCommand->IsCommandAcitve("Jump")) {
-		if (isJump_) { return; }
-		isJump_ = true;
-		jumpTimer_ = 0.0f;
+	// 攻撃操作
+	if (inputCommand->IsCommandAcitve("Attack")) {
+		if (isJump_) {
+			velocity_.y = -kAttackDownSpeed_;
+            isAttackDown_ = true;
+		} else {
+			StartCharge({ 0.0f,0.0f,1.0f });
+		}
 	}
 }
 
-void Player::JumpUpdate() {
-	// フラグが立っていなければ早期リターン
-	if (!isJump_) { return; }
+void Player::StartCharge(const Vector3& direction) {
+	// 突進開始(予備動作)
+	isPreCharging_ = true;
+	isCharging_ = false;
+	chargeTimer_ = 0.0f;
+	chargeActiveTimer_ = 0.0f;
+    velocity_ = { 0.0f,0.0f,0.0f };
+	// 方向を設定（正規化）
+	chargeDirection_ = Normalize(direction);
+}
 
-	jumpTimer_ += 1.0f / (FpsCounter::maxFrameCount * kJumpMaxTime_);
-
-	// ジャンプ処理
-	if (jumpTimer_ <= 0.5f) {
-		// ジャンプの上昇
-		float jumpUpTimer_ = jumpTimer_ / 0.5f;
-		worldTransform_.transform_.translate.y = Lerp(1.0f, kJumpHeight_, EaseOut(jumpUpTimer_));
-	} else {
-		// ジャンプの下降
-		float jumpDownTimer_ = (jumpTimer_ - 0.5f) / 0.5f;
-		worldTransform_.transform_.translate.y = Lerp(kJumpHeight_, 1.0f, EaseIn(jumpDownTimer_));
+void Player::ChargeUpdate() {
+	if (!isPreCharging_ && !isCharging_) {
+		return;
 	}
 
-	// 時間がたったらフラグをfalse
-	if (jumpTimer_ >= 1.0f) {
-		isJump_ = false;
+	// 予備動作中
+	if (isPreCharging_) {
+		chargeTimer_ += FpsCounter::deltaTime;
+		if (chargeTimer_ >= kPreChargeTime_) {
+			// 本突進へ移行
+			isPreCharging_ = false;
+			isCharging_ = true;
+			chargeActiveTimer_ = 0.0f;
+		}
+		return; // 予備動作中は移動しない
+	}
+
+	// 突進中
+	if (isCharging_) {
+		chargeActiveTimer_ += FpsCounter::deltaTime;
+		// 突進は一定速度
+		desiredVelXZ_.x = chargeDirection_.x * kChargeSpeed_;
+		desiredVelXZ_.z = chargeDirection_.z * kChargeSpeed_;
+		velocity_.x = desiredVelXZ_.x;
+		velocity_.z = desiredVelXZ_.z;
+		// 仮：突進終了条件(時間で終了)。
+		if (chargeActiveTimer_ > 1.0f) {
+			// テスト用に壁衝突処理を呼ぶ
+			ChargeWallBounce(chargeDirection_, false);
+		}
+	}
+}
+
+void Player::BounceUpdate() {
+	if (!isBounceLock_) { return; }
+
+	bounceLockTimer_ += FpsCounter::deltaTime;
+
+	// 硬直解除
+	if (bounceLockTimer_ >= currentBounceLockTime_) {
+		isBounceLock_ = false;
+		bounceLockTimer_ = 0.0f;
+		currentBounceUpSpeed_ = 0.0f;
+		currentBounceAwaySpeed_ = 0.0f;
+		currentBounceLockTime_ = 0.0f;
+		bounceAwayDir_ = {0.0f,0.0f,0.0f};
+	}
+}
+
+void Player::ChargeWallBounce(const Vector3 &bounceDirection, bool isGreatWall) {
+	if (isPreCharging_ || !isCharging_) {
+		return;
+	}
+	// 突進終了
+	isPreCharging_ = false;
+	isCharging_ = false;
+	isJump_ = true;
+
+	// 跳ね返りの初期設定（硬直開始）。方向は突進方向と逆
+	isBounceLock_ = true;
+	bounceLockTimer_ = 0.0f;
+	bounceAwayDir_ = { -bounceDirection.x, 0.0f, -bounceDirection.z };
+	bounceAwayDir_ = Normalize(bounceAwayDir_);
+
+	if (isGreatWall) {
+		velocity_ = bounceAwayDir_ * kGreatWallBounceAwaySpeed_;
+		velocity_.y = kGreatWallBounceUpSpeed_;
+		currentBounceLockTime_ = kGreatWallBounceLockTime_;
+	} else {
+		velocity_ = bounceAwayDir_ * kWallBounceAwaySpeed_;
+		velocity_.y = kWallBounceUpSpeed_;
+		currentBounceLockTime_ = kWallBounceLockTime_;
 	}
 }
 
 void Player::RegisterBebugParam() {
 	// 値の登録
-	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxHeight", kJumpHeight_);
-	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxTime", kJumpMaxTime_);
-	GameParamEditor::GetInstance()->AddItem("Player", "MoveSpeed", kMoveSpeed_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "JumpMaxHeight", kJumpHeight_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "JumpMaxTime", kJumpMaxTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "MoveSpeed", kMoveSpeed_);
+
+	// プレイヤー共通
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "AirMoveSpeed", kAirMoveSpeed_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "MaxFallSpeed", MaxFallSpeed_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "AirAcceleration", AirAcceleration_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "GroundAcceleration", kGroundAcceleration_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "AirDeceleration", kAirDeceleration_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "FallAcceleration", kFallAcceleration_);
+
+	// 突撃設定
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "PreChargeTime", kPreChargeTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "ChargeSpeed", kChargeSpeed_);
+
+	// 通常壁跳ね返り設定
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceUpSpeed", kWallBounceUpSpeed_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceAwaySpeed", kWallBounceAwaySpeed_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceLockTime", kWallBounceLockTime_);
+
+	// 強化壁跳ね返り設定
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "GreatWallBounceUpSpeed", kGreatWallBounceUpSpeed_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "GreatWallBounceAwaySpeed", kGreatWallBounceAwaySpeed_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "GreatWallBounceLockTime", kGreatWallBounceLockTime_);
+
+	// Attack（空中急降下）設定
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "AttackPreDownTime", kAttackPreDownTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "AttackDownSpeed", kAttackDownSpeed_);
 }
 
 void Player::ApplyDebugParam() {
 	// 値の適応
-	kJumpHeight_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "JumpMaxHeight");
-	kJumpMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "JumpMaxTime");
-	kMoveSpeed_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "MoveSpeed");
+	kJumpHeight_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "JumpMaxHeight");
+	kJumpMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "JumpMaxTime");
+	kMoveSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "MoveSpeed");
+
+	// プレイヤー共通
+	kAirMoveSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "AirMoveSpeed");
+	MaxFallSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "MaxFallSpeed");
+	AirAcceleration_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "AirAcceleration");
+	kGroundAcceleration_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "GroundAcceleration");
+	kAirDeceleration_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "AirDeceleration");
+	kFallAcceleration_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "FallAcceleration");
+
+	// 突撃設定
+	kPreChargeTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "PreChargeTime");
+	kChargeSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "ChargeSpeed");
+
+	// 通常壁跳ね返り設定
+	kWallBounceUpSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceUpSpeed");
+	kWallBounceAwaySpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceAwaySpeed");
+	kWallBounceLockTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceLockTime");
+
+	// 強化壁跳ね返り設定
+	kGreatWallBounceUpSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "GreatWallBounceUpSpeed");
+	kGreatWallBounceAwaySpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "GreatWallBounceAwaySpeed");
+	kGreatWallBounceLockTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "GreatWallBounceLockTime");
+
+	// Attack（空中急降下）設定
+	kAttackPreDownTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "AttackPreDownTime");
+	kAttackDownSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "AttackDownSpeed");
 }
