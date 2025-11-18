@@ -4,6 +4,6 @@
         "JumpMaxTime": 0.6499999761581421,
         "MoveSpeed": 20.0,
         "SceneName": "ALGameScene",
-        "TurnTime": 1.0
+        "TurnTime": 0.800000011920929
     }
 }

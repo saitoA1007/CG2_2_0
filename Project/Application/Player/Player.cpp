@@ -8,7 +8,10 @@
 #include"LogManager.h"
 using namespace GameEngine;
 
-void Player::Initialize() {
+void Player::Initialize(GameEngine::InputCommand* inputCommand) {
+
+	// 入力処理を受け取る
+	inputCommand_ = inputCommand;
 
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
@@ -25,6 +28,13 @@ void Player::Initialize() {
 		this->OnCollisionEnter(result);
 	});
 
+	// プレイヤーの更新状態を設定する
+	behaviorsTable_ = {
+		[this]() { NormalUpdate(); },
+		[this]() { AttackUpdate(); },
+		[this]() { JumpUpdate(); }
+	};
+
 #ifdef _DEBUG
 	// 値を登録する
 	RegisterBebugParam();
@@ -35,23 +45,42 @@ void Player::Initialize() {
 #endif
 }
 
-void Player::Update(GameEngine::InputCommand* inputCommand) {
+void Player::Update() {
 #ifdef _DEBUG
 	// 値を適応
 	ApplyDebugParam();
 #endif
 
-	// プレイヤー情報
-	playerInfo playerInfo;
+	if (behaviorRequest_) {
+		// 状態を変更
+		behavior_ = behaviorRequest_.value();
+
+		// 振る舞いによる初期化を呼び出す
+		switch (behavior_)
+		{
+		case Player::Behavior::Normal:
+			break;
+		case Player::Behavior::Attack:
+			break;
+		case Player::Behavior::Jump:
+			jumpTimer_ = 0.0f;
+			break;
+		default:
+			break;
+		}
+		// 振る舞いのリクエストをクリア
+		behaviorRequest_ = std::nullopt;
+	}
+
+	// 移動のリセット
+	move = {0.0f,0.0f,0.0f};
+	isMove = false;
 
 	// プレイヤーの入力処理
-	ProcessMoveInput(inputCommand, playerInfo);
+	ProcessMoveInput();
 
-	// 移動処理
-	Move(playerInfo);
-
-	// プレイヤーのジャンプ処理
-	JumpUpdate();
+	// プレイヤーの状態による更新処理をおこなう
+	behaviorsTable_[static_cast<size_t>(behavior_)]();
 
 	// プレイヤーを移動範囲に制限
 	//worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x,-9.0f,9.0f);
@@ -64,50 +93,50 @@ void Player::Update(GameEngine::InputCommand* inputCommand) {
 	collider_->SetWorldPosition(worldTransform_.transform_.translate);
 }
 
-void Player::ProcessMoveInput(GameEngine::InputCommand* inputCommand, playerInfo& playerInfo) {
+void Player::ProcessMoveInput() {
 
 	// プレイヤーの移動操作
-	if (inputCommand->IsCommandAcitve("MoveUp")) {
-		playerInfo.move.z = 1.0f;
-		playerInfo.isMove = true;
+	if (inputCommand_->IsCommandAcitve("MoveUp")) {
+		move.z = 1.0f;
+		isMove = true;
 	}
 
-	if (inputCommand->IsCommandAcitve("MoveDown")) {
-		playerInfo.move.z = -1.0f;
-		playerInfo.isMove = true;
+	if (inputCommand_->IsCommandAcitve("MoveDown")) {
+		move.z = -1.0f;
+		isMove = true;
 	}
 
-	if (inputCommand->IsCommandAcitve("MoveLeft")) {
-		playerInfo.move.x = -1.0f;
-		playerInfo.isMove = true;
+	if (inputCommand_->IsCommandAcitve("MoveLeft")) {
+		move.x = -1.0f;
+		isMove = true;
 	}
 
-	if (inputCommand->IsCommandAcitve("MoveRight")) {
-		playerInfo.move.x = 1.0f;
-		playerInfo.isMove = true;
+	if (inputCommand_->IsCommandAcitve("MoveRight")) {
+		move.x = 1.0f;
+		isMove = true;
 	}
 
 	// ジャンプ操作
-	if (inputCommand->IsCommandAcitve("Jump")) {
-		if (isJump_) { return; }
-		isJump_ = true;
-		jumpTimer_ = 0.0f;
+	if (inputCommand_->IsCommandAcitve("Jump")) {
+		if (behavior_ != Behavior::Jump) {
+			behaviorRequest_ = Behavior::Jump;
+		}
 	}
 }
 
-void Player::Move(playerInfo& playerInfo) {
+void Player::Move() {
 	// 移動
-	if (playerInfo.isMove) {
+	if (isMove) {
 		// 正規化する
-		playerInfo.move = Normalize(playerInfo.move);
-		playerInfo.move = TransformNormal(playerInfo.move, rotateMatrix_);
-		playerInfo.move.y = 0.0f;
-		playerInfo.move = Normalize(playerInfo.move);
+		move = Normalize(move);
+		move = TransformNormal(move, rotateMatrix_);
+		move.y = 0.0f;
+		move = Normalize(move);
 		// 移動する
-		worldTransform_.transform_.translate += playerInfo.move * kMoveSpeed_ * FpsCounter::deltaTime;
+		worldTransform_.transform_.translate += move * kMoveSpeed_ * FpsCounter::deltaTime;
 
 		// 角度を設定する
-		float tmpRotateY = std::atan2f(playerInfo.move.x, playerInfo.move.z);
+		float tmpRotateY = std::atan2f(move.x, move.z);
 
 		// 角度が変化していれば更新
 		if (tmpRotateY != targetRotateY_) {
@@ -124,11 +153,18 @@ void Player::Move(playerInfo& playerInfo) {
 	}
 }
 
-void Player::JumpUpdate() {
-	// フラグが立っていなければ早期リターン
-	if (!isJump_) { return; }
+void Player::NormalUpdate() {
+	// 移動処理
+	Move();
+}
 
-	jumpTimer_ += 1.0f / (FpsCounter::maxFrameCount * kJumpMaxTime_);
+void Player::JumpUpdate() {
+
+	// 移動処理
+	Move();
+
+	// ジャンプの移動処理
+	jumpTimer_ += FpsCounter::deltaTime / kJumpMaxTime_;
 
 	// ジャンプ処理
 	if (jumpTimer_ <= 0.5f) {
@@ -143,8 +179,12 @@ void Player::JumpUpdate() {
 
 	// 時間がたったらフラグをfalse
 	if (jumpTimer_ >= 1.0f) {
-		isJump_ = false;
+		behaviorRequest_ = Behavior::Normal;
 	}
+}
+
+void Player::AttackUpdate() {
+
 }
 
 void Player::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {

@@ -24,6 +24,9 @@ void GEScene::Initialize(SceneContext* context) {
 
 #pragma endregion
 
+	// 入力コマンドを設定する
+	InputRegisterCommand();
+
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
@@ -32,7 +35,7 @@ void GEScene::Initialize(SceneContext* context) {
 	playerModel_ = context_->modelManager->GetNameByModel("Cube");
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();
-	player_->Initialize();
+	player_->Initialize(context_->inputCommand);
 
 	// カメラをコントロールするクラスを初期化
 	cameraController_ = std::make_unique<CameraController>();
@@ -54,9 +57,6 @@ void GEScene::Initialize(SceneContext* context) {
 	// ログのテスト
 	Log("HallWorldConsloe","test");
 	Log("HallWorldConsloe");
-
-	// 入力コマンドを設定する
-	InputRegisterCommand();
 }
 
 void GEScene::Update() {
@@ -65,7 +65,7 @@ void GEScene::Update() {
 	debugRenderer_->Clear();
 
 	// プレイヤーの更新処理
-	player_->Update(context_->inputCommand);
+	player_->Update();
 
 	// パーティクルの更新処理
 	testParticle_->Update(mainCamera_->GetWorldMatrix());

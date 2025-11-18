@@ -1,4 +1,8 @@
 #pragma once
+#include <optional>
+#include<array>
+#include<functional>
+
 #include"WorldTransform.h"
 #include"InputCommand.h"
 #include"Collider.h"
@@ -6,10 +10,13 @@
 class Player {
 public:
 
-	// プレイヤー情報
-	struct playerInfo {
-		Vector3 move = {0.0f,0.0f,0.0f}; // 移動処理
-		bool isMove = false; // 移動フラグ
+	// プレイヤーの行動パターン
+	enum class Behavior {
+		Normal, // 通常状態
+		Attack, // 攻撃状態
+		Jump,   // ジャンプ状態
+
+		MaxCount // 状態の数
 	};
 
 public:
@@ -18,13 +25,13 @@ public:
 	/// 初期化処理
 	/// </summary>
 	/// <param name="model"></param>
-	void Initialize();
+	void Initialize(GameEngine::InputCommand* inputCommand);
 
 	/// <summary>
 	/// 更新処理
 	/// </summary>
 	/// <param name="inputCommand"></param>
-	void Update(GameEngine::InputCommand* inputCommand);
+	void Update();
 
 	/// <summary>
 	/// ワールド行列を取得
@@ -74,45 +81,72 @@ private:
 
 private:
 
+	// 入力処理
+	GameEngine::InputCommand* inputCommand_;
+
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
 
+	// 移動処理
+	Vector3 move = { 0.0f,0.0f,0.0f };
+
+	// 速度
+	Vector3 velocity_ = {};
+	
+	// 移動フラグ
+	bool isMove = false;  
 	// 生存フラグ
 	bool isAlive_ = true;
-
-	// ジャンプフラグ
-	bool isJump_ = false;
 	
 	// ジャンプタイマー
 	float jumpTimer_ = 0.0f;
-
-	// ベクトル変換用の行列
-	Matrix4x4 rotateMatrix_;
 
 	// 旋回するために必要な変数
 	float turnTimer_ = 0.0f;
 	float targetRotateY_ = 0.0f;
 
+	// ベクトル変換用の行列
+	Matrix4x4 rotateMatrix_;
+
 	// 球の当たり判定
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
 
-private:
+	// プレイヤーの振る舞い
+	Behavior behavior_ = Behavior::Normal;
+	// 振る舞いの変更を管理
+	std::optional<Behavior> behaviorRequest_ = std::nullopt;
+	// プレイヤーの状態テーブル
+	std::array<std::function<void()>, static_cast<size_t>(Behavior::MaxCount)> behaviorsTable_;
+
+private: // プレイヤーの行動関数
 
 	/// <summary>
 	/// プレイヤーの入力処理
 	/// </summary>
 	/// <param name="inputCommand"></param>
-	void ProcessMoveInput(GameEngine::InputCommand* inputCommand,playerInfo& playerInfo);
+	void ProcessMoveInput();
 
 	/// <summary>
 	/// 移動処理
 	/// </summary>
-	void Move(playerInfo& playerInfo);
+	void Move();
+
+	/// <summary>
+	/// 通常の更新処理
+	/// </summary>
+	void NormalUpdate();
 
 	/// <summary>
 	/// ジャンプする処理
 	/// </summary>
 	void JumpUpdate();
+
+	/// <summary>
+	/// 攻撃する処理
+	/// </summary>
+	void AttackUpdate();
+
+private: // プレイヤーの他の関数
 
 	/// <summary>
 	/// 当たり判定
