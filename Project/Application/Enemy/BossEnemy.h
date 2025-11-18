@@ -39,13 +39,19 @@ public:
 	/// <returns></returns>
 	bool GetIsAlive() const { return isAlive_; }
 
+	/// <summary>
+	/// 透明度を取得
+	/// </summary>
+	/// <returns></returns>
+	float GetAlpha() const { return alpha_; }
+
 private:
 
 	// 最大hp
 	uint32_t maxHp_ = 3;
 
 	// 当たり判定の大きさ
-	float collisionRadius_ = 4.0f;
+	float collisionRadius_ = 2.5f;
 
 private:
 
@@ -60,6 +66,14 @@ private:
 
 	// 球の当たり判定
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
+
+	float alpha_ = 1.0f;
+
+	bool isHit_ = false;
+
+	float hitTimer_ = 0.0f;
+
+	float maxHitTime_ = 1.0f;
 
 private:
 

@@ -1,5 +1,6 @@
 #include"BossEnemy.h"
 #include"CollisionConfig.h"
+#include"FPSCounter.h"
 #include"Application/Player/Player.h"
 #include"Application/CollisionTypeID.h"
 #include"LogManager.h"
@@ -38,6 +39,23 @@ void BossEnemy::Update() {
 	ApplyDebugParam();
 #endif
 
+	// ヒットした時に点滅する処理
+	if (isHit_) {
+		hitTimer_ += FpsCounter::deltaTime / maxHitTime_;
+
+		if (static_cast<int>(hitTimer_ * 20.0f) % 2 == 0) {
+			alpha_ = 1.0f;
+		} else {
+			alpha_ = 0.5f;
+		}
+
+		if (hitTimer_ >= maxHitTime_) {
+			isHit_ = false;
+			alpha_ = 1.0f;
+			hitTimer_ = 0.0f;
+		}
+	}
+
 	// 行列の更新
 	worldTransform_.UpdateTransformMatrix();
 
@@ -47,13 +65,15 @@ void BossEnemy::Update() {
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
 
+	if (isHit_) { return; }
+
 	if (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Player)) {
 		Player* player = result.userData.As<Player>();
 
 		if (player->GetPlayerBehavior() == Player::Behavior::Jump) {
 			Log("isHitBoss");
 			hp_ -= 1;
-
+			isHit_ = true;
 			if (hp_ <= 0) {
 				isAlive_ = false;
 			}

@@ -1,6 +1,7 @@
 #include"FollowCameraController.h"
 #include"MyMath.h"
 #include"EasingManager.h"
+#include"FPSCounter.h"
 using namespace GameEngine;
 
 void FollowCameraController::Initialize() {
@@ -45,7 +46,7 @@ void FollowCameraController::Update(GameEngine::InputCommand* inputCommand) {
 
 void FollowCameraController::FollowPosition() {
 	// 追従対象とオフセットと追従対象の速度からカメラの目標座標を計算
-	TargetCoordinate_ = targetPos_ + targetVelocity_ * kVelocityBias;
+	TargetCoordinate_ = targetPos_ + targetVelocity_ * (kVelocityBias * FpsCounter::deltaTime);
 
 	// 座標補間によりゆったり追従
 	target = Lerp(target, TargetCoordinate_, kInterpolationRate);

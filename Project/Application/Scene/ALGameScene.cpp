@@ -77,7 +77,6 @@ void ALGameScene::Initialize(SceneContext* context) {
 	// ボス敵クラスを初期化
 	bossEnemy_ = std::make_unique<BossEnemy>();
 	bossEnemy_->Initialize();
-
 }
 
 void ALGameScene::Update() {
@@ -109,6 +108,7 @@ void ALGameScene::Update() {
 
 	// ボス敵の更新処理
 	bossEnemy_->Update();
+	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,bossEnemy_->GetAlpha() });
 
 	// カメラの更新処理
 	mainCamera_->SetCamera(followCameraController_->GetCamera());
