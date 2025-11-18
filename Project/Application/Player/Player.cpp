@@ -5,12 +5,27 @@
 #include"EasingManager.h"
 #include"MyMath.h"
 #include"FPSCounter.h"
+#include"CollisionConfig.h"
+#include"Application/CollisionTypeID.h"
+#include "LogManager.h"
 using namespace GameEngine;
 
 void Player::Initialize() {
 
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
+
+	// コライダー生成・設定
+	collider_ = std::make_unique<SphereCollider>();
+	collider_->SetRadius(sphereData_.radius);
+	collider_->SetWorldPosition(worldTransform_.transform_.translate);
+	collider_->SetCollisionAttribute(kCollisionAttributePlayer);
+	collider_->SetCollisionMask(~kCollisionAttributePlayer); // プレイヤー以外全部
+	// ユーザーデータ設定（IDのみ暫定）
+	UserData userData; userData.typeID = static_cast<uint32_t>(CollisionTypeID::Player); userData.object = nullptr; // object設定は必要なら後で
+	collider_->SetUserData(userData);
+	// コールバック登録
+	collider_->SetOnCollisionCallback([this](const CollisionResult& result) { this->OnCollision(result); });
 
 #ifdef _DEBUG
 	//===========================================================
@@ -67,12 +82,15 @@ void Player::Update(GameEngine::InputCommand* inputCommand) {
         isAttackDown_ = false;
 	}
 
-	// プレイヤーを移動範囲に制限
-	worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x,-9.0f,9.0f);
-	worldTransform_.transform_.translate.z = std::clamp(worldTransform_.transform_.translate.z, -9.0f, 9.0f);
-
 	// 行列の更新
 	worldTransform_.UpdateTransformMatrix();
+
+	// コライダー位置同期
+	if (collider_) {
+		collider_->SetWorldPosition(worldTransform_.transform_.translate);
+        // 球データ同期
+        sphereData_.center = worldTransform_.transform_.translate;
+	}
 }
 
 void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
@@ -155,11 +173,6 @@ void Player::ChargeUpdate() {
 		desiredVelXZ_.z = chargeDirection_.z * kChargeSpeed_;
 		velocity_.x = desiredVelXZ_.x;
 		velocity_.z = desiredVelXZ_.z;
-		// 仮：突進終了条件(時間で終了)。
-		if (chargeActiveTimer_ > 1.0f) {
-			// テスト用に壁衝突処理を呼ぶ
-			ChargeWallBounce(chargeDirection_, false);
-		}
 	}
 }
 
@@ -202,6 +215,29 @@ void Player::ChargeWallBounce(const Vector3 &bounceDirection, bool isGreatWall) 
 		velocity_ = bounceAwayDir_ * kWallBounceAwaySpeed_;
 		velocity_.y = kWallBounceUpSpeed_;
 		currentBounceLockTime_ = kWallBounceLockTime_;
+	}
+}
+
+void Player::OnCollision(const CollisionResult &result) {
+
+	Log("is hit.");
+
+	// 壁との衝突から跳ね返りを誘発（突進中のみ）
+	if (!result.isHit) {
+		return;
+	}
+
+	
+	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss)) == false;
+	if (isCharging_ && isWall) {
+		// 接触法線を利用して跳ね返り
+		Vector3 normal = result.contactNormal;
+		// XZ成分で跳ね返り方向作成
+		Vector3 bounceDir = { normal.x, 0.0f, normal.z };
+		if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
+		// 強化壁判定 (例: penetrationDepthが大きい場合など仮)
+		bool isGreat = false; // 今後必要なら result.userData から判定
+		ChargeWallBounce(bounceDir, isGreat);
 	}
 }
 

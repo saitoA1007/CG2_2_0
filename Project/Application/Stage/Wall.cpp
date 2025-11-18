@@ -2,6 +2,7 @@
 #include"CollisionConfig.h"
 #include"FPSCounter.h"
 #include"Application/CollisionTypeID.h"
+#include "LogManager.h"
 using namespace GameEngine;
 
 void Wall::Initialilze(const Transform& transform, float respawnTime, uint32_t maxHp) {
@@ -56,6 +57,8 @@ void Wall::Update() {
 }
 
 void Wall::OnCollision([[maybe_unused]] const GameEngine::CollisionResult& result) {
+
+	Log("is hit.");
 
 	// 生存フラグがfalseなら早期リターン
 	if (!isAlive_) { return; }

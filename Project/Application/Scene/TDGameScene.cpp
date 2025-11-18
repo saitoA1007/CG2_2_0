@@ -159,6 +159,10 @@ void TDGameScene::InputRegisterCommand() {
 }
 
 void TDGameScene::UpdateCollision() {
+    collisionManager_->AddCollider(player_->GetCollider());
+#ifdef _DEBUG
+    debugRenderer_->AddSphere(player_->GetSphereData());
+#endif
 
 	// 生存している壁の要素を取得する
 	const std::vector<Wall*> aliveWalls =  stageManager_->GetAliveWalls();

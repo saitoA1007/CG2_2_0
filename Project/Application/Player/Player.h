@@ -1,6 +1,7 @@
 #pragma once
 #include"WorldTransform.h"
 #include"InputCommand.h"
+#include"Collider.h"
 
 class Player {
 public:
@@ -28,6 +29,16 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	Vector3 GetPlayerPos() { return worldTransform_.GetWorldPosition(); }
+
+	/// <summary>
+	/// コライダー取得
+	/// </summary>
+	GameEngine::Collider* GetCollider() { return collider_.get(); }
+
+    /// <summary>
+    /// プレイヤーの当たり判定用の球データを取得
+	/// </summary>
+    Sphere GetSphereData() const { return sphereData_; }
 
 private:
 	//==================================================
@@ -102,6 +113,9 @@ private:
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
 
+    // プレイヤーの当たり判定用の球データ
+    Sphere sphereData_ = { {0.0f,0.0f,0.0f}, 2.f };
+
     // 速度ベクトル
 	Vector3 velocity_ = {0.0f,0.0f,0.0f};
     // XZの目標速度
@@ -131,6 +145,9 @@ private:
 
 	// 急降下攻撃フラグ
     bool isAttackDown_ = false;
+
+	// プレイヤー用コライダー（球）
+	std::unique_ptr<GameEngine::SphereCollider> collider_;
 
 private:
 
@@ -162,6 +179,11 @@ private:
     /// <param name="bounceDirection">跳ね返り方向</param>
 	/// <param name="isGreatWall">強化壁かどうか</param>
 	void ChargeWallBounce(const Vector3 &bounceDirection, bool isGreatWall);
+
+	/// <summary>
+	/// 当たり判定コールバック
+	/// </summary>
+	void OnCollision(const GameEngine::CollisionResult& result);
 
 	/// <summary>
 	/// 値を登録する
