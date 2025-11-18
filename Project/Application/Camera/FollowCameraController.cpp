@@ -48,7 +48,7 @@ void FollowCameraController::FollowPosition() {
 	TargetCoordinate_ = targetPos_ + targetVelocity_ * kVelocityBias;
 
 	// 座標補間によりゆったり追従
-	target = Lerp(position_, TargetCoordinate_, kInterpolationRate);
+	target = Lerp(target, TargetCoordinate_, kInterpolationRate);
 }
 
 Matrix4x4 FollowCameraController::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {

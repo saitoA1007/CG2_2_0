@@ -38,7 +38,7 @@ void GEScene::Initialize(SceneContext* context) {
 	player_->Initialize(context_->inputCommand);
 
 	// カメラをコントロールするクラスを初期化
-	cameraController_ = std::make_unique<CameraController>();
+	cameraController_ = std::make_unique<FollowCameraController>();
 	cameraController_->Initialize();
 
 	// 画像
@@ -71,7 +71,7 @@ void GEScene::Update() {
 	testParticle_->Update(mainCamera_->GetWorldMatrix());
 
 	// カメラコントロールの更新処理
-	cameraController_->Update(context_->inputCommand,player_->GetPlayerPos());
+	cameraController_->Update(context_->inputCommand);
 
 	// カメラの更新処理
 	mainCamera_->SetCamera(cameraController_->GetCamera());

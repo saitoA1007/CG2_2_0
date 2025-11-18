@@ -11,7 +11,7 @@
 
 // アプリ機能をインクルード
 #include"Application/Player/Player.h"
-#include"Application/Camera/CameraController.h"
+#include"Application/Camera/FollowCameraController.h"
 #include"Application/Light/SceneLightingController.h"
 #include"Application/Enemy/BossEnemy.h"
 
@@ -87,7 +87,7 @@ private: // シーン機能
 	std::unique_ptr<Player> player_;
 
 	// カメラコントローラークラス
-	std::unique_ptr<CameraController> cameraController_;
+	std::unique_ptr<FollowCameraController> followCameraController_;
 
 	// ボスキャラのモデル
 	GameEngine::Model* bossEnemyModel_;

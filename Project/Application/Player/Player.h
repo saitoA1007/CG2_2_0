@@ -47,6 +47,12 @@ public:
 	Vector3 GetPlayerPos() { return worldTransform_.GetWorldPosition(); }
 
 	/// <summary>
+	/// プレイヤーの速度を取得
+	/// </summary>
+	/// <returns></returns>
+	Vector3 GetVelocity() const { return velocity_; }
+
+	/// <summary>
 	/// カメラ方向へ向けるための行列を設定
 	/// </summary>
 	/// <param name="vpMatrix"></param>

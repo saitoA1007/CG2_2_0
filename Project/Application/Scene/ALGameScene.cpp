@@ -60,8 +60,8 @@ void ALGameScene::Initialize(SceneContext* context) {
 	player_->Initialize(context_->inputCommand);
 
 	// カメラをコントロールするクラスを初期化
-	cameraController_ = std::make_unique<CameraController>();
-	cameraController_->Initialize();
+	followCameraController_ = std::make_unique<FollowCameraController>();
+	followCameraController_->Initialize();
 
 	// ボスモデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Cube");
@@ -82,18 +82,20 @@ void ALGameScene::Update() {
 	// ライトの更新処理
 	sceneLightingController_->Update();
 
-	// カメラコントロールの更新処理
-	cameraController_->Update(context_->inputCommand, player_->GetPlayerPos());
-
 	// プレイヤーの更新処理
-	player_->SetRotateMatrix(cameraController_->GetRotateMatrix());
+	player_->SetRotateMatrix(followCameraController_->GetRotateMatrix());
 	player_->Update();
+
+	// カメラコントロールの更新処理
+	followCameraController_->Update(context_->inputCommand);
+	// プレイヤーの要素をカメラに送る
+	followCameraController_->SetFollowPos(player_->GetPlayerPos(), player_->GetVelocity());
 
 	// ボス敵の更新処理
 	bossEnemy_->Update();
 
 	// カメラの更新処理
-	mainCamera_->SetCamera(cameraController_->GetCamera());
+	mainCamera_->SetCamera(followCameraController_->GetCamera());
 
 	// 当たり判定の更新処理
 	UpdateCollision();

@@ -10,13 +10,12 @@
 #include"DebugRenderer.h"
 
 #include"Application/Player/Player.h"
-#include"Application/Camera/CameraController.h"
+#include"Application/Camera/FollowCameraController.h"
 
 #include"ParticleSystem/ParticleBehavior.h"
 
 class GEScene : public BaseScene {
 public:
-
 	~GEScene();
 
 	/// <summary>
@@ -71,7 +70,7 @@ private: // シーン機能
 	std::unique_ptr<Player> player_;
 
 	// カメラコントローラークラス
-	std::unique_ptr<CameraController> cameraController_;
+	std::unique_ptr<FollowCameraController> cameraController_;
 
 	// uvChecker
 	std::unique_ptr<GameEngine::Sprite> sprite_;

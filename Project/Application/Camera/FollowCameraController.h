@@ -65,9 +65,9 @@ private:
 	Vector3 TargetCoordinate_ = {};
 
 	// 座標補間割合
-	float kInterpolationRate = 0.1f;
+	float kInterpolationRate = 0.2f;
 	// 速度掛け率
-	float kVelocityBias = 20.0f;
+	float kVelocityBias = -0.5f;
 
 private:
 
@@ -80,5 +80,8 @@ private:
 	/// <returns></returns>
 	Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
 
+	/// <summary>
+	/// カメラの追尾位置に補間
+	/// </summary>
 	void FollowPosition();
 };
