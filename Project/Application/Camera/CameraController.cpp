@@ -8,10 +8,10 @@ void CameraController::Initialize() {
 	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},position_ }, 1280, 720);
 }
 
-void CameraController::Update(GameEngine::InputCommand* inputCommand, const Vector3& targetPos) {
+void CameraController::Update(GameEngine::InputCommand* inputCommand) {
 
 	// 注目する位置を取得
-	Vector3 target = targetPos;
+    Vector3 target = target_.emplace<Vector3>();
 	target.y = 1.0f;
 
 	// カメラ操作

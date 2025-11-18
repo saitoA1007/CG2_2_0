@@ -1,9 +1,12 @@
 #pragma once
 #include"Camera.h"
 #include"InputCommand.h"
+#include "Geometry.h"
+#include <variant>
 
 class CameraController {
 public:
+	using Target = std::variant<Vector3, Line>;
 
 	/// <summary>
 	/// 初期化
@@ -15,7 +18,13 @@ public:
 	/// </summary>
 	/// <param name="inputCommand"></param>
 	/// <param name="targetPos"></param>
-	void Update(GameEngine::InputCommand* inputCommand,const Vector3& targetPos);
+	void Update(GameEngine::InputCommand* inputCommand);
+
+	/// <summary>
+    /// ターゲットの設定
+    /// </summary>
+	/// <param name="target"></param>
+    void SetTarget(const Target &target) { target_ = target; }
 
 	/// <summary>
 	/// カメラデータ
@@ -34,6 +43,9 @@ private:
 
 	// 回転の移動量
 	Vector2 rotateMove_ = { 3.1f,1.0f };
+
+	// ターゲット
+    Target target_ = Vector3{ 0.0f,0.0f,0.0f };
 
 private:
 

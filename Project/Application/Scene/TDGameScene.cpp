@@ -84,7 +84,7 @@ void TDGameScene::Update() {
 	player_->Update(context_->inputCommand);
 
 	// カメラコントロールの更新処理
-	cameraController_->Update(context_->inputCommand, player_->GetPlayerPos());
+	cameraController_->Update(context_->inputCommand);
 
 	// カメラの更新処理
 	mainCamera_->SetCamera(cameraController_->GetCamera());
