@@ -5,6 +5,7 @@ namespace GameEngine {
 
 	// 基底クラス
 	class GameObject {
+	public:
 		virtual ~GameObject() = default;
 	};
 
