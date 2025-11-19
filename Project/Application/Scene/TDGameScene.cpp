@@ -48,6 +48,12 @@ void TDGameScene::Initialize(SceneContext* context) {
 	sceneLightingController_ = std::make_unique<SceneLightingController>();
 	sceneLightingController_->Initialize(context_->graphicsDevice->GetDevice());
 
+	// 壁を生成する
+	wallModel_ = context_->modelManager->GetNameByModel("Wall");
+	// ステージを生成を初期化
+	stageManager_ = std::make_unique<StageManager>();
+	stageManager_->Initialize();
+
 	// プレイヤーモデルを生成
 	playerModel_ = context_->modelManager->GetNameByModel("Triangular");
 	playerModel_->SetDefaultIsEnableLight(true);
@@ -59,11 +65,13 @@ void TDGameScene::Initialize(SceneContext* context) {
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
 
-	// 壁を生成する
-	wallModel_ = context_->modelManager->GetNameByModel("Wall");
-	// ステージを生成を初期化
-	stageManager_ = std::make_unique<StageManager>();
-	stageManager_->Initialize();
+	// ボス敵モデルを生成
+	bossEnemyModel_ = context_->modelManager->GetNameByModel("Cube");
+	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
+	bossEnemyModel_->SetDefaultIsEnableLight(true);
+	// ボス敵クラスを初期化
+	bossEnemy_ = std::make_unique<BossEnemy>();
+	bossEnemy_->Initialize(stageManager_->GetRadius());
 
 	// 入力コマンドを設定する
 	InputRegisterCommand();
@@ -88,6 +96,9 @@ void TDGameScene::Update() {
 
 	// カメラの更新処理
 	mainCamera_->SetCamera(cameraController_->GetCamera());
+
+	// 敵の移動処理
+	bossEnemy_->Update(player_->GetPlayerPos());
 
 	// 当たり判定の更新処理
 	UpdateCollision();
@@ -124,6 +135,10 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	uint32_t DefaultWhiteGH = 0;
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform(), DefaultWhiteGH);
+
+	// 敵を描画
+	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
 
 #ifdef _DEBUG
 
@@ -190,10 +205,8 @@ void TDGameScene::DebugUpdate() {
 	// 生存している壁の要素を取得する
 	const std::vector<Wall*> aliveWalls = stageManager_->GetAliveWalls();
 	for (auto& wall : aliveWalls) {
-#ifdef _DEBUG
 		// デバック描画に追加
 		debugRenderer_->AddBox(wall->GetOBBData());
-#endif
 	}
 
 	// 当たり判定の表示管理

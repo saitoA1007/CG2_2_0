@@ -1,5 +1,5 @@
 #include"BossStateBattle.h"
-
+#include"Application/Enemy/BossState.h"
 using namespace GameEngine;
 
 BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius) : bossContext_(context) {

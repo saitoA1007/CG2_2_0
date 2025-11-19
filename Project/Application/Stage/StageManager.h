@@ -27,6 +27,8 @@ public:
 	/// </summary>
 	void DebugUpdate();
 
+public:
+
 	/// <summary>
 	/// 壁の要素を取得
 	/// </summary>
@@ -38,6 +40,12 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	std::vector<Wall*>& GetAliveWalls() { return aliveWalls_; }
+
+	/// <summary>
+	/// ステージの半径を取得
+	/// </summary>
+	/// <returns></returns>
+	const float& GetRadius() const { return radius_; }
 
 private:
 

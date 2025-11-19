@@ -14,4 +14,15 @@ private:
     // ボスの共通データを取得
     BossContext& bossContext_;
 
+private:
+
+	/// <summary>
+	/// 値を登録する
+	/// </summary>
+	void RegisterBebugParam();
+
+	/// <summary>
+	/// 値を適応する
+	/// </summary>
+	void ApplyDebugParam();
 };

@@ -14,6 +14,7 @@
 #include"Application/Camera/CameraController.h"
 #include"Application/Light/SceneLightingController.h"
 #include"Application/Stage/StageManager.h"
+#include"Application/Enemy/BossEnemy.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -94,6 +95,11 @@ private: // シーン機能
 	// ステージを生成する
 	GameEngine::Model* wallModel_;
 	std::unique_ptr<StageManager> stageManager_;
+
+	// ボス敵モデル
+	GameEngine::Model* bossEnemyModel_;
+	// ボス敵
+	std::unique_ptr<BossEnemy> bossEnemy_;
 
 private:
 
