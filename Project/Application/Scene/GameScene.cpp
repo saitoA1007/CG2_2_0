@@ -49,8 +49,10 @@ void GameScene::Initialize(SceneContext* context) {
 	// ボーンアニメーションを生成する
 	bronAnimationModel_ = context_->modelManager->GetNameByModel("Walk");
 	bronAnimationWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
-	// ボーンアニメーションデータを取得する
+	// ボーンアニメーションデータを取得する。
+	// アニメーションするデータを取得している。現在は先頭の1つのアニメーションデータしか取得していない。
 	bronAnimation_ = Model::LoadAnimationFile("walk.gltf", "Walk");
+	// モデルからボーン情報を取得する
 	skeletonBron_ = Model::CreateSkeleton(bronAnimationModel_->modelData_.rootNode);
 	skinClusterBron_ = Animation::CreateSkinCluster(skeletonBron_, bronAnimationModel_->modelData_);
 	timer_ = 0.0f;
@@ -72,6 +74,7 @@ void GameScene::Update() {
 
 	timer_ += FpsCounter::deltaTime;
 	float animationTime = fmodf(timer_, bronAnimation_.duration);
+	// アニメーションデータ(これは変化しない)を元にボーン達を変更する
 	Animation::Update(skinClusterBron_, skeletonBron_, bronAnimation_, animationTime);
 
 	// カメラの更新処理
