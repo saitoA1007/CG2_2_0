@@ -52,7 +52,7 @@ void BossEnemy::Update(const Vector3& targetPos) {
 
     // 状態変更が有効であれば、切り替える
     if (bossContext_.bossStateRequest_) {
-        currentState_->Exit();
+        //currentState_->Exit();
         currentState_ = nullptr;
 #ifdef _DEBUG
         // 切り替わった状態のログを出す
@@ -74,7 +74,7 @@ void BossEnemy::Update(const Vector3& targetPos) {
     worldTransform_.UpdateTransformMatrix();
 
     // 体の当たり判定の位置を設定する
-    //bodyCollider_->SetWorldPosition(worldTransform_.transform_.translate);
+    bodyCollider_->SetWorldPosition(worldTransform_.transform_.translate);
 }
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {

@@ -7,6 +7,7 @@ BossStateOut::BossStateOut(BossContext& context) : bossContext_(context) {
 #ifdef _DEBUG
 	// 値を登録する
 	RegisterBebugParam();
+	ApplyDebugParam();
 #else
 	// 値を適応させる
 	ApplyDebugParam();
