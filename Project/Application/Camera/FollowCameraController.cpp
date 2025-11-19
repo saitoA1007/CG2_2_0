@@ -17,11 +17,11 @@ void FollowCameraController::Update(GameEngine::InputCommand* inputCommand) {
 
 	// カメラ操作
 	if (inputCommand->IsCommandAcitve("CameraMoveLeft")) {
-		rotateMove_.x += 0.02f;
+		rotateMove_.x += 0.04f;
 	}
 
 	if (inputCommand->IsCommandAcitve("CameraMoveRight")) {
-		rotateMove_.x -= 0.02f;
+		rotateMove_.x -= 0.04f;
 	}
 
 	// 球面座標系で移動

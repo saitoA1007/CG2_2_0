@@ -39,6 +39,11 @@ void BossEnemy::Update() {
 	ApplyDebugParam();
 #endif
 
+	// 円運動をおこなう
+	theta_ += FpsCounter::deltaTime;
+	worldTransform_.transform_.translate.x = std::cosf(theta_) * 15.0f;
+	worldTransform_.transform_.translate.z = std::sinf(theta_) * 15.0f;
+
 	// ヒットした時に点滅する処理
 	if (isHit_) {
 		hitTimer_ += FpsCounter::deltaTime / maxHitTime_;

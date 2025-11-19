@@ -1,6 +1,8 @@
 #pragma once
 #include"Transform.h"
 #include"WorldTransform.h"
+#include"Collider.h"
+#include<vector>
 
 class IWeapon {
 public:
@@ -32,4 +34,10 @@ public:
 	/// </summary>
 	/// <param name="position"></param>
 	virtual void SetOwnerPosition(GameEngine::WorldTransform* OwnerTransform) = 0;
+
+	/// <summary>
+	/// 当たり判定を取得
+	/// </summary>
+	/// <returns></returns>
+	//virtual std::vector<GameEngine::Collider>& GetCollider() = 0;
 };

@@ -48,7 +48,7 @@ public:
 private:
 
 	// 最大hp
-	uint32_t maxHp_ = 3;
+	uint32_t maxHp_ = 5;
 
 	// 当たり判定の大きさ
 	float collisionRadius_ = 2.5f;
@@ -59,7 +59,7 @@ private:
 	GameEngine::WorldTransform worldTransform_;
 
 	// hp
-	uint32_t hp_ = 3;
+	uint32_t hp_ = 5;
 
 	// 生存フラグ
 	bool isAlive_ = true;
@@ -74,6 +74,9 @@ private:
 	float hitTimer_ = 0.0f;
 
 	float maxHitTime_ = 1.0f;
+
+	// 角度
+	float theta_ = 1.5f;
 
 private:
 
