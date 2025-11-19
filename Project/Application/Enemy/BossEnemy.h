@@ -2,7 +2,6 @@
 #include<array>
 #include<functional>
 
-//#include"WorldTransform.h"
 #include"Collider.h"
 
 #include"BossContext.h"
@@ -19,7 +18,13 @@ public:
 	/// <summary>
 	/// 更新処理
 	/// </summary>
-	void Update();
+	void Update(const Vector3& targetPos);
+
+	/// <summary>
+	/// ワールド行列を取得
+	/// </summary>
+	/// <returns></returns>
+	GameEngine::WorldTransform& GetWorldTransform() { return worldTransform_; }
 
 private: // 調整項目
 
