@@ -290,6 +290,10 @@
     <ClCompile Include="Application\Stage\Wall.cpp" />
     <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="Application\Scene\ResultScene.cpp" />
+    <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
+    <ClCompile Include="Application\Enemy\States\BossStateIn.cpp" />
+    <ClCompile Include="Application\Enemy\States\BossStateOut.cpp" />
+    <ClCompile Include="Application\Enemy\States\BossStateBattle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -575,6 +579,13 @@
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\CollisionTypeID.h" />
     <ClInclude Include="Application\Scene\ResultScene.h" />
+    <ClInclude Include="Application\Enemy\BossEnemy.h" />
+    <ClInclude Include="Application\Enemy\States\IBossState.h" />
+    <ClInclude Include="Application\Enemy\States\BossStateIn.h" />
+    <ClInclude Include="Application\Enemy\States\BossStateOut.h" />
+    <ClInclude Include="Application\Enemy\BossContext.h" />
+    <ClInclude Include="Application\Enemy\BossState.h" />
+    <ClInclude Include="Application\Enemy\States\BossStateBattle.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

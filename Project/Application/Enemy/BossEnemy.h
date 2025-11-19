@@ -1,0 +1,63 @@
+#pragma once
+#include<array>
+#include<functional>
+
+//#include"WorldTransform.h"
+#include"Collider.h"
+
+#include"BossContext.h"
+#include"States/IBossState.h"
+
+class BossEnemy {
+public:
+
+	/// <summary>
+	/// 初期化処理
+	/// </summary>
+	void Initialize(const float& stageRadius);
+
+	/// <summary>
+	/// 更新処理
+	/// </summary>
+	void Update();
+
+private: // 調整項目
+
+	// 最大体力
+	uint32_t kMaxHp_ = 10;
+
+private: // メンバ変数
+
+	// ワールド行列
+	GameEngine::WorldTransform worldTransform_;
+
+	// ボスの共通パラメータ
+	BossContext bossContext_;
+
+	// 行動状態を保存
+	std::array<std::unique_ptr<IBossState>, static_cast<size_t>(BossState::MaxCount)> statesTable_;
+	// 現在の状態
+	IBossState* currentState_ = nullptr;
+
+	// 両翼の当たり判定も追加する場合はstd::arrayにしてenumで管理する
+	// 体の当たり判定
+	std::unique_ptr<GameEngine::SphereCollider> bodyCollider_;
+
+private:
+
+	/// <summary>
+	/// 当たり判定
+	/// </summary>
+	/// <param name="result"></param>
+	void OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result);
+
+	/// <summary>
+	/// 値を登録する
+	/// </summary>
+	void RegisterBebugParam();
+
+	/// <summary>
+	/// 値を適応する
+	/// </summary>
+	void ApplyDebugParam();
+};
