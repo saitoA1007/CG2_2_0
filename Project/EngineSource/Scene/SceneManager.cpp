@@ -27,6 +27,9 @@ void SceneManager::Initialize(SceneContext* context) {
 	// 画像を読み込む
 	LoadSpriteData();
 
+	// アニメーションデータを読み込む
+	LoadAnimationData();
+
 	// デバックカメラを生成
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->graphicsDevice->GetDevice());
@@ -130,6 +133,11 @@ void SceneManager::LoadSpriteData() {
 
 	// テクスチャのリソースを全てロードする
 	context_->textureManager->LoadAllTexture();
+}
+
+void SceneManager::LoadAnimationData() {
+	// 歩くアニメーションデータを登録する
+	context_->animationManager->RegisterAnimation("Walk", "walk.gltf");
 }
 
 void SceneManager::ChangeScene(SceneState nextSceneState) {

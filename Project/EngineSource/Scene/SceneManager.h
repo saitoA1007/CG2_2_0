@@ -93,6 +93,11 @@ private:
 	void LoadSpriteData();
 
 	/// <summary>
+	/// 使用するアニメーションデータを読み込む
+	/// </summary>
+	void LoadAnimationData();
+
+	/// <summary>
 	/// シーンを作成する
 	/// </summary>
 	/// <param name="sceneState"></param>

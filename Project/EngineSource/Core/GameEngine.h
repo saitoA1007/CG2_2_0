@@ -34,9 +34,9 @@
 #include"WorldTransform.h"
 #include"WorldTransforms.h"
 #include"AxisIndicator.h"
-#include"Animation.h"
 #include"ModelRenderer.h"
 #include"DebugRenderer.h"
+#include"AnimationManager.h"
 
 // 2D
 #include"ImGuiManager.h"
@@ -82,6 +82,9 @@ namespace GameEngine {
 
 		// モデルのリソースを管理
 		std::unique_ptr<GameEngine::ModelManager> modelManager_;
+
+		// アニメーションのリソースを管理
+		std::unique_ptr<AnimationManager> animationManager_;
 
 		/// Audio ========================================
 

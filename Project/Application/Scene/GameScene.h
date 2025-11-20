@@ -9,6 +9,8 @@
 #include"LightManager.h"
 #include"DirectionalLight.h"
 
+#include"Animator.h"
+
 class GameScene : public BaseScene {
 public:
 
@@ -81,10 +83,10 @@ private: // シーン機能
 	// アニメーションモデル
 	GameEngine::Model* bronAnimationModel_;
 	GameEngine::WorldTransform bronAnimationWorldTransform_;
-	AnimationData bronAnimation_;
-	Skeleton skeletonBron_;
-	SkinCluster skinClusterBron_;
-	float timer_ = 0.0f;
+	// 歩くアニメーションデータ
+	std::map<std::string, AnimationData> walkAnimationData_;
+	// アニメーションを再生するクラス
+	std::unique_ptr<GameEngine::Animator> walkAnimator_;
 
 private:
 
