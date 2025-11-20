@@ -74,7 +74,7 @@ private:
     // 空中移動速度（秒速）
     float kAirMoveSpeed_ = 5.0f;
     // 地上移動加減速量（秒速）
-    float kGroundAcceleration_ = 0.3f;
+    float kGroundAcceleration_ = 0.1f;
     // 空中移動加減速量（秒速）
     float kAirDeceleration_ = 0.1f;
     // 落下速度の上限（秒速）

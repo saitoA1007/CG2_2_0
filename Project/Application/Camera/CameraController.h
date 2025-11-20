@@ -72,6 +72,11 @@ public:
         enableShakeZ_ = enableZ;
     }
 
+	/// <summary>
+	/// 自動回転の全体倍率設定
+	/// </summary>
+	void SetAutoRotateGain(float g) { autoRotateOverallGain_ = g; }
+
 private:
 
 	// カメラ
@@ -120,6 +125,14 @@ private:
     bool enableShakeY_ = true;
 	// Z軸シェイク有効フラグ
     bool enableShakeZ_ = true;
+	// 自動回転用: 前フレームのターゲット位置
+	Vector3 prevTargetPos_ = {0.0f,0.0f,0.0f};
+	// 自動回転感度(左右移動→ヨー回転)
+	float autoRotateYawSensitivity_ = 0.25f; // 大きいほど強く追従
+	// ターゲット接近時の回転倍率スケール
+	float autoRotateApproachScale_ = 1.0f; // 接近速度 * scale を乗算
+	// 自動回転の全体倍率
+	float autoRotateOverallGain_ = 0.5f;
 
 private:
 	void UpdateTargetVector3(const Vector3& v);
@@ -127,5 +140,6 @@ private:
 	void UpdateTargetVector3Array(const std::vector<Vector3>& arr);
 	void UpdateCartesian(GameEngine::InputCommand* inputCommand);
 	void UpdateSpherical(GameEngine::InputCommand* inputCommand, GameEngine::Input* rawInput);
+	void ApplyAutoRotate(const Vector3& eye, const Vector3& center);
 	Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
 };
