@@ -143,6 +143,13 @@ public:
 		return std::get<T>(itItem->second.value);
 	}
 
+	/// <summary>
+	/// 登録した値を削除する
+	/// </summary>
+	/// <param name="groupName"></param>
+	/// <param name="key"></param>
+	void RemoveItem(const std::string& groupName, const std::string& key);
+
 private:
 	GameParamEditor() = default;
 	~GameParamEditor() = default;
