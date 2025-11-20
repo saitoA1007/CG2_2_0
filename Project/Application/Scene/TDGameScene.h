@@ -101,6 +101,9 @@ private: // シーン機能
 	// ボス敵
 	std::unique_ptr<BossEnemy> bossEnemy_;
 
+	// ボスロックオンフラグ
+    bool isBossLockOn_ = false;
+
 private:
 
 	/// <summary>

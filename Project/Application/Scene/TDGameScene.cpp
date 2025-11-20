@@ -96,7 +96,21 @@ void TDGameScene::Update() {
 
 	// プレイヤーの更新処理
 	player_->Update(context_->inputCommand, cameraController_->GetCamera());
-	cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
+
+	// ロックオン: 入力が有効ならプレイヤーとボスの位置をターゲットに設定
+	if (context_->inputCommand->IsCommandAcitve("LockOnBoss")) {
+		isBossLockOn_ = !isBossLockOn_;
+	}
+
+	if (isBossLockOn_) {
+		std::vector<Vector3> targets;
+		targets.reserve(2);
+		targets.emplace_back(player_->GetWorldTransform().GetWorldPosition());
+		targets.emplace_back(bossEnemy_->GetWorldTransform().GetWorldPosition());
+		cameraController_->SetTarget(targets);
+	} else {
+		cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
+	}
 
 	cameraController_->SetDesiredFov(player_->IsCharging() ? 1.0f : 0.7f);
 	cameraController_->Update(context_->inputCommand, context_->input);
@@ -172,7 +186,9 @@ void TDGameScene::InputRegisterCommand() {
 
 	// Attackコマンド
 	context_->inputCommand->RegisterCommand("Attack", { {InputState::MouseTrigger, 0}, {InputState::PadTrigger, XINPUT_GAMEPAD_X} });
-
+	// ロックオンコマンド
+	context_->inputCommand->RegisterCommand("LockOnBoss", { {InputState::KeyTrigger, DIK_TAB }, {InputState::PadTrigger, XINPUT_GAMEPAD_RIGHT_THUMB} });
+	
 	// カメラ操作のコマンドを登録する
 	context_->inputCommand->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
 	context_->inputCommand->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
