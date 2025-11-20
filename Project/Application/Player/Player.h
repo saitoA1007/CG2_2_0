@@ -41,6 +41,10 @@ public:
 	/// </summary>
     Sphere GetSphereData() const { return sphereData_; }
 
+	// 追加: 状態取得
+	bool IsCharging() const { return isCharging_; }
+	bool IsAttackDown() const { return isAttackDown_; }
+
 private:
 	//==================================================
     // 定数・設定値

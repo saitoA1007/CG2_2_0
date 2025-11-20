@@ -20,6 +20,7 @@ void Player::Initialize() {
 	collider_->SetCollisionAttribute(kCollisionAttributePlayer);
 	collider_->SetCollisionMask(~kCollisionAttributePlayer);
 	// ユーザーデータ設定（IDのみ暫定）
+    UserData userData;
 	collider_->SetUserData(userData);
 	// コールバック登録
 	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) { this->OnCollision(result); });

@@ -60,8 +60,6 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
-
-	// カメラをコントロールするクラスを初期化
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
 
@@ -90,12 +88,10 @@ void TDGameScene::Update() {
 
 	// プレイヤーの更新処理
 	player_->Update(context_->inputCommand, cameraController_->GetCamera());
+	cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
 
-	// カメラコントロールの更新処理
-    cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
-	cameraController_->Update(context_->inputCommand);
-
-	// カメラの更新処理
+	cameraController_->SetDesiredFov((player_->IsCharging() || player_->IsAttackDown()) ? 1.0f : 0.7f);
+	cameraController_->Update(context_->inputCommand, context_->input);
 	mainCamera_->SetCamera(cameraController_->GetCamera());
 
 	// 敵の移動処理

@@ -21,7 +21,7 @@ void CameraController::Initialize() {
 	desiredTargetFov_ = targetFov_;
 }
 
-void CameraController::Update(GameEngine::InputCommand* inputCommand) {
+void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine::Input* rawInput) {
 	// ターゲット種類に応じて目標値更新
 	std::visit([this](auto&& value) {
 		using T = std::decay_t<decltype(value)>;
@@ -37,10 +37,10 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand) {
 	// スムーズ補間係数
 	const float t = 0.1f;
 
-	// 座標系種類でカメラ位置追従 (補間後 targetPos_ を基準)
+	// 座標系種類でカメラ位置追従 (補間前に回転入力反映)
 	switch (cameraCoordinateType_) {
 	case CameraCoodinateType::Cartesian:  UpdateCartesian(inputCommand);  break;
-	case CameraCoodinateType::Spherical: UpdateSpherical(inputCommand); break;
+	case CameraCoodinateType::Spherical: UpdateSpherical(inputCommand, rawInput); break;
 	}
 	// 位置・回転(Euler)・FOV補間
 	targetPos_ = Lerp(targetPos_, desiredTargetPos_, t);
@@ -55,19 +55,16 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand) {
 	worldMatrix.m[3][2] = targetLookAt_.z;
 	camera_->SetWorldMatrix(worldMatrix);
 
-	float fovRad = static_cast<float>(targetFov_ * static_cast<float>(M_PI) / 180.0f);
-	camera_->SetProjectionMatrix(fovRad, 1280, 720, 0.1f, 1000.0f);
+	camera_->SetProjectionMatrix(targetFov_, 1280, 720, 0.1f, 1000.0f);
 	camera_->UpdateFromWorldMatrix();
 }
 
 void CameraController::UpdateTargetVector3(const Vector3& v) {
 	desiredTargetPos_ = v;
-	// ターゲット方向から Euler を計算
 	Vector3 dir = Normalize(v - position_);
 	float yaw = std::atan2(dir.x, dir.z);
 	float pitch = std::asin(std::clamp(dir.y, -1.0f, 1.0f));
 	desiredTargetRotate_ = { pitch, yaw, 0.0f };
-	desiredTargetFov_ = 60.0f;
 }
 
 void CameraController::UpdateTargetLine(const Line& line) {
@@ -105,9 +102,27 @@ void CameraController::UpdateCartesian(GameEngine::InputCommand* inputCommand) {
 	position_.z = targetPos_.z + offset.z;
 }
 
-void CameraController::UpdateSpherical(GameEngine::InputCommand* inputCommand) {
+void CameraController::UpdateSpherical(GameEngine::InputCommand* inputCommand, GameEngine::Input* rawInput) {
+	// 左右回転(既存コマンド)
 	if (inputCommand && inputCommand->IsCommandAcitve("CameraMoveLeft")) { rotateMove_.x += 0.02f; }
 	if (inputCommand && inputCommand->IsCommandAcitve("CameraMoveRight")) { rotateMove_.x -= 0.02f; }
+
+	// マウス右ボタン押下でドラッグ回転
+	if (rawInput && rawInput->PushMouse(1)) {
+		Vector2 delta = rawInput->GetMouseDelta(); // 正規化済み
+		rotateMove_.x += delta.x * mouseRotateSensitivity_;
+	}
+
+	// コントローラー右スティック
+	if (rawInput) {
+		Vector2 rstick = rawInput->GetRightStick();
+		rotateMove_.x += rstick.x * stickRotateSensitivity_;
+	}
+
+	// ピッチ制限 (極端な上下を防ぐ)
+	rotateMove_.y = std::clamp(rotateMove_.y, 0.05f, 3.05f); // 0~π 付近で制限
+
+	// 球面座標でカメラ位置(注視点は targetPos_)
 	desiredTargetLookAt_.x = targetPos_.x + kDistance_ * std::sinf(rotateMove_.y) * std::sinf(rotateMove_.x);
 	desiredTargetLookAt_.y = targetPos_.y + kDistance_ * std::cosf(rotateMove_.y);
 	desiredTargetLookAt_.z = targetPos_.z + kDistance_ * std::sinf(rotateMove_.y) * std::cosf(rotateMove_.x);
