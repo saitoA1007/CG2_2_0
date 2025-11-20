@@ -1,6 +1,7 @@
 #pragma once
 #include <d3d12.h>
 #include<vector>
+#include <optional>
 #include <unordered_map>
 #include <wrl.h>
 
@@ -10,8 +11,8 @@
 #include"WorldTransform.h"
 #include"WorldTransforms.h"
 #include"AnimationData.h"
-#include"Animation.h"
 
+#include"SrvManager.h"
 #include"TextureManager.h"
 
 #include"LightManager.h"
@@ -35,7 +36,7 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="device"></param>
 		/// <param name="commandList"></param>
-		static void StaticInitialize(ID3D12Device* device, TextureManager* textureManager);
+		static void StaticInitialize(ID3D12Device* device, TextureManager* textureManager, SrvManager* srvManager);
 
 		/// <summary>
 		/// OBJファイルからメッシュ生成
@@ -85,6 +86,9 @@ namespace GameEngine {
 		/// <returns></returns>
 		[[nodiscard]]
 		static AnimationData LoadAnimationFile(const std::string& objFilename, const std::string& filename);
+
+		[[nodiscard]]
+		static std::map<std::string, AnimationData> LoadAnimationsFile(const std::string& objFilename, const std::string& filename);
 
 		/// <summary>
 		/// スケルトンを作成する
@@ -148,8 +152,14 @@ namespace GameEngine {
 		// ロードしているか
 		const bool IsLoad() const { return isLoad_; }
 
+	public:
+
 		ModelData modelData_;
 		Node node_;
+
+		// アニメーションデータ
+		std::optional<Skeleton> skeletonBron_ = std::nullopt;
+		std::optional<SkinCluster> skinClusterBron_ = std::nullopt;
 
 	private:
 		Model(Model&) = delete;
@@ -160,6 +170,8 @@ namespace GameEngine {
 
 		// テクスチャ
 		static TextureManager* textureManager_;
+		// srvの管理
+		static SrvManager* srvManager_;
 
 		// ファイル名
 		static inline const std::string kDirectoryPath_ = "Resources/Models";
@@ -207,5 +219,8 @@ namespace GameEngine {
 		/// <returns></returns>
 		[[nodiscard]]
 		static int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
+
+		[[nodiscard]]
+		static SkinCluster CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData);
 	};
 }

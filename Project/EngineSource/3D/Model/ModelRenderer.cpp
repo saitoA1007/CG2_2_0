@@ -234,7 +234,7 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 	}
 }
 
-void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, const SkinCluster& skinCluster, const Material* material) {
+void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, const Material* material) {
 	// カメラ座標に変換
 	worldTransform.SetWVPMatrix(vpMatrix_);
 
@@ -245,7 +245,7 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 
 		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
 			meshes[i]->GetVertexBufferView(),
-			skinCluster.influenceBufferView
+			model->skinClusterBron_->influenceBufferView
 		};
 
 		commandList_->IASetVertexBuffers(0, 2, vbvs);
@@ -265,7 +265,7 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
 
-		commandList_->SetGraphicsRootDescriptorTable(3, skinCluster.paletteSrvHandle.second);
+		commandList_->SetGraphicsRootDescriptorTable(3, model->skinClusterBron_->paletteSrvHandle.second);
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);

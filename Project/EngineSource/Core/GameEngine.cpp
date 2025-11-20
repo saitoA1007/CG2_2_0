@@ -79,18 +79,17 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	inputCommand_ = std::make_unique<InputCommand>(input_.get());
 	// モデルを管理するクラスを生成
 	modelManager_ = std::make_unique<ModelManager>();
+	// アニメーションデータを管理するクラスを生成する
+	animationManager_ = std::make_unique<AnimationManager>();
 
 	// ポストエフェクトの初期化
 	PostEffectManager::StaticInitialize(bloomPSO_.get(), scanLinePSO_.get(), vignettingPSO_.get(), radialBlurPSO_.get(), outLinePSO_.get());
-
-	// アニメーションの初期化
-	Animation::StaticInitialize(graphicsDevice_->GetDevice(), srvManager_.get());
 
 	// 画像の初期化
 	Sprite::StaticInitialize(graphicsDevice_->GetDevice(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), psoManager_.get());
 	// 3dを描画する処理の初期化
-	Model::StaticInitialize(graphicsDevice_->GetDevice(), textureManager_.get());
+	Model::StaticInitialize(graphicsDevice_->GetDevice(), textureManager_.get(), srvManager_.get());
 	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), psoManager_.get());
 	// ワールドトランスフォームの初期化
 	WorldTransform::StaticInitialize(graphicsDevice_->GetDevice());
@@ -120,6 +119,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneContext.modelManager = modelManager_.get();
 	sceneContext.audioManager = audioManager_.get();
 	sceneContext.graphicsDevice = graphicsDevice_.get();
+	sceneContext.animationManager = animationManager_.get();
 
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();

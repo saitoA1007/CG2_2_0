@@ -16,10 +16,12 @@ using namespace GameEngine;
 
 ID3D12Device* Model::device_ = nullptr;
 TextureManager* Model::textureManager_ = nullptr;
+SrvManager* Model::srvManager_ = nullptr;
 
-void Model::StaticInitialize(ID3D12Device* device, TextureManager* textureManager) {
+void Model::StaticInitialize(ID3D12Device* device, TextureManager* textureManager, SrvManager* srvManager) {
 	device_ = device;
 	textureManager_ = textureManager;
+	srvManager_ = srvManager;
 }
 
 [[nodiscard]]
@@ -96,6 +98,7 @@ std::unique_ptr<Model> Model::CreateGridPlane(const Vector2& size) {
 [[nodiscard]]
 std::unique_ptr<Model> Model::CreateModel(const std::string& objFilename, const std::string& filename) {
 
+	LogManager::GetInstance().Log("//==============================");
 	LogManager::GetInstance().Log("Start create model");
 
 	// インスタンスを生成
@@ -144,7 +147,17 @@ std::unique_ptr<Model> Model::CreateModel(const std::string& objFilename, const 
 	// モデルのロード
 	model->isLoad_ = true;
 
-	LogManager::GetInstance().Log("End create model\n");
+
+	// ボーンのデータが存在している場合、読み込む
+	if (modelData.isAnimation_) {
+		LogManager::GetInstance().Log(objFilename + " : Load animationData");
+		// ボーン情報を取得する
+		model->skeletonBron_ = CreateSkeleton(model->modelData_.rootNode);
+		model->skinClusterBron_ = CreateSkinCluster(*model->skeletonBron_, model->modelData_);
+	}
+
+	LogManager::GetInstance().Log("End create model");
+	LogManager::GetInstance().Log("//==============================\n");
 
 	return model;
 }
@@ -159,6 +172,9 @@ ModelData Model::LoadModelFile(const std::string& directoryPath, const std::stri
 	std::string filePath = directoryPath + "/" + filename + "/" + objFilename;
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 	assert(scene && scene->HasMeshes()); // メッシュがないのは対応しない
+
+	// アニメーションデータの確認をする
+	modelData.isAnimation_ = (scene->mNumAnimations != 0) ? true : false;
 
 	// Material解析
 	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
@@ -447,6 +463,76 @@ AnimationData Model::LoadAnimationFile(const std::string& objFilename, const std
 	return animation;
 }
 
+[[nodiscard]]
+std::map<std::string, AnimationData> Model::LoadAnimationsFile(const std::string& objFilename, const std::string& filename) {
+	// Assimpを使ったモデルの生成するログを出す
+	LogManager::GetInstance().Log("Load AnimationData From Assimp : Start loading Model file: " + filename + objFilename);
+
+	std::map<std::string, AnimationData> loadedAnimations;
+
+	Assimp::Importer importer;
+	std::string filePath = kDirectoryPath_ + "/" + filename + "/" + objFilename;
+	const aiScene* scene = importer.ReadFile(filePath.c_str(), 0);
+	assert(scene->mNumAnimations != 0); // アニメーションがない
+
+	for (uint32_t animationIndex = 0; animationIndex < scene->mNumAnimations; ++animationIndex) {
+		aiAnimation* animationAssimp = scene->mAnimations[animationIndex];
+
+		// 新しいアニメーションデータを作成
+		AnimationData animation;
+
+		// 時間を取得する
+		animation.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond); // 時間の単位を秒に変換
+
+		// assimpでは個々のNodeのAnimationをchannelと呼んでいるのでchannelを回してNodeAnimationの情報を取ってくる
+		for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; ++channelIndex) {
+			aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
+			NodeAnimation& nodeAnimation = animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
+
+			// 位置
+			for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys; ++keyIndex) {
+				aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
+				KeyframeVector3 keyframe;
+				keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);  // ここも秒に変換
+				keyframe.value = { -keyAssimp.mValue.x,keyAssimp.mValue.y,keyAssimp.mValue.z }; // 右手->左手
+				nodeAnimation.translate.push_back(keyframe);
+			}
+			// 回転
+			for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumRotationKeys; ++keyIndex) {
+				aiQuatKey& keyAssimp = nodeAnimationAssimp->mRotationKeys[keyIndex];
+				KeyframeQuaternion keyframe;
+				keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+				keyframe.value = { keyAssimp.mValue.x,-keyAssimp.mValue.y, -keyAssimp.mValue.z, keyAssimp.mValue.w };
+				nodeAnimation.rotate.push_back(keyframe);
+			}
+			// 拡縮
+			for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumScalingKeys; ++keyIndex) {
+				aiVectorKey& keyAssimp = nodeAnimationAssimp->mScalingKeys[keyIndex];
+				KeyframeVector3 keyframe;
+				keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+				keyframe.value = { keyAssimp.mValue.x,keyAssimp.mValue.y, keyAssimp.mValue.z };
+				nodeAnimation.scale.push_back(keyframe);
+			}
+		}
+
+		// アニメーション名を取得
+		std::string animationName = animationAssimp->mName.C_Str();
+
+		// 名前が空の場合、名前を設定する
+		if (animationName.empty()) {
+			animationName = "AnimationIndex" + std::to_string(animationIndex);
+		}
+
+		loadedAnimations[animationName] = animation;
+	}
+
+	// モデルが無事に作成されたログを出す
+	LogManager::GetInstance().Log("Load AnimationData From Assimp : Success loaded Model file: " + filename + objFilename);
+
+	// 解析結果を返す
+	return loadedAnimations;
+}
+
 Material* Model::GetMaterial(const std::string& name) const {
 	auto it = materials_.find(name);
 	if (it != materials_.end()) {
@@ -455,4 +541,72 @@ Material* Model::GetMaterial(const std::string& name) const {
 	
 	assert(it != materials_.end() && "Material not found");
 	return nullptr;
+}
+
+[[nodiscard]]
+SkinCluster Model::CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData) {
+
+	assert(!skeleton.joints.empty() && "Skeleton joints are empty!");
+	assert(!modelData.meshes.empty() && "Model has no meshes!");
+	assert(!modelData.meshes[0].vertices.empty() && "Model mesh[0] has no vertices!");
+
+	uint32_t srvIndex = srvManager_->AllocateSrvIndex();
+
+	SkinCluster skinCluster;
+	// palette用のResourceを確保
+	skinCluster.paletteResource = CreateBufferResource(device_, sizeof(WellForGPU) * skeleton.joints.size());
+	WellForGPU* mappedPalette = nullptr;
+	skinCluster.paletteResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedPalette));
+	skinCluster.mappedPalette = { mappedPalette,skeleton.joints.size() }; // spanを使ってアクセスするようにする
+	skinCluster.paletteSrvHandle.first = srvManager_->GetCPUHandle(srvIndex);
+	skinCluster.paletteSrvHandle.second = srvManager_->GetGPUHandle(srvIndex);
+
+	// palette用のsrvを作成。StructuredBufferでアクセス出来るようにする。
+	D3D12_SHADER_RESOURCE_VIEW_DESC paletteSrvDesc{};
+	paletteSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	paletteSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	paletteSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	paletteSrvDesc.Buffer.FirstElement = 0;
+	paletteSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+	paletteSrvDesc.Buffer.NumElements = static_cast<UINT>(skeleton.joints.size());
+	paletteSrvDesc.Buffer.StructureByteStride = sizeof(WellForGPU);
+	device_->CreateShaderResourceView(skinCluster.paletteResource.Get(), &paletteSrvDesc, skinCluster.paletteSrvHandle.first);
+
+	// influence用のResourceを確保。頂点ごとにinfluence情報を追加出来るようにする
+	skinCluster.influenceResource = CreateBufferResource(device_, sizeof(VertexInfluence) * modelData.meshes[0].vertices.size());
+	VertexInfluence* mappedInfluence = nullptr;
+	skinCluster.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
+	std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * modelData.meshes[0].vertices.size()); // 0埋め。weightを0にしておく
+	skinCluster.mappedInfluence = { mappedInfluence,modelData.meshes[0].vertices.size() };
+
+	// influence用のVBVを作成
+	skinCluster.influenceBufferView.BufferLocation = skinCluster.influenceResource->GetGPUVirtualAddress();
+	skinCluster.influenceBufferView.SizeInBytes = static_cast<UINT>(sizeof(VertexInfluence) * modelData.meshes[0].vertices.size());
+	skinCluster.influenceBufferView.StrideInBytes = sizeof(VertexInfluence);
+
+	// inverseBindPoseMatrixを格納する場所を作成して、単位行列で埋める
+	skinCluster.inverseBindPoseMatrices.resize(skeleton.joints.size());
+	std::generate(skinCluster.inverseBindPoseMatrices.begin(), skinCluster.inverseBindPoseMatrices.end(), MakeIdentity4x4);
+
+	// ModelのSkinClusterの情報を解析
+	for (const auto& jointWeight : modelData.skinClusterData) {
+		auto it = skeleton.jointMap.find(jointWeight.first); // jointWeight.firstはjoint名なので、skeletonに対象となるjointが含まれているか判断
+		if (it == skeleton.jointMap.end()) { // 存在しない場合は次に回す
+			continue;
+		}
+		// (*it).secondにはjointのindexが入っているので、該当のindexのinverseBindPoseMatrixを代入
+		skinCluster.inverseBindPoseMatrices[(*it).second] = jointWeight.second.inverseBindPoseMatrix;
+		for (const auto& vertexWeight : jointWeight.second.vertexWeights) {
+			auto& currentInfluence = skinCluster.mappedInfluence[vertexWeight.vertexIndex]; // 該当のvertexIndexのinfluence情報を参照しておく
+			for (uint32_t index = 0; index < kNumMaxInfluence; ++index) { // 空いているところに入れる
+				if (currentInfluence.weights[index] == 0.0f) { // weight==0が空いている状態なので、その場所にweightとjointのindexを代入
+					currentInfluence.weights[index] = vertexWeight.weight;
+					currentInfluence.jointIndices[index] = (*it).second;
+					break;
+				}
+			}
+		}
+	}
+
+	return skinCluster;
 }
