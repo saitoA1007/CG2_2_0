@@ -2,7 +2,9 @@
 #include"MyMath.h"
 #include <algorithm>
 #include <cmath>
+#include <random>
 #include "EasingManager.h"
+#include "FPSCounter.h"
 #ifdef max
 #undef max
 #endif
@@ -48,11 +50,51 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine
 	targetRotate_ = Lerp(targetRotate_, desiredTargetRotate_, t);
 	targetFov_ = Lerp(targetFov_, desiredTargetFov_, t);
 
-    Matrix4x4 rotateMatrix = LookAt(targetLookAt_, targetPos_, { 0.0f,1.0f,0.0f });
+    // カメラシェイク適用
+	Vector3 eye = targetLookAt_;
+    Vector3 center = targetPos_;
+	if (cameraShakePower_ > 0.0f && cameraShakeElapsedTime_ < cameraShakeMaxTime_) {
+		cameraShakeElapsedTime_ += FpsCounter::deltaTime;
+		float tn = std::clamp(cameraShakeElapsedTime_ / std::max(cameraShakeMaxTime_, 0.0001f), 0.0f, 1.0f);
+		float amp = EaseOutQuad(cameraShakePower_, 0.0f, tn); // 減衰
+		// 距離係数(近いほど強く, 遠いほど弱く)
+		float currentDistance = Length(center - eye);
+		float distanceScale = std::clamp(kDistance_ / std::max(currentDistance, 0.0001f), 0.1f, 1.0f);
+		amp *= distanceScale;
+		static thread_local std::mt19937 rng{ std::random_device{}() };
+		std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
+		Vector3 noise{ dist(rng), dist(rng) * 0.5f, dist(rng) };
+		// 軸有効フラグ適用
+		if (!enableShakeX_) noise.x = 0.0f;
+		if (!enableShakeY_) noise.y = 0.0f;
+		if (!enableShakeZ_) noise.z = 0.0f;
+        switch (shakeOrigin_) {
+        case ShakeOrigin::CameraPosition:
+            eye.x += noise.x * amp;
+			eye.y += noise.y * amp;
+			eye.z += noise.z * amp;
+            break;
+        case ShakeOrigin::TargetPosition:
+            center.x += noise.x * amp;
+			center.y += noise.y * amp;
+			center.z += noise.z * amp;
+            break;
+		case ShakeOrigin::TargetAndCameraPosition:
+            eye.x += noise.x * amp * 0.5f;
+            eye.y += noise.y * amp * 0.5f;
+            eye.z += noise.z * amp * 0.5f;
+            center.x += noise.x * amp * 0.5f;
+            center.y += noise.y * amp * 0.5f;
+            center.z += noise.z * amp * 0.5f;
+            break;
+        }
+	}
+
+    Matrix4x4 rotateMatrix = LookAt(eye, center, { 0.0f,1.0f,0.0f });
 	Matrix4x4 worldMatrix = rotateMatrix;
-	worldMatrix.m[3][0] = targetLookAt_.x;
-	worldMatrix.m[3][1] = targetLookAt_.y;
-	worldMatrix.m[3][2] = targetLookAt_.z;
+	worldMatrix.m[3][0] = eye.x;
+	worldMatrix.m[3][1] = eye.y;
+	worldMatrix.m[3][2] = eye.z;
 	camera_->SetWorldMatrix(worldMatrix);
 
 	camera_->SetProjectionMatrix(targetFov_, 1280, 720, 0.1f, 1000.0f);
@@ -75,7 +117,7 @@ void CameraController::UpdateTargetLine(const Line& line) {
 	float pitch = std::asin(std::clamp(dir.y, -1.0f, 1.0f));
 	desiredTargetRotate_ = { pitch, yaw, 0.0f };
 	float length = std::sqrt(line.diff.x*line.diff.x + line.diff.y*line.diff.y + line.diff.z*line.diff.z);
-	desiredTargetFov_ = std::clamp(45.0f + length * 0.5f, 30.0f, 90.0f);
+	desiredTargetFov_ = std::clamp(0.45f + length * 0.5f, 0.3f, 0.9f);
 }
 
 void CameraController::UpdateTargetVector3Array(const std::vector<Vector3>& arr) {
@@ -91,7 +133,7 @@ void CameraController::UpdateTargetVector3Array(const std::vector<Vector3>& arr)
 	float maxDistSq = 0.0f;
 	for (const auto& p : arr) { float dx = p.x - avg.x; float dy = p.y - avg.y; float dz = p.z - avg.z; float d2 = dx*dx + dy*dy + dz*dz; if (d2 > maxDistSq) maxDistSq = d2; }
 	float radius = std::sqrt(maxDistSq);
-	desiredTargetFov_ = std::clamp(45.0f + radius * 0.8f, 30.0f, 90.0f);
+	desiredTargetFov_ = std::clamp(0.45f + radius * 0.8f, 0.3f, 0.9f);
 }
 
 void CameraController::UpdateCartesian(GameEngine::InputCommand* inputCommand) {
@@ -103,26 +145,17 @@ void CameraController::UpdateCartesian(GameEngine::InputCommand* inputCommand) {
 }
 
 void CameraController::UpdateSpherical(GameEngine::InputCommand* inputCommand, GameEngine::Input* rawInput) {
-	// 左右回転(既存コマンド)
 	if (inputCommand && inputCommand->IsCommandAcitve("CameraMoveLeft")) { rotateMove_.x += 0.02f; }
 	if (inputCommand && inputCommand->IsCommandAcitve("CameraMoveRight")) { rotateMove_.x -= 0.02f; }
-
-	// マウス右ボタン押下でドラッグ回転
 	if (rawInput && rawInput->PushMouse(1)) {
-		Vector2 delta = rawInput->GetMouseDelta(); // 正規化済み
+		Vector2 delta = rawInput->GetMouseDelta();
 		rotateMove_.x += delta.x * mouseRotateSensitivity_;
 	}
-
-	// コントローラー右スティック
 	if (rawInput) {
 		Vector2 rstick = rawInput->GetRightStick();
 		rotateMove_.x += rstick.x * stickRotateSensitivity_;
 	}
-
-	// ピッチ制限 (極端な上下を防ぐ)
-	rotateMove_.y = std::clamp(rotateMove_.y, 0.05f, 3.05f); // 0~π 付近で制限
-
-	// 球面座標でカメラ位置(注視点は targetPos_)
+	rotateMove_.y = std::clamp(rotateMove_.y, 0.05f, 3.05f);
 	desiredTargetLookAt_.x = targetPos_.x + kDistance_ * std::sinf(rotateMove_.y) * std::sinf(rotateMove_.x);
 	desiredTargetLookAt_.y = targetPos_.y + kDistance_ * std::cosf(rotateMove_.y);
 	desiredTargetLookAt_.z = targetPos_.z + kDistance_ * std::sinf(rotateMove_.y) * std::cosf(rotateMove_.x);

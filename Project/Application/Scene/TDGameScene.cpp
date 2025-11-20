@@ -63,6 +63,14 @@ void TDGameScene::Initialize(SceneContext* context) {
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
 
+	// 壁衝突時のカメラシェイク設定
+	player_->SetOnWallHit([this]() {
+		// 強度と時間は調整可能
+		cameraController_->StartCameraShake(3.0f, 0.5f,
+			CameraController::ShakeOrigin::TargetPosition,
+			false, true, false);
+	});
+
 	// ボス敵モデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Cube");
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
@@ -90,7 +98,7 @@ void TDGameScene::Update() {
 	player_->Update(context_->inputCommand, cameraController_->GetCamera());
 	cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
 
-	cameraController_->SetDesiredFov((player_->IsCharging() || player_->IsAttackDown()) ? 1.0f : 0.7f);
+	cameraController_->SetDesiredFov(player_->IsCharging() ? 1.0f : 0.7f);
 	cameraController_->Update(context_->inputCommand, context_->input);
 	mainCamera_->SetCamera(cameraController_->GetCamera());
 

@@ -12,6 +12,11 @@ public:
         Cartesian,
 		Spherical,
     };
+    enum class ShakeOrigin {
+		TargetPosition,
+		CameraPosition,
+        TargetAndCameraPosition,
+    };
     using Target = std::variant<Vector3, Line, std::vector<Vector3>>;
 
 	/// <summary>
@@ -45,10 +50,27 @@ public:
 	GameEngine::Camera& GetCamera() const { return *camera_.get(); }
 
 	/// <summary>
-	/// 追加: FOVの目標値を外部から設定
+	/// FOVの目標値を外部から設定
 	/// </summary>
 	/// <param name="fov"></param>
 	void SetDesiredFov(float fov) { desiredTargetFov_ = fov; }
+
+    /// <summary>
+    /// カメラシェイク開始
+	/// </summary>
+	/// <param name="power">強度</param>
+	/// <param name="time">時間</param>
+	/// <param name="origin">揺らす対象</param>
+	void StartCameraShake(float power, float time, ShakeOrigin origin = ShakeOrigin::CameraPosition,
+        bool enableX = true, bool enableY = true, bool enableZ = true) {
+		cameraShakePower_ = power;
+		cameraShakeMaxTime_ = time;
+		cameraShakeElapsedTime_ = 0.0f;
+        shakeOrigin_ = origin;
+        enableShakeX_ = enableX;
+        enableShakeY_ = enableY;
+        enableShakeZ_ = enableZ;
+    }
 
 private:
 
@@ -83,6 +105,21 @@ private:
 	// 入力感度
 	float mouseRotateSensitivity_ = 0.1f; // マウス差分スケール
 	float stickRotateSensitivity_ = 0.1f; // 右スティックスケール
+
+	// カメラシェイク強度
+    float cameraShakePower_ = 0.0f;
+    // カメラシェイク最大時間
+	float cameraShakeMaxTime_ = 0.0f;
+    // カメラシェイク経過時間
+    float cameraShakeElapsedTime_ = 0.0f;
+    // シェイクの基準
+    ShakeOrigin shakeOrigin_ = ShakeOrigin::CameraPosition;
+	// X軸シェイク有効フラグ
+    bool enableShakeX_ = true;
+	// Y軸シェイク有効フラグ
+    bool enableShakeY_ = true;
+	// Z軸シェイク有効フラグ
+    bool enableShakeZ_ = true;
 
 private:
 	void UpdateTargetVector3(const Vector3& v);

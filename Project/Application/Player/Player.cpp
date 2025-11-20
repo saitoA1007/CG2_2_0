@@ -185,13 +185,21 @@ void Player::ChargeWallBounce(const Vector3 &bounceDirection, bool isGreatWall) 
 }
 
 void Player::OnCollision(const CollisionResult &result) {
-	if (!result.isHit) { return; }
+	// 壁との衝突から跳ね返りを誘発（突進中のみ）
+	if (!result.isHit) {
+		return;
+	}
+	
 	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss)) == false;
 	if (isCharging_ && isWall) {
+		// 接触法線を利用して跳ね返り
 		Vector3 normal = result.contactNormal;
+		// XZ成分で跳ね返り方向作成
 		Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
 		if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
 		bool isGreat = false; // 今後拡張
+		// カメラシェイク通知
+		if (onWallHit_) { onWallHit_(); }
 		ChargeWallBounce(bounceDir, isGreat);
 	}
 }

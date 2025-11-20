@@ -3,6 +3,7 @@
 #include"InputCommand.h"
 #include"Collider.h"
 #include"Camera.h"
+#include <functional>
 
 class Player {
 public:
@@ -41,9 +42,14 @@ public:
 	/// </summary>
     Sphere GetSphereData() const { return sphereData_; }
 
-	// 追加: 状態取得
+	// 状態取得
 	bool IsCharging() const { return isCharging_; }
 	bool IsAttackDown() const { return isAttackDown_; }
+
+	// 壁ヒット時コールバック設定
+	void SetOnWallHit(std::function<void()> cb) { onWallHit_ = std::move(cb); }
+    // 着地時コールバック設定
+    void SetOnLandHit(std::function<void()> cb) { onLandHit_ = std::move(cb); }
 
 private:
 	//==================================================
@@ -68,7 +74,7 @@ private:
     // 空中移動速度（秒速）
     float kAirMoveSpeed_ = 5.0f;
     // 地上移動加減速量（秒速）
-    float kGroundAcceleration_ = 0.5f;
+    float kGroundAcceleration_ = 0.3f;
     // 空中移動加減速量（秒速）
     float kAirDeceleration_ = 0.1f;
     // 落下速度の上限（秒速）
@@ -157,6 +163,11 @@ private:
 
 	// プレイヤー用コライダー（球）
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
+
+	// 壁衝突イベント
+	std::function<void()> onWallHit_;
+	// 着地衝突イベント
+    std::function<void()> onLandHit_;
 
 private:
 	void ProcessMoveInput(GameEngine::InputCommand* inputCommand);
