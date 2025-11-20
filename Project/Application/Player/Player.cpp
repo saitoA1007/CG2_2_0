@@ -11,22 +11,18 @@
 using namespace GameEngine;
 
 void Player::Initialize() {
-
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
-
 	// コライダー生成・設定
 	collider_ = std::make_unique<SphereCollider>();
 	collider_->SetRadius(sphereData_.radius);
 	collider_->SetWorldPosition(worldTransform_.transform_.translate);
 	collider_->SetCollisionAttribute(kCollisionAttributePlayer);
-	collider_->SetCollisionMask(~kCollisionAttributePlayer); // プレイヤー以外全部
+	collider_->SetCollisionMask(~kCollisionAttributePlayer);
 	// ユーザーデータ設定（IDのみ暫定）
-	UserData userData; userData.typeID = static_cast<uint32_t>(CollisionTypeID::Player); userData.object = nullptr; // object設定は必要なら後で
 	collider_->SetUserData(userData);
 	// コールバック登録
 	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) { this->OnCollision(result); });
-
 #ifdef _DEBUG
 	//===========================================================
 	// 
@@ -43,21 +39,18 @@ void Player::Initialize() {
 #endif
 }
 
-void Player::Update(GameEngine::InputCommand* inputCommand) {
+void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera) {
 #ifdef _DEBUG
 	// 値を適応
 	ApplyDebugParam();
 #endif
+	// カメラ基準ベクトル更新
+	UpdateCameraBasis(&camera);
 
-	// フレーム開始時に入力方向をリセット
-	bounceAwayDir_ = bounceAwayDir_; // NOP to avoid unused warnings if any macros
-
-    // XZの目標速度リセット
-    desiredVelXZ_ = { 0.0f, 0.0f, 0.0f };
-
+	bounceAwayDir_ = bounceAwayDir_;
+	desiredVelXZ_ = { 0.0f, 0.0f, 0.0f };
 	// 跳ね返り（硬直）中の更新を最優先
 	BounceUpdate();
-
 	// 入力・突進状態更新（硬直中は無効）
 	if (!isBounceLock_) {
 		ProcessMoveInput(inputCommand);
@@ -67,7 +60,7 @@ void Player::Update(GameEngine::InputCommand* inputCommand) {
 	// 重力（常時適応）
 	velocity_.y += kFallAcceleration_ * FpsCounter::deltaTime;
 	// 縦方向の上限（落下最大速度）
-    velocity_.y = std::max(velocity_.y, (isAttackDown_ ? -kAttackDownSpeed_ : -MaxFallSpeed_));
+	velocity_.y = std::max(velocity_.y, (isAttackDown_ ? -kAttackDownSpeed_ : -MaxFallSpeed_));
 
 	// 速度を適応
 	worldTransform_.transform_.translate.x += velocity_.x * FpsCounter::deltaTime;
@@ -88,27 +81,39 @@ void Player::Update(GameEngine::InputCommand* inputCommand) {
 	// コライダー位置同期
 	if (collider_) {
 		collider_->SetWorldPosition(worldTransform_.transform_.translate);
-        // 球データ同期
         sphereData_.center = worldTransform_.transform_.translate;
 	}
 }
 
-void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
-	if (isPreCharging_ || isCharging_ || isBounceLock_) {
-		return;
-	}
+void Player::UpdateCameraBasis(const Camera* camera) {
+	if (!camera) { return; }
+	// ワールド行列から前方向を取得 (カメラのZ軸マイナスがForward想定)
+	Matrix4x4 camWorld = camera->GetWorldMatrix();
+	Vector3 forward = { -camWorld.m[2][0], -camWorld.m[2][1], -camWorld.m[2][2] }; // カメラが見る方向
+	forward = Normalize(forward);
+	// XZ平面へ投影
+	forward.y = 0.0f;
+	if (forward.x != 0.0f || forward.z != 0.0f) { forward = Normalize(forward); }
+	// 右方向 = カメラのX軸 (ワールド行列の0列)
+	Vector3 right = { camWorld.m[0][0], camWorld.m[0][1], camWorld.m[0][2] };
+	right.y = 0.0f;
+	if (right.x != 0.0f || right.z != 0.0f) { right = Normalize(right); }
+	cameraForwardXZ_ = forward;
+	cameraRightXZ_ = right;
+}
 
-	// 入力から方向を決める
+void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
+	if (isPreCharging_ || isCharging_ || isBounceLock_) { return; }
 	Vector3 dir = { 0.0f, 0.0f, 0.0f };
-	// MoveUp/Down/Left/Rightの押下状態を確認
-	if (inputCommand->IsCommandAcitve("MoveUp")) { dir.z += 1.0f; }
-	if (inputCommand->IsCommandAcitve("MoveDown")) { dir.z -= 1.0f; }
-	if (inputCommand->IsCommandAcitve("MoveLeft")) { dir.x -= 1.0f; }
-	if (inputCommand->IsCommandAcitve("MoveRight")) { dir.x += 1.0f; }
-	// 正規化（斜め速度の過剰上昇を防ぐ）
+	if (inputCommand->IsCommandAcitve("MoveUp"))    { dir -= cameraForwardXZ_; }
+	if (inputCommand->IsCommandAcitve("MoveDown"))  { dir += cameraForwardXZ_; }
+	if (inputCommand->IsCommandAcitve("MoveLeft"))  { dir -= cameraRightXZ_; }
+	if (inputCommand->IsCommandAcitve("MoveRight")) { dir += cameraRightXZ_; }
 	if (dir.x != 0.0f || dir.z != 0.0f) {
+		// Y成分は常に0
+		dir.y = 0.0f;
 		dir = Normalize(dir);
-		lastMoveDir_ = { dir.x, 0.0f, dir.z }; // XZの最後の移動方向を更新
+		lastMoveDir_ = { dir.x, 0.0f, dir.z };
 	}
 	float maxSpeed = (isJump_ ? kAirMoveSpeed_ : kMoveSpeed_);
 	desiredVelXZ_.x = dir.x * maxSpeed;
@@ -117,11 +122,8 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 	// 加減速（地上/空中で異なるレート）
 	const float accel = (isJump_ ? kAirDeceleration_ : kGroundAcceleration_);
 	auto approach = [](float current, float target, float delta) {
-		if (current < target) {
-			current = std::min(current + delta, target);
-		} else if (current > target) {
-			current = std::max(current - delta, target);
-		}
+		if (current < target) { current = std::min(current + delta, target); }
+		else if (current > target) { current = std::max(current - delta, target); }
 		return current;
 	};
 	velocity_.x = approach(velocity_.x, desiredVelXZ_.x, accel);
@@ -130,127 +132,65 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 	// 攻撃操作
 	if (inputCommand->IsCommandAcitve("Attack")) {
 		if (isJump_) {
-			if (isAttackDown_) {
-				isAttackDown_ = false;
-			} else {
-				velocity_.y = -kAttackDownSpeed_;
-				isAttackDown_ = true;
-			}
+			if (isAttackDown_) { isAttackDown_ = false; }
+			else { velocity_.y = -kAttackDownSpeed_; isAttackDown_ = true; }
 		} else {
-			// 最後に移動していた方向に突進する
 			Vector3 chargeDirXZ = lastMoveDir_;
-			// 直前の入力がない場合は現在の速度方向をフォールバック
-			if (chargeDirXZ.x == 0.0f && chargeDirXZ.z == 0.0f) {
-				chargeDirXZ = { velocity_.x, 0.0f, velocity_.z };
-			}
+			if (chargeDirXZ.x == 0.0f && chargeDirXZ.z == 0.0f) { chargeDirXZ = { velocity_.x, 0.0f, velocity_.z }; }
 			StartCharge(chargeDirXZ);
 		}
 	}
 }
 
 void Player::StartCharge(const Vector3& direction) {
-	// XZ成分のみで方向を決定
 	Vector3 dirXZ = { direction.x, 0.0f, direction.z };
-	// ゼロ方向の安全対策: デフォルト前方に
-	if (dirXZ.x == 0.0f && dirXZ.z == 0.0f) {
-		dirXZ = { 0.0f, 0.0f, 1.0f };
-	}
-
-	// 突進開始(予備動作)
-	isPreCharging_ = true;
-	isCharging_ = false;
-	chargeTimer_ = 0.0f;
-	chargeActiveTimer_ = 0.0f;
-	// 方向を設定（正規化）
-	chargeDirection_ = Normalize(dirXZ);
-	velocity_ = { 0.0f,0.0f,0.0f };
+	if (dirXZ.x == 0.0f && dirXZ.z == 0.0f) { dirXZ = cameraForwardXZ_; }
+	isPreCharging_ = true; isCharging_ = false; chargeTimer_ = 0.0f; chargeActiveTimer_ = 0.0f;
+	chargeDirection_ = Normalize(dirXZ); velocity_ = { 0.0f,0.0f,0.0f };
 }
 
 void Player::ChargeUpdate() {
-	if (!isPreCharging_ && !isCharging_) {
-		return;
-	}
-
-	// 予備動作中
+	if (!isPreCharging_ && !isCharging_) { return; }
 	if (isPreCharging_) {
 		chargeTimer_ += FpsCounter::deltaTime;
-		if (chargeTimer_ >= kPreChargeTime_) {
-			// 本突進へ移行
-			isPreCharging_ = false;
-			isCharging_ = true;
-			chargeActiveTimer_ = 0.0f;
-		}
-		return; // 予備動作中は移動しない
+		if (chargeTimer_ >= kPreChargeTime_) { isPreCharging_ = false; isCharging_ = true; chargeActiveTimer_ = 0.0f; }
+		return;
 	}
-
-	// 突進中
 	if (isCharging_) {
 		chargeActiveTimer_ += FpsCounter::deltaTime;
-		// 突進は一定速度
 		desiredVelXZ_.x = chargeDirection_.x * kChargeSpeed_;
 		desiredVelXZ_.z = chargeDirection_.z * kChargeSpeed_;
-		velocity_.x = desiredVelXZ_.x;
-		velocity_.z = desiredVelXZ_.z;
+		velocity_.x = desiredVelXZ_.x; velocity_.z = desiredVelXZ_.z;
 	}
 }
 
 void Player::BounceUpdate() {
 	if (!isBounceLock_) { return; }
-
 	bounceLockTimer_ += FpsCounter::deltaTime;
-
-	// 硬直解除
 	if (bounceLockTimer_ >= currentBounceLockTime_) {
-		isBounceLock_ = false;
-		bounceLockTimer_ = 0.0f;
-		currentBounceUpSpeed_ = 0.0f;
-		currentBounceAwaySpeed_ = 0.0f;
-		currentBounceLockTime_ = 0.0f;
-		bounceAwayDir_ = {0.0f,0.0f,0.0f};
+		isBounceLock_ = false; bounceLockTimer_ = 0.0f; currentBounceUpSpeed_ = 0.0f; currentBounceAwaySpeed_ = 0.0f; currentBounceLockTime_ = 0.0f; bounceAwayDir_ = {0.0f,0.0f,0.0f};
 	}
 }
 
 void Player::ChargeWallBounce(const Vector3 &bounceDirection, bool isGreatWall) {
-	if (isPreCharging_ || !isCharging_) {
-		return;
-	}
-	// 突進終了
-	isPreCharging_ = false;
-	isCharging_ = false;
-	isJump_ = true;
-
-	// 跳ね返りの初期設定（硬直開始）。方向は突進方向と逆
-	isBounceLock_ = true;
-	bounceLockTimer_ = 0.0f;
-	bounceAwayDir_ = { -bounceDirection.x, 0.0f, -bounceDirection.z };
-	bounceAwayDir_ = Normalize(bounceAwayDir_);
-
+	if (isPreCharging_ || !isCharging_) { return; }
+	isPreCharging_ = false; isCharging_ = false; isJump_ = true;
+	isBounceLock_ = true; bounceLockTimer_ = 0.0f; bounceAwayDir_ = { -bounceDirection.x, 0.0f, -bounceDirection.z }; bounceAwayDir_ = Normalize(bounceAwayDir_);
 	if (isGreatWall) {
-		velocity_ = bounceAwayDir_ * kGreatWallBounceAwaySpeed_;
-		velocity_.y = kGreatWallBounceUpSpeed_;
-		currentBounceLockTime_ = kGreatWallBounceLockTime_;
+		velocity_ = bounceAwayDir_ * kGreatWallBounceAwaySpeed_; velocity_.y = kGreatWallBounceUpSpeed_; currentBounceLockTime_ = kGreatWallBounceLockTime_;
 	} else {
-		velocity_ = bounceAwayDir_ * kWallBounceAwaySpeed_;
-		velocity_.y = kWallBounceUpSpeed_;
-		currentBounceLockTime_ = kWallBounceLockTime_;
+		velocity_ = bounceAwayDir_ * kWallBounceAwaySpeed_; velocity_.y = kWallBounceUpSpeed_; currentBounceLockTime_ = kWallBounceLockTime_;
 	}
 }
 
 void Player::OnCollision(const CollisionResult &result) {
-	// 壁との衝突から跳ね返りを誘発（突進中のみ）
-	if (!result.isHit) {
-		return;
-	}
-	
+	if (!result.isHit) { return; }
 	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss)) == false;
 	if (isCharging_ && isWall) {
-		// 接触法線を利用して跳ね返り
 		Vector3 normal = result.contactNormal;
-		// XZ成分で跳ね返り方向作成
 		Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
 		if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
-		// 強化壁判定 (例: penetrationDepthが大きい場合など仮)
-		bool isGreat = false; // 今後必要なら result.userData から判定
+		bool isGreat = false; // 今後拡張
 		ChargeWallBounce(bounceDir, isGreat);
 	}
 }

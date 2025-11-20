@@ -12,20 +12,17 @@
 using namespace GameEngine;
 
 void CameraController::Initialize() {
-	// カメラの初期化
 	camera_ = std::make_unique<Camera>();
 	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},position_ }, 1280, 720);
-
-	// 目標値を現在値に合わせる
+	// 現在値を目標値に同期
 	desiredTargetPos_ = targetPos_;
+    desiredTargetLookAt_ = targetLookAt_;
 	desiredTargetRotate_ = targetRotate_;
 	desiredTargetFov_ = targetFov_;
 }
 
 void CameraController::Update(GameEngine::InputCommand* inputCommand) {
-    inputCommand_ = inputCommand;
-
-	// Target毎にdesiredTarget* を更新
+	// ターゲット種類に応じて目標値更新
 	std::visit([this](auto&& value) {
 		using T = std::decay_t<decltype(value)>;
 		if constexpr (std::is_same_v<T, Vector3>) {
@@ -37,41 +34,40 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand) {
 		}
 	}, target_);
 
-	// 目標に向けてスムーズに補間
+	// スムーズ補間係数
 	const float t = 0.1f;
-	targetPos_    = Lerp(targetPos_,    desiredTargetPos_,    t);
+
+	// 座標系種類でカメラ位置追従 (補間後 targetPos_ を基準)
+	switch (cameraCoordinateType_) {
+	case CameraCoodinateType::Cartesian:  UpdateCartesian(inputCommand);  break;
+	case CameraCoodinateType::Spherical: UpdateSpherical(inputCommand); break;
+	}
+	// 位置・回転(Euler)・FOV補間
+	targetPos_ = Lerp(targetPos_, desiredTargetPos_, t);
+    targetLookAt_ = Lerp(targetLookAt_, desiredTargetLookAt_, t);
 	targetRotate_ = Lerp(targetRotate_, desiredTargetRotate_, t);
-	targetFov_    = Lerp(targetFov_,    desiredTargetFov_,    t);
+	targetFov_ = Lerp(targetFov_, desiredTargetFov_, t);
 
-	// 回転行列に変換(ターゲットへ注視)
-	Matrix4x4 rotateMatrix = LookAt(position_, targetPos_, { 0.0f,1.0f,0.0f });
-
-	// ワールド行列
+    Matrix4x4 rotateMatrix = LookAt(targetLookAt_, targetPos_, { 0.0f,1.0f,0.0f });
 	Matrix4x4 worldMatrix = rotateMatrix;
-	worldMatrix.m[3][0] = position_.x;
-	worldMatrix.m[3][1] = position_.y;
-	worldMatrix.m[3][2] = position_.z;
-
-	// ワールド行列を設定
+	worldMatrix.m[3][0] = targetLookAt_.x;
+	worldMatrix.m[3][1] = targetLookAt_.y;
+	worldMatrix.m[3][2] = targetLookAt_.z;
 	camera_->SetWorldMatrix(worldMatrix);
-	// FOVも補間済みの値で更新(度->ラジアン)
+
 	float fovRad = static_cast<float>(targetFov_ * static_cast<float>(M_PI) / 180.0f);
 	camera_->SetProjectionMatrix(fovRad, 1280, 720, 0.1f, 1000.0f);
-	// ワールド行列から更新する
 	camera_->UpdateFromWorldMatrix();
 }
 
 void CameraController::UpdateTargetVector3(const Vector3& v) {
 	desiredTargetPos_ = v;
-	// 座標系種類でカメラ位置を更新
-	switch (cameraCoordinateType_) {
-		case CameraCoodinateType::Cartesian:
-			UpdateCartesian(inputCommand_);
-			break;
-		case CameraCoodinateType::Spherical:
-			UpdateSpherical(inputCommand_);
-			break;
-	}
+	// ターゲット方向から Euler を計算
+	Vector3 dir = Normalize(v - position_);
+	float yaw = std::atan2(dir.x, dir.z);
+	float pitch = std::asin(std::clamp(dir.y, -1.0f, 1.0f));
+	desiredTargetRotate_ = { pitch, yaw, 0.0f };
+	desiredTargetFov_ = 60.0f;
 }
 
 void CameraController::UpdateTargetLine(const Line& line) {
@@ -86,52 +82,35 @@ void CameraController::UpdateTargetLine(const Line& line) {
 }
 
 void CameraController::UpdateTargetVector3Array(const std::vector<Vector3>& arr) {
-	if (arr.empty()) {
-		UpdateTargetVector3({0.0f,0.0f,0.0f});
-		return;
-	}
+	if (arr.empty()) { UpdateTargetVector3({0.0f,0.0f,0.0f}); return; }
 	Vector3 sum{0.0f,0.0f,0.0f};
-	for (const auto& p : arr) {
-		sum.x += p.x; sum.y += p.y; sum.z += p.z;
-	}
-	desiredTargetPos_.x = sum.x / static_cast<float>(arr.size());
-	desiredTargetPos_.y = sum.y / static_cast<float>(arr.size());
-	desiredTargetPos_.z = sum.z / static_cast<float>(arr.size());
-	desiredTargetRotate_ = {0.0f,0.0f,0.0f};
+	for (const auto& p : arr) { sum.x += p.x; sum.y += p.y; sum.z += p.z; }
+	Vector3 avg{ sum.x / (float)arr.size(), sum.y / (float)arr.size(), sum.z / (float)arr.size() };
+	desiredTargetPos_ = avg;
+	Vector3 dir = Normalize(avg - position_);
+	float yaw = std::atan2(dir.x, dir.z);
+	float pitch = std::asin(std::clamp(dir.y, -1.0f, 1.0f));
+	desiredTargetRotate_ = { pitch, yaw, 0.0f };
 	float maxDistSq = 0.0f;
-	for (const auto& p : arr) {
-		float dx = p.x - desiredTargetPos_.x;
-		float dy = p.y - desiredTargetPos_.y;
-		float dz = p.z - desiredTargetPos_.z;
-		float d2 = dx*dx + dy*dy + dz*dz;
-		if (d2 > maxDistSq) { maxDistSq = d2; }
-	}
+	for (const auto& p : arr) { float dx = p.x - avg.x; float dy = p.y - avg.y; float dz = p.z - avg.z; float d2 = dx*dx + dy*dy + dz*dz; if (d2 > maxDistSq) maxDistSq = d2; }
 	float radius = std::sqrt(maxDistSq);
 	desiredTargetFov_ = std::clamp(45.0f + radius * 0.8f, 30.0f, 90.0f);
 }
 
 void CameraController::UpdateCartesian(GameEngine::InputCommand* inputCommand) {
-	if (inputCommand->IsCommandAcitve("CameraMoveLeft")) {
-		position_.x -= 0.5f;
-	}
-	if (inputCommand->IsCommandAcitve("CameraMoveRight")) {
-		position_.x += 0.5f;
-	}
+	if (inputCommand && inputCommand->IsCommandAcitve("CameraMoveLeft")) { position_.x -= 0.5f; }
+	if (inputCommand && inputCommand->IsCommandAcitve("CameraMoveRight")) { position_.x += 0.5f; }
 	Vector3 offset{0.0f, 4.0f, -10.0f};
 	position_.y = targetPos_.y + offset.y;
 	position_.z = targetPos_.z + offset.z;
 }
 
 void CameraController::UpdateSpherical(GameEngine::InputCommand* inputCommand) {
-	if (inputCommand->IsCommandAcitve("CameraMoveLeft")) {
-		rotateMove_.x += 0.02f;
-	}
-	if (inputCommand->IsCommandAcitve("CameraMoveRight")) {
-		rotateMove_.x -= 0.02f;
-	}
-	position_.x = targetPos_.x + kDistance_ * std::sinf(rotateMove_.y) * std::sinf(rotateMove_.x);
-	position_.y = targetPos_.y + kDistance_ * std::cosf(rotateMove_.y);
-	position_.z = targetPos_.z + kDistance_ * std::sinf(rotateMove_.y) * std::cosf(rotateMove_.x);
+	if (inputCommand && inputCommand->IsCommandAcitve("CameraMoveLeft")) { rotateMove_.x += 0.02f; }
+	if (inputCommand && inputCommand->IsCommandAcitve("CameraMoveRight")) { rotateMove_.x -= 0.02f; }
+	desiredTargetLookAt_.x = targetPos_.x + kDistance_ * std::sinf(rotateMove_.y) * std::sinf(rotateMove_.x);
+	desiredTargetLookAt_.y = targetPos_.y + kDistance_ * std::cosf(rotateMove_.y);
+	desiredTargetLookAt_.z = targetPos_.z + kDistance_ * std::sinf(rotateMove_.y) * std::cosf(rotateMove_.x);
 }
 
 Matrix4x4 CameraController::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {

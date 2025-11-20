@@ -2,10 +2,10 @@
 #include"WorldTransform.h"
 #include"InputCommand.h"
 #include"Collider.h"
+#include"Camera.h"
 
 class Player {
 public:
-
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
@@ -13,10 +13,11 @@ public:
 	void Initialize();
 
 	/// <summary>
-	/// 更新処理
+	/// 更新処理 (カメラ基準移動)
 	/// </summary>
 	/// <param name="inputCommand"></param>
-	void Update(GameEngine::InputCommand* inputCommand);
+	/// <param name="camera">メインカメラ</param>
+	void Update(GameEngine::InputCommand* inputCommand, const GameEngine::Camera& camera);
 
 	/// <summary>
 	/// ワールド行列を取得
@@ -123,9 +124,12 @@ private:
     // 最後に移動していたXZ方向（正規化）
     Vector3 lastMoveDir_ = { 0.0f, 0.0f, 1.0f };
 
+	// カメラ基準の前/右(XZ平面)
+	Vector3 cameraForwardXZ_ = {0.0f,0.0f,1.0f};
+	Vector3 cameraRightXZ_   = {1.0f,0.0f,0.0f};
+
 	// ジャンプフラグ
 	bool isJump_ = false;
-	
 	// ジャンプタイマー
 	float jumpTimer_ = 0.0f;
 
@@ -151,48 +155,15 @@ private:
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
 
 private:
-
-	/// <summary>
-	/// プレイヤーの入力処理
-	/// </summary>
-	/// <param name="inputCommand"></param>
 	void ProcessMoveInput(GameEngine::InputCommand* inputCommand);
-
-	/// <summary>
-	/// 突進開始
-	/// </summary>
-	/// <param name="direction">突進方向</param>
 	void StartCharge(const Vector3& direction);
-
-	/// <summary>
-	/// 突進更新処理（予備動作 -> 本突進）
-	/// </summary>
 	void ChargeUpdate();
-
-	/// <summary>
-	/// 跳ね返り中の更新処理（硬直移動）
-	/// </summary>
 	void BounceUpdate();
-
-	/// <summary>
-	/// 突進後、壁に衝突した際の跳ね返り（壁側から呼ばれる想定）
-	/// </summary>
-    /// <param name="bounceDirection">跳ね返り方向</param>
-	/// <param name="isGreatWall">強化壁かどうか</param>
 	void ChargeWallBounce(const Vector3 &bounceDirection, bool isGreatWall);
-
-	/// <summary>
-	/// 当たり判定コールバック
-	/// </summary>
 	void OnCollision(const GameEngine::CollisionResult& result);
-
-	/// <summary>
-	/// 値を登録する
-	/// </summary>
 	void RegisterBebugParam();
-
-	/// <summary>
-	/// 値を適応する
-	/// </summary>
 	void ApplyDebugParam();
+
+	// カメラ基準ベクトル更新
+	void UpdateCameraBasis(const GameEngine::Camera* camera);
 };

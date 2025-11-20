@@ -89,9 +89,10 @@ void TDGameScene::Update() {
 	sceneLightingController_->Update();
 
 	// プレイヤーの更新処理
-	player_->Update(context_->inputCommand);
+	player_->Update(context_->inputCommand, cameraController_->GetCamera());
 
 	// カメラコントロールの更新処理
+    cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
 	cameraController_->Update(context_->inputCommand);
 
 	// カメラの更新処理
