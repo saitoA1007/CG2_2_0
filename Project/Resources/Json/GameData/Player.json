@@ -1,0 +1,11 @@
+{
+    "Player": {
+        "DushMaxTime": 0.5,
+        "DushSpeed": 35.0,
+        "JumpMaxHeight": 6.0,
+        "JumpMaxTime": 0.6499999761581421,
+        "MoveSpeed": 20.0,
+        "SceneName": "ALGameScene",
+        "TurnTime": 0.800000011920929
+    }
+}

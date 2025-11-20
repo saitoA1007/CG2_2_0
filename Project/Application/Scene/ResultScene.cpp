@@ -1,21 +1,21 @@
-#include"TitleScene.h"
+#include"ResultScene.h"
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
 #include"GameParamEditor.h"
 #include"SpriteRenderer.h"
 using namespace GameEngine;
 
-TitleScene::~TitleScene() {
+ResultScene::~ResultScene() {
 }
 
-void TitleScene::Initialize(SceneContext* context) {
+void ResultScene::Initialize(SceneContext* context) {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem 
 	// エンジン機能を取得
 	context_ = context;
 
 	// 登録するパラメータを設定
-	GameParamEditor::GetInstance()->SetActiveScene("TitleScene");
+	GameParamEditor::GetInstance()->SetActiveScene("ResultScene");
 
 #pragma endregion
 
@@ -28,25 +28,25 @@ void TitleScene::Initialize(SceneContext* context) {
 	skyDomeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// タイトル画像
-	titleSprite_ = Sprite::Create({640.0f,250.0f},{600.0f,128.0f},{0.5f,0.5f});
-	titleGH_ = context_->textureManager->GetHandleByName("titleText.png");
+	titleSprite_ = Sprite::Create({ 640.0f,250.0f }, { 600.0f,128.0f }, { 0.5f,0.5f });
+	titleGH_ = context_->textureManager->GetHandleByName("clearText.png");
 
 	// スペースボタン
 	spaceSprite_ = Sprite::Create({ 640.0f,500.0f }, { 256.0f,64.0f }, { 0.5f,0.5f });
 	spaceGH_ = context_->textureManager->GetHandleByName("spaceText.png");
 }
 
-void TitleScene::Update() {
+void ResultScene::Update() {
 
 	if (context_->input->TriggerKey(DIK_SPACE) || context_->input->TriggerPad(XINPUT_GAMEPAD_A)) {
 		isFinished_ = true;
 	}
-	
+
 	// カメラの更新処理
 	mainCamera_->Update();
 }
 
-void TitleScene::Draw(const bool& isDebugView) {
+void ResultScene::Draw(const bool& isDebugView) {
 
 	// 描画に使用するカメラを設定
 	if (isDebugView) {
