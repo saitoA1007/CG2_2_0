@@ -49,12 +49,13 @@ void GameScene::Initialize(SceneContext* context) {
 	// ボーンアニメーションを生成する
 	bronAnimationModel_ = context_->modelManager->GetNameByModel("Walk");
 	bronAnimationWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
-	// ボーンアニメーションデータを取得する
-	bronAnimation_ = Model::LoadAnimationFile("walk.gltf", "Walk");
-	skeletonBron_ = Model::CreateSkeleton(bronAnimationModel_->modelData_.rootNode);
-	skinClusterBron_ = Animation::CreateSkinCluster(skeletonBron_, bronAnimationModel_->modelData_);
-	timer_ = 0.0f;
 
+	// 歩くアニメーションデータを取得する
+	walkAnimationData_ = context_->animationManager->GetNameByAnimations("Walk");
+	// 歩くアニメーションの再生を管理する
+	walkAnimator_ = std::make_unique<Animator>();
+	walkAnimator_->Initialize(bronAnimationModel_, &walkAnimationData_["Armature|mixamo.com|Layer0"]);
+	
 	// 値の保存の登録と適応(テスト)
 	RegisterBebugParam();
 	ApplyDebugParam();
@@ -70,9 +71,8 @@ void GameScene::Update() {
 	// ライトの更新
 	lightManager_->Update();
 
-	timer_ += FpsCounter::deltaTime;
-	float animationTime = fmodf(timer_, bronAnimation_.duration);
-	Animation::Update(skinClusterBron_, skeletonBron_, bronAnimation_, animationTime);
+	// 歩くアニメーションの更新処理
+	walkAnimator_->Update();
 
 	// カメラの更新処理
 	mainCamera_->Update();
@@ -124,7 +124,7 @@ void GameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 
 	// アニメーションしているモデルを描画
-	ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_, skinClusterBron_);
+	ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_);
 }
 
 void GameScene::RegisterBebugParam() {

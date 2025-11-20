@@ -54,6 +54,7 @@ struct ModelData {
 	std::vector<LoadMaterialData> materials;
 	Node rootNode;
 	std::map<std::string, JointWeightData> skinClusterData;
+	bool isAnimation_ = false;
 };
 
 struct GridVertexData {

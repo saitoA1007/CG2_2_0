@@ -237,7 +237,6 @@
     <ClCompile Include="Application\Scene\GameScene.cpp">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\3D\Model\Animation.cpp" />
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
     <ClCompile Include="Application\Scene\GEScene.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
@@ -288,6 +287,8 @@
     <ClCompile Include="EngineSource\Graphics\RenderPipeline.cpp" />
     <ClCompile Include="Application\Scene\TDGameScene.cpp" />
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\AnimationManager.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\Animator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -503,7 +504,6 @@
     <ClInclude Include="Application\Scene\GameScene.h">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\3D\Model\Animation.h" />
     <ClInclude Include="EngineSource\Input\InputCommand.h" />
     <ClInclude Include="Application\Scene\GEScene.h" />
     <ClInclude Include="Application\Player\Player.h" />
@@ -570,6 +570,8 @@
     <ClInclude Include="EngineSource\Collision\CollisionResult.h" />
     <ClInclude Include="EngineSource\Collision\ColliderData.h" />
     <ClInclude Include="EngineSource\Collision\UserData.h" />
+    <ClInclude Include="EngineSource\3D\Model\AnimationManager.h" />
+    <ClInclude Include="EngineSource\3D\Model\Animator.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

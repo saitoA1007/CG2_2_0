@@ -6,6 +6,7 @@
 #include"InputCommand.h"
 #include"ModelManager.h"
 #include"DebugCamera.h"
+#include"AnimationManager.h"
 
 // シーンで使用するエンジン機能
 struct SceneContext {
@@ -16,4 +17,5 @@ struct SceneContext {
 	GameEngine::AudioManager* audioManager = nullptr; // 音を取得可能
 	GameEngine::GraphicsDevice* graphicsDevice = nullptr; // DirectXのコア機能
 	GameEngine::DebugCamera* debugCamera_ = nullptr; // デバック描画機能
+	GameEngine::AnimationManager* animationManager = nullptr; // アニメーションデータを取得可能
 };
