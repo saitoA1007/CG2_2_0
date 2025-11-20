@@ -108,6 +108,7 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 	// 正規化（斜め速度の過剰上昇を防ぐ）
 	if (dir.x != 0.0f || dir.z != 0.0f) {
 		dir = Normalize(dir);
+		lastMoveDir_ = { dir.x, 0.0f, dir.z }; // XZの最後の移動方向を更新
 	}
 	float maxSpeed = (isJump_ ? kAirMoveSpeed_ : kMoveSpeed_);
 	desiredVelXZ_.x = dir.x * maxSpeed;
@@ -129,22 +130,39 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 	// 攻撃操作
 	if (inputCommand->IsCommandAcitve("Attack")) {
 		if (isJump_) {
-			velocity_.y = -kAttackDownSpeed_;
-            isAttackDown_ = true;
+			if (isAttackDown_) {
+				isAttackDown_ = false;
+			} else {
+				velocity_.y = -kAttackDownSpeed_;
+				isAttackDown_ = true;
+			}
 		} else {
-			StartCharge(velocity_);
+			// 最後に移動していた方向に突進する
+			Vector3 chargeDirXZ = lastMoveDir_;
+			// 直前の入力がない場合は現在の速度方向をフォールバック
+			if (chargeDirXZ.x == 0.0f && chargeDirXZ.z == 0.0f) {
+				chargeDirXZ = { velocity_.x, 0.0f, velocity_.z };
+			}
+			StartCharge(chargeDirXZ);
 		}
 	}
 }
 
 void Player::StartCharge(const Vector3& direction) {
+	// XZ成分のみで方向を決定
+	Vector3 dirXZ = { direction.x, 0.0f, direction.z };
+	// ゼロ方向の安全対策: デフォルト前方に
+	if (dirXZ.x == 0.0f && dirXZ.z == 0.0f) {
+		dirXZ = { 0.0f, 0.0f, 1.0f };
+	}
+
 	// 突進開始(予備動作)
 	isPreCharging_ = true;
 	isCharging_ = false;
 	chargeTimer_ = 0.0f;
 	chargeActiveTimer_ = 0.0f;
 	// 方向を設定（正規化）
-	chargeDirection_ = Normalize(direction);
+	chargeDirection_ = Normalize(dirXZ);
 	velocity_ = { 0.0f,0.0f,0.0f };
 }
 

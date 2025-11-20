@@ -120,6 +120,8 @@ private:
 	Vector3 velocity_ = {0.0f,0.0f,0.0f};
     // XZの目標速度
     Vector3 desiredVelXZ_ = { 0.0f, 0.0f, 0.0f };
+    // 最後に移動していたXZ方向（正規化）
+    Vector3 lastMoveDir_ = { 0.0f, 0.0f, 1.0f };
 
 	// ジャンプフラグ
 	bool isJump_ = false;
@@ -128,20 +130,19 @@ private:
 	float jumpTimer_ = 0.0f;
 
 	// 突進関連フラグ
-	bool isPreCharging_ = false;	// 予備動作中
-	bool isCharging_ = false;		// 突進中
-	float chargeTimer_ = 0.0f;		// 予備動作 & 突進のタイマー
-	float chargeActiveTimer_ = 0.0f;// 突進中経過時間
-	Vector3 chargeDirection_ = { 0.0f,0.0f,1.0f }; // 突進方向
+	bool isPreCharging_ = false;
+	bool isCharging_ = false;
+	float chargeTimer_ = 0.0f;
+	float chargeActiveTimer_ = 0.0f;
+	Vector3 chargeDirection_ = { 0.0f,0.0f,1.0f };
 
 	// 壁跳ね返り（硬直）関連
-	bool isBounceLock_ = false;     // 跳ね返り硬直中
-	float bounceLockTimer_ = 0.0f;  // 硬直経過時間
-	// 跳ね返りパラメータ（種類に応じて開始時に確定させる）
-	float currentBounceUpSpeed_ = 0.0f;		// 上昇速度（秒速）
-	float currentBounceAwaySpeed_ = 0.0f;	// 壁から離れる速度（秒速）
-	float currentBounceLockTime_ = 0.0f;	// 硬直時間
-	Vector3 bounceAwayDir_ = {0.0f, 0.0f, 0.0f}; // 反射（壁から離れる）方向
+	bool isBounceLock_ = false;
+	float bounceLockTimer_ = 0.0f;
+	float currentBounceUpSpeed_ = 0.0f;
+	float currentBounceAwaySpeed_ = 0.0f;
+	float currentBounceLockTime_ = 0.0f;
+	Vector3 bounceAwayDir_ = {0.0f, 0.0f, 0.0f};
 
 	// 急降下攻撃フラグ
     bool isAttackDown_ = false;
