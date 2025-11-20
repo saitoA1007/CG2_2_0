@@ -210,6 +210,27 @@ void GameParamEditor::LoadFile(const std::string& groupName) {
 	}
 }
 
+void GameParamEditor::RemoveItem(const std::string& groupName, const std::string& key) {
+	// グループを検索
+	auto itGroup = datas_.find(groupName);
+
+	// グループが存在しなければ終了
+	if (itGroup == datas_.end()) {
+		return;
+	}
+
+	// グループ内のアイテムマップの参照を取得
+	std::map<std::string, Item>& items = itGroup->second.items;
+
+	// アイテムを検索
+	auto itItem = items.find(key);
+
+	// アイテムが存在すれば削除
+	if (itItem != items.end()) {
+		items.erase(itItem);
+	}
+}
+
 void GameParamEditor::SelectGroup(const std::string& groupName) {
 	selectedGroupName_ = groupName;
 }
