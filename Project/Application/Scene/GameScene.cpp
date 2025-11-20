@@ -74,6 +74,7 @@ void GameScene::Update() {
 	// 歩くアニメーションの更新処理
 	walkAnimator_->Update();
 
+
 	// カメラの更新処理
 	mainCamera_->Update();
 

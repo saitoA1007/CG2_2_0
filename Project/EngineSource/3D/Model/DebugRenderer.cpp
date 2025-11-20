@@ -276,6 +276,7 @@ void DebugRenderer::DrawAll(const Matrix4x4& VPMatrix) {
     // 頂点バッファを設定
     commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
     commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+    ;
     commandList_->SetGraphicsRootConstantBufferView(0, transformMatrixResource_->GetGPUVirtualAddress());
 
     // 1回のDrawCallですべての線を描画
