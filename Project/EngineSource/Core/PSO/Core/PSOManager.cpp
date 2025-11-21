@@ -268,7 +268,7 @@ void PSOManager::DefaultLoadPSO() {
     rootSigBuilder.Initialize(device_);
     rootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
-    rootSigBuilder.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
@@ -305,7 +305,7 @@ void PSOManager::DefaultLoadPSO() {
     instancingRootSigBuilder.Initialize(device_);
     instancingRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
     instancingRootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_VERTEX);
-    instancingRootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_PIXEL);
+    instancingRootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount),0, D3D12_SHADER_VISIBILITY_PIXEL);
     instancingRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     instancingRootSigBuilder.CreateRootSignature();
     RegisterPSO("Instancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
@@ -343,7 +343,7 @@ void PSOManager::DefaultLoadPSO() {
     animationRootSigBuilder.Initialize(device_);
     animationRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
     animationRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
-    animationRootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_PIXEL);
+    animationRootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
     animationRootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_VERTEX);
     animationRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
     animationRootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);

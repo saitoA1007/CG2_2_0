@@ -35,6 +35,7 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& 
 		transformData.transform = transform;
 		transformData.worldMatrix = MakeAffineMatrix(transformData.transform.scale, transformData.transform.rotate, transformData.transform.translate);
 		transformData.color = { 1.0f,1.0f,1.0f,1.0f };
+		transformData.textureHandle = 0;
 		transformDatas_.push_back(transformData);
 	}
 
@@ -50,6 +51,7 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& 
 		instancingData_[index].WVP = MakeIdentity4x4();
 		instancingData_[index].World = MakeIdentity4x4();
 		instancingData_[index].color = { 1.0f,1.0f,1.0f,1.0f };
+		instancingData_[index].textureHandle = 0;
 	}
 
 	// SRVのインデックスを取得
@@ -81,6 +83,7 @@ void WorldTransforms::SetWVPMatrix(const uint32_t& numInstance,const Matrix4x4& 
 		instancingData_[i].WVP = Multiply(transformDatas_[i].worldMatrix, VPMatrix);
 		instancingData_[i].World = transformDatas_[i].worldMatrix;
 		instancingData_[i].color = transformDatas_[i].color;
+		instancingData_[i].textureHandle = transformDatas_[i].textureHandle;
 	}
 }
 
@@ -91,5 +94,6 @@ void WorldTransforms::SetWVPMatrix(const uint32_t& numInstance, const Matrix4x4&
 		instancingData_[i].WVP = Multiply(localMatrix, Multiply(transformDatas_[i].worldMatrix, VPMatrix));
 		instancingData_[i].World = transformDatas_[i].worldMatrix;
 		instancingData_[i].color = transformDatas_[i].color;
+		instancingData_[i].textureHandle = transformDatas_[i].textureHandle;
 	}
 }

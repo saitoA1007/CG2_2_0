@@ -133,6 +133,7 @@ std::unique_ptr<Model> Model::CreateModel(const std::string& objFilename, const 
 
 			uint32_t textureHandle = textureManager_->Load(modelData.materials[index].textureFilePath);
 			tmpMaterial->SetTextureHandle(textureHandle);
+			tmpMaterial->SetDefaultTexture(textureHandle);
 		}
 
 		model->materials_[modelData.materials[index].name] = std::move(tmpMaterial);
@@ -356,6 +357,14 @@ void Model::SetDefaultUVMatrix(const Transform& uvTransform, const std::string& 
 	assert(it != materials_.end() && "Material not found");
 	Material* material = it->second.get();
 	material->SetUVTransform(uvTransform);
+}
+
+void Model::SetDefaultTextureHandle(const uint32_t& handle, const std::string& materialName) {
+	auto it = materialName == "default" ? materials_.begin() : materials_.find(materialName);
+
+	assert(it != materials_.end() && "Material not found");
+	Material* material = it->second.get();
+	material->SetTextureHandle(handle);
 }
 
 [[nodiscard]]

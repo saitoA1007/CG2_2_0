@@ -15,6 +15,8 @@
 #include"RasterizerBuilder.h"
 #include"BlendBuilder.h"
 
+#include"DescriptorCounts.h"
+
 #include"DrawPSOData.h"
 
 #include<json.hpp>
