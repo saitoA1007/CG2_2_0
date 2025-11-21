@@ -139,12 +139,12 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::Draw(skyDomeModel_, skyDomeWorldTransform_);
 
 	// 地面を描画
-	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_, grassGH_);
+	terrainModel_->SetDefaultTextureHandle(grassGH_);
+	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
 
 	// プレイヤーを描画
-	uint32_t DefaultWhiteGH = 0;
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
-	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform(), DefaultWhiteGH);
+	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
 
 	// ボス敵を描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
@@ -153,7 +153,7 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::Instancing);
 	// パーティクルを描画
-	ModelRenderer::DrawInstancing(planeModel_, playerMoveParticle_->GetCurrentNumInstance(), *playerMoveParticle_->GetWorldTransforms(), playerMoveParticle_->GetTexture());
+	ModelRenderer::DrawInstancing(planeModel_, playerMoveParticle_->GetCurrentNumInstance(), *playerMoveParticle_->GetWorldTransforms());
 
 #ifdef _DEBUG
 
