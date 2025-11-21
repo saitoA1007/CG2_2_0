@@ -33,6 +33,8 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 	materialData_->specularColor = specularColor;
 	// 輝度を設定
 	materialData_->shininess = shininess;
+	// テクスチャデータ
+	materialData_->textureHandle = 0;
 }
 
 void Material::SetUVTransform(Transform uvTransform) {

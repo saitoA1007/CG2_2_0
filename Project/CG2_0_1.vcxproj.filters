@@ -571,6 +571,7 @@
     <ClInclude Include="EngineSource\Collision\UserData.h" />
     <ClInclude Include="EngineSource\3D\Model\AnimationManager.h" />
     <ClInclude Include="EngineSource\3D\Model\Animator.h" />
+    <ClInclude Include="EngineSource\Graphics\DescriptorCounts.h" />
     <ClInclude Include="Application\Scene\ALGameScene.h" />
     <ClInclude Include="Application\Scene\ResultScene.h" />
     <ClInclude Include="Application\Enemy\BossEnemy.h" />

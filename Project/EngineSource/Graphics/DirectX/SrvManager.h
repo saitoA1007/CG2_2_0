@@ -5,25 +5,9 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#include"DescriptorCounts.h"
+
 namespace GameEngine {
-
-	// 使用するヒープのタイプ
-	enum class SrvHeapType {
-		Texture,      // 画像データ
-		System,       // オフスクリーンなど
-		Buffer,       // インスタンシング、パーティクルのStructuredBuffer
-		Other,        // 他で使用する(現在はImGuiでのみ使用している)
-
-		Count         // 総数
-	};
-
-	// 使用するヒープの数
-	enum class SrvHeapTypeCount : uint32_t {
-		TextureMaxCount = 2048,
-		SystemMaxCount = 18,
-		BufferMaxCount = 1024,
-		OtherMaxCount = 1
-	};
 
 	class SrvManager {
 	public:
@@ -75,8 +59,6 @@ namespace GameEngine {
 		SrvManager& operator=(const SrvManager&) = delete;
 
 		static ID3D12Device* device_;
-
-		static inline const uint32_t kMaxSrvIndex_ = 4096; // 最大のsrvインデックス
 
 		std::queue<uint32_t> availableIndices_;  // 利用出来るインデックス
 		std::unordered_set<uint32_t> usedIndices_; // 利用しているインデックスを保持
