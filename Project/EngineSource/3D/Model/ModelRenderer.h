@@ -5,6 +5,7 @@
 #include <wrl.h>
 
 #include"TextureManager.h"
+#include"SrvManager.h"
 
 #include"PSO/Core/PSOManager.h"
 #include"PSO/Core/DrawPSOData.h"
@@ -32,7 +33,7 @@ namespace GameEngine {
 		/// 静的初期化
 		/// </summary>
 		/// <param name="commandList"></param>
-		static void StaticInitialize(ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,PSOManager* psoManager);
+		static void StaticInitialize(ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,SrvManager* srvManager,PSOManager* psoManager);
 
 		/// <summary>
 		/// 描画前処理
@@ -124,6 +125,9 @@ namespace GameEngine {
 
 		// テクスチャ
 		static TextureManager* textureManager_;
+
+		// srv
+		static SrvManager* srvManager_;
 
 		// カメラ行列
 		static Matrix4x4 vpMatrix_;

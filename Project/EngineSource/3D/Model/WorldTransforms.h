@@ -20,10 +20,12 @@ namespace GameEngine {
 	class WorldTransforms final {
 	public:
 
+		// 1つのパーティクルがもつデータ
 		struct TransformData {
 			Matrix4x4 worldMatrix;
 			Transform transform;
 			Vector4 color;
+			uint32_t textureHandle;
 		};
 
 	public:

@@ -578,6 +578,7 @@
     <ClInclude Include="EngineSource\Collision\UserData.h" />
     <ClInclude Include="EngineSource\3D\Model\AnimationManager.h" />
     <ClInclude Include="EngineSource\3D\Model\Animator.h" />
+    <ClInclude Include="EngineSource\Graphics\DescriptorCounts.h" />
     <ClInclude Include="Application\Stage\Wall.h" />
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\CollisionTypeID.h" />
