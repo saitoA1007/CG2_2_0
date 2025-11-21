@@ -1,0 +1,65 @@
+{
+    "PlayerSmokeParticle": {
+        "ColorRange": {
+            "Max": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "FieldAcceleration": [
+            0.0,
+            3.200000047683716,
+            0.0
+        ],
+        "IsBillBoard": true,
+        "IsLoop": true,
+        "LifeTime": 2.0,
+        "ScaleRange": {
+            "Max": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "Min": [
+                0.20000000298023224,
+                0.20000000298023224,
+                0.20000000298023224
+            ]
+        },
+        "SceneName": "ALGameScene",
+        "SpawnCoolTime": 0.20000000298023224,
+        "SpawnMaxCount": 2,
+        "SpawnRange": {
+            "Max": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "Min": [
+                -0.5,
+                -0.5,
+                -0.5
+            ]
+        },
+        "VelocityRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    }
+}

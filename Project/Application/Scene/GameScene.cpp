@@ -50,12 +50,14 @@ void GameScene::Initialize(SceneContext* context) {
 	bronAnimationModel_ = context_->modelManager->GetNameByModel("Walk");
 	bronAnimationWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
+
 	// 歩くアニメーションデータを取得する
 	walkAnimationData_ = context_->animationManager->GetNameByAnimations("Walk");
 	// 歩くアニメーションの再生を管理する
 	walkAnimator_ = std::make_unique<Animator>();
 	walkAnimator_->Initialize(bronAnimationModel_, &walkAnimationData_["Armature|mixamo.com|Layer0"]);
 	
+
 	// 値の保存の登録と適応(テスト)
 	RegisterBebugParam();
 	ApplyDebugParam();

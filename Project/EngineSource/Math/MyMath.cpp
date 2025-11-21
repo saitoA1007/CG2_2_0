@@ -1,6 +1,7 @@
 #include"MyMath.h"
 #include<cassert>
 #include<cmath>
+#include<numbers>
 #include <algorithm> 
 
 Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs) {
@@ -173,6 +174,21 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
 	};
 
 	return result;
+}
+
+float LerpShortAngle(float a, float b, float t) {
+	// 角度差分を求める
+	float diff = b - a;
+	// -2pi-2piに補正する
+	diff = std::fmodf(diff, std::numbers::pi_v<float> *2.0f);
+	// -pi-piに補正する
+	if (diff < -std::numbers::pi_v<float>) {
+		diff += std::numbers::pi_v<float> *2.0f;
+	} else if(diff > std::numbers::pi_v<float>) {
+		diff -= std::numbers::pi_v<float> *2.0f;
+	}
+
+	return a + diff * t;
 }
 
 Vector3 Project(const Vector3& worldPosition, const Vector2& viewport, const float& viewportWidth, const float& viewportHeight, const Matrix4x4& viewProjection) {

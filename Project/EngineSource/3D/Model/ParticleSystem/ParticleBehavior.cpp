@@ -2,6 +2,7 @@
 #include"FPSCounter.h"
 #include"RandomGenerator.h"
 #include"GameParamEditor.h"
+#include"EasingManager.h"
 #include"MyMath.h"
 using namespace GameEngine;
 
@@ -88,6 +89,10 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     // 生存時間
     tmpParticleData.currentTime = 0.0f;
     tmpParticleData.lifeTime = particleEmitter_.lifeTime;
+    // 初期値を保存
+    tmpParticleData.startSize = tmpParticleData.transform.scale;
+    tmpParticleData.startColor = Vector3(tmpParticleData.color.x, tmpParticleData.color.y, tmpParticleData.color.z);
+    tmpParticleData.startAlpha = tmpParticleData.color.w;
     return tmpParticleData;
 }
 
@@ -128,15 +133,33 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         particle.velocity += particleEmitter_.fieldAcceleration * FpsCounter::deltaTime;
         particle.transform.translate += particle.velocity * FpsCounter::deltaTime;
 
+        // 大きさの変化
+        if (particleEmitter_.sizeOverLifeTime.isEnable) {
+            particle.transform.scale = Lerp(particle.startSize, particleEmitter_.sizeOverLifeTime.endSize, particle.currentTime / particle.lifeTime);
+        }
+
         // worldTransformsの更新
         if (particleEmitter_.isBillBoard) {
             // ビルボードを適応する
-            worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = MakeBillboardMatrix(particles_[i].transform.scale, particles_[i].transform.translate, cameraMatrix);
+            worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = MakeBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix);
         } else {
-            worldTransforms_->transformDatas_[currentNumInstance_].transform = particles_[i].transform;
+            worldTransforms_->transformDatas_[currentNumInstance_].transform = particle.transform;
         }
 
-        worldTransforms_->transformDatas_[currentNumInstance_].color = particles_[i].color;
+        // 色の変化
+        if (particleEmitter_.colorOverLifeTime.isEnable) {
+            Vector3 tmpColor = Lerp(particle.startColor, particleEmitter_.colorOverLifeTime.endColor, particle.currentTime / particle.lifeTime);
+            particle.color.x = tmpColor.x;
+            particle.color.y = tmpColor.y;
+            particle.color.z = tmpColor.z;
+        }
+
+        // 透明度の変化
+        if (particleEmitter_.alphaOverLifeTime.isEnable) {
+            particle.color.w = Lerp(particle.startAlpha, particleEmitter_.alphaOverLifeTime.endAlpha, particle.currentTime / particle.lifeTime);
+        }
+
+        worldTransforms_->transformDatas_[currentNumInstance_].color = particle.color;
         currentNumInstance_++;
     }
 
@@ -158,6 +181,15 @@ void ParticleBehavior::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(name_, "SpawnRange", particleEmitter_.posRange, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "ScaleRange", particleEmitter_.scaleRange, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "ColorRange", particleEmitter_.colorRange, index++);
+    // 拡張機能
+    GameParamEditor::GetInstance()->AddItem(name_, "IsEnableSizeOverLifeTime", particleEmitter_.sizeOverLifeTime.isEnable, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "EndSize", particleEmitter_.sizeOverLifeTime.endSize, index++);
+
+    GameParamEditor::GetInstance()->AddItem(name_, "IsEnableColorOverLifeTime", particleEmitter_.colorOverLifeTime.isEnable, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "EndColor", particleEmitter_.colorOverLifeTime.endColor, index++);
+
+    GameParamEditor::GetInstance()->AddItem(name_, "IsEnableAlphaOverLifeTime", particleEmitter_.alphaOverLifeTime.isEnable, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "EndAlpha", particleEmitter_.alphaOverLifeTime.endAlpha, index++);
 }
 
 void ParticleBehavior::ApplyDebugParam() {
@@ -171,6 +203,15 @@ void ParticleBehavior::ApplyDebugParam() {
     particleEmitter_.posRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "SpawnRange");
     particleEmitter_.scaleRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "ScaleRange");
     particleEmitter_.colorRange = GameParamEditor::GetInstance()->GetValue<Range4>(name_, "ColorRange");
+    // 拡張機能
+    particleEmitter_.sizeOverLifeTime.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableSizeOverLifeTime");
+    particleEmitter_.sizeOverLifeTime.endSize = GameParamEditor::GetInstance()->GetValue<Vector3>(name_, "EndSize");
+
+    particleEmitter_.colorOverLifeTime.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableColorOverLifeTime");
+    particleEmitter_.colorOverLifeTime.endColor = GameParamEditor::GetInstance()->GetValue<Vector3>(name_, "EndColor");
+
+    particleEmitter_.alphaOverLifeTime.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableAlphaOverLifeTime");
+    particleEmitter_.alphaOverLifeTime.endAlpha = GameParamEditor::GetInstance()->GetValue<float>(name_, "EndAlpha");
 
     // 出現範囲を抑える
     if (maxNumInstance_ <= particleEmitter_.spawnMaxCount) {
