@@ -4,7 +4,6 @@
 #include"Application/Scene/TitleScene.h"
 #include"Application/Scene/GameScene.h"
 #include"Application/Scene/GEScene.h"
-#include"Application/Scene/TDGameScene.h"
 
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
@@ -46,7 +45,7 @@ void SceneManager::Initialize(SceneContext* context) {
 #endif
 	
 	// シーンの初期化。
-	ChangeScene(SceneState::TDGame);
+	ChangeScene(SceneState::Title);
 }
 
 void SceneManager::Update() {
@@ -181,10 +180,6 @@ std::unique_ptr<BaseScene> SceneManager::CreateScene(SceneState sceneState) {
 
 	case SceneState::GE:
 		return std::make_unique<GEScene>();
-		break;
-
-	case SceneState::TDGame:
-		return std::make_unique<TDGameScene>();
 		break;
 
 	default:
