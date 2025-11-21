@@ -12,9 +12,9 @@ namespace GameEngine {
 		void Run();
 
 	private:
-		SceneState sceneState_ = SceneState::GE;
+		SceneState sceneState_ = SceneState::ALGame;
 		SceneChangeRequest* sceneChangeRequest_ = nullptr;
-		static inline const char* sceneNames_[] = { "Title", "Game", "GE","TDGame"};
+		static inline const char* sceneNames_[] = { "Title", "Game", "ALGame","Result"};
 	};
 }
 

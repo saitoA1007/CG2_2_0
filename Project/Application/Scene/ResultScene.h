@@ -8,10 +8,10 @@
 #include"Sprite.h"
 #include"WorldTransform.h"
 
-class TitleScene : public BaseScene {
+class ResultScene : public BaseScene {
 public:
 
-	~TitleScene();
+	~ResultScene();
 
 	/// <summary>
 	/// 初期化
@@ -27,7 +27,7 @@ public:
 	/// <summary>
 	/// デバック時、処理して良いものを更新する
 	/// </summary>
-	void DebugUpdate() override{}
+	void DebugUpdate() override {}
 
 	/// <summary>
 	/// 描画処理
@@ -44,7 +44,7 @@ public:
 	/// 次のシーン遷移する場面の値を取得
 	/// </summary>
 	/// <returns></returns>
-	SceneState NextSceneState() override { return SceneState::ALGame; }
+	SceneState NextSceneState() override { return SceneState::Title; }
 
 private: // シーン機能
 

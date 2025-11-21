@@ -57,6 +57,7 @@ void GameScene::Initialize(SceneContext* context) {
 	walkAnimator_ = std::make_unique<Animator>();
 	walkAnimator_->Initialize(bronAnimationModel_, &walkAnimationData_["Armature|mixamo.com|Layer0"]);
 	
+
 	// 値の保存の登録と適応(テスト)
 	RegisterBebugParam();
 	ApplyDebugParam();
