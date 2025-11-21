@@ -86,7 +86,7 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 	}
 
 	// srvインデックスを取得
-	uint32_t index = srvManager_->AllocateSrvIndex();
+	uint32_t index = srvManager_->AllocateSrvIndex(SrvHeapType::Texture);
 
 	// metaDataを基にSRVの設定
 	srvDesc_.Format = metadata_->format;
@@ -94,7 +94,7 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 	srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;// 2Dテクスチャ
 	srvDesc_.Texture2D.MipLevels = UINT(metadata_->mipLevels);
 
-	// SRVを作成するDescriptorHeapの場所を決める。先頭はImGuiが使っているのでその次を使う
+	// SRVを作成するDescriptorHeapの場所を決める。
 	texture.textureSrvHandleCPU = srvManager_->GetCPUHandle(index);
 	texture.textureSrvHandleGPU = srvManager_->GetGPUHandle(index);
 	LogManager::GetInstance().Log(std::format("CPU Handle: {}, GPU Handle: {}", texture.textureSrvHandleCPU.ptr, texture.textureSrvHandleGPU.ptr));

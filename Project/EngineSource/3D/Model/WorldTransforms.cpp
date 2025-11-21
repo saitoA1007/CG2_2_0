@@ -53,7 +53,7 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& 
 	}
 
 	// SRVのインデックスを取得
-	srvIndex_ = srvManager_->AllocateSrvIndex();
+	srvIndex_ = srvManager_->AllocateSrvIndex(SrvHeapType::Buffer);
 	// SRVの作成
 	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
 	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
