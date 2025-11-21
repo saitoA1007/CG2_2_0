@@ -550,7 +550,7 @@ SkinCluster Model::CreateSkinCluster(const Skeleton& skeleton, const ModelData& 
 	assert(!modelData.meshes.empty() && "Model has no meshes!");
 	assert(!modelData.meshes[0].vertices.empty() && "Model mesh[0] has no vertices!");
 
-	uint32_t srvIndex = srvManager_->AllocateSrvIndex();
+	uint32_t srvIndex = srvManager_->AllocateSrvIndex(SrvHeapType::Buffer);
 
 	SkinCluster skinCluster;
 	// palette用のResourceを確保

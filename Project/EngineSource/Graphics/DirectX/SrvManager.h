@@ -7,9 +7,26 @@
 
 namespace GameEngine {
 
+	// 使用するヒープのタイプ
+	enum class SrvHeapType {
+		Texture,      // 画像データ
+		System,       // オフスクリーンなど
+		Buffer,       // インスタンシング、パーティクルのStructuredBuffer
+		Other,        // 他で使用する(現在はImGuiでのみ使用している)
+
+		Count         // 総数
+	};
+
+	// 使用するヒープの数
+	enum class SrvHeapTypeCount : uint32_t {
+		TextureMaxCount = 2048,
+		SystemMaxCount = 18,
+		BufferMaxCount = 1024,
+		OtherMaxCount = 1
+	};
+
 	class SrvManager {
 	public:
-
 		SrvManager() = default;
 		~SrvManager() = default;
 
@@ -25,7 +42,7 @@ namespace GameEngine {
 		/// インデックスを取得
 		/// </summary>
 		/// <returns></returns>
-		uint32_t AllocateSrvIndex();
+		uint32_t AllocateSrvIndex(SrvHeapType srvHeapType);
 
 		/// <summary>
 		/// インデックスを削除
@@ -44,12 +61,22 @@ namespace GameEngine {
 		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(uint32_t index) const;
 
 	private:
+
+		// メモリの領域データ
+		struct HeapRange {
+			uint32_t start;     // 開始インデックス
+			uint32_t end;       // 終了インデックス
+			uint32_t current;   // 次に割り当てる新規インデックス
+			std::queue<uint32_t> freeList; // 解放されたインデックス
+		};
+
+	private:
 		SrvManager(const SrvManager&) = delete;
 		SrvManager& operator=(const SrvManager&) = delete;
 
 		static ID3D12Device* device_;
 
-		static inline const uint32_t kMaxSrvIndex_ = 1024; // 最大のsrvインデックス
+		static inline const uint32_t kMaxSrvIndex_ = 4096; // 最大のsrvインデックス
 
 		std::queue<uint32_t> availableIndices_;  // 利用出来るインデックス
 		std::unordered_set<uint32_t> usedIndices_; // 利用しているインデックスを保持
@@ -57,5 +84,12 @@ namespace GameEngine {
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_;
 		uint32_t descriptorSizeSRV_ = 0;
+
+		// 新しい追加要素
+
+		// 各タイプの範囲設定
+		std::unordered_map<SrvHeapType, HeapRange> ranges_;
+		// インデックスがどのタイプに属するか検索するためのマップ（解放時に使用）
+		std::unordered_map<uint32_t, SrvHeapType> indexTypeMap_;
 	};
 }
