@@ -138,6 +138,13 @@ namespace GameEngine {
 		void SetDefaultUVMatrix(const Transform& uvTransform, const std::string& materialName = "default");
 
 		/// <summary>
+		/// /デフォルトのテクスチャを設定
+		/// </summary>
+		/// <param name="handle"></param>
+		/// <param name="materialName"></param>
+		void SetDefaultTextureHandle(const uint32_t& handle, const std::string& materialName = "default");
+
+		/// <summary>
 		/// モデルの名前を取得
 		/// </summary>
 		/// <returns></returns>

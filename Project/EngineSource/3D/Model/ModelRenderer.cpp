@@ -8,10 +8,12 @@ TextureManager* ModelRenderer::textureManager_ = nullptr;
 std::unordered_map<RenderMode3D, DrawPsoData> ModelRenderer::psoList_;
 Matrix4x4 ModelRenderer::vpMatrix_ = {};
 ID3D12Resource* ModelRenderer::cameraResource_ = nullptr;
+SrvManager* ModelRenderer::srvManager_ = nullptr;
 
-void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, PSOManager* psoManager) {
+void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, SrvManager* srvManager, PSOManager* psoManager) {
 	commandList_ = commandList;
 	textureManager_ = textureManager;
+	srvManager_ = srvManager;
 
 	// 通常描画のpsoデータを取得する
 	psoList_[RenderMode3D::DefaultModel] = psoManager->GetDrawPsoData("Default3D");
@@ -58,17 +60,17 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// マテリアルを設定
-		const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
+			// マテリアルを設定
+			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
 			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
+		textureHandle;
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
@@ -94,17 +96,15 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// マテリアルを設定
-		const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
+			// マテリアルを設定
+			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
 			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		}
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
@@ -131,18 +131,16 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, ID3
 		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// マテリアルを設定
-		const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
+			// マテリアルを設定
+			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
 			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 		if (meshes[i]->GetTotalIndices() != 0) {
@@ -183,7 +181,9 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
 		}
 		commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
-		commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
+		//commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
+		textureHandle;
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), numInstance, 0, 0, 0);
@@ -213,18 +213,16 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// マテリアルを設定
-		const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
+			// マテリアルを設定
+			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
 			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		}
 		commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), numInstance, 0, 0, 0);
@@ -252,18 +250,16 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// マテリアルを設定
-		const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-
 		// マテリアルが設定されていなければデフォルトのマテリアルを使う
 		if (material == nullptr) {
+			// マテリアルを設定
+			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
 			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(drawMaterial->GetTextureHandle()));
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 
 		commandList_->SetGraphicsRootDescriptorTable(3, model->skinClusterBron_->paletteSrvHandle.second);
 

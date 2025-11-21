@@ -18,6 +18,8 @@ namespace GameEngine {
 			Matrix4x4 uvTransform;
 			Vector3 specularColor;
 			float shininess;
+			uint32_t textureHandle;
+			float padding2[3];
 		};
 
 	public:
@@ -86,9 +88,13 @@ namespace GameEngine {
 		/// <param name="uvTransform"></param>
 		void SetUVTransform(Transform uvTransform);
 
-		void SetTextureHandle(const uint32_t& tex) { textureHandle_ = tex; }
+		void SetTextureHandle(const uint32_t& tex) { materialData_->textureHandle = tex; }
 
-		const uint32_t& GetTextureHandle() const { return textureHandle_; }
+		const uint32_t& GetTextureHandle() const { return materialData_->textureHandle; }
+
+		void SetDefaultTexture(const uint32_t& handle) { defaultTextureHandle_ = handle; }
+
+		void AdaptDefaultTexture() { materialData_->textureHandle = defaultTextureHandle_; }
 
 	private:
 
@@ -99,6 +105,6 @@ namespace GameEngine {
 		MaterialData* materialData_ = nullptr;
 
 		// テクスチャ情報
-		uint32_t textureHandle_ = 1;
+		uint32_t defaultTextureHandle_ = 0;
 	};
 }
