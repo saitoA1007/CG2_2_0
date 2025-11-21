@@ -96,14 +96,13 @@ void GEScene::Draw(const bool& isDebugView) {
 	ModelRenderer::PreDraw(RenderMode3D::Instancing);
 
 	// パーティクルを描画
-	ModelRenderer::DrawInstancing(planeModel_, testParticle_->GetCurrentNumInstance(), *testParticle_->GetWorldTransforms(), testParticle_->GetTexture());
+	ModelRenderer::DrawInstancing(planeModel_, testParticle_->GetCurrentNumInstance(), *testParticle_->GetWorldTransforms());
 
 	// 3Dモデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
 	// プレイヤーを描画
-	uint32_t DefaultWhiteGH = 0;
-	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform(), DefaultWhiteGH);
+	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
 
 #ifdef _DEBUG
 

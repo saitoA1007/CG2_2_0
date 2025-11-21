@@ -118,7 +118,8 @@ void GameScene::Draw(const bool& isDebugView) {
 
 	// 地面を描画
 	ModelRenderer::DrawLight(lightManager_->GetResource());
-	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_, grassGH_);
+	terrainModel_->SetDefaultTextureHandle(grassGH_);
+	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
 
 	// アニメーションの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
