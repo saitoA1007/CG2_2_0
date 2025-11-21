@@ -8,11 +8,6 @@ using namespace GameEngine;
 void RootSignatureBuilder::Initialize(ID3D12Device* device) {
 	device_ = device;
     // SRVを作成する配列のメモリをあらかじめ確保しておく
-    // =====================================================
-    // 
-    // 一時敵な対処なので後で検討するべき
-    //
-    //======================================================
     descriptorRanges_.reserve(8); 
 }
 
@@ -24,10 +19,11 @@ void RootSignatureBuilder::AddCBVParameter(uint32_t shaderRegister, D3D12_SHADER
 	rootParameters_.push_back(param);
 }
 
-void RootSignatureBuilder::AddSRVDescriptorTable(uint32_t shaderRegister, uint32_t arryNum, D3D12_SHADER_VISIBILITY visibility) {
+void RootSignatureBuilder::AddSRVDescriptorTable(uint32_t shaderRegister, uint32_t arryNum, uint32_t spaceNum, D3D12_SHADER_VISIBILITY visibility) {
 
     D3D12_DESCRIPTOR_RANGE range{};
     range.BaseShaderRegister = shaderRegister; // 始まる番号
+    range.RegisterSpace = spaceNum; // 使用するスペース
     range.NumDescriptors = arryNum; // 数
     range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // SRVを使う
     range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // offsetを自動計算
