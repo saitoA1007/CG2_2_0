@@ -98,7 +98,7 @@ void ALGameScene::Update() {
 	player_->SetRotateMatrix(followCameraController_->GetRotateMatrix());
 	player_->Update();
 	// パーティクルの更新処理
-	playerMoveParticle_->Emit(player_->GetPlayerPos());
+	//playerMoveParticle_->Emit(player_->GetPlayerPos());
 	playerMoveParticle_->Update(mainCamera_->GetWorldMatrix());
 
 	// カメラコントロールの更新処理
@@ -151,7 +151,7 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
 
 	// 複数モデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
+	ModelRenderer::PreDraw(RenderMode3D::Instancing);
 	// パーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, playerMoveParticle_->GetCurrentNumInstance(), *playerMoveParticle_->GetWorldTransforms(), playerMoveParticle_->GetTexture());
 

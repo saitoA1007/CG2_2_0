@@ -291,7 +291,6 @@
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
     <ClCompile Include="Application\Camera\FollowCameraController.cpp" />
     <ClCompile Include="Application\Weapon\Sword.cpp" />
-
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -579,6 +578,7 @@
     <ClInclude Include="Application\Weapon\IWeapon.h" />
     <ClInclude Include="Application\Weapon\Sword.h" />
     <ClInclude Include="Application\CollisionTypeID.h" />
+    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleExtensionData.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

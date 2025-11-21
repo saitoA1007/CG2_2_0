@@ -5,6 +5,8 @@
 #include"Range.h"
 #include<cstdint>
 
+#include"ParticleExtensionData.h"
+
 namespace GameEngine {
 
 	// パーティクルの調整パラメータ
@@ -19,6 +21,10 @@ namespace GameEngine {
 		Range3 posRange = { {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} }; // 発生位置の範囲
 		Range3 scaleRange = { {1.0f,1.0f,1.0f},{1.0f,1.0f,1.0f} };  // 大きさの範囲
 		Range4 colorRange = { {1.0f,1.0f,1.0f,1.0f},{1.0f,1.0f,1.0f,1.0f} }; // 色の範囲
+
+		SizeOverLifeTimeModule sizeOverLifeTime;   // 大きさの補間
+		ColorOverLifeTimeModule colorOverLifeTime; // 色の補間
+		AlphaOverLifeTimeModule alphaOverLifeTime; // 透明度の補間
 	};
 
 	// パーティクルデータ
@@ -28,5 +34,9 @@ namespace GameEngine {
 		Vector4 color;  // 色
 		float lifeTime; // 生存時間
 		float currentTime; // 現在の生存時間
-	};
+
+		Vector3 startSize;  // 最初の大きさ
+		Vector3 startColor; // 最初の色
+		float startAlpha;   // 最初の透明度
+	};	
 }
