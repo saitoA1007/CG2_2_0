@@ -76,7 +76,7 @@ void PostEffectManager::Initialize(ID3D12Device* device, float clearColor_[4], u
     srvDesc.Texture2D.MipLevels = 1;
 
     // SRVハンドル取得
-    uint32_t index = srvManager_->AllocateSrvIndex();
+    uint32_t index = srvManager_->AllocateSrvIndex(SrvHeapType::System);
     D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(index);
     drawObjectSRVHandle_ = srvManager_->GetGPUHandle(index);
 
@@ -253,25 +253,25 @@ void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_
     uint32_t index[4] = {};
     D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle[4];
 
-    index[0] = srvManager_->AllocateSrvIndex();
+    index[0] = srvManager_->AllocateSrvIndex(SrvHeapType::System);
     srvCPUHandle[0] = srvManager_->GetCPUHandle(index[0]);
     bloomSRVHandle_[0] = srvManager_->GetGPUHandle(index[0]);
     device_->CreateShaderResourceView(bloomBrightResource_.Get(), &srvDesc, srvCPUHandle[0]);
 
     // ブラー2回目用SRV
-    index[1] = srvManager_->AllocateSrvIndex();
+    index[1] = srvManager_->AllocateSrvIndex(SrvHeapType::System);
     srvCPUHandle[1] = srvManager_->GetCPUHandle(index[1]);
     bloomSRVHandle_[1] = srvManager_->GetGPUHandle(index[1]);
     device_->CreateShaderResourceView(bloomBlurShrinkResource_.Get(), &srvDesc, srvCPUHandle[1]);
 
     // ブラー3回目用SRV
-    index[2] = srvManager_->AllocateSrvIndex();
+    index[2] = srvManager_->AllocateSrvIndex(SrvHeapType::System);
     srvCPUHandle[2] = srvManager_->GetCPUHandle(index[2]);
     bloomSRVHandle_[2] = srvManager_->GetGPUHandle(index[2]);
     device_->CreateShaderResourceView(bloomResultResource_.Get(), &srvDesc, srvCPUHandle[2]);
 
     // ブラー4回目用SRV
-    index[3] = srvManager_->AllocateSrvIndex();
+    index[3] = srvManager_->AllocateSrvIndex(SrvHeapType::System);
     srvCPUHandle[3] = srvManager_->GetCPUHandle(index[3]);
     bloomSRVHandle_[3] = srvManager_->GetGPUHandle(index[3]);
     device_->CreateShaderResourceView(bloomCompositeResource_.Get(), &srvDesc, srvCPUHandle[3]);
@@ -625,7 +625,7 @@ void PostEffectManager::CreatePostEffectResources(
     srvDesc.Texture2D.MipLevels = 1;
 
     // SRVハンドル取得
-    uint32_t srvIndex = srvManager_->AllocateSrvIndex();
+    uint32_t srvIndex = srvManager_->AllocateSrvIndex(SrvHeapType::System);
     D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(srvIndex);
     srvGpuHandle = srvManager_->GetGPUHandle(srvIndex);
 

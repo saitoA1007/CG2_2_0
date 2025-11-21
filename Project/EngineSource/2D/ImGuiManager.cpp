@@ -19,14 +19,18 @@ void ImGuiManager::Initialize([[maybe_unused]]ID3D12Device* device, [[maybe_unus
 	rtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
+	uint32_t index = srvManager_->AllocateSrvIndex(SrvHeapType::Other);
+	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = srvManager_->GetCPUHandle(index);
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srvManager_->GetGPUHandle(index);
+
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(windowsApp_->GetHwnd());
 	ImGui_ImplDX12_Init(device,
 		swapChainDesc.BufferCount,
 		rtvDesc_.Format,
 		srvManager_->GetSRVHeap(),
-		srvManager_->GetSRVHeap()->GetCPUDescriptorHandleForHeapStart(),
-		srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+		cpuHandle,
+		gpuHandle);
 
 	ed::Config config;
 	config.SettingsFile = "node_editor_docked.json";

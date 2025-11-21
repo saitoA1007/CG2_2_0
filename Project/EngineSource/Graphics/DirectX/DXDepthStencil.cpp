@@ -26,7 +26,7 @@ void DXDepthStencil::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* dsvH
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;// 2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = 1;
 
-	uint32_t index = srvManager->AllocateSrvIndex();
+	uint32_t index = srvManager->AllocateSrvIndex(SrvHeapType::System);
 	D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager->GetCPUHandle(index);
 	depthSRVHandle_ = srvManager->GetGPUHandle(index);
 
