@@ -13,6 +13,8 @@
 #include"Application/Player/Player.h"
 #include"Application/Camera/CameraController.h"
 #include"Application/Light/SceneLightingController.h"
+#include"Application/Stage/StageManager.h"
+#include"Application/Enemy/BossEnemy.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -33,7 +35,7 @@ public:
 	/// <summary>
 	/// デバック時、処理して良いものを更新する
 	/// </summary>
-	void DebugUpdate() override {}
+	void DebugUpdate() override;
 
 	/// <summary>
 	/// 描画処理
@@ -56,6 +58,8 @@ private: // エンジンの低レイヤー機能を取得
 
 	// デバック描画するリスト
 	std::unique_ptr<GameEngine::DebugRenderer> debugRenderer_;
+	// デバックの表示管理
+	bool isDrawCollision_ = true;
 
 	// 当たり判定の管理
 	std::unique_ptr<GameEngine::CollisionManager> collisionManager_;
@@ -87,6 +91,18 @@ private: // シーン機能
 
 	// カメラコントローラークラス
 	std::unique_ptr<CameraController> cameraController_;
+
+	// ステージを生成する
+	GameEngine::Model* wallModel_;
+	std::unique_ptr<StageManager> stageManager_;
+
+	// ボス敵モデル
+	GameEngine::Model* bossEnemyModel_;
+	// ボス敵
+	std::unique_ptr<BossEnemy> bossEnemy_;
+
+	// ボスロックオンフラグ
+    bool isBossLockOn_ = false;
 
 private:
 

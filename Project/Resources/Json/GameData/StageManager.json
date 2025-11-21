@@ -1,0 +1,18 @@
+{
+    "StageManager": {
+        "CenterPosition": [
+            0.0,
+            1.0,
+            0.0
+        ],
+        "IsCreate": false,
+        "MaxSideNum": 6,
+        "OffsetWallWidth": 2.0,
+        "Radius": 20.0,
+        "SceneName": "TDGameScene",
+        "WallDepth": 1.0,
+        "WallHeight": 2.0,
+        "WallMaxHp": 2,
+        "WallRespawnTime": 3.0
+    }
+}

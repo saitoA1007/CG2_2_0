@@ -48,16 +48,36 @@ void TDGameScene::Initialize(SceneContext* context) {
 	sceneLightingController_ = std::make_unique<SceneLightingController>();
 	sceneLightingController_->Initialize(context_->graphicsDevice->GetDevice());
 
+	// 壁を生成する
+	wallModel_ = context_->modelManager->GetNameByModel("Wall");
+	// ステージを生成を初期化
+	stageManager_ = std::make_unique<StageManager>();
+	stageManager_->Initialize();
+
 	// プレイヤーモデルを生成
 	playerModel_ = context_->modelManager->GetNameByModel("Triangular");
 	playerModel_->SetDefaultIsEnableLight(true);
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
-
-	// カメラをコントロールするクラスを初期化
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
+
+	// 壁衝突時のカメラシェイク設定
+	player_->SetOnWallHit([this]() {
+		// 強度と時間は調整可能
+		cameraController_->StartCameraShake(3.0f, 0.5f,
+			CameraController::ShakeOrigin::TargetPosition,
+			false, true, false);
+	});
+
+	// ボス敵モデルを生成
+	bossEnemyModel_ = context_->modelManager->GetNameByModel("Cube");
+	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
+	bossEnemyModel_->SetDefaultIsEnableLight(true);
+	// ボス敵クラスを初期化
+	bossEnemy_ = std::make_unique<BossEnemy>();
+	bossEnemy_->Initialize(stageManager_->GetRadius());
 
 	// 入力コマンドを設定する
 	InputRegisterCommand();
@@ -68,17 +88,36 @@ void TDGameScene::Update() {
 	// デバックリストを削除
 	debugRenderer_->Clear();
 
+	// 当たり判定をリセット
+	collisionManager_->ClearList();
+
 	// ライトの更新処理
 	sceneLightingController_->Update();
 
 	// プレイヤーの更新処理
-	player_->Update(context_->inputCommand);
+	player_->Update(context_->inputCommand, cameraController_->GetCamera());
 
-	// カメラコントロールの更新処理
-	cameraController_->Update(context_->inputCommand, player_->GetPlayerPos());
+	// ロックオン: 入力が有効ならプレイヤーとボスの位置をターゲットに設定
+	if (context_->inputCommand->IsCommandAcitve("LockOnBoss")) {
+		isBossLockOn_ = !isBossLockOn_;
+	}
 
-	// カメラの更新処理
+	if (isBossLockOn_) {
+		std::vector<Vector3> targets;
+		targets.reserve(2);
+		targets.emplace_back(player_->GetWorldTransform().GetWorldPosition());
+		targets.emplace_back(bossEnemy_->GetWorldTransform().GetWorldPosition());
+		cameraController_->SetTarget(targets);
+	} else {
+		cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
+	}
+
+	cameraController_->SetDesiredFov(player_->IsCharging() ? 1.0f : 0.7f);
+	cameraController_->Update(context_->inputCommand, context_->input);
 	mainCamera_->SetCamera(cameraController_->GetCamera());
+
+	// 敵の移動処理
+	bossEnemy_->Update(player_->GetPlayerPos());
 
 	// 当たり判定の更新処理
 	UpdateCollision();
@@ -108,17 +147,22 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// 地面を描画
 	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_, grassGH_);
 
+	// ステージを描画する
+	stageManager_->Draw(wallModel_);
+
 	// プレイヤーを描画
 	uint32_t DefaultWhiteGH = 0;
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform(), DefaultWhiteGH);
 
+	// 敵を描画
+	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
+
 #ifdef _DEBUG
 
 	// デバック描画
-	if (isDebugView) {
-		debugRenderer_->DrawAll(context_->debugCamera_->GetVPMatrix());
-	}
+	debugRenderer_->DrawAll(isDebugView ? context_->debugCamera_->GetVPMatrix() : mainCamera_->GetVPMatrix());
 #endif
 
 	//========================================================================
@@ -140,14 +184,56 @@ void TDGameScene::InputRegisterCommand() {
 	// ジャンプコマンドを登録する
 	context_->inputCommand->RegisterCommand("Jump", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
 
+	// Attackコマンド
+	context_->inputCommand->RegisterCommand("Attack", { {InputState::MouseTrigger, 0}, {InputState::PadTrigger, XINPUT_GAMEPAD_X} });
+	// ロックオンコマンド
+	context_->inputCommand->RegisterCommand("LockOnBoss", { {InputState::KeyTrigger, DIK_TAB }, {InputState::PadTrigger, XINPUT_GAMEPAD_RIGHT_THUMB} });
+	
 	// カメラ操作のコマンドを登録する
 	context_->inputCommand->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
 	context_->inputCommand->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
 }
 
 void TDGameScene::UpdateCollision() {
+    collisionManager_->AddCollider(player_->GetCollider());
+#ifdef _DEBUG
+    debugRenderer_->AddSphere(player_->GetSphereData());
+#endif
 
+	// 生存している壁の要素を取得する
+	const std::vector<Wall*> aliveWalls =  stageManager_->GetAliveWalls();
+	for (auto& wall : aliveWalls) {
+		// 当たり判定を追加
+		collisionManager_->AddCollider(wall->GetCollider());
+#ifdef _DEBUG
+		// デバック描画に追加
+		debugRenderer_->AddBox(wall->GetOBBData());
+#endif
+	}
 
 	// 衝突判定
 	collisionManager_->CheckAllCollisions();
+}
+
+void TDGameScene::DebugUpdate() {
+#ifdef _DEBUG
+
+	// ステージ作成のデバック用
+	stageManager_->DebugUpdate();
+
+	// デバックリストを削除
+	debugRenderer_->Clear();
+	// 生存している壁の要素を取得する
+	const std::vector<Wall*> aliveWalls = stageManager_->GetAliveWalls();
+	for (auto& wall : aliveWalls) {
+		// デバック描画に追加
+		debugRenderer_->AddBox(wall->GetOBBData());
+	}
+
+	// 当たり判定の表示管理
+	ImGui::Begin("DebugCollision");
+	ImGui::Checkbox("IsDrawCollision", &isDrawCollision_);
+	debugRenderer_->SetEnabled(isDrawCollision_);
+	ImGui::End();
+#endif
 }
