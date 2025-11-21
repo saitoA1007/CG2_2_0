@@ -52,16 +52,7 @@ namespace GameEngine {
 	public:
 
 		/// <summary>
-		/// 生成したモデルを描画(画像差し替え用)
-		/// </summary>
-		/// <param name="worldMatrix">ワールド行列</param>
-		/// <param name="directionalLightResource">光源</param>
-		/// <param name="textureHandle">テクスチャハンドル</param>
-		/// <param name="material">マテリアル : 何の書かなければデフォルトのマテリアルを適応</param>
-		static void Draw(const Model* model,WorldTransform& worldTransform, const uint32_t& textureHandle, const Material* material = nullptr);
-
-		/// <summary>
-		/// 生成したモデルを描画(元のテクスチャを使用)
+		/// 生成したモデルを描画
 		/// </summary>
 		/// <param name="worldMatrix">ワールド行列</param>
 		/// <param name="directionalLightResource">光源</param>
@@ -77,15 +68,6 @@ namespace GameEngine {
 		/// <param name="cameraResource"></param>
 		/// <param name="material"></param>
 		static void Draw(const Model* model, WorldTransform& worldTransform, ID3D12Resource* lightGroupResource, const Material* material = nullptr);
-
-		/// <summary>
-		/// 生成したモデルの複数描画
-		/// </summary>
-		/// <param name="worldTransforms"></param>
-		/// <param name="textureHandle"></param>
-		/// <param name="VPMatrix"></param>
-		/// <param name="material"></param>
-		static void DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Material* material = nullptr);
 
 		/// <summary>
 		/// 生成したモデルの複数描画
