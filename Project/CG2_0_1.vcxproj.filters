@@ -288,6 +288,7 @@
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
     <ClCompile Include="EngineSource\3D\Model\AnimationManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Animator.cpp" />
+    <ClCompile Include="Application\Scene\TDGameScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -571,6 +572,7 @@
     <ClInclude Include="EngineSource\3D\Model\AnimationManager.h" />
     <ClInclude Include="EngineSource\3D\Model\Animator.h" />
     <ClInclude Include="EngineSource\Graphics\DescriptorCounts.h" />
+    <ClInclude Include="Application\Scene\TDGameScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
