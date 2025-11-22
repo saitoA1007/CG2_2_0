@@ -34,6 +34,7 @@ namespace GameEngine {
 		Vector4 color;  // 色
 		float lifeTime; // 生存時間
 		float currentTime; // 現在の生存時間
+		uint32_t textureHandle = 0; // 使用するテクスチャ
 
 		Vector3 startSize;  // 最初の大きさ
 		Vector3 startColor; // 最初の色
