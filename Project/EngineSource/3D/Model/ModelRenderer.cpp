@@ -43,43 +43,6 @@ void ModelRenderer::SetCamera(const Matrix4x4& vpMatrix, ID3D12Resource* cameraR
 	cameraResource_ = cameraResource;
 }
 
-void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const uint32_t& textureHandle, const Material* material) {
-
-	// カメラ座標に変換
-	if (model->IsLoad()) {
-		worldTransform.SetWVPMatrix(model->GetLocalMatrix(), vpMatrix_);
-	} else {
-		worldTransform.SetWVPMatrix(vpMatrix_);
-	}
-
-	// メッシュを取得
-	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
-
-	for (uint32_t i = 0; i < meshes.size(); ++i) {
-		commandList_->IASetVertexBuffers(0, 1, &meshes[i]->GetVertexBufferView());
-		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// マテリアルが設定されていなければデフォルトのマテリアルを使う
-		if (material == nullptr) {
-			// マテリアルを設定
-			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
-		textureHandle;
-		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
-
-		if (meshes[i]->GetTotalIndices() != 0) {
-			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
-		} else {
-			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), 1, 0, 0);
-		}
-	}
-}
-
 void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const Material* material) {
 	// カメラ座標に変換
 	if (model->IsLoad()) {
@@ -147,48 +110,6 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, ID3
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
 		} else {
 			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), 1, 0, 0);
-		}
-	}
-}
-
-void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const uint32_t& textureHandle, const Material* material) {
-	
-	// 描画するのが0以下の場合は早期リターン
-	if (numInstance <= 0) { return;}
-
-	// カメラ座標に変換
-	if (model->IsLoad()) {
-		worldTransforms.SetWVPMatrix(numInstance, model->GetLocalMatrix(), vpMatrix_);
-	} else {
-		worldTransforms.SetWVPMatrix(numInstance, vpMatrix_);
-	}
-
-	// メッシュを取得
-	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
-
-	for (uint32_t i = 0; i < meshes.size(); ++i) {
-		commandList_->IASetVertexBuffers(0, 1, &meshes[i]->GetVertexBufferView());
-		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// マテリアルを設定
-		const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-
-		// マテリアルが設定されていなければデフォルトのマテリアルを使う
-		if (material == nullptr) {
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
-		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
-		}
-		commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
-		//commandList_->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureSrvHandlesGPU(textureHandle));
-		textureHandle;
-		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
-
-		if (meshes[i]->GetTotalIndices() != 0) {
-			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), numInstance, 0, 0, 0);
-		} else {
-			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), numInstance, 0, 0);
 		}
 	}
 }
