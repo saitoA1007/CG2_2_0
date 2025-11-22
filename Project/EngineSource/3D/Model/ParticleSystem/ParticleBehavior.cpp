@@ -93,6 +93,8 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     tmpParticleData.startSize = tmpParticleData.transform.scale;
     tmpParticleData.startColor = Vector3(tmpParticleData.color.x, tmpParticleData.color.y, tmpParticleData.color.z);
     tmpParticleData.startAlpha = tmpParticleData.color.w;
+    // テクスチャを設定
+    tmpParticleData.textureHandle = textureHandle_;
     return tmpParticleData;
 }
 
@@ -160,6 +162,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         }
 
         worldTransforms_->transformDatas_[currentNumInstance_].color = particle.color;
+        worldTransforms_->transformDatas_[currentNumInstance_].textureHandle = particle.textureHandle;
         currentNumInstance_++;
     }
 
