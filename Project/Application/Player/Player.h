@@ -44,7 +44,12 @@ public:
 
 	// 状態取得
 	bool IsCharging() const { return isCharging_; }
+    bool IsPreRushing() const { return isPreRushing_; }
+	bool IsRushing() const { return isRushing_; }
 	bool IsAttackDown() const { return isAttackDown_; }
+
+    // 溜め時間の比率取得
+    float GetChargeRatio() const { return std::min(chargeTimer_ / kRushChargeMaxTime_, 1.0f); }
 
 	// 壁ヒット時コールバック設定
 	void SetOnWallHit(std::function<void()> cb) { onWallHit_ = std::move(cb); }
@@ -58,7 +63,7 @@ private:
 
 	const std::vector<std::string> kGroupNames = {
 		"Player",
-		"Player/Charge",
+		"Player/Rush",
 		"Player/WallBounce",
 		"Player/GreatWallBounce",
 		"Player/Attack",
@@ -70,26 +75,32 @@ private:
 	float kJumpMaxTime_ = 0.65f;
 
     // 地上移動速度（秒速）
-	float kMoveSpeed_ = 5.0f;
+	float kMoveSpeed_ = 16.0f;
     // 空中移動速度（秒速）
-    float kAirMoveSpeed_ = 5.0f;
-    // 地上移動加減速量（秒速）
-    float kGroundAcceleration_ = 0.1f;
-    // 空中移動加減速量（秒速）
-    float kAirDeceleration_ = 0.1f;
+    float kAirMoveSpeed_ = 16.0f;
+    // 地上での加速量（秒速）
+    float kGroundAcceleration_ = 4.0f;
+    // 空中での加速量（秒速）
+    float kAirAcceleration_ = 2.0f;
+    // 地上での減速量（秒速）
+    float kGroundDeceleration_ = 2.0f;
+    // 空中での減速量（秒速）
+    float kAirDeceleration_ = 1.0f;
     // 落下速度の上限（秒速）
-	float MaxFallSpeed_ = 2.0f;
+	float kMaxFallSpeed_ = 2.0f;
     // 落下加減速量（秒速）
     float kFallAcceleration_ = -9.6f;
-    // 空中での方向転換のしやすさ
-    float AirAcceleration_ = 50.0f;
 
 	//--------- 突撃の設定 ---------//
 
-	// 突撃予備動作時間
-    float kPreChargeTime_ = 0.5f;
-	// 突撃速度
-    float kChargeSpeed_ = 25.0f;
+    // 突撃予備動作最大時間
+    float kPreRushMaxTime_ = 0.5f;
+	// 突撃最大速度
+    float kRushMaxSpeed_ = 32.0f;
+	// 突進時硬直最大時間
+    float kRushLockMaxTime_ = 1.0f;
+	// 突進溜め最大時間
+    float kRushChargeMaxTime_ = 2.0f;
 
 	//--------- 通常壁への跳ね返り設定 ---------//
 
@@ -144,11 +155,17 @@ private:
 	float jumpTimer_ = 0.0f;
 
 	// 突進関連フラグ
-	bool isPreCharging_ = false;
-	bool isCharging_ = false;
-	float chargeTimer_ = 0.0f;
-	float chargeActiveTimer_ = 0.0f;
-	Vector3 chargeDirection_ = { 0.0f,0.0f,1.0f };
+    bool isCharging_ = false;
+	bool isPreRushing_ = false;
+	bool isRushing_ = false;
+    bool isRushLock_ = false;
+	float rushTimer_ = 0.0f;
+	float rushActiveTimer_ = 0.0f;
+	Vector3 rushDirection_ = { 0.0f,0.0f,1.0f };
+	// 溜め関連
+	float chargeTimer_ = 0.0f;        // 溜め時間
+	float chargeRatio_ = 0.0f;        // 0.0-1.0
+	float preRushDuration_ = 0.0f;    // 予備動作の実時間
 
 	// 壁跳ね返り（硬直）関連
 	bool isBounceLock_ = false;
@@ -171,14 +188,17 @@ private:
 
 private:
 	void ProcessMoveInput(GameEngine::InputCommand* inputCommand);
-	void StartCharge(const Vector3& direction);
-	void ChargeUpdate();
+    void ProcessAttackDownInput(GameEngine::InputCommand *inputCommand);
+	void RushUpdate();
 	void BounceUpdate();
-	void ChargeWallBounce(const Vector3 &bounceDirection, bool isGreatWall);
+	void RushWallBounce(const Vector3 &bounceDirection, bool isGreatWall);
 	void OnCollision(const GameEngine::CollisionResult& result);
 	void RegisterBebugParam();
 	void ApplyDebugParam();
 
 	// カメラ基準ベクトル更新
 	void UpdateCameraBasis(const GameEngine::Camera* camera);
+	// 溜め入力処理 / 溜め解除処理
+	void HandleRushCharge(GameEngine::InputCommand* inputCommand);
+	void HandleRushStart(GameEngine::InputCommand* inputCommand);
 };

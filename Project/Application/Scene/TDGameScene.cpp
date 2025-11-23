@@ -3,6 +3,7 @@
 #include"ModelRenderer.h"
 #include"SpriteRenderer.h"
 #include"GameParamEditor.h"
+#include"EasingManager.h"
 #include"LogManager.h"
 #include<numbers>
 using namespace GameEngine;
@@ -98,7 +99,7 @@ void TDGameScene::Update() {
 	player_->Update(context_->inputCommand, cameraController_->GetCamera());
 
 	// ロックオン: 入力が有効ならプレイヤーとボスの位置をターゲットに設定
-	if (context_->inputCommand->IsCommandAcitve("LockOnBoss")) {
+	if (context_->inputCommand->IsCommandActive("LockOnBoss")) {
 		isBossLockOn_ = !isBossLockOn_;
 	}
 
@@ -112,7 +113,19 @@ void TDGameScene::Update() {
 		cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
 	}
 
-	cameraController_->SetDesiredFov(player_->IsCharging() ? 1.0f : 0.7f);
+	//============================
+	// FOV設定
+	//============================
+	float desiredFov = 0.7f; // 通常
+	if (player_->IsRushing()) {
+		desiredFov = 1.0f; // 突進中
+	} else if (player_->IsCharging() || player_->IsPreRushing()) {
+		// 溜め比率 0.0 -> 0.6f, 1.0 -> 0.4f に線形補間
+		float chargeRatio = player_->GetChargeRatio();
+        desiredFov = Lerp(0.6f, 0.4f, chargeRatio);
+	}
+	cameraController_->SetDesiredFov(desiredFov);
+
 	cameraController_->Update(context_->inputCommand, context_->input);
 	mainCamera_->SetCamera(cameraController_->GetCamera());
 
@@ -184,8 +197,13 @@ void TDGameScene::InputRegisterCommand() {
 	// ジャンプコマンドを登録する
 	context_->inputCommand->RegisterCommand("Jump", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
 
-	// Attackコマンド
-	context_->inputCommand->RegisterCommand("Attack", { {InputState::MouseTrigger, 0}, {InputState::PadTrigger, XINPUT_GAMEPAD_X} });
+    // AttackDownコマンド
+	context_->inputCommand->RegisterCommand("AttackDown", { {InputState::MouseTrigger, 0}, {InputState::PadTrigger, XINPUT_GAMEPAD_X} });
+    // RushChargeコマンド
+    context_->inputCommand->RegisterCommand("RushCharge", { {InputState::MousePush, 0}, {InputState::PadPush, XINPUT_GAMEPAD_X} });
+    // RushStartコマンド
+    context_->inputCommand->RegisterCommand("RushStart", { {InputState::MouseRelease, 0}, {InputState::PadRelease, XINPUT_GAMEPAD_X} });
+
 	// ロックオンコマンド
 	context_->inputCommand->RegisterCommand("LockOnBoss", { {InputState::KeyTrigger, DIK_TAB }, {InputState::PadTrigger, XINPUT_GAMEPAD_RIGHT_THUMB} });
 	

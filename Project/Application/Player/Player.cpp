@@ -23,7 +23,7 @@ void Player::Initialize() {
     UserData userData;
 	collider_->SetUserData(userData);
 	// コールバック登録
-	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) { this->OnCollision(result); });
+	collider_->SetOnCollisionCallback([this](const CollisionResult& result) { this->OnCollision(result); });
 #ifdef _DEBUG
 	//===========================================================
 	// 
@@ -50,18 +50,17 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 
 	bounceAwayDir_ = bounceAwayDir_;
 	desiredVelXZ_ = { 0.0f, 0.0f, 0.0f };
-	// 跳ね返り（硬直）中の更新を最優先
 	BounceUpdate();
-	// 入力・突進状態更新（硬直中は無効）
-	if (!isBounceLock_) {
-		ProcessMoveInput(inputCommand);
-		ChargeUpdate();
-	}
+	ProcessMoveInput(inputCommand);
+    ProcessAttackDownInput(inputCommand);
+	HandleRushCharge(inputCommand);
+	HandleRushStart(inputCommand);
+	RushUpdate();
 
 	// 重力（常時適応）
 	velocity_.y += kFallAcceleration_ * FpsCounter::deltaTime;
 	// 縦方向の上限（落下最大速度）
-	velocity_.y = std::max(velocity_.y, (isAttackDown_ ? -kAttackDownSpeed_ : -MaxFallSpeed_));
+	velocity_.y = std::max(velocity_.y, (isAttackDown_ ? -kAttackDownSpeed_ : -kMaxFallSpeed_));
 
 	// 速度を適応
 	worldTransform_.transform_.translate.x += velocity_.x * FpsCounter::deltaTime;
@@ -104,64 +103,153 @@ void Player::UpdateCameraBasis(const Camera* camera) {
 }
 
 void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
-	if (isPreCharging_ || isCharging_ || isBounceLock_) { return; }
-	Vector3 dir = { 0.0f, 0.0f, 0.0f };
-	if (inputCommand->IsCommandAcitve("MoveUp"))    { dir -= cameraForwardXZ_; }
-	if (inputCommand->IsCommandAcitve("MoveDown"))  { dir += cameraForwardXZ_; }
-	if (inputCommand->IsCommandAcitve("MoveLeft"))  { dir -= cameraRightXZ_; }
-	if (inputCommand->IsCommandAcitve("MoveRight")) { dir += cameraRightXZ_; }
-	if (dir.x != 0.0f || dir.z != 0.0f) {
-		// Y成分は常に0
-		dir.y = 0.0f;
-		dir = Normalize(dir);
-		lastMoveDir_ = { dir.x, 0.0f, dir.z };
-	}
-	float maxSpeed = (isJump_ ? kAirMoveSpeed_ : kMoveSpeed_);
-	desiredVelXZ_.x = dir.x * maxSpeed;
-	desiredVelXZ_.z = dir.z * maxSpeed;
-
-	// 加減速（地上/空中で異なるレート）
-	const float accel = (isJump_ ? kAirDeceleration_ : kGroundAcceleration_);
-	auto approach = [](float current, float target, float delta) {
-		if (current < target) { current = std::min(current + delta, target); }
-		else if (current > target) { current = std::max(current - delta, target); }
-		return current;
-	};
-	velocity_.x = approach(velocity_.x, desiredVelXZ_.x, accel);
-	velocity_.z = approach(velocity_.z, desiredVelXZ_.z, accel);
-
-	// 攻撃操作
-	if (inputCommand->IsCommandAcitve("Attack")) {
-		if (isJump_) {
-			if (isAttackDown_) { isAttackDown_ = false; }
-			else { velocity_.y = -kAttackDownSpeed_; isAttackDown_ = true; }
-		} else {
-			Vector3 chargeDirXZ = lastMoveDir_;
-			if (chargeDirXZ.x == 0.0f && chargeDirXZ.z == 0.0f) { chargeDirXZ = { velocity_.x, 0.0f, velocity_.z }; }
-			StartCharge(chargeDirXZ);
+	// 溜め/予備/突進/硬直中は通常移動禁止
+	if (isCharging_ || isPreRushing_ || isRushing_ || isBounceLock_ || isRushLock_) { 
+		// 溜め中は向きのみ変更可能
+		if (isCharging_) {
+			Vector3 dir = { 0.0f, 0.0f, 0.0f };
+			if (inputCommand->IsCommandActive("MoveUp"))    { dir -= cameraForwardXZ_; }
+			if (inputCommand->IsCommandActive("MoveDown"))  { dir += cameraForwardXZ_; }
+			if (inputCommand->IsCommandActive("MoveLeft"))  { dir -= cameraRightXZ_; }
+			if (inputCommand->IsCommandActive("MoveRight")) { dir += cameraRightXZ_; }
+			if (dir.x != 0.0f || dir.z != 0.0f) {
+				dir.y = 0.0f;
+				dir = Normalize(dir);
+				lastMoveDir_ = { dir.x, 0.0f, dir.z };
+				// Rush方向更新
+				rushDirection_ = lastMoveDir_;
+			}
 		}
+	} else {
+		Vector3 dir = { 0.0f, 0.0f, 0.0f };
+		if (inputCommand->IsCommandActive("MoveUp")) { dir -= cameraForwardXZ_; }
+		if (inputCommand->IsCommandActive("MoveDown")) { dir += cameraForwardXZ_; }
+		if (inputCommand->IsCommandActive("MoveLeft")) { dir -= cameraRightXZ_; }
+		if (inputCommand->IsCommandActive("MoveRight")) { dir += cameraRightXZ_; }
+		if (dir.x != 0.0f || dir.z != 0.0f) {
+			// Y成分は常に0
+			dir.y = 0.0f;
+			dir = Normalize(dir);
+			lastMoveDir_ = { dir.x, 0.0f, dir.z };
+		}
+		float maxSpeed = (isJump_ ? kAirMoveSpeed_ : kMoveSpeed_);
+		// 入力から算出される到達可能最大速度（XZのみ）。ここで既に上限を規定するため、直接 velocity を clamp する必要はない。
+		desiredVelXZ_.x = dir.x * maxSpeed;
+		desiredVelXZ_.z = dir.z * maxSpeed;
+	}
+
+	// ここで加速と減速を分離する
+	auto applyAxis = [&](float &vel, float target, bool isAir) {
+		float accel = isAir ? kAirAcceleration_ : kGroundAcceleration_;
+		float decel = isAir ? kAirDeceleration_ : kGroundDeceleration_;
+		float dt = FpsCounter::deltaTime;
+		if (target != 0.0f) {
+			// 目標速度方向へ加速
+			float diff = target - vel;
+			float step = accel * dt;
+			if (std::fabs(diff) <= step) { vel = target; }
+			else { vel += (diff > 0.0f ? step : -step); }
+		} else {
+			// 入力が無いので減速
+			float speed = std::fabs(vel);
+			float step = decel * dt;
+			if (speed <= step) { vel = 0.0f; }
+			else { vel += (vel > 0.0f ? -step : step); }
+		}
+	};
+
+	applyAxis(velocity_.x, desiredVelXZ_.x, isJump_);
+	applyAxis(velocity_.z, desiredVelXZ_.z, isJump_);
+
+	// 最大速度の安全確認（念のため）
+	float maxSpeedGround = kMoveSpeed_;
+	float maxSpeedAir = kAirMoveSpeed_;
+	float maxSpeed = isJump_ ? maxSpeedAir : maxSpeedGround;
+	Vector3 horiz = { velocity_.x, 0.0f, velocity_.z };
+	float horizLen = Length(horiz);
+	if (horizLen > maxSpeed) {
+		Vector3 n = Normalize(horiz);
+		velocity_.x = n.x * maxSpeed;
+		velocity_.z = n.z * maxSpeed;
 	}
 }
 
-void Player::StartCharge(const Vector3& direction) {
-	Vector3 dirXZ = { direction.x, 0.0f, direction.z };
-	if (dirXZ.x == 0.0f && dirXZ.z == 0.0f) { dirXZ = cameraForwardXZ_; }
-	isPreCharging_ = true; isCharging_ = false; chargeTimer_ = 0.0f; chargeActiveTimer_ = 0.0f;
-	chargeDirection_ = Normalize(dirXZ); velocity_ = { 0.0f,0.0f,0.0f };
-}
-
-void Player::ChargeUpdate() {
-	if (!isPreCharging_ && !isCharging_) { return; }
-	if (isPreCharging_) {
-		chargeTimer_ += FpsCounter::deltaTime;
-		if (chargeTimer_ >= kPreChargeTime_) { isPreCharging_ = false; isCharging_ = true; chargeActiveTimer_ = 0.0f; }
+void Player::ProcessAttackDownInput(GameEngine::InputCommand *inputCommand) {
+    if (isCharging_ || isPreRushing_ || isRushing_ || isBounceLock_ || isRushLock_ || !isJump_) {
 		return;
 	}
+	// 攻撃下降開始
+	if (inputCommand->IsCommandActive("AttackDown")) {
+		if (isAttackDown_) {
+			velocity_.y = -kMaxFallSpeed_;
+		} else {
+			velocity_.y = -kAttackDownSpeed_;
+		}
+        isAttackDown_ = !isAttackDown_;
+    }
+}
+
+void Player::HandleRushCharge(GameEngine::InputCommand* inputCommand) {
+	if (isCharging_ || isJump_ || isRushing_) {
+		return;
+	}
+	// 溜め開始/継続
+	if (inputCommand->IsCommandActive("RushCharge")) {
+		isCharging_ = true;
+		chargeTimer_ = 0.0f;
+		chargeRatio_ = 0.0f;
+		// Rush方向初期化
+		Vector3 rushDirXZ = lastMoveDir_;
+		if (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) { rushDirXZ = { velocity_.x, 0.0f, velocity_.z }; }
+		rushDirection_ = (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) ? cameraForwardXZ_ : Normalize(rushDirXZ);
+	}
+}
+
+void Player::HandleRushStart(GameEngine::InputCommand* inputCommand) {
+	if (!isCharging_) {
+		return;
+	}
+	// 溜め解除でRush開始要求
+	if (inputCommand->IsCommandActive("RushStart")) {
+		// 予備動作時間を溜め比率で決定
+		chargeRatio_ = std::clamp(chargeTimer_ / kRushChargeMaxTime_, 0.0f, 1.0f);
+		preRushDuration_ = Lerp(0.0f, kPreRushMaxTime_, chargeRatio_);
+		rushActiveTimer_ = Lerp(0.0f, kRushLockMaxTime_, chargeRatio_);
+		isCharging_ = false;
+		isPreRushing_ = true;
+		rushTimer_ = 0.0f; // 可変予備動作
+	}
+}
+
+void Player::RushUpdate() {
+	// 溜め進行
 	if (isCharging_) {
-		chargeActiveTimer_ += FpsCounter::deltaTime;
-		desiredVelXZ_.x = chargeDirection_.x * kChargeSpeed_;
-		desiredVelXZ_.z = chargeDirection_.z * kChargeSpeed_;
-		velocity_.x = desiredVelXZ_.x; velocity_.z = desiredVelXZ_.z;
+		chargeTimer_ += FpsCounter::deltaTime;
+		chargeTimer_ = std::min(chargeTimer_, kRushChargeMaxTime_);
+		// 視覚/内部用に比率更新
+		chargeRatio_ = std::clamp(chargeTimer_ / kRushChargeMaxTime_, 0.0f, 1.0f);
+		return;
+	}
+
+	if (!isPreRushing_ && !isRushing_) { return; }
+	if (isPreRushing_) {
+		rushTimer_ += FpsCounter::deltaTime;
+		float waitTime = (preRushDuration_ > 0.0f ? preRushDuration_ : kPreRushMaxTime_);
+		if (rushTimer_ >= waitTime) { 
+			isPreRushing_ = false; isRushing_ = true;
+			// 突進は初速のみ設定（溜めに応じて速度をLerp）
+			float rushSpeed = Lerp(0.0f, kRushMaxSpeed_, chargeRatio_);
+			Vector3 initVel = rushDirection_ * rushSpeed;
+			velocity_.x = initVel.x; velocity_.z = initVel.z; // 慣性に任せる
+		}
+		return;
+	}
+	if (isRushing_) {
+		rushActiveTimer_ -= FpsCounter::deltaTime;
+        // 突進時間が終了したら突進終了
+        if (rushActiveTimer_ <= 0.0f) {
+            isRushing_ = false;
+		}
 	}
 }
 
@@ -173,9 +261,9 @@ void Player::BounceUpdate() {
 	}
 }
 
-void Player::ChargeWallBounce(const Vector3 &bounceDirection, bool isGreatWall) {
-	if (isPreCharging_ || !isCharging_) { return; }
-	isPreCharging_ = false; isCharging_ = false; isJump_ = true;
+void Player::RushWallBounce(const Vector3 &bounceDirection, bool isGreatWall) {
+	if (isPreRushing_ || !isRushing_) { return; }
+	isPreRushing_ = false; isRushing_ = false; isJump_ = true;
 	isBounceLock_ = true; bounceLockTimer_ = 0.0f; bounceAwayDir_ = { -bounceDirection.x, 0.0f, -bounceDirection.z }; bounceAwayDir_ = Normalize(bounceAwayDir_);
 	if (isGreatWall) {
 		velocity_ = bounceAwayDir_ * kGreatWallBounceAwaySpeed_; velocity_.y = kGreatWallBounceUpSpeed_; currentBounceLockTime_ = kGreatWallBounceLockTime_;
@@ -191,7 +279,7 @@ void Player::OnCollision(const CollisionResult &result) {
 	}
 	
 	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss)) == false;
-	if (isCharging_ && isWall) {
+	if (isRushing_ && isWall) {
 		// 接触法線を利用して跳ね返り
 		Vector3 normal = result.contactNormal;
 		// XZ成分で跳ね返り方向作成
@@ -200,7 +288,30 @@ void Player::OnCollision(const CollisionResult &result) {
 		bool isGreat = false; // 今後拡張
 		// カメラシェイク通知
 		if (onWallHit_) { onWallHit_(); }
-		ChargeWallBounce(bounceDir, isGreat);
+		RushWallBounce(bounceDir, isGreat);
+		return;
+	}
+
+	// 通常時の壁との衝突: めり込み分だけ押し戻す（XZ 平面）
+	if (isWall && !isRushing_) {
+		Vector3 n = result.contactNormal;
+		Vector3 nXZ = { n.x, 0.0f, n.z };
+		if (nXZ.x != 0.0f || nXZ.z != 0.0f) { nXZ = Normalize(nXZ); }
+		float depth = std::max(result.penetrationDepth, 0.0f);
+		Vector3 correction = { nXZ.x * depth, 0.0f, nXZ.z * depth };
+		worldTransform_.transform_.translate.x += correction.x;
+		worldTransform_.transform_.translate.z += correction.z;
+		// 速度の壁方向成分を除去して連続めり込みを防止
+		Vector3 velXZ = { velocity_.x, 0.0f, velocity_.z };
+		float dot = velXZ.x * nXZ.x + velXZ.z * nXZ.z;
+		if (dot < 0.0f) {
+			velXZ.x -= nXZ.x * dot;
+			velXZ.z -= nXZ.z * dot;
+			velocity_.x = velXZ.x;
+			velocity_.z = velXZ.z;
+		}
+		// コライダー位置も同期
+		if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
 	}
 }
 
@@ -212,15 +323,15 @@ void Player::RegisterBebugParam() {
 
 	// プレイヤー共通
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "AirMoveSpeed", kAirMoveSpeed_);
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "MaxFallSpeed", MaxFallSpeed_);
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "AirAcceleration", AirAcceleration_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "MaxFallSpeed", kMaxFallSpeed_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "AirAcceleration", kAirAcceleration_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "GroundAcceleration", kGroundAcceleration_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "AirDeceleration", kAirDeceleration_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "FallAcceleration", kFallAcceleration_);
 
 	// 突撃設定
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "PreChargeTime", kPreChargeTime_);
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "ChargeSpeed", kChargeSpeed_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "PreRushTime", kPreRushMaxTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushSpeed", kRushMaxSpeed_);
 
 	// 通常壁跳ね返り設定
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceUpSpeed", kWallBounceUpSpeed_);
@@ -245,15 +356,15 @@ void Player::ApplyDebugParam() {
 
 	// プレイヤー共通
 	kAirMoveSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "AirMoveSpeed");
-	MaxFallSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "MaxFallSpeed");
-	AirAcceleration_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "AirAcceleration");
+	kMaxFallSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "MaxFallSpeed");
+	kAirAcceleration_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "AirAcceleration");
 	kGroundAcceleration_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "GroundAcceleration");
 	kAirDeceleration_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "AirDeceleration");
 	kFallAcceleration_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "FallAcceleration");
 
 	// 突撃設定
-	kPreChargeTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "PreChargeTime");
-	kChargeSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "ChargeSpeed");
+	kPreRushMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "PreRushTime");
+	kRushMaxSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushSpeed");
 
 	// 通常壁跳ね返り設定
 	kWallBounceUpSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceUpSpeed");

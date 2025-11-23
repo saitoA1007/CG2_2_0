@@ -95,6 +95,15 @@ bool Input::TriggerKey(BYTE keyNumber) const {
 	}
 }
 
+bool Input::ReleaseKey(BYTE keyNumber) const {
+	// 前フレーム押されていた かつ 今フレーム離された
+	if (keys_[keyNumber] == 0x00 && preKeys_[keyNumber] == 0x80) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 bool Input::PushMouse(int32_t mouseNumber) const {
 	if (mouse_.rgbButtons[mouseNumber] == 0x80) {
 		return true;
@@ -105,6 +114,14 @@ bool Input::PushMouse(int32_t mouseNumber) const {
 
 bool Input::TriggerMouse(int32_t buttonNumber) const {
 	if (mouse_.rgbButtons[buttonNumber] == 0x80 && preMouse_.rgbButtons[buttonNumber] == 0x00) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool Input::ReleaseMouse(int32_t buttonNumber) const {
+	if (mouse_.rgbButtons[buttonNumber] == 0x00 && preMouse_.rgbButtons[buttonNumber] == 0x80) {
 		return true;
 	} else {
 		return false;
@@ -139,6 +156,15 @@ bool Input::PushPad(WORD button) const {
 bool Input::TriggerPad(WORD button) const {
 	if ((controllerState_.Gamepad.wButtons & button) != 0 &&
 		(preControllerState_.Gamepad.wButtons & button) == 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool Input::ReleasePad(WORD button) const {
+	if ((controllerState_.Gamepad.wButtons & button) == 0 &&
+		(preControllerState_.Gamepad.wButtons & button) != 0) {
 		return true;
 	} else {
 		return false;
@@ -204,6 +230,25 @@ bool Input::GetPushPadRightTrigger(const float& value) {
 	float rt = static_cast<float>(controllerState_.Gamepad.bRightTrigger);
 
 	if (rt > value) {
+		return true;
+	}
+	return false;
+}
+
+bool Input::GetReleasePadLeftTrigger(const float& value) {
+	float lt = static_cast<float>(controllerState_.Gamepad.bLeftTrigger);
+	float preLt = static_cast<float>(preControllerState_.Gamepad.bLeftTrigger);
+	// 前フレーム閾値を超えていた かつ 今フレーム閾値以下
+	if (lt <= value && preLt > value) {
+		return true;
+	}
+	return false;
+}
+
+bool Input::GetReleasePadRightTrigger(const float& value) {
+	float rt = static_cast<float>(controllerState_.Gamepad.bRightTrigger);
+	float preRt = static_cast<float>(preControllerState_.Gamepad.bRightTrigger);
+	if (rt <= value && preRt > value) {
 		return true;
 	}
 	return false;

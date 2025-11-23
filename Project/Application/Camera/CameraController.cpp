@@ -129,7 +129,7 @@ void CameraController::UpdateTargetLine(const Line& line) {
 	float pitch = std::asin(std::clamp(dir.y, -1.0f, 1.0f));
 	desiredTargetRotate_ = { pitch, yaw, 0.0f };
 	float length = std::sqrt(line.diff.x*line.diff.x + line.diff.y*line.diff.y + line.diff.z*line.diff.z);
-	desiredTargetFov_ = std::clamp(0.45f + length * 0.5f, 0.3f, 0.9f);
+	desiredTargetFov_ = std::clamp(0.45f + length * 0.5f, 0.3f, 1.0f);
 }
 
 void CameraController::UpdateTargetVector3Array(const std::vector<Vector3>& arr) {
@@ -144,20 +144,20 @@ void CameraController::UpdateTargetVector3Array(const std::vector<Vector3>& arr)
 	float maxDistSq = 0.0f;
 	for (const auto& p : arr) { float dx = p.x - avg.x; float dy = p.y - avg.y; float dz = p.z - avg.z; float d2 = dx*dx + dy*dy + dz*dz; if (d2 > maxDistSq) maxDistSq = d2; }
 	float radius = std::sqrt(maxDistSq);
-	desiredTargetFov_ = std::clamp(0.45f + radius * 0.8f, 0.3f, 0.9f);
+	desiredTargetFov_ = std::clamp(0.45f + radius * 0.8f, 0.3f, 1.0f);
 }
 
 void CameraController::UpdateCartesian(GameEngine::InputCommand* inputCommand) {
-	if (inputCommand && inputCommand->IsCommandAcitve("CameraMoveLeft")) { position_.x -= 0.5f; }
-	if (inputCommand && inputCommand->IsCommandAcitve("CameraMoveRight")) { position_.x += 0.5f; }
+	if (inputCommand && inputCommand->IsCommandActive("CameraMoveLeft")) { position_.x -= 0.5f; }
+	if (inputCommand && inputCommand->IsCommandActive("CameraMoveRight")) { position_.x += 0.5f; }
 	Vector3 offset{0.0f, 4.0f, -10.0f};
 	position_.y = targetPos_.y + offset.y;
 	position_.z = targetPos_.z + offset.z;
 }
 
 void CameraController::UpdateSpherical(GameEngine::InputCommand* inputCommand, GameEngine::Input* rawInput) {
-	if (inputCommand && inputCommand->IsCommandAcitve("CameraMoveLeft")) { rotateMove_.x += 0.02f; }
-	if (inputCommand && inputCommand->IsCommandAcitve("CameraMoveRight")) { rotateMove_.x -= 0.02f; }
+	if (inputCommand && inputCommand->IsCommandActive("CameraMoveLeft")) { rotateMove_.x += 0.02f; }
+	if (inputCommand && inputCommand->IsCommandActive("CameraMoveRight")) { rotateMove_.x -= 0.02f; }
 	if (rawInput && rawInput->PushMouse(1)) { Vector2 delta = rawInput->GetMouseDelta(); rotateMove_.x += delta.x * mouseRotateSensitivity_; }
 	if (rawInput) { Vector2 rstick = rawInput->GetRightStick(); rotateMove_.x += rstick.x * stickRotateSensitivity_; }
 	rotateMove_.y = std::clamp(rotateMove_.y, 0.05f, 3.05f);

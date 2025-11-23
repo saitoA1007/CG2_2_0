@@ -128,11 +128,11 @@ private:
 	// 自動回転用: 前フレームのターゲット位置
 	Vector3 prevTargetPos_ = {0.0f,0.0f,0.0f};
 	// 自動回転感度(左右移動→ヨー回転)
-	float autoRotateYawSensitivity_ = 0.25f; // 大きいほど強く追従
+	float autoRotateYawSensitivity_ = 0.2f; // 大きいほど強く追従
 	// ターゲット接近時の回転倍率スケール
 	float autoRotateApproachScale_ = 1.0f; // 接近速度 * scale を乗算
 	// 自動回転の全体倍率
-	float autoRotateOverallGain_ = 0.5f;
+	float autoRotateOverallGain_ = 0.4f;
 
 private:
 	void UpdateTargetVector3(const Vector3& v);
