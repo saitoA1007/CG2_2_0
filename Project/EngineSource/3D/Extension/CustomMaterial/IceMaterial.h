@@ -16,7 +16,9 @@ public:
 		Vector3 specularColor;
 		float shininess;
 		uint32_t textureHandle;
-		float padding2[3];
+		uint32_t normalTextureHandle;
+		float time;
+		float padding2;
 	};
 
 public:

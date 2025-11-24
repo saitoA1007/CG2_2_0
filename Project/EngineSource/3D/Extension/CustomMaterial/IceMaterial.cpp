@@ -31,4 +31,7 @@ void IceMaterial::Initialize() {
 	materialData_->shininess = 250.0f;
 	// テクスチャデータ
 	materialData_->textureHandle = 0;
+	materialData_->normalTextureHandle = 0;
+	// 時間
+	materialData_->time = 0.0f;
 }

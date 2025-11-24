@@ -51,7 +51,12 @@ void CustomRenderer::DrawIce(const Model* model, WorldTransform& worldTransform,
 	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
 
 	for (uint32_t i = 0; i < meshes.size(); ++i) {
-		commandList_->IASetVertexBuffers(0, 1, &meshes[i]->GetVertexBufferView());
+
+		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
+			meshes[i]->GetVertexBufferView(),
+			model->normalMapData_->tangentBufferView
+		};
+		commandList_->IASetVertexBuffers(0, 2, vbvs);
 		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
