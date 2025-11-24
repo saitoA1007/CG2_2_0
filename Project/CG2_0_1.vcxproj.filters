@@ -295,7 +295,8 @@
     <ClCompile Include="Application\Enemy\States\BossStateIn.cpp" />
     <ClCompile Include="Application\Enemy\States\BossStateOut.cpp" />
     <ClCompile Include="Application\Enemy\States\BossStateBattle.cpp" />
-
+    <ClCompile Include="Application\Enemy\EnemyAttackManager.cpp" />
+    <ClCompile Include="Application\Enemy\LongLangeAttack\IceFall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -590,6 +591,8 @@
     <ClInclude Include="Application\Enemy\BossContext.h" />
     <ClInclude Include="Application\Enemy\BossState.h" />
     <ClInclude Include="Application\Enemy\States\BossStateBattle.h" />
+    <ClInclude Include="Application\Enemy\EnemyAttackManager.h" />
+    <ClInclude Include="Application\Enemy\LongLangeAttack\IceFall.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

@@ -17,6 +17,9 @@ struct BossContext {
 	// 状態の切り替えを管理
 	std::optional<BossState> bossStateRequest_ = std::nullopt;
 
+	// 氷柱の発射を管理
+	bool isActiveIceFall = false;
+
 	// アニメーションの状態のリクエストデータ
 
 };

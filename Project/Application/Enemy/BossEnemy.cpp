@@ -13,7 +13,10 @@
 
 using namespace GameEngine;
 
-void BossEnemy::Initialize(const float& stageRadius) {
+void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager) {
+
+    // 取得
+    enemyAttackManager_ = enemyAttackManager;
 
     // ワールド行列を初期化
     worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
@@ -69,6 +72,11 @@ void BossEnemy::Update(const Vector3& targetPos) {
 
     // 現在の状態の更新処理
     currentState_->Update();
+
+    // 氷柱の発射をする
+    if (bossContext_.isActiveIceFall) {
+        enemyAttackManager_->AddIceFall(worldTransform_.transform_.translate);
+    }
 
     // 行列を更新する
     worldTransform_.UpdateTransformMatrix();

@@ -72,13 +72,19 @@ void TDGameScene::Initialize(SceneContext* context) {
 			false, true, false);
 	});
 
+
+	// 敵の攻撃管理クラス
+	enemyAttackManager_ = std::make_unique<EnemyAttackManager>();
 	// ボス敵モデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Cube");
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
 	bossEnemyModel_->SetDefaultIsEnableLight(true);
 	// ボス敵クラスを初期化
 	bossEnemy_ = std::make_unique<BossEnemy>();
-	bossEnemy_->Initialize(stageManager_->GetRadius());
+	bossEnemy_->Initialize(stageManager_->GetRadius(), enemyAttackManager_.get());
+
+	// 氷柱のモデルを取得
+	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
 
 	// 入力コマンドを設定する
 	InputRegisterCommand();
@@ -131,6 +137,7 @@ void TDGameScene::Update() {
 
 	// 敵の移動処理
 	bossEnemy_->Update(player_->GetPlayerPos());
+	enemyAttackManager_->Update();
 
 	// 当たり判定の更新処理
 	UpdateCollision();
@@ -171,6 +178,14 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// 敵を描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
+
+	// 氷柱のモデルを描画
+	const std::list<std::unique_ptr<IceFall>>& iceFalls = enemyAttackManager_->GetIceFalls();
+	for (auto& iceFall : iceFalls) {
+		if (iceFall->IsAlive()) {
+			ModelRenderer::Draw(iceFallModel_, iceFall->GetWorldTransform());
+		}
+	}
 
 #ifdef _DEBUG
 
@@ -227,6 +242,14 @@ void TDGameScene::UpdateCollision() {
 		// デバック描画に追加
 		debugRenderer_->AddBox(wall->GetOBBData());
 #endif
+	}
+
+	// 氷柱の当たり判定を登録する
+	const std::list<std::unique_ptr<IceFall>>& iceFalls = enemyAttackManager_->GetIceFalls();
+	for (auto& iceFall : iceFalls) {
+		if (iceFall->IsAlive()) {
+			collisionManager_->AddCollider(iceFall->GetCollider());
+		}
 	}
 
 	// 衝突判定
