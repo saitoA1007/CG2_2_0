@@ -6,6 +6,9 @@
 #include"EasingManager.h"
 #include"LogManager.h"
 #include<numbers>
+
+#include"Extension/CustomRenderer.h"
+
 using namespace GameEngine;
 
 TDGameScene::~TDGameScene() {
@@ -85,6 +88,14 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// 氷柱のモデルを取得
 	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
+
+	// 氷のテスト
+	icePlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
+	testWorldTransform_.Initialize({ { 10.0f,10.0f,10.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.2f,0.0f } });
+	iceMaterial_ = std::make_unique<IceMaterial>();
+	iceMaterial_->Initialize();
+	iceMaterial_->materialData_->textureHandle = context_->textureManager->GetHandleByName("ice.png");
+	iceMaterial_->materialData_->normalTextureHandle = context_->textureManager->GetHandleByName("iceNormal.png");
 
 	// 入力コマンドを設定する
 	InputRegisterCommand();
@@ -187,6 +198,15 @@ void TDGameScene::Draw(const bool& isDebugView) {
 		}
 	}
 
+	// 氷のテスト描画
+	if (isDebugView) {
+		CustomRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	} else {
+		CustomRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
+	}
+	CustomRenderer::PreDraw(CustomRenderMode::Ice);
+	CustomRenderer::DrawIce(icePlaneModel_, testWorldTransform_, sceneLightingController_->GetResource(), iceMaterial_.get());
+
 #ifdef _DEBUG
 
 	// デバック描画
@@ -275,6 +295,13 @@ void TDGameScene::DebugUpdate() {
 	ImGui::Begin("DebugCollision");
 	ImGui::Checkbox("IsDrawCollision", &isDrawCollision_);
 	debugRenderer_->SetEnabled(isDrawCollision_);
+	ImGui::End();
+
+	ImGui::Begin("Ice");
+
+	ImGui::ColorEdit3("BaseColor", &iceMaterial_->materialData_->color.x);
+	ImGui::ColorEdit3("SpecularColor", &iceMaterial_->materialData_->specularColor.x);
+	ImGui::DragFloat("Shininess", &iceMaterial_->materialData_->shininess);
 	ImGui::End();
 #endif
 }

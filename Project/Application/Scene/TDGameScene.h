@@ -8,6 +8,7 @@
 #include"Sprite.h"
 #include"DebugRenderer.h"
 #include"CollisionManager.h"
+#include"Extension/CustomMaterial/IceMaterial.h"
 
 // アプリ機能をインクルード
 #include"Application/Player/Player.h"
@@ -111,6 +112,10 @@ private: // シーン機能
 	// ボスロックオンフラグ
     bool isBossLockOn_ = false;
 
+	// 氷のテスト
+	GameEngine::Model* icePlaneModel_;
+	GameEngine::WorldTransform testWorldTransform_;
+	std::unique_ptr<IceMaterial> iceMaterial_;
 private:
 
 	/// <summary>

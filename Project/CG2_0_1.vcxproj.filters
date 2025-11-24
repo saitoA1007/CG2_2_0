@@ -650,6 +650,7 @@
     <None Include="Externals\imgui\imgui_bezier_math.inl" />
     <None Include="Externals\imgui\imgui_extra_math.inl" />
     <None Include="Externals\imgui\imgui_node_editor_internal.inl" />
+    <None Include="Resources\Shaders\IceMaterial.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Object3d.PS.hlsl">
@@ -744,5 +745,6 @@
     </FxCompile>
     <FxCompile Include="Resources\Shaders\SkinningObject3d.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\IceMaterial.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\IceMaterial.VS.hlsl" />
   </ItemGroup>
 </Project>

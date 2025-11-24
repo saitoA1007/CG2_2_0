@@ -62,3 +62,9 @@ struct SkinCluster {
 	std::span<WellForGPU> mappedPalette;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> paletteSrvHandle;
 };
+
+struct normalMapData {
+	Microsoft::WRL::ComPtr<ID3D12Resource> tangentResource;
+	D3D12_VERTEX_BUFFER_VIEW tangentBufferView;
+	std::vector<Vector3> tangents;
+};

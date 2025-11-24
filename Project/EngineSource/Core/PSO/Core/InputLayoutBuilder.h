@@ -49,19 +49,16 @@ namespace GameEngine {
 
 		D3D12_INPUT_LAYOUT_DESC GetInputLayoutDesc() const { return inputLayoutDesc_; }
 
-	private:
-
-		std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs_;
-		std::vector<std::string> semanticNames_;
-		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_{};
-
-	private:
-
 		/// <summary>
 		/// 手動で指定する場合、保存していた名前を適応させる
 		/// </summary>
 		void SetSemanticName();
 
+	private:
+
+		std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs_;
+		std::vector<std::string> semanticNames_;
+		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_{};
 	};
 }
 
