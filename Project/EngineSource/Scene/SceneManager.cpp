@@ -103,9 +103,9 @@ void SceneManager::Draw() {
 #ifdef _DEBUG
 	if (isDebugView_) {
 		// モデルの単体描画前処理
-		ModelRenderer::PreDraw(RenderMode3D::Grid);
+		//ModelRenderer::PreDraw(RenderMode3D::Grid);
 		// グリッドを描画
-		ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+		//ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
 	}
 #endif
 

@@ -17,6 +17,7 @@
 #include"Application/Stage/StageManager.h"
 #include"Application/Enemy/BossEnemy.h"
 #include"Application/Enemy/EnemyAttackManager.h"
+#include"Application/Graphics/Terrain.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -78,10 +79,10 @@ private: // シーン機能
 	GameEngine::Model* skyDomeModel_;
 	GameEngine::WorldTransform skyDomeWorldTransform_;
 
+	// 氷の地面を作るためのモデル
+	GameEngine::Model* icePlaneModel_;
 	// 地面
-	GameEngine::Model* terrainModel_;
-	uint32_t grassGH_ = 0u;
-	GameEngine::WorldTransform terrainWorldTransform_;
+	std::unique_ptr<Terrain> terrain_;
 
 	// ライト
 	std::unique_ptr<SceneLightingController> sceneLightingController_;
@@ -112,10 +113,6 @@ private: // シーン機能
 	// ボスロックオンフラグ
     bool isBossLockOn_ = false;
 
-	// 氷のテスト
-	GameEngine::Model* icePlaneModel_;
-	GameEngine::WorldTransform testWorldTransform_;
-	std::unique_ptr<IceMaterial> iceMaterial_;
 private:
 
 	/// <summary>

@@ -2,13 +2,17 @@
 
 struct Material
 {
+    float32_t4 baseColor;
     float32_t4 color;
     float32_t4x4 uvTransform;
     float32_t3 specularColor;
     float shininess;
     uint32_t textureHandle;
     uint32_t normalTextureHandle;
+    uint32_t baseTextureHandle;
     float time;
+    float32_t3 rimColor;
+    float rimIntensity;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 
@@ -39,6 +43,8 @@ PixelShaderOutput main(VertexShaderOutput input)
     float4 transformedUV = mul(float32_t4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float32_t4 textureColor = gTexture[gMaterial.textureHandle].Sample(gSampler, transformedUV.xy);
     
+    float32_t4 baseTextureColor = gTexture[gMaterial.baseTextureHandle].Sample(gSampler, transformedUV.xy);
+    
     //===========================
     // ノーマルマッピング
     //===========================
@@ -54,7 +60,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     float32_t3 tangent = normalize(input.tangent);
 
     // 従法線 (Binormal) の計算
-    float32_t3 binormal = normalize(cross(normal, tangent));
+    float32_t3 binormal = normalize(cross(tangent,normal));
 
     // 接空間からワールド空間への変換行列
     float32_t3x3 tbn = float32_t3x3(tangent, binormal, normal);
@@ -82,15 +88,32 @@ PixelShaderOutput main(VertexShaderOutput input)
     float specularPow = pow(saturate(NDotH), gMaterial.shininess); // 反射強度
     // 鏡面反射
     float32_t3 specularDirectionalLight = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * gMaterial.specularColor;
-        
-    // diffuse+specular
-    tmpColor += diffuseDirectionalLight + specularDirectionalLight;
     
-    // 最終的な色を適応
-    output.color.rgb = tmpColor;
-       
-   // アルファ値を適応
-    output.color.a = gMaterial.color.a * textureColor.a;
+    // ===========================
+    // リムライト
+    // ===========================
+ 
+    // 視線と法線の内積を取る
+    float rimNdotV = saturate(dot(inputNormal, toEye));
+  
+    float rimFactor = 1.0f - rimNdotV;
+ 
+    // 累乗計算でリムの太さを調整する
+    float rimPower = 3.0f;
+    rimFactor = pow(rimFactor, rimPower);
+    
+    // リムライトの最終成分
+    float32_t3 rimLight = gMaterial.rimColor * rimFactor * gMaterial.rimIntensity * gDirectionalLight.intensity;
+
+    // diffuse+specular+rim
+    tmpColor += diffuseDirectionalLight + specularDirectionalLight + rimLight;
+    
+    // 最終的な色を適応  
+    float32_t4 resultColor = { 0.0f, 0.0f, 0.0f,0.0f };
+    resultColor.rgb = tmpColor;
+    resultColor.a = gMaterial.color.a;
+    
+    output.color = (baseTextureColor * gMaterial.baseColor) + (resultColor * gMaterial.time);
     
     if (output.color.a == 0.0)
     {

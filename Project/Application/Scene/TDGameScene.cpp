@@ -44,9 +44,12 @@ void TDGameScene::Initialize(SceneContext* context) {
 	skyDomeWorldTransform_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}});
 
 	// 地面を生成
-	terrainModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
-	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
-	terrainWorldTransform_.Initialize({ {30.0f,30.0f,30.0f},{0.0f,0.0f,0.0f},{0.0f,-0.2f,0.0f} });
+	// 氷の地面を描画するためのモデル
+	icePlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
+	// 地面を生成する
+	terrain_ = std::make_unique<Terrain>();
+	terrain_->Initialize(context_->textureManager->GetHandleByName("grass.png"),
+		context_->textureManager->GetHandleByName("ice.png"), context_->textureManager->GetHandleByName("iceNormal.png"));
 
 	// ライトの生成
 	sceneLightingController_ = std::make_unique<SceneLightingController>();
@@ -75,7 +78,6 @@ void TDGameScene::Initialize(SceneContext* context) {
 			false, true, false);
 	});
 
-
 	// 敵の攻撃管理クラス
 	enemyAttackManager_ = std::make_unique<EnemyAttackManager>();
 	// ボス敵モデルを生成
@@ -88,14 +90,6 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// 氷柱のモデルを取得
 	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
-
-	// 氷のテスト
-	icePlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
-	testWorldTransform_.Initialize({ { 10.0f,10.0f,10.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.2f,0.0f } });
-	iceMaterial_ = std::make_unique<IceMaterial>();
-	iceMaterial_->Initialize();
-	iceMaterial_->materialData_->textureHandle = context_->textureManager->GetHandleByName("ice.png");
-	iceMaterial_->materialData_->normalTextureHandle = context_->textureManager->GetHandleByName("iceNormal.png");
 
 	// 入力コマンドを設定する
 	InputRegisterCommand();
@@ -175,10 +169,6 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// 天球の描画
 	ModelRenderer::Draw(skyDomeModel_, skyDomeWorldTransform_);
 
-	// 地面を描画
-	terrainModel_->SetDefaultTextureHandle(grassGH_);
-	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
-
 	// ステージを描画する
 	stageManager_->Draw(wallModel_);
 
@@ -205,7 +195,7 @@ void TDGameScene::Draw(const bool& isDebugView) {
 		CustomRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
 	}
 	CustomRenderer::PreDraw(CustomRenderMode::Ice);
-	CustomRenderer::DrawIce(icePlaneModel_, testWorldTransform_, sceneLightingController_->GetResource(), iceMaterial_.get());
+	CustomRenderer::DrawIce(icePlaneModel_, terrain_->GetWorldTransform(), sceneLightingController_->GetResource(), terrain_->GetMaterial());
 
 #ifdef _DEBUG
 
@@ -291,17 +281,13 @@ void TDGameScene::DebugUpdate() {
 		debugRenderer_->AddBox(wall->GetOBBData());
 	}
 
+	// 地面マテリアルの更新処理
+	terrain_->Update();
+
 	// 当たり判定の表示管理
 	ImGui::Begin("DebugCollision");
 	ImGui::Checkbox("IsDrawCollision", &isDrawCollision_);
 	debugRenderer_->SetEnabled(isDrawCollision_);
-	ImGui::End();
-
-	ImGui::Begin("Ice");
-
-	ImGui::ColorEdit3("BaseColor", &iceMaterial_->materialData_->color.x);
-	ImGui::ColorEdit3("SpecularColor", &iceMaterial_->materialData_->specularColor.x);
-	ImGui::DragFloat("Shininess", &iceMaterial_->materialData_->shininess);
 	ImGui::End();
 #endif
 }
