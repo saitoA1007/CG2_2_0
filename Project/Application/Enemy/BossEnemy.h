@@ -7,13 +7,15 @@
 #include"BossContext.h"
 #include"States/IBossState.h"
 
+#include"EnemyAttackManager.h"
+
 class BossEnemy {
 public:
 
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Initialize(const float& stageRadius);
+	void Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager);
 
 	/// <summary>
 	/// 更新処理
@@ -32,6 +34,9 @@ private: // 調整項目
 	uint32_t kMaxHp_ = 10;
 
 private: // メンバ変数
+
+	// 遠距離などの攻撃を管理
+	EnemyAttackManager* enemyAttackManager_ = nullptr;
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;

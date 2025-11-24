@@ -3,6 +3,7 @@
 #include"MyMath.h"
 #include"FPSCounter.h"
 #include"EasingManager.h"
+#include"RandomGenerator.h"
 #include<numbers>
 using namespace GameEngine;
 
@@ -21,7 +22,7 @@ BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius)
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::Normal)] = [this]() {ResetNormal(); };
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::RushAttack)] = [this]() {ResetRush(); };
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::ShotAttack)] = [this]() {};
-	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::IceFallAttack)] = [this]() {};
+	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::IceFallAttack)] = [this]() {ResetIceFall();};
 
 #ifdef _DEBUG
 	// 値を登録する
@@ -192,7 +193,7 @@ void BossStateBattle::RushAttackUpdate() {
 		// 突進終了
 		if (rushTimer_ >= 1.0f) {
 			// 振る舞いの切り替えをリクエスト
-			behaviorRequest_ = ButtleBehavior::Normal;
+			behaviorRequest_ = ButtleBehavior::IceFallAttack;
 		}
 	}	
 }
@@ -201,8 +202,67 @@ void BossStateBattle::ShotAttackUpdate() {
 
 }
 
+void BossStateBattle::ResetIceFall() {
+	// 自分から円の中心へのベクトル
+	Vector3 v = bossContext_.worldTransform->transform_.translate * -1.0f;
+	v = Normalize(v);
+
+	// 角度を求める
+	float nowAngle = std::atan2f(v.z, v.x);
+	// 範囲内のランダムな角度を取得
+	float rangeRad = (std::numbers::pi_v<float> * 2.0f) / 6.0f;
+	float randomOffset = RandomGenerator::Get(-rangeRad, rangeRad);
+	// 最終的に移動する角度を求める
+	float rad = nowAngle + randomOffset;
+
+	// 開始位置を設定
+	startIceFall_ = bossContext_.worldTransform->transform_.translate;
+	// 最終位置を設定
+	endIceFall_ = { std::cosf(rad) * (stageRadius_ + 4.0f),0.0f,std::sinf(rad) * (stageRadius_ + 4.0f) };
+	
+	// 落とす時間を設定
+	fallTime_ = RandomGenerator::Get(0.2f,0.8f);
+
+	// 時間をリセット
+	iceFallTimer_ = 0.0f;
+	iceFallHeightTimer_ = 0.0f;
+	isActiveIceFall_ = false;
+}
+
 void BossStateBattle::IceFallAttackUpdate() {
 
+	iceFallTimer_ += FpsCounter::deltaTime / maxIceFallTime_;
+
+	// 時間が過ぎたら氷柱を落とす
+	if (iceFallTimer_ >= fallTime_) {
+		if (!isActiveIceFall_) {
+			bossContext_.isActiveIceFall = true;
+			isActiveIceFall_ = true;
+		} else {
+			// 一度発射したらfalseにする
+			if (bossContext_.isActiveIceFall) {
+				bossContext_.isActiveIceFall = false;
+			}
+		}
+	}
+	
+	// 移動
+	bossContext_.worldTransform->transform_.translate = Lerp(startIceFall_, endIceFall_, iceFallTimer_);
+
+	// 高さの移動処理
+	if (iceFallHeightTimer_ <= maxIceFallTime_ / 3) {
+		iceFallHeightTimer_ += FpsCounter::deltaTime / (maxIceFallTime_ / 3);
+
+		bossContext_.worldTransform->transform_.translate.y = Lerp(startIceFall_.y, iceFallHeight, iceFallHeightTimer_);
+	} else {
+		bossContext_.worldTransform->transform_.translate.y = iceFallHeight;
+	}
+
+	// 氷柱を落とす処理を終了
+	if (iceFallTimer_ >= 1.0f) {
+		// 振る舞いの切り替えをリクエスト
+		behaviorRequest_ = ButtleBehavior::Normal;
+	}
 }
 
 void BossStateBattle::RegisterBebugParam() {

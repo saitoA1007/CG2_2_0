@@ -15,6 +15,7 @@
 #include"Application/Light/SceneLightingController.h"
 #include"Application/Stage/StageManager.h"
 #include"Application/Enemy/BossEnemy.h"
+#include"Application/Enemy/EnemyAttackManager.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -100,6 +101,12 @@ private: // シーン機能
 	GameEngine::Model* bossEnemyModel_;
 	// ボス敵
 	std::unique_ptr<BossEnemy> bossEnemy_;
+
+	// ボスの遠距離攻撃管理クラス
+	std::unique_ptr<EnemyAttackManager> enemyAttackManager_;
+
+	// 氷柱のモデル
+	GameEngine::Model* iceFallModel_;
 
 	// ボスロックオンフラグ
     bool isBossLockOn_ = false;

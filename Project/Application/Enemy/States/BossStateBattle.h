@@ -100,6 +100,24 @@ private:
 
 	bool isRotMove_ = true;
 
+	// 氷柱落とし =============================
+
+	// 時間
+	float iceFallTimer_ = 0.0f;
+	float maxIceFallTime_ = 3.0f;
+
+	// 移動する位置
+	Vector3 startIceFall_ = {};
+	Vector3 endIceFall_ = {};
+
+	// 飛ぶ最大の高さ
+	float iceFallHeight = 8.0f;
+	float iceFallHeightTimer_ = 0.0f;
+
+	// 落とす時間
+	float fallTime_ = 0.0f;
+	// 氷柱を落とすフラグ
+	bool isActiveIceFall_ = false;
 
 private: // 各振る舞いの処理
 
@@ -132,6 +150,11 @@ private: // 各振る舞いの処理
 	/// 弾を発射する攻撃処理
 	/// </summary>
 	void ShotAttackUpdate();
+
+	/// <summary>
+	/// 氷柱を落とす行動のリセット処理
+	/// </summary>
+	void ResetIceFall();
 
 	/// <summary>
 	/// 氷柱を落とす攻撃処理
