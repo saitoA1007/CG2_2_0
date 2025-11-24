@@ -354,6 +354,17 @@ void PSOManager::DefaultLoadPSO() {
     RegisterPSO("Animation", animation, &animationRootSigBuilder, &animationInputLayoutBuilder);
 
     LogManager::GetInstance().Log("Default PSOs loaded");
+
+
+    // 氷のモデル用
+    CreatePSOData ice3D;
+    ice3D.rootSigName = "IceVS";
+    ice3D.vsPath = L"Resources/Shaders/Object3d.VS.hlsl";
+    ice3D.psPath = L"Resources/Shaders/IceMaterial.PS.hlsl";
+    ice3D.drawMode = DrawModel::FillFront;
+    ice3D.blendMode = BlendMode::kBlendModeNormal;
+    ice3D.isDepthEnable = true;
+    RegisterPSO("IceMaterial", ice3D, &rootSigBuilder, &inputLayoutBuilder);
 }
 
 void PSOManager::DeaultLoadPostEffectPSO() {

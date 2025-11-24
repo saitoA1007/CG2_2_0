@@ -102,6 +102,9 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// 軸方向表示の初期化
 	AxisIndicator::StaticInitialize(graphicsDevice_->GetCommandList());
 
+	// カスタム描画機能
+	CustomRenderer::StaticInitialize(graphicsDevice_->GetDevice(),graphicsDevice_->GetCommandList(), srvManager_.get(), psoManager_.get());
+
 	// fpsを計測する
 	fpsCounter_ = std::make_unique<FpsCounter>();
 	fpsCounter_->Initialize();
