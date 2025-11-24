@@ -297,6 +297,8 @@
     <ClCompile Include="Application\Enemy\States\BossStateBattle.cpp" />
     <ClCompile Include="Application\Enemy\EnemyAttackManager.cpp" />
     <ClCompile Include="Application\Enemy\LongLangeAttack\IceFall.cpp" />
+    <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.cpp" />
+    <ClCompile Include="EngineSource\3D\Extension\CustomRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -593,6 +595,9 @@
     <ClInclude Include="Application\Enemy\States\BossStateBattle.h" />
     <ClInclude Include="Application\Enemy\EnemyAttackManager.h" />
     <ClInclude Include="Application\Enemy\LongLangeAttack\IceFall.h" />
+    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.h" />
+    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\ICustomMaterial.h" />
+    <ClInclude Include="EngineSource\3D\Extension\CustomRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
@@ -738,5 +743,6 @@
       <Filter>Shaders\PostEffect</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\SkinningObject3d.VS.hlsl" />
+    <FxCompile Include="Resources\Shaders\IceMaterial.PS.hlsl" />
   </ItemGroup>
 </Project>
