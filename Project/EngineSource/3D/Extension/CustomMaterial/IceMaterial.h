@@ -11,14 +11,17 @@ class IceMaterial : public ICustomMaterial {
 public:
 
 	struct alignas(16) MaterialData {
+		Vector4 baseColor;
 		Vector4 color;
 		Matrix4x4 uvTransform;
 		Vector3 specularColor;
 		float shininess;
 		uint32_t textureHandle;
 		uint32_t normalTextureHandle;
+		uint32_t baseTextureHandle;
 		float time;
-		float padding2;
+		Vector3 rimColor;
+		float rimIntensity;
 	};
 
 public:
