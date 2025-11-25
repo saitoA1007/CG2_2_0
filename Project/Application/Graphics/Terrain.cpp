@@ -14,6 +14,8 @@ void Terrain::Initialize(const uint32_t& baseTexture, const uint32_t& iceTexture
 	iceMaterial_->materialData_->baseTextureHandle = baseTexture;
 
 #ifdef _DEBUG
+	rimColor = Vector4(iceMaterial_->materialData_->rimColor.x,iceMaterial_->materialData_->rimColor.y, iceMaterial_->materialData_->rimColor.z, 1.0f);
+	specularColor = Vector4(iceMaterial_->materialData_->specularColor.x,iceMaterial_->materialData_->specularColor.y, iceMaterial_->materialData_->specularColor.z, 1.0f);
 	// 値を登録する
 	RegisterBebugParam();
 	ApplyDebugParam();
@@ -33,18 +35,32 @@ void Terrain::Update() {
 void Terrain::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "BaseColor", iceMaterial_->materialData_->baseColor);
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "IceColor", iceMaterial_->materialData_->color);
+	GameParamEditor::GetInstance()->AddItem("IceTerrain", "SpecularColor", specularColor);
+	GameParamEditor::GetInstance()->AddItem("IceTerrain", "RimColor", rimColor);
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "Shininess", iceMaterial_->materialData_->shininess);
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "RimIntensity", iceMaterial_->materialData_->rimIntensity);
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "Time", iceMaterial_->materialData_->time);
 	//iceMaterial_->materialData_->specularColor
 	//iceMaterial_->materialData_->rimColor
 	//iceMaterial_->materialData_->time
+
+
 }
 
 void Terrain::ApplyDebugParam() {
 	iceMaterial_->materialData_->baseColor = GameParamEditor::GetInstance()->GetValue<Vector4>("IceTerrain", "BaseColor");
 	iceMaterial_->materialData_->color = GameParamEditor::GetInstance()->GetValue<Vector4>("IceTerrain", "IceColor");
+	specularColor = GameParamEditor::GetInstance()->GetValue<Vector4>("IceTerrain", "SpecularColor");
+	rimColor = GameParamEditor::GetInstance()->GetValue<Vector4>("IceTerrain", "RimColor");
 	iceMaterial_->materialData_->shininess = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "Shininess");
 	iceMaterial_->materialData_->rimIntensity = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "RimIntensity");
 	iceMaterial_->materialData_->time = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "Time");
+
+	iceMaterial_->materialData_->rimColor.x = rimColor.x;
+	iceMaterial_->materialData_->rimColor.y = rimColor.y;
+	iceMaterial_->materialData_->rimColor.z = rimColor.z;
+
+	iceMaterial_->materialData_->specularColor.x = rimColor.x;
+	iceMaterial_->materialData_->specularColor.y = rimColor.y;
+	iceMaterial_->materialData_->specularColor.z = rimColor.z;
 }
