@@ -5,7 +5,7 @@
 #include"Camera.h"
 #include <functional>
 
-class Player {
+class Player : public GameEngine::GameObject {
 public:
 	/// <summary>
 	/// 初期化処理
@@ -49,7 +49,7 @@ public:
 	bool IsAttackDown() const { return isAttackDown_; }
 
     // 溜め時間の比率取得
-    float GetChargeRatio() const { return std::min(chargeTimer_ / kRushChargeMaxTime_, 1.0f); }
+    float GetChargeRatio() const { return std::min<float>(chargeTimer_ / kRushChargeMaxTime_, 1.0f); }
 
 	// 壁ヒット時コールバック設定
 	void SetOnWallHit(std::function<void()> cb) { onWallHit_ = std::move(cb); }
@@ -65,7 +65,6 @@ private:
 		"Player",
 		"Player/Rush",
 		"Player/WallBounce",
-		"Player/GreatWallBounce",
 		"Player/Attack",
 	};
 
@@ -110,15 +109,6 @@ private:
     float kWallBounceAwaySpeed_ = 5.0f;
 	// 跳ね返り直後の硬直時間
     float kWallBounceLockTime_ = 0.8f;
-
-	//--------- 強化壁への跳ね返り設定 ---------//
-
-	// 跳ね上がり後の高さ
-	float kGreatWallBounceUpSpeed_ = 15.0f;
-	// 跳ね上がり後の壁から離れる距離
-	float kGreatWallBounceAwaySpeed_ = 5.0f;
-	// 跳ね返り直後の硬直時間
-	float kGreatWallBounceLockTime_ = 1.2f;
 
 	//--------- Attack（空中急降下）の設定 ---------//
 
@@ -191,7 +181,7 @@ private:
     void ProcessAttackDownInput(GameEngine::InputCommand *inputCommand);
 	void RushUpdate();
 	void BounceUpdate();
-	void RushWallBounce(const Vector3 &bounceDirection, bool isGreatWall);
+	void Bounce(const Vector3 &bounceDirection, float bounceStrength);
 	void OnCollision(const GameEngine::CollisionResult& result);
 	void RegisterBebugParam();
 	void ApplyDebugParam();

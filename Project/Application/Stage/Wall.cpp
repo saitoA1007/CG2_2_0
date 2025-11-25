@@ -32,6 +32,9 @@ void Wall::Initialilze(const Transform& transform, float respawnTime, uint32_t m
 	collider_->UpdateOrientationsFromRotate(worldTransform_.transform_.rotate);
 	collider_->SetCollisionAttribute(kCollisionAttributeTerrain);
 	collider_->SetCollisionMask(~kCollisionAttributeTerrain);
+    UserData userData;
+    userData.typeID = static_cast<uint32_t>(CollisionTypeID::Wall);
+    collider_->SetUserData(userData);
 
 	// コールバック関数に登録する
 	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {

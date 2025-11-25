@@ -43,6 +43,8 @@ private:
 
 	// 生存フラグ
 	bool isAlive_ = true;
+    // 死亡通知フラグ
+    bool isDeadNotified_ = false;
 
 	// 速度
 	Vector3 velocity_ = {0.0f,0.0f,0.0f};
@@ -55,5 +57,5 @@ private:
 	/// <summary>
 	/// 当たり判定
 	/// </summary>
-	void OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result);
+	void OnCollision([[maybe_unused]] const GameEngine::CollisionResult& result);
 };

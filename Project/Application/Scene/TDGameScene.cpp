@@ -48,7 +48,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	icePlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
 	// 地面を生成する
 	terrain_ = std::make_unique<Terrain>();
-	terrain_->Initialize(context_->textureManager->GetHandleByName("grass.png"),
+	terrain_->Initialize(context_->textureManager->GetHandleByName("gras.png"),
 		context_->textureManager->GetHandleByName("ice.png"), context_->textureManager->GetHandleByName("iceNormal.png"));
 
 	// ライトの生成

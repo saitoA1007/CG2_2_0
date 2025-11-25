@@ -21,6 +21,8 @@ void Player::Initialize() {
 	collider_->SetCollisionMask(~kCollisionAttributePlayer);
 	// ユーザーデータ設定（IDのみ暫定）
     UserData userData;
+    userData.typeID = static_cast<uint32_t>(CollisionTypeID::Player);
+    userData.object = this;
 	collider_->SetUserData(userData);
 	// コールバック登録
 	collider_->SetOnCollisionCallback([this](const CollisionResult& result) { this->OnCollision(result); });
@@ -213,7 +215,7 @@ void Player::HandleRushStart(GameEngine::InputCommand* inputCommand) {
 	if (inputCommand->IsCommandActive("RushStart")) {
 		// 予備動作時間を溜め比率で決定
 		chargeRatio_ = std::clamp(chargeTimer_ / kRushChargeMaxTime_, 0.0f, 1.0f);
-		preRushDuration_ = Lerp(0.0f, kRushMaxSpeed_, chargeRatio_);
+		preRushDuration_ = Lerp(0.0f, kPreRushMaxTime_, chargeRatio_);
 		rushActiveTimer_ = Lerp(0.0f, kRushLockMaxTime_, chargeRatio_);
 		isCharging_ = false;
 		isPreRushing_ = true;
@@ -255,21 +257,18 @@ void Player::RushUpdate() {
 
 void Player::BounceUpdate() {
 	if (!isBounceLock_) { return; }
+	isRushing_ = false;
 	bounceLockTimer_ += FpsCounter::deltaTime;
 	if (bounceLockTimer_ >= currentBounceLockTime_) {
 		isBounceLock_ = false; bounceLockTimer_ = 0.0f; currentBounceUpSpeed_ = 0.0f; currentBounceAwaySpeed_ = 0.0f; currentBounceLockTime_ = 0.0f; bounceAwayDir_ = {0.0f,0.0f,0.0f};
 	}
 }
 
-void Player::RushWallBounce(const Vector3 &bounceDirection, bool isGreatWall) {
+void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength) {
 	if (isPreRushing_ || !isRushing_) { return; }
-	isPreRushing_ = false; isRushing_ = false; isJump_ = true;
+	isPreRushing_ = false; isJump_ = true;
 	isBounceLock_ = true; bounceLockTimer_ = 0.0f; bounceAwayDir_ = { -bounceDirection.x, 0.0f, -bounceDirection.z }; bounceAwayDir_ = Normalize(bounceAwayDir_);
-	if (isGreatWall) {
-		velocity_ = bounceAwayDir_ * kGreatWallBounceAwaySpeed_; velocity_.y = kGreatWallBounceUpSpeed_; currentBounceLockTime_ = kGreatWallBounceLockTime_;
-	} else {
-		velocity_ = bounceAwayDir_ * kWallBounceAwaySpeed_; velocity_.y = kWallBounceUpSpeed_; currentBounceLockTime_ = kWallBounceLockTime_;
-	}
+	velocity_ = bounceAwayDir_ * (kWallBounceAwaySpeed_ * bounceStrength); velocity_.y = kWallBounceUpSpeed_ * bounceStrength; currentBounceLockTime_ = kWallBounceLockTime_;
 }
 
 void Player::OnCollision(const CollisionResult &result) {
@@ -278,17 +277,22 @@ void Player::OnCollision(const CollisionResult &result) {
 		return;
 	}
 	
-	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss)) == false;
-	if (isRushing_ && isWall) {
+	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall));
+    bool isIceFall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::IceFall));
+
+	//==================================================
+    // 壁との衝突処理
+	//==================================================
+
+	if (isWall && isRushing_) {
 		// 接触法線を利用して跳ね返り
 		Vector3 normal = result.contactNormal;
 		// XZ成分で跳ね返り方向作成
 		Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
 		if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
-		bool isGreat = false; // 今後拡張
 		// カメラシェイク通知
 		if (onWallHit_) { onWallHit_(); }
-		RushWallBounce(bounceDir, isGreat);
+		Bounce(bounceDir, 1.0f); // 跳ね返りの強さを1.0fで呼び出し
 		return;
 	}
 
@@ -312,6 +316,44 @@ void Player::OnCollision(const CollisionResult &result) {
 		}
 		// コライダー位置も同期
 		if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
+        return;
+	}
+
+	//==================================================
+    // 氷柱との衝突処理
+    //==================================================
+
+	if (isIceFall && isRushing_) {
+		// 接触法線を利用して跳ね返り
+		Vector3 normal = result.contactNormal;
+		// XZ成分で跳ね返り方向作成
+		Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
+		if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
+		// カメラシェイク通知
+		if (onWallHit_) { onWallHit_(); }
+		Bounce(bounceDir, 0.5f);
+		return;
+	}
+
+	// 通常移動時のつららとの衝突: めり込み分だけ押し戻す（XZ 平面）
+	if (isIceFall && !isRushing_) {
+		Vector3 n = result.contactNormal;
+		if (n.x != 0.0f || n.y != 0.0f || n.z != 0.0f) { n = Normalize(n); }
+		float depth = -result.penetrationDepth;
+		Vector3 correction = n * depth;
+		worldTransform_.transform_.translate.x += correction.x;
+		worldTransform_.transform_.translate.y += correction.y;
+		worldTransform_.transform_.translate.z += correction.z;
+		// 速度の方向成分を除去して連続めり込みを防止
+		float dot = velocity_.x * n.x + velocity_.y * n.y + velocity_.z * n.z;
+		if (dot < 0.0f) {
+			velocity_.x -= n.x * dot;
+			velocity_.y -= n.y * dot;
+			velocity_.z -= n.z * dot;
+		}
+		// コライダー位置も同期
+		if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
+		return;
 	}
 }
 
@@ -338,14 +380,9 @@ void Player::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceAwaySpeed", kWallBounceAwaySpeed_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceLockTime", kWallBounceLockTime_);
 
-	// 強化壁跳ね返り設定
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "GreatWallBounceUpSpeed", kGreatWallBounceUpSpeed_);
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "GreatWallBounceAwaySpeed", kGreatWallBounceAwaySpeed_);
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "GreatWallBounceLockTime", kGreatWallBounceLockTime_);
-
 	// Attack（空中急降下）設定
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "AttackPreDownTime", kAttackPreDownTime_);
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "AttackDownSpeed", kAttackDownSpeed_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackPreDownTime", kAttackPreDownTime_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownSpeed", kAttackDownSpeed_);
 }
 
 void Player::ApplyDebugParam() {
@@ -371,12 +408,7 @@ void Player::ApplyDebugParam() {
 	kWallBounceAwaySpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceAwaySpeed");
 	kWallBounceLockTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceLockTime");
 
-	// 強化壁跳ね返り設定
-	kGreatWallBounceUpSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "GreatWallBounceUpSpeed");
-	kGreatWallBounceAwaySpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "GreatWallBounceAwaySpeed");
-	kGreatWallBounceLockTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "GreatWallBounceLockTime");
-
 	// Attack（空中急降下）設定
-	kAttackPreDownTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "AttackPreDownTime");
-	kAttackDownSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "AttackDownSpeed");
+	kAttackPreDownTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackPreDownTime");
+	kAttackDownSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackDownSpeed");
 }

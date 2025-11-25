@@ -2,6 +2,7 @@
 #include"FPSCounter.h"
 #include"CollisionConfig.h"
 #include"Application/CollisionTypeID.h"
+#include"Application/Player/Player.h"
 
 using namespace GameEngine;
 
@@ -16,13 +17,21 @@ void IceFall::Initialize(const Vector3& pos) {
     collider_->SetWorldPosition(worldTransform_.transform_.translate);
     collider_->SetCollisionAttribute(kCollisionAttributeEnemy);
     collider_->SetCollisionMask(~kCollisionAttributeEnemy);
+    UserData userData;
+    userData.typeID = static_cast<uint32_t>(CollisionTypeID::IceFall);
+    collider_->SetUserData(userData);
+
     // 当たり判定の関数を登録する
-    collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
-        this->OnCollisionEnter(result);
+    collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
+        this->OnCollision(result);
     });
 }
 
 void IceFall::Update() {
+    if (isDeadNotified_) {
+        isAlive_ = false;
+        return;
+    }
 
     // 地面に着地していなければ移動する
     if (worldTransform_.transform_.translate.y > 0.0f) {
@@ -41,8 +50,13 @@ void IceFall::Update() {
     }    
 }
 
-void IceFall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
-
-    // 生存フラグをfalse
-    isAlive_ = false;
+void IceFall::OnCollision([[maybe_unused]] const GameEngine::CollisionResult& result) {
+    Player *player = dynamic_cast<Player *>(result.userData.object);
+    if (!player) {
+        return;
+    }
+    // プレイヤーが突進中なら消滅
+    if (player->IsRushing()) {
+        isDeadNotified_ = true;
+    }
 }
