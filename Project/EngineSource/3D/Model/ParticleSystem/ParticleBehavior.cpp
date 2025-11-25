@@ -8,7 +8,6 @@ using namespace GameEngine;
 
 void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum, uint32_t textureHandle) {
     maxNumInstance_ = maxNum;
-    textureHandle_ = textureHandle;
     name_ = name;
 
     // パーティクル配列を確保
@@ -24,6 +23,9 @@ void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum, uint3
         particle.currentTime = 0.0f;
         particle.lifeTime = 0.0f;
     }
+
+    // 初期画像を設定
+    particleEmitter_.textures_["circle.png"] = textureHandle;
 
 #ifdef _DEBUG
     // パラメータを登録する
@@ -94,7 +96,13 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     tmpParticleData.startColor = Vector3(tmpParticleData.color.x, tmpParticleData.color.y, tmpParticleData.color.z);
     tmpParticleData.startAlpha = tmpParticleData.color.w;
     // テクスチャを設定
-    tmpParticleData.textureHandle = textureHandle_;
+    if (particleEmitter_.textures_.size() == 0) {
+        tmpParticleData.textureHandle = 0;
+    } else {
+        uint32_t index = RandomGenerator::Get(static_cast<uint32_t>(0),static_cast<uint32_t>(particleEmitter_.textures_.size()-1));
+        auto it = std::next(particleEmitter_.textures_.begin(), index);
+        tmpParticleData.textureHandle = it->second;
+    }
     return tmpParticleData;
 }
 
@@ -174,6 +182,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
 
 void ParticleBehavior::RegisterBebugParam() {
     int index = 0;
+    GameParamEditor::GetInstance()->AddItem(name_, "Textures", particleEmitter_.textures_, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "SpawnMaxCount", particleEmitter_.spawnMaxCount, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "SpawnCoolTime", particleEmitter_.spawnCoolTime, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "IsLoop", particleEmitter_.isLoop, index++);
@@ -196,6 +205,7 @@ void ParticleBehavior::RegisterBebugParam() {
 }
 
 void ParticleBehavior::ApplyDebugParam() {
+    particleEmitter_.textures_ = GameParamEditor::GetInstance()->GetValue<std::map<std::string, uint32_t>>(name_, "Textures");
     particleEmitter_.spawnMaxCount = GameParamEditor::GetInstance()->GetValue<uint32_t>(name_, "SpawnMaxCount");
     particleEmitter_.spawnCoolTime = GameParamEditor::GetInstance()->GetValue<float>(name_, "SpawnCoolTime");
     particleEmitter_.isLoop = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsLoop");

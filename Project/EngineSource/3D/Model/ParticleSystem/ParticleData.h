@@ -4,6 +4,8 @@
 #include "Transform.h"
 #include"Range.h"
 #include<cstdint>
+#include<string>
+#include<map>
 
 #include"ParticleExtensionData.h"
 
@@ -11,6 +13,7 @@ namespace GameEngine {
 
 	// パーティクルの調整パラメータ
 	struct ParticelEmitter {
+		std::map<std::string, uint32_t> textures_; // 使用するテクスチャ
 		uint32_t spawnMaxCount = 1; // 出現する数
 		float spawnCoolTime = 1.0f; // 発生する時間
 		bool isLoop = true; // ループするかを判断する
