@@ -14,7 +14,7 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>(rendererManager));
 	windowManager_->RegisterWindow(std::make_unique<AssetWindow>());
 	windowManager_->RegisterWindow(std::make_unique<HierarchyWindow>());
-	windowManager_->RegisterWindow(std::make_unique<InspectorWindow>());
+	windowManager_->RegisterWindow(std::make_unique<InspectorWindow>(textureManager));
 	windowManager_->RegisterWindow(std::make_unique<ConsoleWindow>());
 	windowManager_->RegisterWindow(std::make_unique<PerformanceWindow>());
 

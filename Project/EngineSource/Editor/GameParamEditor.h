@@ -19,7 +19,7 @@ public:
 
 	// 項目
 	struct Item {
-		std::variant<int32_t, uint32_t, float, Vector2, Vector3,Vector4,Range3, Range4, bool, std::string> value;
+		std::variant<int32_t, uint32_t, float, Vector2, Vector3,Vector4,Range3, Range4, bool, std::string, std::map<std::string, uint32_t>> value;
 		int priority = INT_MAX; // 優先順位
 	};
 

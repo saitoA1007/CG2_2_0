@@ -2,6 +2,12 @@
 
 using namespace GameEngine;
 
+TextureManager* InspectorWindow::textureManager_ = nullptr;
+
+InspectorWindow::InspectorWindow(TextureManager* textureManager) {
+    textureManager_ = textureManager;
+}
+
 void InspectorWindow::Draw() {
     if (!isActive) return;
 
@@ -89,4 +95,58 @@ void InspectorWindow::Draw() {
     }
 
     ImGui::End();
+}
+
+void InspectorWindow::EditTexutre(std::map<std::string, uint32_t>& value) {
+   
+    // リストの表示と削除
+    ImGui::Text("Current Textures (%d)", (int)value.size());
+    ImGui::Separator();
+
+    // イテレータを使ってループ
+    for (auto it = value.begin(); it != value.end(); ) {
+        const std::string& key = it->first;
+        uint32_t handle = it->second;
+
+        ImGui::PushID(key.c_str());
+
+        // データの表示
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("%s : %u", key.c_str(), handle);
+
+        ImGui::SameLine();
+
+        // 削除ボタン
+        if (ImGui::Button("Delete")) {
+            it = value.erase(it);
+        } else {
+            ++it;
+        }
+
+        ImGui::PopID();
+    }
+
+    ImGui::Spacing();
+    ImGui::Separator();
+
+    // 新規追加
+    ImGui::Text("Add New Texture");
+
+    // 入力フィールド
+    ImGui::InputText("Texture Name", nameBuffer, sizeof(nameBuffer));
+
+    // 追加ボタン
+    if (ImGui::Button("Add")) {
+        std::string inputName = nameBuffer;
+
+        // マネージャーからハンドルを取得
+        uint32_t handle = textureManager_->GetHandleByName(inputName);
+
+        // 有効なハンドルならmapに追加
+        value[inputName] = handle;
+
+        // バッファのクリア
+        memset(nameBuffer, 0, sizeof(nameBuffer));
+    }
+    ImGui::Separator();
 }
