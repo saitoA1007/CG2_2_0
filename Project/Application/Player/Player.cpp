@@ -213,7 +213,7 @@ void Player::HandleRushStart(GameEngine::InputCommand* inputCommand) {
 	if (inputCommand->IsCommandActive("RushStart")) {
 		// 予備動作時間を溜め比率で決定
 		chargeRatio_ = std::clamp(chargeTimer_ / kRushChargeMaxTime_, 0.0f, 1.0f);
-		preRushDuration_ = Lerp(0.0f, kPreRushMaxTime_, chargeRatio_);
+		preRushDuration_ = Lerp(0.0f, kRushMaxSpeed_, chargeRatio_);
 		rushActiveTimer_ = Lerp(0.0f, kRushLockMaxTime_, chargeRatio_);
 		isCharging_ = false;
 		isPreRushing_ = true;
