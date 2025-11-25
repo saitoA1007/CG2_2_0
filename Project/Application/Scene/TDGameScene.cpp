@@ -146,6 +146,11 @@ void TDGameScene::Update() {
 
 	// 当たり判定の更新処理
 	UpdateCollision();
+
+#ifdef _DEBUG
+	// 地面マテリアルの更新処理
+	terrain_->Update();
+#endif
 }
 
 void TDGameScene::Draw(const bool& isDebugView) {

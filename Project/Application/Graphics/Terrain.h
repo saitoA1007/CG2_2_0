@@ -40,6 +40,10 @@ private:
 	// マテリアル
 	std::unique_ptr<IceMaterial> iceMaterial_;
 
+	// デバック用
+	Vector4 rimColor;
+	Vector4 specularColor;
+
 private:
 
 	/// <summary>
