@@ -28,4 +28,8 @@ namespace GameEngine {
 		float minVelocity = 0.0f;
 		float maxVelocity = 0.0f;
 	};
+
+	struct RotateZFromVelocity {
+		bool isEnable = false;
+	};
 }

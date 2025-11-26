@@ -23,6 +23,7 @@ namespace GameEngine {
 		Range3 velocityRange = { {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} }; // 速度の範囲
 		Range3 posRange = { {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} }; // 発生位置の範囲
 		Range3 scaleRange = { {1.0f,1.0f,1.0f},{1.0f,1.0f,1.0f} };  // 大きさの範囲
+		Range3 rotateRange = { {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} }; // 回転の範囲
 		Range4 colorRange = { {1.0f,1.0f,1.0f,1.0f},{1.0f,1.0f,1.0f,1.0f} }; // 色の範囲
 
 		SizeOverLifeTimeModule sizeOverLifeTime;   // 大きさの補間
@@ -30,6 +31,7 @@ namespace GameEngine {
 		AlphaOverLifeTimeModule alphaOverLifeTime; // 透明度の補間
 
 		VelocityFromPosition velocityFromPosition; // 生成位置から速度を求める
+		RotateZFromVelocity rotateZFromVelocity; // 速度方向から回転
 	};
 
 	// パーティクルデータ

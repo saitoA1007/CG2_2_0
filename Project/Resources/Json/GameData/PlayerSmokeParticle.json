@@ -40,6 +40,18 @@
         "LifeTime": 2.0,
         "MaxVelocity": 2.0,
         "MinVelocity": 1.0,
+        "RotateRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
         "ScaleRange": {
             "Max": [
                 0.800000011920929,

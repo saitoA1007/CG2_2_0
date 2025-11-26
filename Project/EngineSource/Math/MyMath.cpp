@@ -448,3 +448,18 @@ Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& translate, co
 	// 行列の更新
 	return scaleMatrix * billboardMatrix * translateMatrix;
 }
+
+Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix, const float& rotateZ) {
+	// ビルボードの回転行列を作成
+	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(0.0f);
+	Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, cameraMatrix);
+	billboardMatrix.m[3][0] = 0.0f;
+	billboardMatrix.m[3][1] = 0.0f;
+	billboardMatrix.m[3][2] = 0.0f;
+	// ST行列を作成
+	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
+	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotateZ);
+	Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
+	// 行列の更新
+	return scaleMatrix * rotateZMatrix * billboardMatrix * translateMatrix;
+}

@@ -72,7 +72,11 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     // srtを設定
     float scale = RandomGenerator::Get(particleEmitter_.scaleRange.min.x, particleEmitter_.scaleRange.max.x);
     tmpParticleData.transform.scale = { scale ,scale ,scale };
-    tmpParticleData.transform.rotate = {0.0f,0.0f,0.0f};
+    tmpParticleData.transform.rotate = {
+        RandomGenerator::Get(particleEmitter_.rotateRange.min.x, particleEmitter_.rotateRange.max.x),
+        RandomGenerator::Get(particleEmitter_.rotateRange.min.y, particleEmitter_.rotateRange.max.y),
+        RandomGenerator::Get(particleEmitter_.rotateRange.min.z, particleEmitter_.rotateRange.max.z),
+    };
     tmpParticleData.transform.translate = {
     RandomGenerator::Get(particleEmitter_.posRange.min.x, particleEmitter_.posRange.max.x),
     RandomGenerator::Get(particleEmitter_.posRange.min.y, particleEmitter_.posRange.max.y), 
@@ -166,7 +170,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         // worldTransformsの更新
         if (particleEmitter_.isBillBoard) {
             // ビルボードを適応する
-            worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = MakeBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix);
+            worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = MakeBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix, particle.transform.rotate.z);
         } else {
             worldTransforms_->transformDatas_[currentNumInstance_].transform = particle.transform;
         }
@@ -207,6 +211,7 @@ void ParticleBehavior::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(name_, "VelocityRange", particleEmitter_.velocityRange, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "SpawnRange", particleEmitter_.posRange, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "ScaleRange", particleEmitter_.scaleRange, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "RotateRange", particleEmitter_.rotateRange, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "ColorRange", particleEmitter_.colorRange, index++);
     // 拡張機能
     GameParamEditor::GetInstance()->AddItem(name_, "IsEnableSizeOverLifeTime", particleEmitter_.sizeOverLifeTime.isEnable, index++);
@@ -221,6 +226,8 @@ void ParticleBehavior::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(name_, "IsEnableVelocityFromPosition", particleEmitter_.velocityFromPosition.isEnable, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "MinVelocity", particleEmitter_.velocityFromPosition.minVelocity, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "MaxVelocity", particleEmitter_.velocityFromPosition.maxVelocity, index++);
+
+    //GameParamEditor::GetInstance()->AddItem(name_, "IsEnableRotateZFromVelocity", particleEmitter_.rotateZFromVelocity.isEnable, index++);
 }
 
 void ParticleBehavior::ApplyDebugParam() {
@@ -234,6 +241,7 @@ void ParticleBehavior::ApplyDebugParam() {
     particleEmitter_.velocityRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "VelocityRange");
     particleEmitter_.posRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "SpawnRange");
     particleEmitter_.scaleRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "ScaleRange");
+    particleEmitter_.rotateRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "RotateRange");
     particleEmitter_.colorRange = GameParamEditor::GetInstance()->GetValue<Range4>(name_, "ColorRange");
     // 拡張機能
     particleEmitter_.sizeOverLifeTime.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableSizeOverLifeTime");
@@ -250,6 +258,8 @@ void ParticleBehavior::ApplyDebugParam() {
     particleEmitter_.velocityFromPosition.maxVelocity = GameParamEditor::GetInstance()->GetValue<float>(name_, "MaxVelocity");
     // 最小範囲が最大範囲を超えないようにする
     particleEmitter_.velocityFromPosition.minVelocity = std::min(particleEmitter_.velocityFromPosition.minVelocity, particleEmitter_.velocityFromPosition.maxVelocity);
+
+    //particleEmitter_.rotateZFromVelocity.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableRotateZFromVelocity");
 
     // 出現範囲を抑える
     if (maxNumInstance_ <= particleEmitter_.spawnMaxCount) {
