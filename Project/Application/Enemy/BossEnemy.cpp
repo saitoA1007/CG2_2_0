@@ -17,6 +17,7 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
 
     // 取得
     enemyAttackManager_ = enemyAttackManager;
+    enemyAttackManager_->SetStageRadius(stageRadius);
 
     // ワールド行列を初期化
     worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
@@ -75,7 +76,8 @@ void BossEnemy::Update(const Vector3& targetPos) {
 
     // 氷柱の発射をする
     if (bossContext_.isActiveIceFall) {
-        enemyAttackManager_->AddIceFall(worldTransform_.transform_.translate);
+        //enemyAttackManager_->AddIceFall(worldTransform_.transform_.translate);
+        enemyAttackManager_->CreateIceFallPositions();
     }
 
     // 行列を更新する
