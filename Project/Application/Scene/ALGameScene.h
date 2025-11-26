@@ -100,6 +100,8 @@ private: // シーン機能
 	GameEngine::Model* bossEnemyModel_;
 	// ボス敵キャラのモデル
 	std::unique_ptr<BossEnemy> bossEnemy_;
+	// ボスの移動パーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> bossEnmeyMoveParticle_;
 
 private:
 

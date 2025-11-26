@@ -149,4 +149,5 @@ void InspectorWindow::EditTexutre(std::map<std::string, uint32_t>& value) {
         memset(nameBuffer, 0, sizeof(nameBuffer));
     }
     ImGui::Separator();
+    ImGui::Spacing();
 }

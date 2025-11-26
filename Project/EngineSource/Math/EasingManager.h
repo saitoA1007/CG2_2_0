@@ -1,4 +1,5 @@
 #pragma once
+#include"Vector4.h"
 #include"Vector3.h"
 #include"Quaternion.h"
 
@@ -11,6 +12,7 @@
 /// <returns></returns>
 float Lerp(const float& start, const float& end, const float& t);
 Vector3 Lerp(const Vector3& start, const Vector3& end, const float& t);
+Vector4 Lerp(const Vector4& start, const Vector4& end, const float& t);
 Quaternion Lerp(const Quaternion& start, const Quaternion& end, const float& t);
 
 // イージングイン

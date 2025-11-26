@@ -40,7 +40,7 @@ namespace GameEngine {
 		uint32_t textureHandle = 0; // 使用するテクスチャ
 
 		Vector3 startSize;  // 最初の大きさ
-		Vector3 startColor; // 最初の色
+		Vector4 startColor; // 最初の色
 		float startAlpha;   // 最初の透明度
 	};	
 }

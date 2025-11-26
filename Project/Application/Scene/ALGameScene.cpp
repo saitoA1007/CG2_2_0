@@ -76,6 +76,11 @@ void ALGameScene::Initialize(SceneContext* context) {
 	// ボス敵クラスを初期化
 	bossEnemy_ = std::make_unique<BossEnemy>();
 	bossEnemy_->Initialize();
+
+	// ボスの移動パーティクル
+	bossEnmeyMoveParticle_ = std::make_unique<ParticleBehavior>();
+	bossEnmeyMoveParticle_->Initialize("BossSmokeParticle", 32);
+	bossEnmeyMoveParticle_->Emit({ 0.0f,0.0f,0.0f });
 }
 
 void ALGameScene::Update() {
@@ -108,6 +113,9 @@ void ALGameScene::Update() {
 	// ボス敵の更新処理
 	bossEnemy_->Update();
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,bossEnemy_->GetAlpha() });
+	// ボスの移動パーティクル
+	bossEnmeyMoveParticle_->Emit(bossEnemy_->GetPosition());
+	bossEnmeyMoveParticle_->Update(mainCamera_->GetWorldMatrix());
 
 	// カメラの更新処理
 	mainCamera_->SetCamera(followCameraController_->GetCamera());
@@ -150,9 +158,12 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
 
 	// 複数モデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::Instancing);
-	// パーティクルを描画
+	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
+	// プレイヤーの移動パーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, playerMoveParticle_->GetCurrentNumInstance(), *playerMoveParticle_->GetWorldTransforms());
+
+	// ボスの移動パーティクルを描画
+	ModelRenderer::DrawInstancing(planeModel_, bossEnmeyMoveParticle_->GetCurrentNumInstance(), *bossEnmeyMoveParticle_->GetWorldTransforms());
 
 #ifdef _DEBUG
 

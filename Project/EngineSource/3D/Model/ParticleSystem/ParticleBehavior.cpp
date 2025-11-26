@@ -96,7 +96,7 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     tmpParticleData.lifeTime = particleEmitter_.lifeTime;
     // 初期値を保存
     tmpParticleData.startSize = tmpParticleData.transform.scale;
-    tmpParticleData.startColor = Vector3(tmpParticleData.color.x, tmpParticleData.color.y, tmpParticleData.color.z);
+    tmpParticleData.startColor = Vector4(tmpParticleData.color.x, tmpParticleData.color.y, tmpParticleData.color.z,1.0f);
     tmpParticleData.startAlpha = tmpParticleData.color.w;
     // テクスチャを設定
     if (particleEmitter_.textures_.size() == 0) {
@@ -162,7 +162,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
 
         // 色の変化
         if (particleEmitter_.colorOverLifeTime.isEnable) {
-            Vector3 tmpColor = Lerp(particle.startColor, particleEmitter_.colorOverLifeTime.endColor, particle.currentTime / particle.lifeTime);
+            Vector4 tmpColor = Lerp(particle.startColor, particleEmitter_.colorOverLifeTime.endColor, particle.currentTime / particle.lifeTime);
             particle.color.x = tmpColor.x;
             particle.color.y = tmpColor.y;
             particle.color.z = tmpColor.z;
@@ -225,7 +225,7 @@ void ParticleBehavior::ApplyDebugParam() {
     particleEmitter_.sizeOverLifeTime.endSize = GameParamEditor::GetInstance()->GetValue<Vector3>(name_, "EndSize");
 
     particleEmitter_.colorOverLifeTime.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableColorOverLifeTime");
-    particleEmitter_.colorOverLifeTime.endColor = GameParamEditor::GetInstance()->GetValue<Vector3>(name_, "EndColor");
+    particleEmitter_.colorOverLifeTime.endColor = GameParamEditor::GetInstance()->GetValue<Vector4>(name_, "EndColor");
 
     particleEmitter_.alphaOverLifeTime.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableAlphaOverLifeTime");
     particleEmitter_.alphaOverLifeTime.endAlpha = GameParamEditor::GetInstance()->GetValue<float>(name_, "EndAlpha");

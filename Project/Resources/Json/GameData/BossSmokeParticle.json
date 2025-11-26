@@ -1,16 +1,16 @@
 {
-    "PlayerSmokeParticle": {
+    "BossSmokeParticle": {
         "ColorRange": {
             "Max": [
                 1.0,
-                1.0,
-                1.0,
+                0.1764705777168274,
+                0.0,
                 1.0
             ],
             "Min": [
-                1.0,
-                1.0,
-                1.0,
+                0.9509803652763367,
+                0.0,
+                0.0,
                 1.0
             ]
         },
@@ -28,44 +28,44 @@
         ],
         "FieldAcceleration": [
             0.0,
-            4.0,
+            0.0,
             0.0
         ],
-        "IsBillBoard": true,
-        "IsEnableAlphaOverLifeTime": false,
+        "IsBillBoard": false,
+        "IsEnableAlphaOverLifeTime": true,
         "IsEnableColorOverLifeTime": false,
         "IsEnableSizeOverLifeTime": true,
         "IsLoop": true,
-        "LifeTime": 2.0,
+        "LifeTime": 1.5,
         "ScaleRange": {
             "Max": [
-                0.800000011920929,
-                0.800000011920929,
-                0.800000011920929
+                1.0,
+                1.0,
+                1.0
             ],
             "Min": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        },
-        "SceneName": "ALGameScene",
-        "SpawnCoolTime": 0.10000000149011612,
-        "SpawnMaxCount": 2,
-        "SpawnRange": {
-            "Max": [
                 0.5,
                 0.5,
                 0.5
+            ]
+        },
+        "SceneName": "ALGameScene",
+        "SpawnCoolTime": 0.20000000298023224,
+        "SpawnMaxCount": 2,
+        "SpawnRange": {
+            "Max": [
+                2.5,
+                2.5,
+                2.5
             ],
             "Min": [
-                -0.5,
-                -0.5,
-                -0.5
+                -2.5,
+                -2.5,
+                -2.5
             ]
         },
         "Textures": {
-            "circle.png": 7
+            "white2x2.png": 0
         },
         "VelocityRange": {
             "Max": [

@@ -12,7 +12,7 @@ namespace GameEngine {
 	// 色の補間
 	struct ColorOverLifeTimeModule {
 		bool isEnable = false;
-		Vector3 endColor = {};
+		Vector4 endColor = {0.0f,0.0f,0.0f,1.0f};
 	};
 
 	// 透明度の補間
