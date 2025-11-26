@@ -67,6 +67,8 @@ void Player::Update() {
 	ApplyDebugParam();
 #endif
 
+	isHit_ = false;
+
 	// 状態遷移のリクエストがあった場合、切り替える処理
 	if (behaviorRequest_) {
 		// 状態を変更
@@ -239,6 +241,8 @@ void Player::DushUpdate() {
 void Player::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
 	// ヒットログを出す
 	Log("IsPlayerHit", "Player");
+
+	isHit_ = true;
 
 	knockbackSpeed_ = 30.0f;
 	hitDirection_ = Vector3(result.contactNormal.x, 0.0f, result.contactNormal.z);

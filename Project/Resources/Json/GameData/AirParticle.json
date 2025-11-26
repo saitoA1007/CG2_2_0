@@ -1,5 +1,5 @@
 {
-    "PlayerSmokeParticle": {
+    "AirParticle": {
         "ColorRange": {
             "Max": [
                 1.0,
@@ -14,7 +14,7 @@
                 1.0
             ]
         },
-        "EndAlpha": 0.0,
+        "EndAlpha": -0.12999999523162842,
         "EndColor": [
             0.0,
             0.0,
@@ -28,57 +28,58 @@
         ],
         "FieldAcceleration": [
             0.0,
-            4.0,
+            -1.0,
             0.0
         ],
         "IsBillBoard": true,
         "IsEnableAlphaOverLifeTime": false,
         "IsEnableColorOverLifeTime": false,
         "IsEnableSizeOverLifeTime": true,
-        "IsEnableVelocityFromPosition": true,
+        "IsEnableVelocityFromPosition": false,
         "IsLoop": true,
         "LifeTime": 2.0,
-        "MaxVelocity": 2.0,
-        "MinVelocity": 1.0,
+        "MaxVelocity": 0.0,
+        "MinVelocity": 0.0,
         "ScaleRange": {
             "Max": [
-                0.800000011920929,
-                0.800000011920929,
-                0.800000011920929
-            ],
-            "Min": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        },
-        "SceneName": "ALGameScene",
-        "SpawnCoolTime": 0.10000000149011612,
-        "SpawnMaxCount": 2,
-        "SpawnRange": {
-            "Max": [
-                0.5,
-                0.5,
+                0.30000001192092896,
+                0.30000001192092896,
                 0.5
             ],
             "Min": [
-                -0.5,
-                0.0,
-                -0.5
+                0.10000000149011612,
+                0.10000000149011612,
+                0.10000000149011612
+            ]
+        },
+        "SceneName": "ALGameScene",
+        "SpawnCoolTime": 0.20000000298023224,
+        "SpawnMaxCount": 8,
+        "SpawnRange": {
+            "Max": [
+                30.0,
+                10.0,
+                30.0
+            ],
+            "Min": [
+                -30.0,
+                10.0,
+                -30.0
             ]
         },
         "Textures": {
-            "circle.png": 7
+            "smoke1.png": 10,
+            "smoke2.png": 11
         },
         "VelocityRange": {
             "Max": [
                 0.0,
-                0.0,
+                -2.0,
                 0.0
             ],
             "Min": [
                 0.0,
-                0.0,
+                -6.0,
                 0.0
             ]
         }

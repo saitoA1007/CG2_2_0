@@ -48,7 +48,7 @@ private:
 	Vector3 target = {};
 
 	// 距離
-	static inline const float kDistance_ = 40.0f;
+	static inline const float kDistance_ = 60.0f;
 
 	// 回転の移動量
 	Vector2 rotateMove_ = { 3.1f,1.0f };

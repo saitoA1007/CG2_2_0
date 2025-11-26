@@ -45,6 +45,14 @@ namespace GameEngine{
 		}
 
 		/// <summary>
+		/// フィールドの速度を設定する
+		/// </summary>
+		/// <param name="acceleration"></param>
+		void SetFieldAcceleration(const Vector3& acceleration) {
+			particleEmitter_.fieldAcceleration = acceleration;
+		}
+
+		/// <summary>
 		/// 行列のデータを取得
 		/// </summary>
 		/// <returns></returns>
