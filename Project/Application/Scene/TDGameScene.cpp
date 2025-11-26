@@ -81,12 +81,18 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// 敵の攻撃管理クラス
 	enemyAttackManager_ = std::make_unique<EnemyAttackManager>();
 	// ボス敵モデルを生成
-	bossEnemyModel_ = context_->modelManager->GetNameByModel("Cube");
+	bossEnemyModel_ = context_->modelManager->GetNameByModel("Walk");
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
 	bossEnemyModel_->SetDefaultIsEnableLight(true);
 	// ボス敵クラスを初期化
 	bossEnemy_ = std::make_unique<BossEnemy>();
 	bossEnemy_->Initialize(stageManager_->GetRadius(), enemyAttackManager_.get());
+
+	// ボスのアニメーションデータを取得する
+	bossEnemyAnimationData_ = context_->animationManager->GetNameByAnimations("Walk");
+	// ボスのアニメーションの再生を管理する
+	bossEnemyAnimator_ = std::make_unique<Animator>();
+	bossEnemyAnimator_->Initialize(bossEnemyModel_, &bossEnemyAnimationData_["Armature|mixamo.com|Layer0"]);
 
 	// 氷柱のモデルを取得
 	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
@@ -143,6 +149,7 @@ void TDGameScene::Update() {
 	// 敵の移動処理
 	bossEnemy_->Update(player_->GetPlayerPos());
 	enemyAttackManager_->Update();
+	bossEnemyAnimator_->Update();
 
 	// ステージの更新処理
 	stageManager_->Update();
@@ -185,8 +192,8 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
 
 	// 敵を描画
-	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
-	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
+	//ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+	//ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
 
 	// 氷柱のモデルを描画
 	const std::list<std::unique_ptr<IceFall>>& iceFalls = enemyAttackManager_->GetIceFalls();
@@ -195,6 +202,12 @@ void TDGameScene::Draw(const bool& isDebugView) {
 			ModelRenderer::Draw(iceFallModel_, iceFall->GetWorldTransform());
 		}
 	}
+
+	// アニメーションの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
+
+	// アニメーションしているモデルを描画
+	ModelRenderer::DrawAnimationWithLight(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource());
 
 	// 氷のテスト描画
 	if (isDebugView) {
