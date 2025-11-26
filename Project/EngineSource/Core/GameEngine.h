@@ -37,6 +37,7 @@
 #include"ModelRenderer.h"
 #include"DebugRenderer.h"
 #include"AnimationManager.h"
+#include"ParticleSystem/ParticleBehavior.h"
 
 // 2D
 #include"ImGuiManager.h"
