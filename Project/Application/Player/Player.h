@@ -81,6 +81,12 @@ public:
 	/// <returns></returns>
 	Behavior GetPlayerBehavior() const { return behavior_; }
 
+	/// <summary>
+	/// ヒットフラグ
+	/// </summary>
+	/// <returns></returns>
+	bool IsHit()const { return isHit_; }
+
 private:
 
 	// 移動速度
@@ -130,6 +136,8 @@ private:
 	std::array<std::function<void()>, static_cast<size_t>(Behavior::MaxCount)> behaviorsTable_;
 	// プレイヤーが指定した状態を行うためのリセット処理
 	std::array<std::function<void()>, static_cast<size_t>(Behavior::MaxCount)> resetBehaviorParamTable_;
+
+	bool isHit_ = false;
 
 	// 移動で使用する変数 ============================
 

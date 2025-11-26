@@ -77,7 +77,7 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 
 		if (player->GetPlayerBehavior() == Player::Behavior::Jump) {
 			Log("isHitBoss");
-			hp_ -= 1;
+			//hp_ -= 1;
 			isHit_ = true;
 			if (hp_ <= 0) {
 				isAlive_ = false;

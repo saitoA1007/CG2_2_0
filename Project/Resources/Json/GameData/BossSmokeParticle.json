@@ -35,8 +35,11 @@
         "IsEnableAlphaOverLifeTime": true,
         "IsEnableColorOverLifeTime": false,
         "IsEnableSizeOverLifeTime": true,
+        "IsEnableVelocityFromPosition": false,
         "IsLoop": true,
         "LifeTime": 1.5,
+        "MaxVelocity": 0.0,
+        "MinVelocity": 0.0,
         "ScaleRange": {
             "Max": [
                 1.0,

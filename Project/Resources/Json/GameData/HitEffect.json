@@ -9,8 +9,8 @@
             ],
             "Min": [
                 0.0,
-                0.5914843082427979,
-                0.0,
+                1.0,
+                0.17134690284729004,
                 1.0
             ]
         },
@@ -35,13 +35,16 @@
         "IsEnableAlphaOverLifeTime": false,
         "IsEnableColorOverLifeTime": false,
         "IsEnableSizeOverLifeTime": true,
-        "IsLoop": true,
+        "IsEnableVelocityFromPosition": false,
+        "IsLoop": false,
         "LifeTime": 1.0,
+        "MaxVelocity": 0.0,
+        "MinVelocity": 0.0,
         "ScaleRange": {
             "Max": [
-                0.800000011920929,
-                0.800000011920929,
-                0.800000011920929
+                0.8999999761581421,
+                0.8999999761581421,
+                0.8999999761581421
             ],
             "Min": [
                 0.0,
@@ -50,7 +53,7 @@
             ]
         },
         "SceneName": "ALGameScene",
-        "SpawnCoolTime": 1.5,
+        "SpawnCoolTime": 1.0,
         "SpawnMaxCount": 32,
         "SpawnRange": {
             "Max": [

@@ -106,6 +106,13 @@ private: // シーン機能
 	// ボスの移動パーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> bossEnmeyMoveParticle_;
 
+	// 空気を演出するためのパーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> airParticle_;
+	// 空気の揺らぎを管理
+	float airTimer_ = 0.0f;
+	float maxAirTime_ = 4.0f;
+	float airSpeed_ = 2.0f;
+
 private:
 
 	/// <summary>

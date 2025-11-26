@@ -3,6 +3,7 @@
 #include"ModelRenderer.h"
 #include"SpriteRenderer.h"
 #include"GameParamEditor.h"
+#include"FPSCounter.h"
 #include"LogManager.h"
 #include<numbers>
 using namespace GameEngine;
@@ -72,10 +73,11 @@ void ALGameScene::Initialize(SceneContext* context) {
 
 	hitEffectParticle_ = std::make_unique<ParticleBehavior>();
 	hitEffectParticle_->Initialize("HitEffect", 32);
-	hitEffectParticle_->Emit({ 0.0f,0.0f,0.0f });
+	//hitEffectParticle_->Emit({ 0.0f,0.0f,0.0f });
 
 	// ボスモデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Cube");
+	bossEnemyModel_->SetDefaultIsEnableLight(true);
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
 	// ボス敵クラスを初期化
 	bossEnemy_ = std::make_unique<BossEnemy>();
@@ -85,6 +87,11 @@ void ALGameScene::Initialize(SceneContext* context) {
 	bossEnmeyMoveParticle_ = std::make_unique<ParticleBehavior>();
 	bossEnmeyMoveParticle_->Initialize("BossSmokeParticle", 32);
 	bossEnmeyMoveParticle_->Emit({ 0.0f,0.0f,0.0f });
+
+	// 空気を演出するためのパーティクル
+	airParticle_ = std::make_unique<ParticleBehavior>();
+	airParticle_->Initialize("AirParticle", 128);
+	airParticle_->Emit({ 0.0f,0.0f,0.0f });
 }
 
 void ALGameScene::Update() {
@@ -124,11 +131,23 @@ void ALGameScene::Update() {
 	// カメラの更新処理
 	mainCamera_->SetCamera(followCameraController_->GetCamera());
 
-	// ヒットエフェクトの演出
-	hitEffectParticle_->Update(mainCamera_->GetWorldMatrix());
+	airTimer_ += FpsCounter::deltaTime / maxAirTime_;
+	if (airTimer_ >= 1.0f) {
+		airParticle_->SetFieldAcceleration(Vector3(airSpeed_,-1.0f,0.0f));
+		airSpeed_ *= -1.0f;
+		airTimer_ = 0.0f;
+	}
+	// 空気を演出するためのパーティクル
+	airParticle_->Update(mainCamera_->GetWorldMatrix());
 
 	// 当たり判定の更新処理
 	UpdateCollision();
+
+	// ヒットした時のエフェクト
+	if (player_->IsHit()) {
+		hitEffectParticle_->Emit(player_->GetPlayerPos());
+	}
+	hitEffectParticle_->Update(mainCamera_->GetWorldMatrix());
 }
 
 void ALGameScene::Draw(const bool& isDebugView) {
@@ -166,14 +185,18 @@ void ALGameScene::Draw(const bool& isDebugView) {
 
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
+
 	// プレイヤーの移動パーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, playerMoveParticle_->GetCurrentNumInstance(), *playerMoveParticle_->GetWorldTransforms());
 
 	// ボスの移動パーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, bossEnmeyMoveParticle_->GetCurrentNumInstance(), *bossEnmeyMoveParticle_->GetWorldTransforms());
 
-	// ヒットエフェクトの演出
+	// ヒットエフェクトの演出の描画
 	ModelRenderer::DrawInstancing(planeModel_, hitEffectParticle_->GetCurrentNumInstance(), *hitEffectParticle_->GetWorldTransforms());
+
+	// 空気を演出するためのパーティクルを描画
+	ModelRenderer::DrawInstancing(planeModel_, airParticle_->GetCurrentNumInstance(), *airParticle_->GetWorldTransforms());
 
 #ifdef _DEBUG
 
