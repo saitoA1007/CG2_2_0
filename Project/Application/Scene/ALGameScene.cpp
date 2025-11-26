@@ -48,6 +48,10 @@ void ALGameScene::Initialize(SceneContext* context) {
 	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
 	terrainWorldTransform_.Initialize({ {30.0f,30.0f,30.0f},{0.0f,0.0f,0.0f},{0.0f,-0.2f,0.0f} });
 
+	// カメラをコントロールするクラスを初期化
+	followCameraController_ = std::make_unique<FollowCameraController>();
+	followCameraController_->Initialize();
+
 	// ライトの生成
 	sceneLightingController_ = std::make_unique<SceneLightingController>();
 	sceneLightingController_->Initialize(context_->graphicsDevice->GetDevice());
@@ -61,14 +65,14 @@ void ALGameScene::Initialize(SceneContext* context) {
 
 	// パーティクルのシステムを初期化
 	playerMoveParticle_ = std::make_unique<ParticleBehavior>();
-	playerMoveParticle_->Initialize("PlayerSmokeParticle", 32);
+	playerMoveParticle_->Initialize("PlayerSmokeParticle", 48);
 	playerMoveParticle_->Emit({ 0.0f,0.0f,0.0f });
 	// 平面モデル
 	planeModel_ = context_->modelManager->GetNameByModel("Plane");
 
-	// カメラをコントロールするクラスを初期化
-	followCameraController_ = std::make_unique<FollowCameraController>();
-	followCameraController_->Initialize();
+	hitEffectParticle_ = std::make_unique<ParticleBehavior>();
+	hitEffectParticle_->Initialize("HitEffect", 32);
+	hitEffectParticle_->Emit({ 0.0f,0.0f,0.0f });
 
 	// ボスモデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Cube");
@@ -102,7 +106,7 @@ void ALGameScene::Update() {
 	player_->SetRotateMatrix(followCameraController_->GetRotateMatrix());
 	player_->Update();
 	// パーティクルの更新処理
-	playerMoveParticle_->Emit(player_->GetPlayerPos());
+	playerMoveParticle_->SetEmitterPos(player_->GetPlayerPos());
 	playerMoveParticle_->Update(mainCamera_->GetWorldMatrix());
 
 	// カメラコントロールの更新処理
@@ -114,11 +118,14 @@ void ALGameScene::Update() {
 	bossEnemy_->Update();
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,bossEnemy_->GetAlpha() });
 	// ボスの移動パーティクル
-	bossEnmeyMoveParticle_->Emit(bossEnemy_->GetPosition());
+	bossEnmeyMoveParticle_->SetEmitterPos(bossEnemy_->GetPosition());
 	bossEnmeyMoveParticle_->Update(mainCamera_->GetWorldMatrix());
 
 	// カメラの更新処理
 	mainCamera_->SetCamera(followCameraController_->GetCamera());
+
+	// ヒットエフェクトの演出
+	hitEffectParticle_->Update(mainCamera_->GetWorldMatrix());
 
 	// 当たり判定の更新処理
 	UpdateCollision();
@@ -164,6 +171,9 @@ void ALGameScene::Draw(const bool& isDebugView) {
 
 	// ボスの移動パーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, bossEnmeyMoveParticle_->GetCurrentNumInstance(), *bossEnmeyMoveParticle_->GetWorldTransforms());
+
+	// ヒットエフェクトの演出
+	ModelRenderer::DrawInstancing(planeModel_, hitEffectParticle_->GetCurrentNumInstance(), *hitEffectParticle_->GetWorldTransforms());
 
 #ifdef _DEBUG
 

@@ -28,6 +28,8 @@ namespace GameEngine {
 		SizeOverLifeTimeModule sizeOverLifeTime;   // 大きさの補間
 		ColorOverLifeTimeModule colorOverLifeTime; // 色の補間
 		AlphaOverLifeTimeModule alphaOverLifeTime; // 透明度の補間
+
+		VelocityFromPosition velocityFromPosition; // 生成位置から速度を求める
 	};
 
 	// パーティクルデータ

@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include"ParticleBehavior.h"
 #include"FPSCounter.h"
 #include"RandomGenerator.h"
@@ -78,12 +79,22 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     RandomGenerator::Get(particleEmitter_.posRange.min.z, particleEmitter_.posRange.max.z),
     };
     tmpParticleData.transform.translate += emitterPos_;
-    // 速度
-    tmpParticleData.velocity = {
-    RandomGenerator::Get(particleEmitter_.velocityRange.min.x, particleEmitter_.velocityRange.max.x),
-    RandomGenerator::Get(particleEmitter_.velocityRange.min.y, particleEmitter_.velocityRange.max.y),
-    RandomGenerator::Get(particleEmitter_.velocityRange.min.z, particleEmitter_.velocityRange.max.z), 
-    };
+
+    if (particleEmitter_.velocityFromPosition.isEnable) {
+        // 方向を求める
+        Vector3 dir = tmpParticleData.transform.translate - emitterPos_;
+        dir = Normalize(dir);
+        // 速度
+        tmpParticleData.velocity = dir * RandomGenerator::Get(particleEmitter_.velocityFromPosition.minVelocity, particleEmitter_.velocityFromPosition.maxVelocity);
+    } else {
+        // 速度
+        tmpParticleData.velocity = {
+        RandomGenerator::Get(particleEmitter_.velocityRange.min.x, particleEmitter_.velocityRange.max.x),
+        RandomGenerator::Get(particleEmitter_.velocityRange.min.y, particleEmitter_.velocityRange.max.y),
+        RandomGenerator::Get(particleEmitter_.velocityRange.min.z, particleEmitter_.velocityRange.max.z),
+        };
+    }
+
     // 色
     tmpParticleData.color = { 
     RandomGenerator::Get(particleEmitter_.colorRange.min.x, particleEmitter_.colorRange.max.x),
@@ -206,6 +217,10 @@ void ParticleBehavior::RegisterBebugParam() {
 
     GameParamEditor::GetInstance()->AddItem(name_, "IsEnableAlphaOverLifeTime", particleEmitter_.alphaOverLifeTime.isEnable, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "EndAlpha", particleEmitter_.alphaOverLifeTime.endAlpha, index++);
+
+    GameParamEditor::GetInstance()->AddItem(name_, "IsEnableVelocityFromPosition", particleEmitter_.velocityFromPosition.isEnable, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "MinVelocity", particleEmitter_.velocityFromPosition.minVelocity, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "MaxVelocity", particleEmitter_.velocityFromPosition.maxVelocity, index++);
 }
 
 void ParticleBehavior::ApplyDebugParam() {
@@ -229,6 +244,12 @@ void ParticleBehavior::ApplyDebugParam() {
 
     particleEmitter_.alphaOverLifeTime.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableAlphaOverLifeTime");
     particleEmitter_.alphaOverLifeTime.endAlpha = GameParamEditor::GetInstance()->GetValue<float>(name_, "EndAlpha");
+
+    particleEmitter_.velocityFromPosition.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableVelocityFromPosition");
+    particleEmitter_.velocityFromPosition.minVelocity = GameParamEditor::GetInstance()->GetValue<float>(name_, "MinVelocity");
+    particleEmitter_.velocityFromPosition.maxVelocity = GameParamEditor::GetInstance()->GetValue<float>(name_, "MaxVelocity");
+    // 最小範囲が最大範囲を超えないようにする
+    particleEmitter_.velocityFromPosition.minVelocity = std::min(particleEmitter_.velocityFromPosition.minVelocity, particleEmitter_.velocityFromPosition.maxVelocity);
 
     // 出現範囲を抑える
     if (maxNumInstance_ <= particleEmitter_.spawnMaxCount) {
