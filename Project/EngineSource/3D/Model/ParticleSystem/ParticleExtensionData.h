@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector3.h"
+#include"Range.h"
 
 namespace GameEngine {
 
@@ -19,5 +20,12 @@ namespace GameEngine {
 	struct AlphaOverLifeTimeModule {
 		bool isEnable = false;
 		float endAlpha = 0.0f;
+	};
+
+	// 生成位置から速度を求める
+	struct VelocityFromPosition {
+		bool isEnable = false;
+		float minVelocity = 0.0f;
+		float maxVelocity = 0.0f;
 	};
 }
