@@ -6,6 +6,12 @@
 #include"MyMath.h"
 using namespace GameEngine;
 
+TextureManager* ParticleBehavior::textureManager_ = nullptr;
+
+void ParticleBehavior::StatcInitialize(TextureManager* textureManager) {
+    textureManager_ = textureManager;
+}
+
 void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum) {
     maxNumInstance_ = maxNum;
     name_ = name;
@@ -30,12 +36,6 @@ void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum) {
 #endif
     // 保存したデータを取得する
     ApplyDebugParam();
-
-    // テクスチャが設定されていなければ初期画像を入れる
-    if (particleEmitter_.textures_.size() <= 0) {
-        // 初期画像を設定
-        particleEmitter_.textures_["white2x2.png"] = 0;
-    }
 }
 
 void ParticleBehavior::Update(const Matrix4x4& cameraMatrix) {
@@ -100,7 +100,8 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     tmpParticleData.startAlpha = tmpParticleData.color.w;
     // テクスチャを設定
     if (particleEmitter_.textures_.size() == 0) {
-        tmpParticleData.textureHandle = 0;
+        // 何もない場合、エラーカラーを入れる
+        tmpParticleData.textureHandle = 1;
     } else {
         uint32_t index = RandomGenerator::Get(static_cast<uint32_t>(0),static_cast<uint32_t>(particleEmitter_.textures_.size()-1));
         auto it = std::next(particleEmitter_.textures_.begin(), index);
@@ -234,9 +235,10 @@ void ParticleBehavior::ApplyDebugParam() {
         particleEmitter_.spawnMaxCount = maxNumInstance_;
     }
 
-    // テクスチャが設定されていなければ初期画像を入れる
-    if (particleEmitter_.textures_.size() > 0) {
-        // 初期画像を設定
-        particleEmitter_.textures_.erase("white2x2.png");
+    if (particleEmitter_.textures_.size() >= 1) {
+        // 画像名からハンドルを取得
+        for (auto& it : particleEmitter_.textures_) {
+            it.second = textureManager_->GetHandleByName(it.first);
+        }
     }
 }

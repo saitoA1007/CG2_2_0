@@ -150,7 +150,7 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
 
 	// 複数モデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
+	ModelRenderer::PreDraw(RenderMode3D::Instancing);
 	// パーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, playerMoveParticle_->GetCurrentNumInstance(), *playerMoveParticle_->GetWorldTransforms());
 

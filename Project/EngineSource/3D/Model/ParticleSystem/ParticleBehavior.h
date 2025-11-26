@@ -2,12 +2,19 @@
 #include"ParticleData.h"
 #include "Matrix4x4.h"
 #include "WorldTransforms.h"
+#include"TextureManager.h"
 #include <vector>
 
 namespace GameEngine{
 
 	class ParticleBehavior {
 	public:
+
+		/// <summary>
+		/// 静的初期化
+		/// </summary>
+		/// <param name="textureManager"></param>
+		static void StatcInitialize(TextureManager* textureManager);
 
 		/// <summary>
 		/// 初期化
@@ -53,6 +60,9 @@ namespace GameEngine{
 		void SetParticleEmitter(const ParticelEmitter& particelEmitter) { particleEmitter_ = particelEmitter; }
 
 	private:
+
+		static TextureManager* textureManager_;
+
 		// パーティクルの配列
 		std::vector<ParticleData> particles_;           
 		// 描画用のトランスフォーム
