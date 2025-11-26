@@ -189,6 +189,15 @@ private:
 				});
 		}
 
+		void operator()(const std::map<std::string, uint32_t>& value) const {
+			json j = json::object();
+			// キーと値をそのまま入れる
+			for (const auto& [key, val] : value) {
+				j[key] = val;  
+			}
+			jsonData = j;
+		}
+
 		void operator()(const Vector4& value) const {
 			jsonData = json::array({ value.x, value.y, value.z,value.w });
 		}

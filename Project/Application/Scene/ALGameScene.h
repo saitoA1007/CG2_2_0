@@ -92,8 +92,7 @@ private: // シーン機能
 	GameEngine::Model* planeModel_;
 	// プレイやーの移動パーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> playerMoveParticle_;
-	uint32_t smokeGH_ = 0;
-
+	
 	// カメラコントローラークラス
 	std::unique_ptr<FollowCameraController> followCameraController_;
 
