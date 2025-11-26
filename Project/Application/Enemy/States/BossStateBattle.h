@@ -102,21 +102,12 @@ private:
 
 	// 氷柱落とし =============================
 
-	// 時間
-	float iceFallTimer_ = 0.0f;
-	float maxIceFallTime_ = 3.0f;
+	uint32_t tmpIndex = 0;
 
-	// 移動する位置
-	Vector3 startIceFall_ = {};
-	Vector3 endIceFall_ = {};
+	// 氷柱を出すまでの時間
+	float waitTimer_ = 0.0f;
+	float maxWaitTime_ = 2.0f;
 
-	// 飛ぶ最大の高さ
-	float iceFallHeight = 8.0f;
-	float iceFallHeightTimer_ = 0.0f;
-
-	// 落とす時間
-	float fallTime_ = 0.0f;
-	// 氷柱を落とすフラグ
 	bool isActiveIceFall_ = false;
 
 private: // 各振る舞いの処理
