@@ -144,6 +144,9 @@ void TDGameScene::Update() {
 	bossEnemy_->Update(player_->GetPlayerPos());
 	enemyAttackManager_->Update();
 
+	// ステージの更新処理
+	stageManager_->Update();
+
 	// 当たり判定の更新処理
 	UpdateCollision();
 

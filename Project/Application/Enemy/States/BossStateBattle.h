@@ -178,4 +178,6 @@ namespace {
 	float GetMoveTimeDistance(float startAngle, float endAngle, float radius, float speed);
 
 	float EaseOutQuart(float t);
+
+	float EaseInBack(float t);
 }

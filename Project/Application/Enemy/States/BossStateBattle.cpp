@@ -102,7 +102,7 @@ void BossStateBattle::NormalUpdate() {
 
 	// 元の場所に戻る
 	backTimer_ += FpsCounter::deltaTime / backMaxTime_;
-	Vector3 tmpPos = Lerp(startBackPos_, endBackPos_, backTimer_);
+	Vector3 tmpPos = Lerp(startBackPos_, endBackPos_, EaseInBack(backTimer_));
 
 	// 移動処理
 	bossContext_.worldTransform->transform_.translate = tmpPos;
@@ -170,7 +170,7 @@ void BossStateBattle::RushAttackUpdate() {
 		}
 
 		// 角度補間する
-		float angle = LerpShortAngle(startAngle_, endAngle_, rotMoveTimer_);
+		float angle = LerpShortAngle(startAngle_, endAngle_, EaseInOut(rotMoveTimer_));
 		// 位置を求める
 		Vector3 pos = {std::cosf(angle) * stageRadius_, bossContext_.worldTransform->transform_.translate.y,std::sinf(angle) * stageRadius_};
 
@@ -188,13 +188,13 @@ void BossStateBattle::RushAttackUpdate() {
 		// y軸の動き
 		float tmpPosY = size_.y * 0.5f;
 		if (fallTimer_ <= 1.0f) {
-			fallTimer_ += FpsCounter::deltaTime / (rushMaxTime_ / 3);
+			fallTimer_ += FpsCounter::deltaTime / ((rushMaxTime_ * 3.0f) / 3.0f);
 			tmpPosY = Lerp(startRushPos_.y, size_.y * 0.5f, EaseOutQuart(fallTimer_));
 		}
 
 		// 突進移動
 		rushTimer_ += FpsCounter::deltaTime / rushMaxTime_;
-		Vector3 tmpPos = Lerp(startRushPos_, endRushPos_, rushTimer_);
+		Vector3 tmpPos = Lerp(startRushPos_, endRushPos_, EaseIn(rushTimer_));
 
 		// 移動処理
 		bossContext_.worldTransform->transform_.translate = { tmpPos.x,tmpPosY,tmpPos.z };
@@ -288,6 +288,12 @@ namespace {
 	}
 
 	float EaseOutQuart(float t) {
-		return 1 - std::powf(1 - t, 4);
+		return 1 - std::powf(1 - t, 3);
+	}
+
+	float EaseInBack(float t) {
+		const float c1 = 1.70158f;
+		const float c3 = c1 + 1;
+		return c3 * t * t * t - c1 * t * t;
 	}
 }
