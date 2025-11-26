@@ -15,7 +15,7 @@ namespace GameEngine{
 		/// <param name="maxNum"></param>
 		/// <param name="textureHandle"></param>
 		/// <param name="particleEmitter"></param>
-		void Initialize(const std::string& name,uint32_t maxNum, uint32_t textureHandle);
+		void Initialize(const std::string& name,uint32_t maxNum);
 
 		/// <summary>
 		/// 更新処理

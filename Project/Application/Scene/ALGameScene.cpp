@@ -60,9 +60,8 @@ void ALGameScene::Initialize(SceneContext* context) {
 	player_->Initialize(context_->inputCommand);
 
 	// パーティクルのシステムを初期化
-	smokeGH_ = context_->textureManager->GetHandleByName("circle.png");
 	playerMoveParticle_ = std::make_unique<ParticleBehavior>();
-	playerMoveParticle_->Initialize("PlayerSmokeParticle", 16, smokeGH_);
+	playerMoveParticle_->Initialize("PlayerSmokeParticle", 32);
 	playerMoveParticle_->Emit({ 0.0f,0.0f,0.0f });
 	// 平面モデル
 	planeModel_ = context_->modelManager->GetNameByModel("Plane");
@@ -98,7 +97,7 @@ void ALGameScene::Update() {
 	player_->SetRotateMatrix(followCameraController_->GetRotateMatrix());
 	player_->Update();
 	// パーティクルの更新処理
-	//playerMoveParticle_->Emit(player_->GetPlayerPos());
+	playerMoveParticle_->Emit(player_->GetPlayerPos());
 	playerMoveParticle_->Update(mainCamera_->GetWorldMatrix());
 
 	// カメラコントロールの更新処理
@@ -151,7 +150,7 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
 
 	// 複数モデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::Instancing);
+	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
 	// パーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, playerMoveParticle_->GetCurrentNumInstance(), *playerMoveParticle_->GetWorldTransforms());
 

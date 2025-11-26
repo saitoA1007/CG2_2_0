@@ -14,14 +14,28 @@
                 1.0
             ]
         },
+        "EndAlpha": 0.0,
+        "EndColor": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "EndSize": [
+            0.0,
+            0.0,
+            0.0
+        ],
         "FieldAcceleration": [
             0.0,
             3.200000047683716,
             0.0
         ],
         "IsBillBoard": true,
+        "IsEnableAlphaOverLifeTime": false,
+        "IsEnableColorOverLifeTime": false,
+        "IsEnableSizeOverLifeTime": true,
         "IsLoop": true,
-        "LifeTime": 2.0,
+        "LifeTime": 3.0,
         "ScaleRange": {
             "Max": [
                 0.5,
@@ -48,6 +62,9 @@
                 -0.5,
                 -0.5
             ]
+        },
+        "Textures": {
+            "circle.png": 6
         },
         "VelocityRange": {
             "Max": [

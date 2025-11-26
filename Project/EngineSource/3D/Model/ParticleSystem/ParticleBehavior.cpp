@@ -6,7 +6,7 @@
 #include"MyMath.h"
 using namespace GameEngine;
 
-void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum, uint32_t textureHandle) {
+void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum) {
     maxNumInstance_ = maxNum;
     name_ = name;
 
@@ -24,15 +24,18 @@ void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum, uint3
         particle.lifeTime = 0.0f;
     }
 
-    // 初期画像を設定
-    particleEmitter_.textures_["circle.png"] = textureHandle;
-
 #ifdef _DEBUG
     // パラメータを登録する
     RegisterBebugParam();
 #endif
     // 保存したデータを取得する
     ApplyDebugParam();
+
+    // テクスチャが設定されていなければ初期画像を入れる
+    if (particleEmitter_.textures_.size() <= 0) {
+        // 初期画像を設定
+        particleEmitter_.textures_["white2x2.png"] = 0;
+    }
 }
 
 void ParticleBehavior::Update(const Matrix4x4& cameraMatrix) {
@@ -229,5 +232,11 @@ void ParticleBehavior::ApplyDebugParam() {
     // 出現範囲を抑える
     if (maxNumInstance_ <= particleEmitter_.spawnMaxCount) {
         particleEmitter_.spawnMaxCount = maxNumInstance_;
+    }
+
+    // テクスチャが設定されていなければ初期画像を入れる
+    if (particleEmitter_.textures_.size() > 0) {
+        // 初期画像を設定
+        particleEmitter_.textures_.erase("white2x2.png");
     }
 }
