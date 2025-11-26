@@ -12,6 +12,10 @@ Vector3 Lerp(const Vector3& start, const Vector3& end, const float& t) {
 	return Vector3(start.x + t * (end.x - start.x), start.y + t * (end.y - start.y) ,start.z + t * (end.z - start.z));
 }
 
+Vector4 Lerp(const Vector4& start, const Vector4& end, const float& t) {
+	return Vector4(start.x + t * (end.x - start.x), start.y + t * (end.y - start.y), start.z + t * (end.z - start.z), start.w + t * (end.w - start.w));
+}
+
 Quaternion Lerp(const Quaternion& start, const Quaternion& end, const float& t) {
 	return Quaternion(start.x + t * (end.x - start.x), start.y + t * (end.y - start.y), start.z + t * (end.z - start.z), start.w + t * (end.w - start.w));
 }

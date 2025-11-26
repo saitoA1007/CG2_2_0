@@ -15,6 +15,8 @@ public:
 	/// </summary>
 	void Update();
 
+public:
+
 	/// <summary>
 	/// ワールド行列を取得
 	/// </summary>
@@ -44,6 +46,12 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	float GetAlpha() const { return alpha_; }
+
+	/// <summary>
+	/// ワールド座標を取得する
+	/// </summary>
+	/// <returns></returns>
+	Vector3 GetPosition() const { return worldTransform_.GetWorldPosition(); }
 
 private:
 

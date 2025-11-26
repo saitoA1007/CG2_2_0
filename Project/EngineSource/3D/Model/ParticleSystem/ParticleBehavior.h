@@ -36,6 +36,15 @@ namespace GameEngine{
 		void Emit(const Vector3& pos);
 
 		/// <summary>
+		/// 速度を設定
+		/// </summary>
+		/// <param name="velocity"></param>
+		void SetVelocity(const Vector3& velocity) {
+			particleEmitter_.velocityRange.min = velocity;
+			particleEmitter_.velocityRange.max = velocity;
+		}
+
+		/// <summary>
 		/// 行列のデータを取得
 		/// </summary>
 		/// <returns></returns>

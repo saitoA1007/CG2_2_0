@@ -87,7 +87,10 @@ namespace GameEngine {
 		}
 
 		void operator()(std::map<std::string, uint32_t>& value) const {
-			InspectorWindow::EditTexutre(value);
+			if (ImGui::TreeNode(itemName.c_str())) {
+				InspectorWindow::EditTexutre(value);
+				ImGui::TreePop();
+			}
 		}
 
 		// 対応出来ない型がきた場合の処理
