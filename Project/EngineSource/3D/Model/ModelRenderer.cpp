@@ -192,6 +192,46 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 	}
 }
 
+void ModelRenderer::DrawAnimationWithLight(const Model* model, WorldTransform& worldTransform, ID3D12Resource* lightGroupResource, const Material* material) {
+	// カメラ座標に変換
+	worldTransform.SetWVPMatrix(vpMatrix_);
+
+	// メッシュを取得
+	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
+
+	for (uint32_t i = 0; i < meshes.size(); ++i) {
+
+		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
+			meshes[i]->GetVertexBufferView(),
+			model->skinClusterBron_->influenceBufferView
+		};
+
+		commandList_->IASetVertexBuffers(0, 2, vbvs);
+		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		// マテリアルが設定されていなければデフォルトのマテリアルを使う
+		if (material == nullptr) {
+			// マテリアルを設定
+			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
+		} else {
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+		}
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+		commandList_->SetGraphicsRootDescriptorTable(3, model->skinClusterBron_->paletteSrvHandle.second);
+		commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(5, cameraResource_->GetGPUVirtualAddress());
+
+		if (meshes[i]->GetTotalIndices() != 0) {
+			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
+		} else {
+			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), 1, 0, 0);
+		}
+	}
+}
+
 void ModelRenderer::DrawGrid(const Model* model, WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* cameraResource) {
 
 	worldTransform.SetWVPMatrix(VPMatrix);

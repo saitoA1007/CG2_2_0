@@ -92,6 +92,14 @@ namespace GameEngine {
 		static void DrawAnimation(const Model* model, WorldTransform& worldTransform, const Material* material = nullptr);
 
 		/// <summary>
+		/// アニメーションのあるモデルを描画。ライトあり。
+		/// </summary>
+		/// <param name="model"></param>
+		/// <param name="worldTransform"></param>
+		/// <param name="material"></param>
+		static void DrawAnimationWithLight(const Model* model, WorldTransform& worldTransform, ID3D12Resource* lightGroupResource, const Material* material = nullptr);
+
+		/// <summary>
 		/// モデルに光源を適応させる
 		/// </summary>
 		/// <param name="directionalLightResource"></param>

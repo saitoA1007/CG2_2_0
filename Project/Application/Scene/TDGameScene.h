@@ -9,6 +9,7 @@
 #include"DebugRenderer.h"
 #include"CollisionManager.h"
 #include"Extension/CustomMaterial/IceMaterial.h"
+#include"Animator.h"
 
 // アプリ機能をインクルード
 #include"Application/Player/Player.h"
@@ -103,6 +104,11 @@ private: // シーン機能
 	GameEngine::Model* bossEnemyModel_;
 	// ボス敵
 	std::unique_ptr<BossEnemy> bossEnemy_;
+
+	// ボスのアニメーションデータ
+	std::map<std::string, AnimationData> bossEnemyAnimationData_;
+	// ボスのアニメーションを再生するクラス
+	std::unique_ptr<GameEngine::Animator> bossEnemyAnimator_;
 
 	// ボスの遠距離攻撃管理クラス
 	std::unique_ptr<EnemyAttackManager> enemyAttackManager_;

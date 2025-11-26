@@ -20,7 +20,7 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
     enemyAttackManager_->SetStageRadius(stageRadius);
 
     // ワールド行列を初期化
-    worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+    worldTransform_.Initialize({ {5.0f,5.0f,5.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
     // コンテキストの設定
     bossContext_.worldTransform = &worldTransform_;
