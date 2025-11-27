@@ -70,6 +70,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
 
+	// プレイヤーの影
+	playerShadow_ = std::make_unique<PlaneProjectionShadow>();
+	playerShadow_->Initialize(&player_->GetWorldTransform());
+
 	// 壁衝突時のカメラシェイク設定
 	player_->SetOnWallHit([this]() {
 		// 強度と時間は調整可能
@@ -93,6 +97,9 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// ボスのアニメーションの再生を管理する
 	bossEnemyAnimator_ = std::make_unique<Animator>();
 	bossEnemyAnimator_->Initialize(bossEnemyModel_, &bossEnemyAnimationData_["Armature|mixamo.com|Layer0"]);
+	// ボスの影
+	bossEnemyShadow_ = std::make_unique<PlaneProjectionShadow>();
+	bossEnemyShadow_->Initialize(&bossEnemy_->GetWorldTransform());
 
 	// 氷柱のモデルを取得
 	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
@@ -153,6 +160,8 @@ void TDGameScene::Update() {
 
 	// プレイヤーの更新処理
 	player_->Update(context_->inputCommand, cameraController_->GetCamera());
+	// プレイヤーの影の更新処理
+	playerShadow_->Update();
 
 	// ロックオン: 入力が有効ならプレイヤーとボスの位置をターゲットに設定
 	if (context_->inputCommand->IsCommandActive("LockOnBoss")) {
@@ -189,6 +198,8 @@ void TDGameScene::Update() {
 	bossEnemy_->Update(player_->GetPlayerPos());
 	enemyAttackManager_->Update();
 	bossEnemyAnimator_->Update();
+	// 敵の影の更新処理
+	bossEnemyShadow_->Update();
 
 	// ステージの更新処理
 	//stageManager_->Update();
@@ -229,10 +240,8 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// プレイヤーを描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
-
-	// 敵を描画
-	//ModelRenderer::DrawLight(sceneLightingController_->GetResource());
-	//ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
+	// プレイヤーの影描画
+	ModelRenderer::Draw(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
 
 	// 氷柱のモデルを描画
 	const std::list<std::unique_ptr<IceFall>>& iceFalls = enemyAttackManager_->GetIceFalls();
@@ -245,8 +254,10 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// アニメーションの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 
-	// アニメーションしているモデルを描画
+	// 敵を描画
 	ModelRenderer::DrawAnimationWithLight(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource());
+	// 敵の影を描画する
+	ModelRenderer::DrawAnimation(bossEnemyModel_, bossEnemyShadow_->GetWorldTransform(), &bossEnemyShadow_->GetMaterial());
 
 	// 氷のテスト描画
 	if (isDebugView) {
