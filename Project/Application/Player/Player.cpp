@@ -299,24 +299,37 @@ void Player::OnCollision(const CollisionResult &result) {
 	// 通常時の壁との衝突: めり込み分だけ押し戻す（XZ 平面）
 	if (isWall && !isRushing_) {
 		Vector3 n = result.contactNormal;
+		// XZ 成分のみを使って反射を計算
 		Vector3 nXZ = { n.x, 0.0f, n.z };
 		if (nXZ.x != 0.0f || nXZ.z != 0.0f) { nXZ = Normalize(nXZ); }
+		// めり込み分だけ押し戻す
 		float depth = std::max(result.penetrationDepth, 0.0f);
 		Vector3 correction = { nXZ.x * depth, 0.0f, nXZ.z * depth };
 		worldTransform_.transform_.translate.x += correction.x;
 		worldTransform_.transform_.translate.z += correction.z;
-		// 速度の壁方向成分を除去して連続めり込みを防止
+
+		// 水平方向の速度を反射（光の反射のように）
 		Vector3 velXZ = { velocity_.x, 0.0f, velocity_.z };
 		float dot = velXZ.x * nXZ.x + velXZ.z * nXZ.z;
+		// 進行方向が壁に向かっている場合のみ反射を行う
 		if (dot < 0.0f) {
-			velXZ.x -= nXZ.x * dot;
-			velXZ.z -= nXZ.z * dot;
-			velocity_.x = velXZ.x;
-			velocity_.z = velXZ.z;
+			Vector3 reflected = {
+				velXZ.x - 2.0f * dot * nXZ.x,
+				0.0f,
+				velXZ.z - 2.0f * dot * nXZ.z
+			};
+			velocity_.x = reflected.x;
+			velocity_.z = reflected.z;
+			// 反射した向きを移動方向として保存（正規化）
+			Vector3 newDir = { reflected.x, 0.0f, reflected.z };
+			float len = Length(newDir);
+			if (len > 0.00001f) {
+				lastMoveDir_ = Normalize(newDir);
+			}
 		}
 		// コライダー位置も同期
 		if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
-        return;
+		return;
 	}
 
 	//==================================================
