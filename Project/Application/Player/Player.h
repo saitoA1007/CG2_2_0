@@ -63,9 +63,9 @@ private:
 
 	const std::vector<std::string> kGroupNames = {
 		"Player",
-		"Player/Rush",
-		"Player/WallBounce",
-		"Player/Attack",
+		"Player-Rush",
+		"Player-WallBounce",
+		"Player-Attack",
 	};
 
 	// ジャンプの高さ
