@@ -40,6 +40,7 @@ void RendererManager::EndFrame(ImGuiManager* imGuiManager) {
     auto rtvHandle = graphicsDevice_->GetSwapChainRTVHandle(backBufferIndex);
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = graphicsDevice_->GetDSVHeap()->GetCPUDescriptorHandleForHeapStart();
     graphicsDevice_->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
+    graphicsDevice_->GetCommandList()->ClearRenderTargetView(rtvHandle, clearColor_, 0, nullptr);
 
     // ビューポート、シザーを設定
     graphicsDevice_->GetCommandList()->RSSetViewports(1, &graphicsDevice_->GetViewport());
