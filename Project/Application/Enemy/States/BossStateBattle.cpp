@@ -176,6 +176,10 @@ void BossStateBattle::ResetRush() {
 	rot = LerpShortAngle(startAngle_, endAngle_, EaseInOut(1.0f));
 	prePos = { std::cosf(rot) * stageRadius_, bossContext_.worldTransform->transform_.translate.y,std::sinf(rot) * stageRadius_ };
 	endDir_ = Normalize(prePos*-1.0f);
+
+	// 上下移動する回数を求める
+	float angleDiff = std::fabs(endAngle_ - startAngle_);
+	cycleCount_ = angleDiff / 0.4f;
 }
 
 void BossStateBattle::RushAttackUpdate() {
@@ -190,10 +194,24 @@ void BossStateBattle::RushAttackUpdate() {
 
 		// 移動
 #pragma region Move
+
+		// 縦移動
+		float posY = 0.0f;
+		float totalCycle = rotMoveTimer_ * cycleCount_;
+		float localTimer = std::fmodf(totalCycle,1.0f);
+
+		if (localTimer <= 0.5f) {
+			float t = localTimer / 0.5f;
+			posY = Lerp(defalutPosY_, defalutPosY_ + 2.0f, EaseInOut(t));
+		} else {
+			float t = (localTimer - 0.5f) / 0.5f;
+			posY = Lerp(defalutPosY_ + 2.0f, defalutPosY_, EaseInOut(t));
+		}
+
 		// 角度補間する
 		float angle = LerpShortAngle(startAngle_, endAngle_, EaseInOut(rotMoveTimer_));
 		// 位置を求める
-		Vector3 pos = {std::cosf(angle) * stageRadius_, bossContext_.worldTransform->transform_.translate.y,std::sinf(angle) * stageRadius_};
+		Vector3 pos = {std::cosf(angle) * stageRadius_, posY,std::sinf(angle) * stageRadius_};
 
 		// 移動
 		bossContext_.worldTransform->transform_.translate = pos;
