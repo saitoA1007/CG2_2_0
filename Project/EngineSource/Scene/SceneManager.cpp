@@ -124,6 +124,9 @@ void SceneManager::LoadModelData() {
 	// モデルの接線を取得する
 	GameEngine::Model* planeModel = context_->modelManager->GetNameByModel("PlaneXZ");
 	planeModel->normalMapData_ = Model::CreateNormalMapData("planeXZ.obj","PlaneXZ");
+
+	GameEngine::Model* exteriorPlaneModel = context_->modelManager->GetNameByModel("ExteriorPlane");
+	exteriorPlaneModel->normalMapData_ = Model::CreateNormalMapData("exteriorPlane.obj", "ExteriorPlane");
 }
 
 void SceneManager::LoadSpriteData() {
