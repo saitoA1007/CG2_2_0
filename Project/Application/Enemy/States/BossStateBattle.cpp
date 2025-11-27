@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include"BossStateBattle.h"
 #include"Application/Enemy/BossState.h"
 #include"MyMath.h"
@@ -7,7 +8,9 @@
 #include"LogManager.h"
 using namespace GameEngine;
 
-BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius) : bossContext_(context) {
+BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius, GameEngine::DebugRenderer* debugRenderer) : bossContext_(context) {
+
+	debugRenderer_ = debugRenderer;
 
 	// ステージの半径を取得
 	stageRadius_ = stageRadius;
@@ -129,6 +132,9 @@ void BossStateBattle::NormalUpdate() {
 }
 
 void BossStateBattle::ResetRush() {
+	
+	// 移動するための角度を求める
+#pragma region MakeRotate
 	// 円の中心からプレイヤーへのベクトルを求める
 	Vector3 tmpTarget = Normalize(Vector3(bossContext_.targetPos.x, 0.0f, bossContext_.targetPos.z));
 	Vector3 targetDir = tmpTarget;
@@ -139,60 +145,103 @@ void BossStateBattle::ResetRush() {
 	float tmpAngle = std::atan2f(targetDir.z, targetDir.x);
 	endRushPos_ = {std::cosf(tmpAngle)* (stageRadius_ + offsetEndRush_),0.0f,std::sinf(tmpAngle)* (stageRadius_ + offsetEndRush_) };
 	
+	// 移動する角度
+	float startAngle = 0.0f;
+	float endAngle = 0.0f;
 	// 反転する
 	targetDir = targetDir * -1.0f;
 	// 反対側の角度を求める
-	endAngle_ = std::atan2f(targetDir.z, targetDir.x);
+	endAngle = std::atan2f(targetDir.z, targetDir.x);
 
 	// 円の中心から自分へのベクトルを求める
 	Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
 	// 最初の角度を求める
-	startAngle_ = std::atan2f(myDir.z, myDir.x);
+	startAngle = std::atan2f(myDir.z, myDir.x);
+#pragma endregion
+
+	// 回転移動の位置と時間を求める
+#pragma region MakeRotateMovePos
+	float maxR = 0.0f;
 
 	// 回る時間を求める
-	if (startAngle_ == endAngle_) {
+	if (startAngle == endAngle) {
 		rotMoveTimer_ = 1.0f;
 		rotMaxMoveTime_ = 0.0f;
 	} else {
-		rotMaxMoveTime_ = GetMoveTimeDistance(startAngle_, endAngle_, stageRadius_, rotSpeed_);
+		rotMaxMoveTime_ = GetMoveTimeDistance(startAngle, endAngle, stageRadius_, rotSpeed_);
+		maxR = rotMaxMoveTime_ * rotMaxMoveTime_;
 	}
+
+	float r = 0.0f;
+	controlPoints_.clear();
+	controlPoints_.push_back(bossContext_.worldTransform->transform_.translate);
+	float t = 0.0f;
+
+	while (t <= 1.0f)
+	{
+		if (t <= 0.8f) {
+			t += 0.02f;
+		} else {
+			t += 0.01f;
+		}
+
+		// 角度補間する
+		float angle = LerpShortAngle(startAngle, endAngle, t);
+
+		if (t >= 0.4f && t < 0.8f) {
+
+			float localT = (t - 0.4f) / 0.4f;
+			r = Lerp(0.0f, maxR, EaseIn(localT));
+		} else if (t >= 0.8f) {
+			float localT = (t - 0.8f) / 0.2f;
+			r = Lerp(maxR, 0.0f, EaseIn(localT));
+		}
+
+		// 位置を求める
+		Vector3 pos = { std::cosf(angle) * (stageRadius_ + r), bossContext_.worldTransform->transform_.translate.y + r * 0.2f,std::sinf(angle) * (stageRadius_ + r) };
+
+		controlPoints_.push_back(pos);
+	}
+#pragma endregion
 
 	// 時間をリセット
 	rotMoveTimer_ = 0.0f;
 	fallTimer_ = 0.0f;
 	rushTimer_ = 0.0f;
 
+	/// 自分自体の回転要素
+
 	// 回転から始まるようにする
 	isRotMove_ = true;
 
 	// 最初の回転各
-	float rot = LerpShortAngle(startAngle_, endAngle_, EaseInOut(0.2f));
+	float rot = LerpShortAngle(startAngle, endAngle, EaseInOut(0.2f));
 	Vector3 prePos = { std::cosf(rot) * stageRadius_, bossContext_.worldTransform->transform_.translate.y,std::sinf(rot) * stageRadius_ };
 	startRotEndDir_ = Normalize(prePos - bossContext_.worldTransform->transform_.translate);
 
 	// 最初の回転するための角度を求める
-	Vector3 tDir = Normalize(Vector3(-bossContext_.worldTransform->transform_.translate.x, 0.0f, -bossContext_.worldTransform->transform_.translate.z));
-	startDir_ = tDir;
+	startDir_ = Normalize(Vector3(-bossContext_.worldTransform->transform_.translate.x, 0.0f, -bossContext_.worldTransform->transform_.translate.z));
 
 	// 最後の回転するための最初の角度を求める
-	rot = LerpShortAngle(startAngle_, endAngle_, EaseInOut(1.0f));
+	rot = LerpShortAngle(startAngle, endAngle, EaseInOut(1.0f));
 	prePos = { std::cosf(rot) * stageRadius_, bossContext_.worldTransform->transform_.translate.y,std::sinf(rot) * stageRadius_ };
 	endDir_ = Normalize(prePos*-1.0f);
 
 	// 上下移動する回数を求める
-	float angleDiff = std::fabs(endAngle_ - startAngle_);
-	cycleCount_ = angleDiff / 0.6f;
+	float angleDiff = std::fabs(Length(CatmullRomPosition(controlPoints_, 1.0f) - CatmullRomPosition(controlPoints_, 0.0f)));
+	cycleCount_ = angleDiff / (stageRadius_ * 0.5f);
 }
 
 void BossStateBattle::RushAttackUpdate() {
 
+	// 移動する位置を表示
+#ifdef _DEBUG
+	CreateCatmullRom();
+#endif
+
 	if (isRotMove_) {
 		// 移動する
-		if (rotMaxMoveTime_ >= 0.0001f) {
-			rotMoveTimer_ += FpsCounter::deltaTime / rotMaxMoveTime_;
-		} else {
-			rotMoveTimer_ = 1.0f;
-		}
+		rotMoveTimer_ += FpsCounter::deltaTime / rotMaxMoveTime_;
 
 		// 移動
 #pragma region Move
@@ -204,19 +253,18 @@ void BossStateBattle::RushAttackUpdate() {
 
 		if (localTimer <= 0.5f) {
 			float t = localTimer / 0.5f;
-			posY = Lerp(defalutPosY_, defalutPosY_ + 2.0f, EaseInOut(t));
+			posY = Lerp(0.0f, 2.0f, EaseInOut(t));
 		} else {
 			float t = (localTimer - 0.5f) / 0.5f;
-			posY = Lerp(defalutPosY_ + 2.0f, defalutPosY_, EaseInOut(t));
+			posY = Lerp(2.0f, 0.0f, EaseInOut(t));
 		}
 
-		// 角度補間する
-		float angle = LerpShortAngle(startAngle_, endAngle_, EaseInOut(rotMoveTimer_));
-		// 位置を求める
-		Vector3 pos = {std::cosf(angle) * stageRadius_, posY,std::sinf(angle) * stageRadius_};
+		rotMoveTimer_ = std::min(rotMoveTimer_, 1.0f);
+		Vector3 pos = CatmullRomPosition(controlPoints_, EaseInOut(rotMoveTimer_));
 
 		// 移動
 		bossContext_.worldTransform->transform_.translate = pos;
+		bossContext_.worldTransform->transform_.translate.y += posY;
 #pragma endregion
 
 		// 回転移動
@@ -228,6 +276,7 @@ void BossStateBattle::RushAttackUpdate() {
 		// 回転の処理
 		if (rotMoveTimer_ <= 0.2f) {
 			float localT = rotMoveTimer_ / 0.2f;
+
 			// 回転
 			dir = Slerp(startDir_, startRotEndDir_, EaseIn(localT));
 			// Y軸周りの角度
@@ -239,8 +288,7 @@ void BossStateBattle::RushAttackUpdate() {
 		} else if (rotMoveTimer_ <= 0.8f) {
 			bossContext_.worldTransform->transform_.rotate.z = 0.2f;
 			// 進行方向に向ける
-			float rot = LerpShortAngle(startAngle_, endAngle_, EaseInOut(rotMoveTimer_ + FpsCounter::deltaTime / rotMaxMoveTime_));
-			Vector3 prePos = { std::cosf(rot) * stageRadius_, bossContext_.worldTransform->transform_.translate.y,std::sinf(rot) * stageRadius_ };
+			Vector3 prePos = CatmullRomPosition(controlPoints_, EaseInOut(rotMoveTimer_ + FpsCounter::deltaTime / rotMaxMoveTime_));
 			dir = Normalize(prePos - pos);
 			// Y軸周りの角度
 			bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
@@ -395,6 +443,75 @@ void BossStateBattle::RegisterBebugParam() {
 
 void BossStateBattle::ApplyDebugParam() {
 
+}
+
+void BossStateBattle::Setup(uint32_t sampleCount) {
+	lookupTable.clear();
+	totalLength = 0.0f;
+	if (controlPoints_.size() < 4) return;
+
+	// 始点を登録
+	lookupTable.push_back({ 0.0f, 0.0f });
+
+	Vector3 prevPos = CatmullRomPosition(controlPoints_, 0.0f);
+
+	// 曲線全体の距離を求める
+	for (uint32_t i = 1; i <= sampleCount; ++i) {
+		float t = static_cast<float>(i) / static_cast<float>(sampleCount);
+		Vector3 currentPos = CatmullRomPosition(controlPoints_, t);
+
+		// ベクトルの長さ
+		float segmentDist = Length(currentPos - prevPos); 
+		totalLength += segmentDist;
+
+		lookupTable.push_back({ totalLength, t });
+		prevPos = currentPos;
+	}
+}
+
+Vector3 BossStateBattle::GetPositionUniform(float t) const {
+	if (controlPoints_.empty()) return Vector3();
+
+	t = std::clamp(t, 0.0f, 1.0f);
+
+	// 欲しい距離を計算
+	float targetDistance = t * totalLength;
+
+	// 二分探索で、目標の距離を超える最初の点を探す
+	auto it = std::upper_bound(lookupTable.begin(), lookupTable.end(), targetDistance,
+		[](float val, const SamplePoint& p) { return val < p.distance; });
+
+	// 補間してrawTを求める
+	float rawT = 0.0f;
+
+	if (it == lookupTable.begin()) {
+		rawT = 0.0f;
+	} else if (it == lookupTable.end()) {
+		rawT = 1.0f;
+	} else {
+		const SamplePoint& pNext = *it;
+		const SamplePoint& pPre = *std::prev(it);
+
+		// 2点間の距離の割合から、rawTを線形補間する
+		float distRatio = (targetDistance - pPre.distance) / (pNext.distance - pPre.distance);
+		rawT = pPre.rawT + (pNext.rawT - pPre.rawT) * distRatio;
+	}
+
+	return CatmullRomPosition(controlPoints_, rawT);
+}
+
+void BossStateBattle::CreateCatmullRom() {
+	// 線分で描画する用の頂点リスト
+	std::vector<Vector3> pointDrawing;
+	// 線分の数+1個分の頂点座標を計算
+	for (size_t i = 0; i < 100 + 1; ++i) {
+		float t = (1.0f / 100) * i;
+		float t1 = (1.0f / 100) * (i + 1);
+		Vector3 pos = CatmullRomPosition(controlPoints_, t);
+		Vector3 nextpos = CatmullRomPosition(controlPoints_, t1);
+		
+		debugRenderer_->AddLine(pos, nextpos,{1.0f,0.0f,0.0f,1.0f});
+	}
 }
 
 namespace {

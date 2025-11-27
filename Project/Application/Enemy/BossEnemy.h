@@ -3,6 +3,7 @@
 #include<functional>
 
 #include"Collider.h"
+#include"DebugRenderer.h"
 
 #include"BossContext.h"
 #include"States/IBossState.h"
@@ -15,7 +16,7 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager);
+	void Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager, GameEngine::DebugRenderer* debugRenderer);
 
 	/// <summary>
 	/// 更新処理

@@ -1,10 +1,13 @@
 #pragma once
-#include"Application/Enemy/BossContext.h"
-#include"IBossState.h"
 #include <optional>
 #include<array>
 #include<numbers>
 #include<functional>
+
+#include"DebugRenderer.h"
+
+#include"Application/Enemy/BossContext.h"
+#include"IBossState.h"
 
 class BossStateBattle : public IBossState {
 public:
@@ -20,8 +23,13 @@ public:
 		MaxCount // 状態の数
 	};
 
+	struct SamplePoint {
+		float distance; // 始点からの累積距離
+		float rawT;     // その地点での元のt (0.0 - 1.0)
+	};
+
 public:
-	BossStateBattle(BossContext& context,const float& stageRadius);
+	BossStateBattle(BossContext& context,const float& stageRadius, GameEngine::DebugRenderer* debugRenderer);
 
 	/// <summary>
 	/// 入りの処理
@@ -42,6 +50,9 @@ private:
 
 	// ボスの共通データを取得
 	BossContext& bossContext_;
+
+	// デバック描画用
+	GameEngine::DebugRenderer* debugRenderer_ = nullptr;
 
 	// ボスの振る舞い
 	ButtleBehavior currentBehavior_ = ButtleBehavior::Normal;
@@ -89,9 +100,6 @@ private:
 	// 回転する時間
 	float rotMoveTimer_ = 0.0f;
 	float rotMaxMoveTime_ = 0.0f;
-	// 移動する角度
-	float startAngle_ = 0.0f;
-	float endAngle_ = 0.0f;
 	// 上下移動する回数
 	float cycleCount_ = 0;
 
@@ -117,6 +125,12 @@ private:
 	float offsetEndRush_ = 5.0f;
 
 	bool isRotMove_ = true;
+
+	// Catmull-Rom曲線の制御点
+	std::vector<Vector3> controlPoints_;
+	// 距離テーブル
+	std::vector<SamplePoint> lookupTable; 
+	float totalLength = 0.0f;
 
 	// 氷柱落とし =============================
 
@@ -200,6 +214,16 @@ private:
 	/// 値を適応する
 	/// </summary>
 	void ApplyDebugParam();
+
+
+	void Setup(uint32_t sampleCount = 100);
+
+	Vector3 GetPositionUniform(float t) const;
+
+	/// <summary>
+	/// デバック描画用の線を作成する
+	/// </summary>
+	void CreateCatmullRom();
 };
 
 // ヘルプ関数
@@ -213,8 +237,6 @@ namespace {
 
 	// 距離に応じた時間を求める
 	float GetMoveTimeDistance(float startAngle, float endAngle, float radius, float speed);
-
-
 
 	float EaseOutQuart(float t);
 
