@@ -300,6 +300,7 @@
     <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.cpp" />
     <ClCompile Include="EngineSource\3D\Extension\CustomRenderer.cpp" />
     <ClCompile Include="Application\Graphics\Terrain.cpp" />
+    <ClCompile Include="Application\Graphics\PlaneProjectionShadow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -600,6 +601,7 @@
     <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\ICustomMaterial.h" />
     <ClInclude Include="EngineSource\3D\Extension\CustomRenderer.h" />
     <ClInclude Include="Application\Graphics\Terrain.h" />
+    <ClInclude Include="Application\Graphics\PlaneProjectionShadow.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

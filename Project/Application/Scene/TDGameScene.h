@@ -19,6 +19,7 @@
 #include"Application/Enemy/BossEnemy.h"
 #include"Application/Enemy/EnemyAttackManager.h"
 #include"Application/Graphics/Terrain.h"
+#include"Application/Graphics/PlaneProjectionShadow.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -92,6 +93,8 @@ private: // シーン機能
 	GameEngine::Model* playerModel_;
 	// プレイヤー
 	std::unique_ptr<Player> player_;
+	// プレイヤーの影
+	std::unique_ptr<PlaneProjectionShadow> playerShadow_;
 
 	// カメラコントローラークラス
 	std::unique_ptr<CameraController> cameraController_;
@@ -109,6 +112,8 @@ private: // シーン機能
 	std::map<std::string, AnimationData> bossEnemyAnimationData_;
 	// ボスのアニメーションを再生するクラス
 	std::unique_ptr<GameEngine::Animator> bossEnemyAnimator_;
+	// ボスの影
+	std::unique_ptr<PlaneProjectionShadow> bossEnemyShadow_;
 
 	// ボスの遠距離攻撃管理クラス
 	std::unique_ptr<EnemyAttackManager> enemyAttackManager_;
