@@ -119,6 +119,9 @@ private:
     // 落下攻撃の落下速度
     float kAttackDownSpeed_ = 10.0f;
 
+    // 回転補間速度（ラジアン / 秒）
+    float kRotationLerpSpeed_ = 10.0f;
+
 private:
 	//==================================================
     // メンバ変数
@@ -136,6 +139,9 @@ private:
     Vector3 desiredVelXZ_ = { 0.0f, 0.0f, 0.0f };
     // 最後に移動していたXZ方向（正規化）
     Vector3 lastMoveDir_ = { 0.0f, 0.0f, 1.0f };
+
+    // 現在のヨー回転（ラジアン）を保存してLerpに使う
+    float currentYaw_ = 0.0f;
 
 	// カメラ基準の前/右(XZ平面)
 	Vector3 cameraForwardXZ_ = {0.0f,0.0f,1.0f};

@@ -13,6 +13,56 @@
 #endif
 using namespace GameEngine;
 
+// helper: build rotation matrix from Euler angles (pitch=x, yaw=y, roll=z)
+static Matrix4x4 RotationMatrixFromEuler(const Vector3& euler) {
+    float pitch = euler.x;
+    float yaw = euler.y;
+    float roll = euler.z;
+    // forward vector from yaw/pitch
+    Vector3 f;
+    f.x = std::sinf(yaw) * std::cosf(pitch);
+    f.y = std::sinf(pitch);
+    f.z = std::cosf(yaw) * std::cosf(pitch);
+    f = Normalize(f);
+    Vector3 up{0.0f, 1.0f, 0.0f};
+    Vector3 s = Normalize(Cross(up, f));
+    Vector3 u = Cross(f, s);
+
+    // apply roll around forward if needed
+    if (std::fabs(roll) > 1e-6f) {
+        float cr = std::cosf(roll);
+        float sr = std::sinf(roll);
+        // rotate s and u around f
+        Vector3 s_rot = { s.x * cr + u.x * sr, s.y * cr + u.y * sr, s.z * cr + u.z * sr };
+        Vector3 u_rot = { -s.x * sr + u.x * cr, -s.y * sr + u.y * cr, -s.z * sr + u.z * cr };
+        s = s_rot; u = u_rot;
+    }
+
+    Matrix4x4 result = { {{ s.x,  s.y, s.z, 0 }, { u.x,  u.y, u.z, 0 }, { f.x,  f.y, f.z, 0 }, { 0.0f, 0.0f, 0.0f, 1} } };
+    return result;
+}
+
+// helper: compute basis vectors s (right), u (up), f (forward) from Euler
+static void BasisFromEuler(const Vector3& euler, Vector3& s, Vector3& u, Vector3& f) {
+    float pitch = euler.x;
+    float yaw = euler.y;
+    float roll = euler.z;
+    f.x = std::sinf(yaw) * std::cosf(pitch);
+    f.y = std::sinf(pitch);
+    f.z = std::cosf(yaw) * std::cosf(pitch);
+    f = Normalize(f);
+    Vector3 up{0.0f, 1.0f, 0.0f};
+    s = Normalize(Cross(up, f));
+    u = Cross(f, s);
+    if (std::fabs(roll) > 1e-6f) {
+        float cr = std::cosf(roll);
+        float sr = std::sinf(roll);
+        Vector3 s_rot = { s.x * cr + u.x * sr, s.y * cr + u.y * sr, s.z * cr + u.z * sr };
+        Vector3 u_rot = { -s.x * sr + u.x * cr, -s.y * sr + u.y * cr, -s.z * sr + u.z * cr };
+        s = s_rot; u = u_rot;
+    }
+}
+
 void CameraController::Initialize() {
 	camera_ = std::make_unique<Camera>();
 	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},position_ }, 1280, 720);
@@ -21,7 +71,7 @@ void CameraController::Initialize() {
     desiredTargetLookAt_ = targetLookAt_;
 	desiredTargetRotate_ = targetRotate_;
 	desiredTargetFov_ = targetFov_;
-	prevTargetPos_ = targetPos_; // 初期化
+	prevTargetPos_ = targetPos_;
 }
 
 void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine::Input* rawInput) {
@@ -65,9 +115,30 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine
 		targetFov_ = Lerp(targetFov_, desiredTargetFov_, t);
 	}
 
-    // カメラシェイク適用
-	Vector3 eye = targetLookAt_;
-    Vector3 center = targetPos_;
+    Vector3 eye;
+    Vector3 center;
+
+	// If lookAt animation exists during playback, treat position.z as distance from target
+    if (isAnimationPlaying_ && !lookAtAnimationState_.keyframes.empty()) {
+        center = targetLookAt_; // center = animated lookAt
+        // use targetPos_ as the position keyframe values (x,y offsets, z = distance)
+        Vector3 posKey = targetPos_;
+        if (!rotateAnimationState_.keyframes.empty()) {
+            // build basis from euler and place camera at center - forward * distance + right*x + up*y
+            Vector3 s,u,f;
+            BasisFromEuler(targetRotate_, s, u, f);
+            float distance = posKey.z;
+            eye = center - f * distance + s * posKey.x + u * posKey.y;
+        } else {
+            // no rotation specified: treat position as world-offset from center
+            eye = center + Vector3{ posKey.x, posKey.y, posKey.z };
+        }
+    } else {
+        // default behavior: eye = camera position, center = lookAt
+        eye = targetLookAt_;
+        center = targetPos_;
+    }
+
 	// ターゲット移動による自動回転(Spherical時のみ有効) - アニメーション時は自動回転を適用しない
 	if (!isAnimationPlaying_) {
 		ApplyAutoRotate(eye, center);
@@ -94,7 +165,13 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine
 		}
 	}
 
-	Matrix4x4 rotateMatrix = LookAt(eye, center, { 0.0f,1.0f,0.0f });
+	Matrix4x4 rotateMatrix;
+	// If animation provides explicit rotate keyframes, construct rotation from Euler angles
+	if (isAnimationPlaying_ && !rotateAnimationState_.keyframes.empty()) {
+		rotateMatrix = RotationMatrixFromEuler(targetRotate_);
+	} else {
+		rotateMatrix = LookAt(eye, center, { 0.0f,1.0f,0.0f });
+	}
 	Matrix4x4 worldMatrix = rotateMatrix;
 	worldMatrix.m[3][0] = eye.x; worldMatrix.m[3][1] = eye.y; worldMatrix.m[3][2] = eye.z;
 	camera_->SetWorldMatrix(worldMatrix);
@@ -114,7 +191,7 @@ void CameraController::ApplyAutoRotate(const Vector3& eye, const Vector3& center
 	Vector3 right = Normalize(Cross(up, forward));
 	// カメラ平面でのターゲット横移動量(右方向成分)
 	float lateral = Dot(delta, right); // 右に動けば +, 左なら -
-	// カメラ平面でのターゲット前進量(前方向成分)
+// カメラ平面でのターゲット前進量(前方向成分)
 	float toward = Dot(delta, forward); // 手前(eyeに近づく)は負になるため符号反転で倍率に使用
 	float approachFactor = std::max(-toward, 0.0f) * autoRotateApproachScale_; // 接近時のみ加算
 	// 後方移動の特別扱い: forward反対方向(=後ろ)に十分動いている場合は右回転を強制
@@ -200,6 +277,13 @@ void CameraController::UpdateAnimation() {
 			idx++;
 		}
 	}
+	if (!rotateAnimationState_.keyframes.empty()) {
+		size_t &idx = rotateAnimationState_.currentIndex;
+		while (idx + 1 < rotateAnimationState_.keyframes.size() &&
+			animationTime_ >= rotateAnimationState_.keyframes[idx + 1].time) {
+			idx++;
+		}
+	}
 	if (!lookAtAnimationState_.keyframes.empty()) {
 		size_t &idx = lookAtAnimationState_.currentIndex;
 		while (idx + 1 < lookAtAnimationState_.keyframes.size() &&
@@ -222,11 +306,34 @@ void CameraController::UpdateAnimation() {
 		if (idx + 1 < keyframes.size()) {
 			float t = (animationTime_ - keyframes[idx].time) / (keyframes[idx + 1].time - keyframes[idx].time);
 			t = std::clamp(t, 0.0f, 1.0f);
-			desiredTargetPos_ = keyframes[idx].interpFunc(keyframes[idx].value, keyframes[idx + 1].value, t);
+			// If lookAt keys are present, position keys represent camera params (x,y offsets, z=distance)
+			if (!lookAtAnimationState_.keyframes.empty()) {
+				desiredTargetPos_ = keyframes[idx].interpFunc(keyframes[idx].value, keyframes[idx + 1].value, t);
+			} else {
+				desiredTargetPos_ = keyframes[idx].interpFunc(keyframes[idx].value, keyframes[idx + 1].value, t);
+			}
 		} else {
-			desiredTargetPos_ = keyframes[idx].value;
+			if (!lookAtAnimationState_.keyframes.empty()) {
+				desiredTargetPos_ = keyframes[idx].value;
+			} else {
+				desiredTargetPos_ = keyframes[idx].value;
+			}
 		}
+	} else {
+		// no position keys
 	}
+    // 回転補間
+    if (!rotateAnimationState_.keyframes.empty()) {
+		const auto& keyframes = rotateAnimationState_.keyframes;
+		size_t idx = rotateAnimationState_.currentIndex;
+		if (idx + 1 < keyframes.size()) {
+			float t = (animationTime_ - keyframes[idx].time) / (keyframes[idx + 1].time - keyframes[idx].time);
+			t = std::clamp(t, 0.0f, 1.0f);
+			desiredTargetRotate_ = keyframes[idx].interpFunc(keyframes[idx].value, keyframes[idx + 1].value, t);
+		} else {
+			desiredTargetRotate_ = keyframes[idx].value;
+		}
+    }
 	// 注視点補間
 	if (!lookAtAnimationState_.keyframes.empty()) {
 		const auto& keyframes = lookAtAnimationState_.keyframes;
@@ -253,8 +360,24 @@ void CameraController::UpdateAnimation() {
 	}
 
 	if ((!positionAnimationState_.keyframes.empty() && positionAnimationState_.currentIndex + 1 >= positionAnimationState_.keyframes.size()) &&
+        (!rotateAnimationState_.keyframes.empty() && rotateAnimationState_.currentIndex + 1 >= rotateAnimationState_.keyframes.size()) &&
 		(!lookAtAnimationState_.keyframes.empty() && lookAtAnimationState_.currentIndex + 1 >= lookAtAnimationState_.keyframes.size()) &&
 		(!fovAnimationState_.keyframes.empty() && fovAnimationState_.currentIndex + 1 >= fovAnimationState_.keyframes.size())) {
+		// target_ に基づき通常の desiredTargetPos_ を再計算する
+		std::visit([this](auto &&value) {
+			using T = std::decay_t<decltype(value)>;
+			if constexpr (std::is_same_v<T, Vector3>) {
+				UpdateTargetVector3(value);
+			} else if constexpr (std::is_same_v<T, Line>) {
+				UpdateTargetLine(value);
+			} else if constexpr (std::is_same_v<T, std::vector<Vector3>>) {
+				UpdateTargetVector3Array(value);
+			}
+			}, target_);
+		switch (cameraCoordinateType_) {
+			case CameraCoodinateType::Cartesian:  UpdateCartesian(nullptr);  break;
+			case CameraCoodinateType::Spherical: UpdateSpherical(nullptr, nullptr); break;
+		}
 		isAnimationPlaying_ = false; // アニメーション終了
     }
 }

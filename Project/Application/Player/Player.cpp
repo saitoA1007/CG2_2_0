@@ -1,6 +1,7 @@
 #define NOMINMAX
 #include"Player.h"
 #include<algorithm>
+#include<cmath>
 #include"GameParamEditor.h"
 #include"EasingManager.h"
 #include"MyMath.h"
@@ -68,6 +69,34 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 	worldTransform_.transform_.translate.x += velocity_.x * FpsCounter::deltaTime;
 	worldTransform_.transform_.translate.y += velocity_.y * FpsCounter::deltaTime;
 	worldTransform_.transform_.translate.z += velocity_.z * FpsCounter::deltaTime;
+
+    // 回転ターゲットを決定（溜め中はrushDirection_、それ以外はlastMoveDir_または移動速度）
+    Vector3 targetDir = {0.0f, 0.0f, 0.0f};
+    if (isCharging_) {
+        targetDir = rushDirection_;
+    } else if (lastMoveDir_.x != 0.0f || lastMoveDir_.z != 0.0f) {
+        targetDir = lastMoveDir_;
+    } else {
+        targetDir = { velocity_.x, 0.0f, velocity_.z };
+    }
+
+    if (targetDir.x != 0.0f || targetDir.z != 0.0f) {
+        targetDir.y = 0.0f;
+        targetDir = Normalize(targetDir);
+        float targetYaw = std::atan2f(targetDir.x, targetDir.z); // ラジアン
+        // 最短角度差にする
+        float diff = targetYaw - currentYaw_;
+        const float PI = 3.14159265358979323846f;
+        while (diff > PI) { diff -= 2.0f * PI; }
+        while (diff < -PI) { diff += 2.0f * PI; }
+        float maxStep = kRotationLerpSpeed_ * FpsCounter::deltaTime;
+        if (std::fabs(diff) <= maxStep) {
+            currentYaw_ = targetYaw;
+        } else {
+            currentYaw_ += (diff > 0.0f ? maxStep : -maxStep);
+        }
+        worldTransform_.transform_.rotate.y = currentYaw_;
+    }
 
 	// 地面との当たり（仮）
 	if (worldTransform_.transform_.translate.y <= 0.0f) {

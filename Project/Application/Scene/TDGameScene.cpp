@@ -97,6 +97,45 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// 氷柱のモデルを取得
 	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
 
+
+	//==================================================
+	// カメラアニメーション設定
+	//==================================================
+
+	{
+		// 指定のキーとイージング関数を設定する
+		std::vector<AnimationKeyframe<Vector3>> positionKeys;
+		std::vector<AnimationKeyframe<Vector3>> rotateKeys;
+		std::vector<AnimationKeyframe<Vector3>> lookAtKeys;
+		std::vector<AnimationKeyframe<float>> fovKeys;
+
+		// イージングラッパー
+		auto vecEase = [](const Vector3 &a, const Vector3 &b, float t) -> Vector3 { return EaseInOutCubic(a, b, t); };
+		auto floatEase = [](const float &a, const float &b, float t) -> float { return EaseInOutCubic(a, b, t); };
+
+		float pitch;
+        float yaw;
+		const float degToRad = static_cast<float>(std::numbers::pi) / 180.0f;
+
+		// t=0.5f のキー
+        pitch = -15.0f * degToRad;
+		positionKeys.push_back(AnimationKeyframe<Vector3>{ 0.5f, Vector3{0.0f, 0.0f, 8.0f}, vecEase });
+		rotateKeys.push_back(AnimationKeyframe<Vector3>{ 0.5f, Vector3{ pitch, 0.0f, 0.0f }, vecEase });
+		lookAtKeys.push_back(AnimationKeyframe<Vector3>{ 0.5f, Vector3{ 0.0f, 0.0f, 0.0f }, vecEase });
+		fovKeys.push_back(AnimationKeyframe<float>{ 0.5f, 0.7f, floatEase });
+
+		// t=2.0f のキー
+        pitch = -45.0f * degToRad;
+		yaw = 360.0f * degToRad;
+		positionKeys.push_back(AnimationKeyframe<Vector3>{ 2.0f, Vector3{0.0f, 0.0f, 32.0f}, vecEase });
+		rotateKeys.push_back(AnimationKeyframe<Vector3>{ 2.0f, Vector3{ pitch, yaw, 0.0f }, vecEase });
+		lookAtKeys.push_back(AnimationKeyframe<Vector3>{ 2.0f, Vector3{ 0.0f, 0.0f, 0.0f }, vecEase });
+		fovKeys.push_back(AnimationKeyframe<float>{ 2.0f, 1.5f, floatEase });
+
+		cameraController_->SetAnimationKeyframes(positionKeys, rotateKeys, lookAtKeys, fovKeys);
+		cameraController_->PlayAnimation();
+	}
+
 	// 入力コマンドを設定する
 	InputRegisterCommand();
 }

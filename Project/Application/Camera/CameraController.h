@@ -94,13 +94,16 @@ public:
     /// カメラアニメーション用キーフレームの設定
     /// </summary>
     /// <param name="positionKeyframes">位置キーフレーム配列</param>
+    /// <param name="rotateKeyframes">回転キーフレーム配列</param>
     /// <param name="lookAtKeyframes">注視点キーフレーム配列</param>
 	/// <param name="fovKeyframes">FOVキーフレーム配列</param>
 	void SetAnimationKeyframes(
 		const std::vector<AnimationKeyframe<Vector3>>& positionKeyframes,
+        const std::vector<AnimationKeyframe<Vector3>> &rotateKeyframes,
 		const std::vector<AnimationKeyframe<Vector3>>& lookAtKeyframes,
 		const std::vector<AnimationKeyframe<float>>& fovKeyframes) {
 		positionAnimationState_.keyframes = positionKeyframes;
+        rotateAnimationState_.keyframes = rotateKeyframes;
 		lookAtAnimationState_.keyframes = lookAtKeyframes;
         fovAnimationState_.keyframes = fovKeyframes;
     }
@@ -111,6 +114,7 @@ public:
     /// <param name="playSpeed">再生速度</param>
     void PlayAnimation(float playSpeed = 1.0f) {
 		if (positionAnimationState_.keyframes.empty() &&
+            rotateAnimationState_.keyframes.empty() &&
 			lookAtAnimationState_.keyframes.empty() &&
 			fovAnimationState_.keyframes.empty()) {
 			return; // キーフレームが無ければ再生しない
@@ -181,6 +185,7 @@ private:
 
     // カメラのアニメーション状態
     AnimationState<Vector3> positionAnimationState_;
+    AnimationState<Vector3> rotateAnimationState_;
     AnimationState<Vector3> lookAtAnimationState_;
     AnimationState<float> fovAnimationState_;
     // アニメーション時間
