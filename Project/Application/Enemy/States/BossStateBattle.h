@@ -14,6 +14,7 @@ public:
 		RushAttack, // 突進攻撃
 		ShotAttack, // 弾の発射
 		IceFallAttack, // 氷柱を落とす攻撃
+		Wait, // その場で留まる。攻撃と攻撃の小休憩
 
 		MaxCount // 状態の数
 	};
@@ -124,6 +125,12 @@ private:
 
 	bool isActiveIceFall_ = false;
 
+	// 待機行動 ================================
+
+	// 待機時間
+	float moveWaitTimer_ = 0.0f; 
+	float maxMoveWaitTime_ = 2.0f;
+
 private: // 各振る舞いの処理
 
 	/// <summary>
@@ -165,6 +172,16 @@ private: // 各振る舞いの処理
 	/// 氷柱を落とす攻撃処理
 	/// </summary>
 	void IceFallAttackUpdate();
+
+	/// <summary>
+	/// 待機行動のリセット処理
+	/// </summary>
+	void ResetWait();
+
+	/// <summary>
+	/// 待機行動処理
+	/// </summary>
+	void WaitUpdate();
 
 private:
 
