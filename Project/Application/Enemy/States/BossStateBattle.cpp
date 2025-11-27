@@ -182,7 +182,7 @@ void BossStateBattle::ResetRush() {
 
 	// 上下移動する回数を求める
 	float angleDiff = std::fabs(endAngle_ - startAngle_);
-	cycleCount_ = angleDiff / 0.4f;
+	cycleCount_ = angleDiff / 0.6f;
 }
 
 void BossStateBattle::RushAttackUpdate() {
