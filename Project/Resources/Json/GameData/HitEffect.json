@@ -81,8 +81,9 @@
             ]
         },
         "Textures": {
-            "circle.png": 7,
-            "height.png": 9
+            "height.png": 9,
+            "sp1.png": 13,
+            "sp2.png": 14
         },
         "VelocityRange": {
             "Max": [
