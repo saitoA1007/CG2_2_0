@@ -21,6 +21,10 @@ void IceFall::Initialize(const Vector3& pos) {
     userData.typeID = static_cast<uint32_t>(CollisionTypeID::IceFall);
     collider_->SetUserData(userData);
 
+    // プレイヤーの影
+    shadow_ = std::make_unique<PlaneProjectionShadow>();
+    shadow_->Initialize(&worldTransform_);
+
     // 当たり判定の関数を登録する
     collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
         this->OnCollision(result);
@@ -32,6 +36,9 @@ void IceFall::Update() {
         isAlive_ = false;
         return;
     }
+
+    // 影の更新処理
+    shadow_->Update();
 
     // 地面に着地していなければ移動する
     if (worldTransform_.transform_.translate.y > 0.0f) {

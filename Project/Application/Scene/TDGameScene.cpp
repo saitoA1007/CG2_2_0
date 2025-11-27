@@ -248,6 +248,7 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	for (auto& iceFall : iceFalls) {
 		if (iceFall->IsAlive()) {
 			ModelRenderer::Draw(iceFallModel_, iceFall->GetWorldTransform());
+			ModelRenderer::Draw(iceFallModel_, iceFall->GetShadowWorldTransform(),&iceFall->GetShadowMaterial());
 		}
 	}
 
