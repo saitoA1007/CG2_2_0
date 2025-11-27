@@ -25,37 +25,53 @@ void CameraController::Initialize() {
 }
 
 void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine::Input* rawInput) {
-	// ターゲット種類に応じて目標値更新
-	std::visit([this](auto&& value) {
-		using T = std::decay_t<decltype(value)>;
-		if constexpr (std::is_same_v<T, Vector3>) {
-			UpdateTargetVector3(value);
-		} else if constexpr (std::is_same_v<T, Line>) {
-			UpdateTargetLine(value);
-		} else if constexpr (std::is_same_v<T, std::vector<Vector3>>) {
-			UpdateTargetVector3Array(value);
-		}
-	}, target_);
+    if (!camera_) return;
 
+	if (isAnimationPlaying_) {
+        UpdateAnimation();
+	} else {
+		// ターゲット種類に応じて目標値更新
+		std::visit([this](auto &&value) {
+			using T = std::decay_t<decltype(value)>;
+			if constexpr (std::is_same_v<T, Vector3>) {
+				UpdateTargetVector3(value);
+			} else if constexpr (std::is_same_v<T, Line>) {
+				UpdateTargetLine(value);
+			} else if constexpr (std::is_same_v<T, std::vector<Vector3>>) {
+				UpdateTargetVector3Array(value);
+			}
+			}, target_);
+
+		// 座標系種類でカメラ位置追従 (補間前に回転入力反映)
+		switch (cameraCoordinateType_) {
+			case CameraCoodinateType::Cartesian:  UpdateCartesian(inputCommand);  break;
+			case CameraCoodinateType::Spherical: UpdateSpherical(inputCommand, rawInput); break;
+		}
+	}
+	
 	// スムーズ補間係数
 	const float t = 0.1f;
-
-	// 座標系種類でカメラ位置追従 (補間前に回転入力反映)
-	switch (cameraCoordinateType_) {
-	case CameraCoodinateType::Cartesian:  UpdateCartesian(inputCommand);  break;
-	case CameraCoodinateType::Spherical: UpdateSpherical(inputCommand, rawInput); break;
-	}
 	// 位置・回転(Euler)・FOV補間
-	targetPos_ = Lerp(targetPos_, desiredTargetPos_, t);
-    targetLookAt_ = Lerp(targetLookAt_, desiredTargetLookAt_, t);
-	targetRotate_ = Lerp(targetRotate_, desiredTargetRotate_, t);
-	targetFov_ = Lerp(targetFov_, desiredTargetFov_, t);
+	if (isAnimationPlaying_) {
+		// アニメーション再生中はアニメーションの値をそのまま反映（補間しない）
+		targetPos_ = desiredTargetPos_;
+		targetLookAt_ = desiredTargetLookAt_;
+		targetRotate_ = desiredTargetRotate_;
+		targetFov_ = desiredTargetFov_;
+	} else {
+		targetPos_ = Lerp(targetPos_, desiredTargetPos_, t);
+    	targetLookAt_ = Lerp(targetLookAt_, desiredTargetLookAt_, t);
+		targetRotate_ = Lerp(targetRotate_, desiredTargetRotate_, t);
+		targetFov_ = Lerp(targetFov_, desiredTargetFov_, t);
+	}
 
     // カメラシェイク適用
 	Vector3 eye = targetLookAt_;
     Vector3 center = targetPos_;
-	// ターゲット移動による自動回転(スpherical時のみ有効)
-	ApplyAutoRotate(eye, center);
+	// ターゲット移動による自動回転(Spherical時のみ有効) - アニメーション時は自動回転を適用しない
+	if (!isAnimationPlaying_) {
+		ApplyAutoRotate(eye, center);
+	}
 
 	// シェイク
 	if (cameraShakePower_ > 0.0f && cameraShakeElapsedTime_ < cameraShakeMaxTime_) {
@@ -144,7 +160,8 @@ void CameraController::UpdateTargetVector3Array(const std::vector<Vector3>& arr)
 	float maxDistSq = 0.0f;
 	for (const auto& p : arr) { float dx = p.x - avg.x; float dy = p.y - avg.y; float dz = p.z - avg.z; float d2 = dx*dx + dy*dy + dz*dz; if (d2 > maxDistSq) maxDistSq = d2; }
 	float radius = std::sqrt(maxDistSq);
-	desiredTargetFov_ = std::clamp(0.45f + radius * 0.8f, 0.3f, 1.0f);
+	float factor = std::clamp(radius / kDistance_, 0.0f, 1.0f);
+    desiredTargetFov_ = Lerp(0.5f, 2.0f, factor);
 }
 
 void CameraController::UpdateCartesian(GameEngine::InputCommand* inputCommand) {
@@ -169,4 +186,75 @@ void CameraController::UpdateSpherical(GameEngine::InputCommand* inputCommand, G
 Matrix4x4 CameraController::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {
 	Vector3 f = Normalize(center - eye); Vector3 s = Normalize(Cross(up, f)); Vector3 u = Cross(f, s);
 	Matrix4x4 result = { {{ s.x,  s.y, s.z, 0 }, { u.x,  u.y, u.z, 0 }, { f.x,  f.y, f.z, 0 }, { 0.0f, 0.0f, 0.0f, 1} } }; return result;
+}
+
+void CameraController::UpdateAnimation() {
+    if (!isAnimationPlaying_) return;
+    animationTime_ += FpsCounter::deltaTime * animationPlaySpeed_;
+
+    // 各アニメーション状態の現在インデックス更新
+	if (!positionAnimationState_.keyframes.empty()) {
+		size_t &idx = positionAnimationState_.currentIndex;
+		while (idx + 1 < positionAnimationState_.keyframes.size() &&
+			animationTime_ >= positionAnimationState_.keyframes[idx + 1].time) {
+			idx++;
+		}
+	}
+	if (!lookAtAnimationState_.keyframes.empty()) {
+		size_t &idx = lookAtAnimationState_.currentIndex;
+		while (idx + 1 < lookAtAnimationState_.keyframes.size() &&
+			animationTime_ >= lookAtAnimationState_.keyframes[idx + 1].time) {
+			idx++;
+		}
+	}
+	if (!fovAnimationState_.keyframes.empty()) {
+		size_t &idx = fovAnimationState_.currentIndex;
+		while (idx + 1 < fovAnimationState_.keyframes.size() &&
+			animationTime_ >= fovAnimationState_.keyframes[idx + 1].time) {
+			idx++;
+		}
+	}
+
+	// 位置補間
+	if (!positionAnimationState_.keyframes.empty()) {
+		const auto& keyframes = positionAnimationState_.keyframes;
+		size_t idx = positionAnimationState_.currentIndex;
+		if (idx + 1 < keyframes.size()) {
+			float t = (animationTime_ - keyframes[idx].time) / (keyframes[idx + 1].time - keyframes[idx].time);
+			t = std::clamp(t, 0.0f, 1.0f);
+			desiredTargetPos_ = keyframes[idx].interpFunc(keyframes[idx].value, keyframes[idx + 1].value, t);
+		} else {
+			desiredTargetPos_ = keyframes[idx].value;
+		}
+	}
+	// 注視点補間
+	if (!lookAtAnimationState_.keyframes.empty()) {
+		const auto& keyframes = lookAtAnimationState_.keyframes;
+		size_t idx = lookAtAnimationState_.currentIndex;
+		if (idx + 1 < keyframes.size()) {
+			float t = (animationTime_ - keyframes[idx].time) / (keyframes[idx + 1].time - keyframes[idx].time);
+			t = std::clamp(t, 0.0f, 1.0f);
+			desiredTargetLookAt_ = keyframes[idx].interpFunc(keyframes[idx].value, keyframes[idx + 1].value, t);
+		} else {
+			desiredTargetLookAt_ = keyframes[idx].value;
+		}
+	}
+	// FOV補間
+	if (!fovAnimationState_.keyframes.empty()) {
+		const auto &keyframes = fovAnimationState_.keyframes;
+		size_t idx = fovAnimationState_.currentIndex;
+		if (idx + 1 < keyframes.size()) {
+			float t = (animationTime_ - keyframes[idx].time) / (keyframes[idx + 1].time - keyframes[idx].time);
+			t = std::clamp(t, 0.0f, 1.0f);
+			desiredTargetFov_ = keyframes[idx].interpFunc(keyframes[idx].value, keyframes[idx + 1].value, t);
+		} else {
+			desiredTargetFov_ = keyframes[idx].value;
+		}
+	}
+
+	if ((!positionAnimationState_.keyframes.empty() && positionAnimationState_.currentIndex + 1 >= positionAnimationState_.keyframes.size()) &&
+		(!lookAtAnimationState_.keyframes.empty() && lookAtAnimationState_.currentIndex + 1 >= lookAtAnimationState_.keyframes.size()) &&
+		(!fovAnimationState_.keyframes.empty() && fovAnimationState_.currentIndex + 1 >= fovAnimationState_.keyframes.size())) {
+		isAnimationPlaying_ = false; // アニメーション終了
+    }
 }

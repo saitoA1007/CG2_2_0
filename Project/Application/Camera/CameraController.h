@@ -6,6 +6,19 @@
 #include <vector>
 #include "InPut.h"
 
+template <typename T>
+struct AnimationKeyframe {
+	float time; // キーフレームの時間
+	T value;    // キーフレームの値
+    std::function<T(const T &, const T &, float)> interpFunc; // 補間関数
+};
+
+template<typename T>
+struct AnimationState {
+	std::vector<AnimationKeyframe<T>> keyframes; // キーフレーム配列
+    size_t currentIndex = 0;	// 現在のキーフレームインデックス
+};
+
 class CameraController {
 public:
     enum class CameraCoodinateType {
@@ -77,6 +90,36 @@ public:
 	/// </summary>
 	void SetAutoRotateGain(float g) { autoRotateOverallGain_ = g; }
 
+    /// <summary>
+    /// カメラアニメーション用キーフレームの設定
+    /// </summary>
+    /// <param name="positionKeyframes">位置キーフレーム配列</param>
+    /// <param name="lookAtKeyframes">注視点キーフレーム配列</param>
+	/// <param name="fovKeyframes">FOVキーフレーム配列</param>
+	void SetAnimationKeyframes(
+		const std::vector<AnimationKeyframe<Vector3>>& positionKeyframes,
+		const std::vector<AnimationKeyframe<Vector3>>& lookAtKeyframes,
+		const std::vector<AnimationKeyframe<float>>& fovKeyframes) {
+		positionAnimationState_.keyframes = positionKeyframes;
+		lookAtAnimationState_.keyframes = lookAtKeyframes;
+        fovAnimationState_.keyframes = fovKeyframes;
+    }
+
+	/// <summary>
+	/// カメラアニメーション再生開始
+	/// </summary>
+    /// <param name="playSpeed">再生速度</param>
+    void PlayAnimation(float playSpeed = 1.0f) {
+		if (positionAnimationState_.keyframes.empty() &&
+			lookAtAnimationState_.keyframes.empty() &&
+			fovAnimationState_.keyframes.empty()) {
+			return; // キーフレームが無ければ再生しない
+        }
+		animationTime_ = 0.0f;
+		animationPlaySpeed_ = playSpeed;
+		isAnimationPlaying_ = true;
+    }
+
 private:
 
 	// カメラ
@@ -134,6 +177,19 @@ private:
 	// 自動回転の全体倍率
 	float autoRotateOverallGain_ = 0.4f;
 
+	//--------- アニメーション用 ---------//
+
+    // カメラのアニメーション状態
+    AnimationState<Vector3> positionAnimationState_;
+    AnimationState<Vector3> lookAtAnimationState_;
+    AnimationState<float> fovAnimationState_;
+    // アニメーション時間
+    float animationTime_ = 0.0f;
+	// アニメーション再生速度
+    float animationPlaySpeed_ = 1.0f;
+    // 再生中フラグ
+    bool isAnimationPlaying_ = false;
+
 private:
 	void UpdateTargetVector3(const Vector3& v);
 	void UpdateTargetLine(const Line& line);
@@ -142,4 +198,7 @@ private:
 	void UpdateSpherical(GameEngine::InputCommand* inputCommand, GameEngine::Input* rawInput);
 	void ApplyAutoRotate(const Vector3& eye, const Vector3& center);
 	Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
+
+	// アニメーション更新
+    void UpdateAnimation();
 };
