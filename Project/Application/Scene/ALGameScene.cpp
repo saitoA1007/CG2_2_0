@@ -114,7 +114,7 @@ void ALGameScene::Update() {
 	player_->Update();
 	// パーティクルの更新処理
 	playerMoveParticle_->SetEmitterPos(player_->GetPlayerPos());
-	playerMoveParticle_->Update(mainCamera_->GetWorldMatrix());
+	playerMoveParticle_->Update(mainCamera_->GetWorldMatrix(),mainCamera_->GetViewMatrix());
 
 	// カメラコントロールの更新処理
 	followCameraController_->Update(context_->inputCommand);
@@ -126,7 +126,7 @@ void ALGameScene::Update() {
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,bossEnemy_->GetAlpha() });
 	// ボスの移動パーティクル
 	bossEnmeyMoveParticle_->SetEmitterPos(bossEnemy_->GetPosition());
-	bossEnmeyMoveParticle_->Update(mainCamera_->GetWorldMatrix());
+	bossEnmeyMoveParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
 	// カメラの更新処理
 	mainCamera_->SetCamera(followCameraController_->GetCamera());
@@ -138,7 +138,7 @@ void ALGameScene::Update() {
 		airTimer_ = 0.0f;
 	}
 	// 空気を演出するためのパーティクル
-	airParticle_->Update(mainCamera_->GetWorldMatrix());
+	airParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
 	// 当たり判定の更新処理
 	UpdateCollision();
@@ -147,7 +147,7 @@ void ALGameScene::Update() {
 	if (player_->IsHit()) {
 		hitEffectParticle_->Emit(player_->GetPlayerPos());
 	}
-	hitEffectParticle_->Update(mainCamera_->GetWorldMatrix());
+	hitEffectParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 }
 
 void ALGameScene::Draw(const bool& isDebugView) {
