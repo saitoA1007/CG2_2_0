@@ -3,6 +3,7 @@
 #include"IBossState.h"
 #include <optional>
 #include<array>
+#include<numbers>
 #include<functional>
 
 class BossStateBattle : public IBossState {
@@ -93,6 +94,11 @@ private:
 	float endAngle_ = 0.0f;
 	// 上下移動する回数
 	float cycleCount_ = 0;
+
+	// 傾ける最大角度
+	float maxTiltAngle_ = std::numbers::pi_v<float> / 6.0f;
+	// 傾き
+	float targetTilt_ = 0.0f;
 
 	// 開始の回転角度
 	Vector3 startRotEndDir_ = {};
