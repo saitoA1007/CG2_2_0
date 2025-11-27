@@ -4,6 +4,7 @@
 #include"FPSCounter.h"
 #include"EasingManager.h"
 #include"RandomGenerator.h"
+#include"LogManager.h"
 #include<numbers>
 using namespace GameEngine;
 
@@ -17,16 +18,18 @@ BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius)
 	behaviorsTable_[static_cast<size_t>(ButtleBehavior::RushAttack)] = [this]() { RushAttackUpdate(); };
 	behaviorsTable_[static_cast<size_t>(ButtleBehavior::ShotAttack)] = [this]() { ShotAttackUpdate(); };
 	behaviorsTable_[static_cast<size_t>(ButtleBehavior::IceFallAttack)] = [this]() { IceFallAttackUpdate(); };
+	behaviorsTable_[static_cast<size_t>(ButtleBehavior::Wait)] = [this]() { WaitUpdate(); };
 
 	// 各振る舞いのリセット処理を設定する
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::Normal)] = [this]() {ResetNormal(); };
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::RushAttack)] = [this]() {ResetRush(); };
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::ShotAttack)] = [this]() {};
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::IceFallAttack)] = [this]() {ResetIceFall();};
+	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::Wait)] = [this]() {ResetWait(); };
 
 #ifdef _DEBUG
 	// 値を登録する
-	RegisterBebugParam();	
+	RegisterBebugParam();
 #endif
 	// 値を適応させる
 	ApplyDebugParam();
@@ -115,14 +118,14 @@ void BossStateBattle::NormalUpdate() {
 	// 元の場所に戻る処理を終了
 	if (backTimer_ >= 1.0f) {
 		// 振る舞いの切り替えをリクエスト
-		if (tmpIndex == 0) {
-			behaviorRequest_ = ButtleBehavior::IceFallAttack;
+		behaviorRequest_ = ButtleBehavior::IceFallAttack;
+		/*if (tmpIndex == 0) {
+			
 			tmpIndex++;
 		} else {
 			behaviorRequest_ = ButtleBehavior::RushAttack;
 			tmpIndex = 0;
-		}
-		
+		}*/	
 	}
 }
 
@@ -325,8 +328,40 @@ void BossStateBattle::IceFallAttackUpdate() {
 		// 待機の終了
 		if (waitTimer_ >= 1.0f) {
 			// 振る舞いの切り替えをリクエスト
-			behaviorRequest_ = ButtleBehavior::Normal;
+			behaviorRequest_ = ButtleBehavior::Wait;
 		}
+	}
+}
+
+void BossStateBattle::ResetWait() {
+	moveWaitTimer_ = 0.0f;
+}
+
+void BossStateBattle::WaitUpdate() {
+
+	//Log("WaitPhase");
+
+	moveWaitTimer_ += FpsCounter::deltaTime / maxMoveWaitTime_;
+
+	// 縦移動
+	float posY = 0.0f;
+	float totalCycle = moveWaitTimer_ * 3.0f;
+	float localTimer = std::fmodf(totalCycle, 1.0f);
+
+	if (localTimer <= 0.5f) {
+		float t = localTimer / 0.5f;
+		posY = Lerp(defalutPosY_, defalutPosY_ + 2.0f, EaseInOut(t));
+	} else {
+		float t = (localTimer - 0.5f) / 0.5f;
+		posY = Lerp(defalutPosY_ + 2.0f, defalutPosY_, EaseInOut(t));
+	}
+
+	// 移動
+	bossContext_.worldTransform->transform_.translate.y = posY;
+	
+	// 待機行動の終了
+	if (moveWaitTimer_ >= 1.0f) {
+		behaviorRequest_ = ButtleBehavior::RushAttack;
 	}
 }
 
