@@ -90,7 +90,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	bossEnemyModel_->SetDefaultIsEnableLight(true);
 	// ボス敵クラスを初期化
 	bossEnemy_ = std::make_unique<BossEnemy>();
-	bossEnemy_->Initialize(stageManager_->GetRadius(), enemyAttackManager_.get());
+	bossEnemy_->Initialize(stageManager_->GetRadius(), enemyAttackManager_.get(), debugRenderer_.get());
 
 	// ボスのアニメーションデータを取得する
 	bossEnemyAnimationData_ = context_->animationManager->GetNameByAnimations("Walk");

@@ -16,5 +16,8 @@ struct Vector3 {
 	Vector3 operator*(const float& other) const { return { x * other, y * other, z * other }; }
 	Vector3 operator/(const float& other) const { return { x / other, y / other, z / other }; }
 	Vector3 operator/=(const float& other) { return { x /= other, y /= other, z /= other }; }
-	//Vector3 operator*(float scalar) const { return { x * scalar, y * scalar, z * scalar }; }
+	
+	friend Vector3 operator*(float other, const Vector3& v) { return { v.x * other, v.y * other, v.z * other }; }
+	Vector3 operator*=(const float& other) { x *= other; y *= other; z *= other; return *this; }
+	Vector3 operator-() const { return { -x, -y, -z }; }
 };

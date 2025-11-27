@@ -2,6 +2,7 @@
 #include<cmath>
 #include <algorithm>
 #include"EngineSource/Math/MyMath.h"
+#include<cassert>
 
 // Use float PI to avoid implicit double->float conversions with cosf/sinf
 static constexpr float PI = 3.14159265358979323846f;
@@ -112,6 +113,64 @@ Vector3 Slerp(const Vector3& start, const Vector3& end, const float& t) {
 	float magnitudeLerp = Lerp(startMag, endMag, t);
 	return interpVec * magnitudeLerp;
 
+}
+
+Vector3 CatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t) {
+
+	const float s = 0.5f;
+
+	float t2 = t * t; // tの2乗
+	float t3 = t2 * t; // tの3乗
+
+	Vector3 e3 = -p0 + 3.0f * p1 - 3.0f * p2 + p3;
+	Vector3 e2 = 2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3;
+	Vector3 e1 = -p0 + p2;
+	Vector3 e0 = 2.0f * p1;
+
+	return s * ((e3 * t3) + (e2 * t2) + (e1 * t) + e0);
+}
+
+Vector3 CatmullRomPosition(const std::vector<Vector3>& points, float t) {
+	assert(points.size() >= 4);
+
+	// 区間数は制御点の数-1
+	size_t division = points.size() - 1;
+	// 1区間の長さ(全体を1.0とした割合)
+	float areaWidth = 1.0f / division;
+
+	// 区間内の始点を0.0f、終点を1.0fとしたときの現在位置
+	float t_2 = std::fmodf(t, areaWidth) * division;
+	// 下限(0.0f)と上限(1.0f)の範囲に収める
+	t_2 = std::clamp(t_2, 0.0f, 1.0f);
+
+	// 区間番号
+	size_t index = static_cast<size_t>(t / areaWidth);
+	// 区間番号が上限を超えないように収める
+	index = std::clamp<size_t>(index, 0, division - 1);
+
+	// 4点分のインデックス
+	size_t index0 = index - 1;
+	size_t index1 = index;
+	size_t index2 = index + 1;
+	size_t index3 = index + 2;
+
+	// 最初の区画のp0はp1を重複使用する
+	if (index == 0) {
+		index0 = index1;
+	}
+	// 最後の区間のp3はp2を重複使用する
+	if (index3 >= points.size()) {
+		index3 = index2;
+	}
+
+	// 4点の座標
+	const Vector3& p0 = points[index0];
+	const Vector3& p1 = points[index1];
+	const Vector3& p2 = points[index2];
+	const Vector3& p3 = points[index3];
+
+	// 4点を指定してCatmull-Rom補間
+	return CatmullRom(p0, p1, p2, p3, t_2);
 }
 
 float EaseInSine(float x1, float x2, float t) {
