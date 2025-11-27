@@ -186,6 +186,8 @@ void Player::ProcessAttackDownInput(GameEngine::InputCommand *inputCommand) {
 			velocity_.y = -kMaxFallSpeed_;
 		} else {
 			velocity_.y = -kAttackDownSpeed_;
+            velocity_.x = 0.0f;
+            velocity_.z = 0.0f;
 		}
         isAttackDown_ = !isAttackDown_;
     }
