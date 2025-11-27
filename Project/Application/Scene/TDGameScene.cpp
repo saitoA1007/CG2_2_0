@@ -152,7 +152,7 @@ void TDGameScene::Update() {
 	bossEnemyAnimator_->Update();
 
 	// ステージの更新処理
-	stageManager_->Update();
+	//stageManager_->Update();
 
 	// 当たり判定の更新処理
 	UpdateCollision();
