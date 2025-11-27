@@ -61,6 +61,10 @@ private:
 
 private:
 
+	// 回転の方向を保存する
+	Vector3 startDir_ = {};
+	Vector3 endDir_ = {};
+
 	// Behavior : Normal
 	// 行動をおこなうための繋ぎの行動に使用する変数============
 
@@ -87,6 +91,11 @@ private:
 	float startAngle_ = 0.0f;
 	float endAngle_ = 0.0f;
 
+	// 開始の回転角度
+	Vector3 startRotEndDir_ = {};
+	// 終わりの回転角度
+	Vector3 endRotStartDir_ = {};
+
 	// 突進する時間
 	float rushTimer_ = 0.0f;
 	float fallTimer_ = 0.0f;
@@ -107,6 +116,9 @@ private:
 	// 氷柱を出すまでの時間
 	float waitTimer_ = 0.0f;
 	float maxWaitTime_ = 2.0f;
+
+	float rotateTimer_ = 0.0f;
+	float maxRotateTime_ = 1.0f;
 
 	bool isActiveIceFall_ = false;
 
@@ -177,7 +189,10 @@ namespace {
 	// 距離に応じた時間を求める
 	float GetMoveTimeDistance(float startAngle, float endAngle, float radius, float speed);
 
+
+
 	float EaseOutQuart(float t);
 
 	float EaseInBack(float t);
+
 }

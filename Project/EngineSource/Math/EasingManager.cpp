@@ -64,6 +64,56 @@ Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
 	return scale0 * q0 + scale1 * q1Copy;
 }
 
+Vector3 Slerp(const Vector3& start, const Vector3& end, const float& t) {
+	// 始点と終点の長さを取得
+	float startMag = Length(start);
+	float endMag = Length(end);
+
+	// 正規化
+	Vector3 startNorm = start;
+	Vector3 endNorm = end;
+	if (startMag > 1e-6f) {
+		startNorm /= startMag;
+	} else {
+		startNorm = Vector3(0, 0, 1);
+	};
+
+	if (endMag > 1e-6f) {
+		endNorm /= endMag;
+	} else {
+		endNorm = Vector3(0, 0, 1);
+	};
+
+	// 内積を求める
+	float dot = Dot(startNorm, endNorm);
+	dot = std::clamp(dot, -1.0f, 1.0f);
+
+	Vector3 interpVec;
+
+	if (dot > 0.9995f) {
+		// 線形補間して正規化
+		interpVec = Normalize(Lerp(startNorm, endNorm, t));
+	} else if(dot < -0.9995f) {
+		// 少し軸をずらす
+		Vector3 tempMid = Normalize(startNorm + Vector3(1, 0, 0) * 0.1f);
+		interpVec = Normalize(Lerp(Lerp(startNorm, tempMid, t), endNorm, t));
+	}else {
+		// Slerpの計算
+		float theta = std::acosf(dot);
+		float sinTheta = std::sinf(theta);
+
+		float sinThetaFrom = std::sinf((1.0f - t) * theta);
+		float sinThetaTo = std::sinf(t * theta);
+
+		interpVec = (startNorm * sinThetaFrom + endNorm * sinThetaTo) / sinTheta;
+	}
+
+	// 長さの線形補間
+	float magnitudeLerp = Lerp(startMag, endMag, t);
+	return interpVec * magnitudeLerp;
+
+}
+
 float EaseInSine(float x1, float x2, float t) {
 	float easedT = 1.0f - cosf((t * PI) / 2.0f);
 	return (1.0f - easedT) * x1 + easedT * x2;
