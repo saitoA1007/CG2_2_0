@@ -90,6 +90,8 @@ private:
 	// 移動する角度
 	float startAngle_ = 0.0f;
 	float endAngle_ = 0.0f;
+	// 上下移動する回数
+	float cycleCount_ = 0;
 
 	// 開始の回転角度
 	Vector3 startRotEndDir_ = {};
