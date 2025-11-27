@@ -5,7 +5,6 @@
 #include"EasingManager.h"
 #include"RandomGenerator.h"
 #include"LogManager.h"
-#include<numbers>
 using namespace GameEngine;
 
 BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius) : bossContext_(context) {
@@ -222,35 +221,60 @@ void BossStateBattle::RushAttackUpdate() {
 
 		// 回転移動
 #pragma region Rotate
+		// 計算用の進行方向ベクトル
+		Vector3 dir = { 0,0,1 }; 
+		float tiltPower = 0.0f;
+
 		// 回転の処理
 		if (rotMoveTimer_ <= 0.2f) {
 			float localT = rotMoveTimer_ / 0.2f;
 			// 回転
-			Vector3 dir = Slerp(startDir_, startRotEndDir_, EaseIn(localT));
+			dir = Slerp(startDir_, startRotEndDir_, EaseIn(localT));
 			// Y軸周りの角度
 			bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
 
+			// 徐々に傾ける
+			tiltPower = EaseIn(localT);
+
 		} else if (rotMoveTimer_ <= 0.8f) {
+			bossContext_.worldTransform->transform_.rotate.z = 0.2f;
 			// 進行方向に向ける
 			float rot = LerpShortAngle(startAngle_, endAngle_, EaseInOut(rotMoveTimer_ + FpsCounter::deltaTime / rotMaxMoveTime_));
 			Vector3 prePos = { std::cosf(rot) * stageRadius_, bossContext_.worldTransform->transform_.translate.y,std::sinf(rot) * stageRadius_ };
-			Vector3 dir = Normalize(prePos - pos);
+			dir = Normalize(prePos - pos);
 			// Y軸周りの角度
 			bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+			// 最大まで傾ける
+			tiltPower = 1.0f;
 			// 保存
 			endRotStartDir_ = dir;
 		} else {
 
 			float localT = (rotMoveTimer_ - 0.8f) / 0.2f;
 			// 回転
-			Vector3 dir = Slerp(endRotStartDir_, endDir_, EaseOut(localT));
+			dir = Slerp(endRotStartDir_, endDir_, EaseOut(localT));
 			// Y軸周りの角度
 			bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+
+			// 徐々に傾きを戻す
+			tiltPower = 1.0f - EaseOut(localT);
 		}
+
+		// 傾ける角度を求める
+		Vector3 rightVector = Normalize(Cross(Vector3(0.0f, 1.0f, 0.0f), dir));
+		Vector3 toCenter = Normalize(bossContext_.worldTransform->transform_.translate * -1.0f);
+		// 内積を使って中心が左右どちらにあるか判定
+		float side = Dot(rightVector, toCenter);
+		// 傾きを適用
+		targetTilt_ = (side > 0.0f ? -maxTiltAngle_ : maxTiltAngle_);
+
+		// 傾きを適用
+		bossContext_.worldTransform->transform_.rotate.z = targetTilt_ * tiltPower;
 #pragma endregion
 
 		// 回転移動が終了
 		if (rotMoveTimer_ >= 1.0f) {
+			//bossContext_.worldTransform->transform_.rotate.z = 0.0f;
 			isRotMove_ = false;
 			// 突進の最初の位置を設定
 			startRushPos_ = bossContext_.worldTransform->transform_.translate;
