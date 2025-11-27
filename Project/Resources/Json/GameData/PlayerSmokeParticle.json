@@ -34,6 +34,7 @@
         "IsBillBoard": true,
         "IsEnableAlphaOverLifeTime": false,
         "IsEnableColorOverLifeTime": false,
+        "IsEnableRotateZFromVelocity": false,
         "IsEnableSizeOverLifeTime": true,
         "IsEnableVelocityFromPosition": true,
         "IsLoop": true,

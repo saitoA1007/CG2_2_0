@@ -39,7 +39,7 @@ void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum) {
     ApplyDebugParam();
 }
 
-void ParticleBehavior::Update(const Matrix4x4& cameraMatrix) {
+void ParticleBehavior::Update(const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix) {
 
 #ifdef _DEBUG
     // デバック結果を適応する
@@ -53,7 +53,7 @@ void ParticleBehavior::Update(const Matrix4x4& cameraMatrix) {
     }
 
     // 移動処理
-    Move(cameraMatrix);
+    Move(cameraMatrix, viewMatrix);
 }
 
 void ParticleBehavior::Emit(const Vector3& pos) {
@@ -147,7 +147,7 @@ void ParticleBehavior::Create() {
     }
 }
 
-void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
+void ParticleBehavior::Move(const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix) {
     currentNumInstance_ = 0;
     for (uint32_t i = 0; i < maxNumInstance_; ++i) {
         ParticleData& particle = particles_[i];
@@ -170,7 +170,11 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         // worldTransformsの更新
         if (particleEmitter_.isBillBoard) {
             // ビルボードを適応する
-            worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = MakeBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix, particle.transform.rotate.z);
+            if (particleEmitter_.rotateZFromVelocity.isEnable) {
+                worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = MakeDirectionalBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix, viewMatrix, particle.velocity);
+            } else {
+                worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = MakeBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix, particle.transform.rotate.z);
+            }
         } else {
             worldTransforms_->transformDatas_[currentNumInstance_].transform = particle.transform;
         }
@@ -227,7 +231,7 @@ void ParticleBehavior::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(name_, "MinVelocity", particleEmitter_.velocityFromPosition.minVelocity, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "MaxVelocity", particleEmitter_.velocityFromPosition.maxVelocity, index++);
 
-    //GameParamEditor::GetInstance()->AddItem(name_, "IsEnableRotateZFromVelocity", particleEmitter_.rotateZFromVelocity.isEnable, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "IsEnableRotateZFromVelocity", particleEmitter_.rotateZFromVelocity.isEnable, index++);
 }
 
 void ParticleBehavior::ApplyDebugParam() {
@@ -259,7 +263,7 @@ void ParticleBehavior::ApplyDebugParam() {
     // 最小範囲が最大範囲を超えないようにする
     particleEmitter_.velocityFromPosition.minVelocity = std::min(particleEmitter_.velocityFromPosition.minVelocity, particleEmitter_.velocityFromPosition.maxVelocity);
 
-    //particleEmitter_.rotateZFromVelocity.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableRotateZFromVelocity");
+    particleEmitter_.rotateZFromVelocity.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableRotateZFromVelocity");
 
     // 出現範囲を抑える
     if (maxNumInstance_ <= particleEmitter_.spawnMaxCount) {
