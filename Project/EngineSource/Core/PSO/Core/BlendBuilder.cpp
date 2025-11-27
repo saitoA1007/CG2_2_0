@@ -13,7 +13,7 @@ void BlendBuilder::Initialize() {
 			blendDesc_[i].RenderTarget[0].BlendEnable = TRUE; // ブレンドを有効化
 			blendDesc_[i].RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE; // アルファ値のソース
 			blendDesc_[i].RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD; // アルファ値の加算ブレンド
-			blendDesc_[i].RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO; // アルファ値のデスティネーション
+			blendDesc_[i].RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE; // アルファ値のデスティネーション
 		}
 
 		switch (i) {

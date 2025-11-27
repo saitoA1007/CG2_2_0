@@ -242,7 +242,9 @@ void Player::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult
 	// ヒットログを出す
 	Log("IsPlayerHit", "Player");
 
-	isHit_ = true;
+	if (behavior_ != Behavior::Jump) {
+		isHit_ = true;
+	}
 
 	knockbackSpeed_ = 30.0f;
 	hitDirection_ = Vector3(result.contactNormal.x, 0.0f, result.contactNormal.z);
