@@ -318,8 +318,8 @@ void Player::OnCollision(const CollisionResult &result) {
 				0.0f,
 				velXZ.z - 2.0f * dot * nXZ.z
 			};
-			velocity_.x = reflected.x;
-			velocity_.z = reflected.z;
+			velocity_.x = reflected.x * kWallHitReflectFactor_;
+			velocity_.z = reflected.z * kWallHitReflectFactor_;
 			// 反射した向きを移動方向として保存（正規化）
 			Vector3 newDir = { reflected.x, 0.0f, reflected.z };
 			float len = Length(newDir);
@@ -383,6 +383,7 @@ void Player::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "GroundAcceleration", kGroundAcceleration_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "AirDeceleration", kAirDeceleration_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "FallAcceleration", kFallAcceleration_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "WallHitReflectFactor", kWallHitReflectFactor_);
 
 	// 突撃設定
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "PreRushTime", kPreRushMaxTime_);

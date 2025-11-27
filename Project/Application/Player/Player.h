@@ -89,6 +89,8 @@ private:
 	float kMaxFallSpeed_ = 2.0f;
     // 落下加減速量（秒速）
     float kFallAcceleration_ = -9.6f;
+    // 壁接触時の移動方向反射倍率
+    float kWallHitReflectFactor_ = 0.5f;
 
 	//--------- 突撃の設定 ---------//
 
