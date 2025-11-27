@@ -1,6 +1,7 @@
 #pragma once
 #include"Collider.h"
 #include"WorldTransform.h"
+#include"Application/Graphics/PlaneProjectionShadow.h"
 
 class IceFall {
 public:
@@ -33,10 +34,25 @@ public:
 	/// <returns></returns>
 	bool IsAlive() const { return isAlive_; }
 
+	/// <summary>
+	/// 影のワールド行列
+	/// </summary>
+	/// <returns></returns>
+	GameEngine::WorldTransform& GetShadowWorldTransform() { return shadow_->GetWorldTransform(); }
+
+	/// <summary>
+	/// 影のマテリアル
+	/// </summary>
+	/// <returns></returns>
+	GameEngine::Material& GetShadowMaterial() { return shadow_->GetMaterial(); }
+
 private:
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
+
+	// 影
+	std::unique_ptr<PlaneProjectionShadow> shadow_;
 
 	// 当たり判定
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
