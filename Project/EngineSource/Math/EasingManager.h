@@ -26,6 +26,7 @@ float EaseInOut(const float& t);
 
 // 球面線形補間
 Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t);
+Vector3 Slerp(const Vector3& start, const Vector3& end, const float& t);
 
 float EaseInSine(float x1, float x2, float t);
 float EaseOutSine(float x1, float x2, float t);

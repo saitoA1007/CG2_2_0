@@ -26,12 +26,10 @@ BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius)
 
 #ifdef _DEBUG
 	// 値を登録する
-	RegisterBebugParam();
-	ApplyDebugParam();
-#else
+	RegisterBebugParam();	
+#endif
 	// 値を適応させる
 	ApplyDebugParam();
-#endif
 }
 
 void BossStateBattle::Enter() {
@@ -87,6 +85,8 @@ void BossStateBattle::ControllBehavior() {
 void BossStateBattle::ResetNormal() {
 	// 円の中心から自分へのベクトルを求める
 	Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
+	startDir_ = myDir;
+	endDir_ = myDir * -1.0f;
 	myDir = myDir * stageRadius_;
 
 	// 戻る位置の始点と終点を決める
@@ -106,6 +106,11 @@ void BossStateBattle::NormalUpdate() {
 
 	// 移動処理
 	bossContext_.worldTransform->transform_.translate = tmpPos;
+
+	// 回転
+	Vector3 dir = Slerp(startDir_, endDir_, backTimer_);
+	// Y軸周りの角度
+	bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
 
 	// 元の場所に戻る処理を終了
 	if (backTimer_ >= 1.0f) {
@@ -157,6 +162,20 @@ void BossStateBattle::ResetRush() {
 
 	// 回転から始まるようにする
 	isRotMove_ = true;
+
+	// 最初の回転各
+	float rot = LerpShortAngle(startAngle_, endAngle_, EaseInOut(0.2f));
+	Vector3 prePos = { std::cosf(rot) * stageRadius_, bossContext_.worldTransform->transform_.translate.y,std::sinf(rot) * stageRadius_ };
+	startRotEndDir_ = Normalize(prePos - bossContext_.worldTransform->transform_.translate);
+
+	// 最初の回転するための角度を求める
+	Vector3 tDir = Normalize(Vector3(-bossContext_.worldTransform->transform_.translate.x, 0.0f, -bossContext_.worldTransform->transform_.translate.z));
+	startDir_ = tDir;
+
+	// 最後の回転するための最初の角度を求める
+	rot = LerpShortAngle(startAngle_, endAngle_, EaseInOut(1.0f));
+	prePos = { std::cosf(rot) * stageRadius_, bossContext_.worldTransform->transform_.translate.y,std::sinf(rot) * stageRadius_ };
+	endDir_ = Normalize(prePos*-1.0f);
 }
 
 void BossStateBattle::RushAttackUpdate() {
@@ -169,6 +188,8 @@ void BossStateBattle::RushAttackUpdate() {
 			rotMoveTimer_ = 1.0f;
 		}
 
+		// 移動
+#pragma region Move
 		// 角度補間する
 		float angle = LerpShortAngle(startAngle_, endAngle_, EaseInOut(rotMoveTimer_));
 		// 位置を求める
@@ -176,6 +197,36 @@ void BossStateBattle::RushAttackUpdate() {
 
 		// 移動
 		bossContext_.worldTransform->transform_.translate = pos;
+#pragma endregion
+
+		// 回転移動
+#pragma region Rotate
+		// 回転の処理
+		if (rotMoveTimer_ <= 0.2f) {
+			float localT = rotMoveTimer_ / 0.2f;
+			// 回転
+			Vector3 dir = Slerp(startDir_, startRotEndDir_, EaseIn(localT));
+			// Y軸周りの角度
+			bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+
+		} else if (rotMoveTimer_ <= 0.8f) {
+			// 進行方向に向ける
+			float rot = LerpShortAngle(startAngle_, endAngle_, EaseInOut(rotMoveTimer_ + FpsCounter::deltaTime / rotMaxMoveTime_));
+			Vector3 prePos = { std::cosf(rot) * stageRadius_, bossContext_.worldTransform->transform_.translate.y,std::sinf(rot) * stageRadius_ };
+			Vector3 dir = Normalize(prePos - pos);
+			// Y軸周りの角度
+			bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+			// 保存
+			endRotStartDir_ = dir;
+		} else {
+
+			float localT = (rotMoveTimer_ - 0.8f) / 0.2f;
+			// 回転
+			Vector3 dir = Slerp(endRotStartDir_, endDir_, EaseOut(localT));
+			// Y軸周りの角度
+			bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+		}
+#pragma endregion
 
 		// 回転移動が終了
 		if (rotMoveTimer_ >= 1.0f) {
@@ -215,28 +266,49 @@ void BossStateBattle::ResetIceFall() {
 	waitTimer_ = 0.0f;
 	bossContext_.isActiveIceFall = false;
 	isActiveIceFall_ = false;
+
+	// 円の中心から自分へのベクトルを求める
+	Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
+	startDir_ = myDir;
+	endDir_ = myDir * -1.0f;
+
+	// リセットする
+	rotateTimer_ = 0.0f;
 }
 
 void BossStateBattle::IceFallAttackUpdate() {
 
-	waitTimer_ += FpsCounter::deltaTime / maxWaitTime_;
 
-	if (waitTimer_ >= 0.2f) {
-		if (!isActiveIceFall_) {
-			bossContext_.isActiveIceFall = true;
-			isActiveIceFall_ = true;
-		} else {
-			// 一度発射したらfalseにする
-			if (bossContext_.isActiveIceFall) {
-				bossContext_.isActiveIceFall = false;
+	if (rotateTimer_ <= 1.0f) {
+
+		rotateTimer_ += FpsCounter::deltaTime / maxRotateTime_;
+
+		// 回転
+		Vector3 dir = Slerp(startDir_, endDir_, backTimer_);
+		// Y軸周りの角度
+		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+
+	} else {
+
+		waitTimer_ += FpsCounter::deltaTime / maxWaitTime_;
+
+		if (waitTimer_ >= 0.2f) {
+			if (!isActiveIceFall_) {
+				bossContext_.isActiveIceFall = true;
+				isActiveIceFall_ = true;
+			} else {
+				// 一度発射したらfalseにする
+				if (bossContext_.isActiveIceFall) {
+					bossContext_.isActiveIceFall = false;
+				}
 			}
 		}
-	}
 
-	// 待機の終了
-	if (waitTimer_ >= 1.0f) {
-		// 振る舞いの切り替えをリクエスト
-		behaviorRequest_ = ButtleBehavior::Normal;
+		// 待機の終了
+		if (waitTimer_ >= 1.0f) {
+			// 振る舞いの切り替えをリクエスト
+			behaviorRequest_ = ButtleBehavior::Normal;
+		}
 	}
 }
 
