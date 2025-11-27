@@ -34,7 +34,7 @@
         "IsBillBoard": true,
         "IsEnableAlphaOverLifeTime": false,
         "IsEnableColorOverLifeTime": false,
-        "IsEnableRotateZFromVelocity": false,
+        "IsEnableRotateZFromVelocity": true,
         "IsEnableSizeOverLifeTime": true,
         "IsEnableVelocityFromPosition": false,
         "IsLoop": false,
@@ -81,7 +81,8 @@
             ]
         },
         "Textures": {
-            "circle.png": 7
+            "circle.png": 7,
+            "height.png": 9
         },
         "VelocityRange": {
             "Max": [
