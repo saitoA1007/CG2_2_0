@@ -358,6 +358,25 @@ void PSOManager::DefaultLoadPSO() {
     RegisterPSO("Animation", animation, &animationRootSigBuilder, &animationInputLayoutBuilder);
 
     LogManager::GetInstance().Log("Default PSOs loaded");
+
+    // 氷のモデル用
+    CreatePSOData ice3D;
+    ice3D.rootSigName = "IceVS";
+    ice3D.vsPath = L"Resources/Shaders/IceMaterial.VS.hlsl";
+    ice3D.psPath = L"Resources/Shaders/IceMaterial.PS.hlsl";
+    ice3D.drawMode = DrawModel::FillFront;
+    ice3D.blendMode = BlendMode::kBlendModeNormal;
+    ice3D.isDepthEnable = true;
+    InputLayoutBuilder iceInputLayoutBuilder;
+    iceInputLayoutBuilder.CreateDefaultAnimationElement();
+    iceInputLayoutBuilder.Reset();
+    iceInputLayoutBuilder.CreateInputElement("POSITION", 0, 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
+    iceInputLayoutBuilder.CreateInputElement("TEXCOORD", 0, 0, DXGI_FORMAT_R32G32_FLOAT);
+    iceInputLayoutBuilder.CreateInputElement("NORMAL", 0, 0, DXGI_FORMAT_R32G32B32_FLOAT);
+    iceInputLayoutBuilder.CreateInputElement("TANGENT", 0, 1, DXGI_FORMAT_R32G32B32_FLOAT);
+    iceInputLayoutBuilder.SetSemanticName();
+    iceInputLayoutBuilder.CreateInputLayoutDesc();
+    RegisterPSO("IceMaterial", ice3D, &rootSigBuilder, &iceInputLayoutBuilder);
 }
 
 void PSOManager::DeaultLoadPostEffectPSO() {

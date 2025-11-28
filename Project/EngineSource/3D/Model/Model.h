@@ -98,6 +98,15 @@ namespace GameEngine {
 		[[nodiscard]]
 		static Skeleton CreateSkeleton(const Node& rootNode);
 
+		/// <summary>
+		/// ノーマルマッピングをできるようにする
+		/// </summary>
+		/// <param name="objFilename"></param>
+		/// <param name="filename"></param>
+		/// <returns></returns>
+		[[nodiscard]]
+		static normalMapData CreateNormalMapData(const std::string& objFilename, const std::string& filename);
+
 	public:
 
 		/// <summary>
@@ -167,6 +176,9 @@ namespace GameEngine {
 		// アニメーションデータ
 		std::optional<Skeleton> skeletonBron_ = std::nullopt;
 		std::optional<SkinCluster> skinClusterBron_ = std::nullopt;
+
+		// tanget
+		std::optional<normalMapData> normalMapData_ = std::nullopt;
 
 	private:
 		Model(Model&) = delete;

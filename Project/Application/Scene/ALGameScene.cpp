@@ -6,6 +6,9 @@
 #include"FPSCounter.h"
 #include"LogManager.h"
 #include<numbers>
+
+#include"Extension/CustomRenderer.h"
+
 using namespace GameEngine;
 
 ALGameScene::~ALGameScene() {
@@ -45,9 +48,12 @@ void ALGameScene::Initialize(SceneContext* context) {
 	skyDomeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 地面を生成
-	terrainModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
-	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
-	terrainWorldTransform_.Initialize({ {30.0f,30.0f,30.0f},{0.0f,0.0f,0.0f},{0.0f,-0.2f,0.0f} });
+	// 氷の地面を描画するためのモデル
+	icePlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
+	// 地面を生成する
+	terrain_ = std::make_unique<Terrain>();
+	terrain_->Initialize(context_->textureManager->GetHandleByName("grass.png"),
+		context_->textureManager->GetHandleByName("ice.png"), context_->textureManager->GetHandleByName("iceNormal.png"));
 
 	// カメラをコントロールするクラスを初期化
 	followCameraController_ = std::make_unique<FollowCameraController>();
@@ -112,6 +118,9 @@ void ALGameScene::Update() {
 	collisionManager_->ClearList();
 	// デバックリストを削除
 	debugRenderer_->Clear();
+
+	// 地面マテリアルの更新処理
+	terrain_->Update();
 
 	// ライトの更新処理
 	sceneLightingController_->Update();
@@ -187,10 +196,6 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// 天球の描画
 	ModelRenderer::Draw(skyDomeModel_, skyDomeWorldTransform_);
 
-	// 地面を描画
-	terrainModel_->SetDefaultTextureHandle(grassGH_);
-	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
-
 	// プレイヤーを描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
@@ -198,6 +203,15 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// ボス敵を描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
+
+	// 氷のテスト描画
+	if (isDebugView) {
+		CustomRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	} else {
+		CustomRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
+	}
+	CustomRenderer::PreDraw(CustomRenderMode::Ice);
+	CustomRenderer::DrawIce(icePlaneModel_, terrain_->GetWorldTransform(), sceneLightingController_->GetResource(), terrain_->GetMaterial());
 
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingScreen);
@@ -269,4 +283,11 @@ void ALGameScene::UpdateCollision() {
 
 	// 衝突判定
 	collisionManager_->CheckAllCollisions();
+}
+
+void ALGameScene::DebugUpdate() {
+#ifdef _DEBUG
+	// 地面マテリアルの更新処理
+	terrain_->Update();
+#endif 
 }

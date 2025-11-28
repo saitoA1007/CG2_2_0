@@ -170,6 +170,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="Application\Camera\FollowCameraController.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
+    <ClCompile Include="Application\Graphics\Terrain.cpp" />
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
     <ClCompile Include="Application\Scene\ALGameScene.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
@@ -178,6 +179,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
+    <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.cpp" />
+    <ClCompile Include="EngineSource\3D\Extension\CustomRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Model\AnimationManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Animator.cpp" />
     <ClCompile Include="EngineSource\3D\Model\DebugRenderer.cpp" />
@@ -329,6 +332,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Camera\FollowCameraController.h" />
     <ClInclude Include="Application\CollisionTypeID.h" />
     <ClInclude Include="Application\Enemy\BossEnemy.h" />
+    <ClInclude Include="Application\Graphics\Terrain.h" />
     <ClInclude Include="Application\Light\SceneLightingController.h" />
     <ClInclude Include="Application\Scene\ALGameScene.h" />
     <ClInclude Include="Application\Player\Player.h" />
@@ -338,6 +342,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
+    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.h" />
+    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\ICustomMaterial.h" />
+    <ClInclude Include="EngineSource\3D\Extension\CustomRenderer.h" />
     <ClInclude Include="EngineSource\3D\Model\AnimationManager.h" />
     <ClInclude Include="EngineSource\3D\Model\Animator.h" />
     <ClInclude Include="EngineSource\3D\Model\DebugRenderer.h" />

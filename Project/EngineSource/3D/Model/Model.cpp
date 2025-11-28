@@ -619,3 +619,74 @@ SkinCluster Model::CreateSkinCluster(const Skeleton& skeleton, const ModelData& 
 
 	return skinCluster;
 }
+
+normalMapData Model::CreateNormalMapData(const std::string& objFilename, const std::string& filename) {
+
+	normalMapData normalMapData;
+
+	// ファイルを読み込み
+	Assimp::Importer importer;
+	std::string filePath = kDirectoryPath_ + "/" + filename + "/" + objFilename;
+	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	assert(scene && scene->HasMeshes()); // メッシュがないのは対応しない
+
+	// Mesh解析
+	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
+		aiMesh* mesh = scene->mMeshes[meshIndex];
+		assert(mesh->HasNormals()); // 法線がないMeshは今回は非対応
+
+		MeshData meshData;
+		// メッシュに対応するマテリアル名を取得する
+		aiMaterial* meshMaterial = scene->mMaterials[mesh->mMaterialIndex];
+		aiString materialName;
+		meshMaterial->Get(AI_MATKEY_NAME, materialName);
+		if (materialName.length > 0) {
+			meshData.materialName = materialName.C_Str();
+		}
+		// Assimpのデフォルトマテリアルまたは空のマテリアル名をスキップ
+		if (meshData.materialName == "DefaultMaterial" || meshData.materialName.empty()) {
+			continue;
+		}
+
+		// 最初に頂点分メモリを確保する
+		normalMapData.tangents.resize(mesh->mNumVertices);
+
+		// tangent解析
+		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
+			Vector3 tangent{};
+
+			if (mesh->HasTangentsAndBitangents()) {
+				aiVector3D& aiTangent = mesh->mTangents[vertexIndex];
+				// 右手->左手に変換する
+				tangent = { -aiTangent.x, aiTangent.y, aiTangent.z };
+			} else {
+				// 接線がない場合のデフォルト値 (例: 法線と適当なベクトルの外積など、あるいはゼロ)
+				tangent = { 0.0f, 0.0f, 0.0f };
+			}
+
+			normalMapData.tangents[vertexIndex] = tangent;
+		}
+		break; // 1つのmeshのtangentを読み取ったら終了する
+	}
+
+	// 数を求める
+	uint32_t totalTangent = static_cast<uint32_t>(normalMapData.tangents.size());
+
+	// 頂点リソースを作る
+	normalMapData.tangentResource = CreateBufferResource(device_, sizeof(Vector3) * totalTangent);
+	// 頂点バッファビューを作成する
+	normalMapData.tangentBufferView.BufferLocation = normalMapData.tangentResource->GetGPUVirtualAddress();// リソースの先頭のアドレスから使う
+	normalMapData.tangentBufferView.SizeInBytes = UINT(sizeof(Vector3) * totalTangent);// 使用するリソースのサイズは頂点サイズ
+	normalMapData.tangentBufferView.StrideInBytes = sizeof(Vector3);// 1頂点あたりのサイズ
+
+	// 頂点リソースにデータを書き込む
+	Vector3* tangentData = nullptr;
+	normalMapData.tangentResource->Map(0, nullptr, reinterpret_cast<void**>(&tangentData));// 書き込むためのアドレスを取得
+	std::memcpy(tangentData, normalMapData.tangents.data(), sizeof(Vector3) * totalTangent);// 頂点データをリソースにコピー
+
+	// UnMapする
+	normalMapData.tangentResource->Unmap(0, nullptr);
+	tangentData = nullptr;
+
+	return normalMapData;
+}

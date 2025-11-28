@@ -15,7 +15,7 @@
 #include"Application/Camera/FollowCameraController.h"
 #include"Application/Light/SceneLightingController.h"
 #include"Application/Enemy/BossEnemy.h"
-
+#include"Application/Graphics/Terrain.h"
 
 class ALGameScene : public BaseScene {
 public:
@@ -36,7 +36,7 @@ public:
 	/// <summary>
 	/// デバック時、処理して良いものを更新する
 	/// </summary>
-	void DebugUpdate() override {}
+	void DebugUpdate() override;
 
 	/// <summary>
 	/// 描画処理
@@ -75,10 +75,10 @@ private: // シーン機能
 	GameEngine::Model* skyDomeModel_;
 	GameEngine::WorldTransform skyDomeWorldTransform_;
 
+	// 氷の地面を作るためのモデル
+	GameEngine::Model* icePlaneModel_;
 	// 地面
-	GameEngine::Model* terrainModel_;
-	uint32_t grassGH_ = 0u;
-	GameEngine::WorldTransform terrainWorldTransform_;
+	std::unique_ptr<Terrain> terrain_;
 
 	// ライト
 	std::unique_ptr<SceneLightingController> sceneLightingController_;
