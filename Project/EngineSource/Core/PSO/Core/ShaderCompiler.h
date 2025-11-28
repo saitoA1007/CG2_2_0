@@ -6,19 +6,33 @@ namespace GameEngine {
 	class ShaderCompiler {
 	public:
 
+		// コンパイルするシェーダータイプ
+		enum class Type {
+			VS,
+			PS,
+			Cs,
+
+			Count
+		};
+
+		/// <summary>
+		/// 初期化
+		/// </summary>
+		/// <param name="dxc"></param>
 		void Initialize(DXC* dxc);
 
-		void CompileVsShader(const std::wstring& vsPath);
-		void CompilePsShader(const std::wstring& psPath);
-
-		IDxcBlob* GetVertexShaderBlob() const { return vertexShaderBlob_.Get(); }
-		IDxcBlob* GetPixelShaderBlob() const { return pixelShaderBlob_.Get(); }
+		// コンパイルするシェーダー
+		Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(Type type, const std::wstring& path);
 
 	private:
 
 		DXC* dxc_ = nullptr;
 
-		Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
-		Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
+		// コンパイルタイプ
+		std::wstring compileTypes[static_cast<size_t>(Type::Count)] = {
+			L"vs_6_0",
+			L"ps_6_0",
+			L"cs_6_0"
+		};
 	};
 }
