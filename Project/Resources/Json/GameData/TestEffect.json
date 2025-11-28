@@ -1,0 +1,99 @@
+{
+    "TestEffect": {
+        "ColorRange": {
+            "Max": [
+                0.9901960492134094,
+                0.9610726833343506,
+                0.0,
+                1.0
+            ],
+            "Min": [
+                0.8970588445663452,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "EndAlpha": 0.0,
+        "EndColor": [
+            0.0,
+            0.14705896377563477,
+            1.0,
+            1.0
+        ],
+        "EndSize": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "FieldAcceleration": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "IsBillBoard": true,
+        "IsEnableAlphaOverLifeTime": false,
+        "IsEnableColorOverLifeTime": false,
+        "IsEnableRotateZFromVelocity": true,
+        "IsEnableSizeOverLifeTime": false,
+        "IsEnableVelocityFromPosition": true,
+        "IsLoop": true,
+        "LifeTime": 2.0,
+        "MaxVelocity": 10.0,
+        "MinVelocity": 5.0,
+        "RotateRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "ScaleRange": {
+            "Max": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "SceneName": "GameScene",
+        "SpawnCoolTime": 1.0,
+        "SpawnMaxCount": 6,
+        "SpawnRange": {
+            "Max": [
+                10.0,
+                10.0,
+                10.0
+            ],
+            "Min": [
+                -10.0,
+                -10.0,
+                0.0
+            ]
+        },
+        "Textures": {
+            "star.png": 18
+        },
+        "VelocityRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    }
+}

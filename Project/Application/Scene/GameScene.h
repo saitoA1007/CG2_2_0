@@ -9,6 +9,8 @@
 #include"LightManager.h"
 #include"DirectionalLight.h"
 
+#include"ParticleSystem/ParticleBehavior.h"
+
 #include"Animator.h"
 
 class GameScene : public BaseScene {
@@ -87,6 +89,9 @@ private: // シーン機能
 	std::map<std::string, AnimationData> walkAnimationData_;
 	// アニメーションを再生するクラス
 	std::unique_ptr<GameEngine::Animator> walkAnimator_;
+
+	// テストパーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> testParticle_;
 
 private:
 

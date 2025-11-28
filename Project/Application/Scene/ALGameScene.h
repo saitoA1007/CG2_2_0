@@ -116,6 +116,10 @@ private: // シーン機能
 	float maxAirTime_ = 4.0f;
 	float airSpeed_ = 2.0f;
 
+	// 操作方法のUI
+	std::unique_ptr<GameEngine::Sprite> guideSprite_;
+	uint32_t guideGH_ = 0;
+
 private:
 
 	/// <summary>

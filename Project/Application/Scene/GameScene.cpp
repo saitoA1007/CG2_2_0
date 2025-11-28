@@ -38,7 +38,7 @@ void GameScene::Initialize(SceneContext* context) {
 	terrainModel_ = context_->modelManager->GetNameByModel("Terrain");
 	terrainModel_->SetDefaultIsEnableLight(true);
 	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
-	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
+	terrainWorldTransform_.Initialize({ {10.0f,10.0f,10.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 平面モデルを生成
 	planeModel_ = context_->modelManager->GetNameByModel("Plane");
@@ -57,6 +57,10 @@ void GameScene::Initialize(SceneContext* context) {
 	walkAnimator_ = std::make_unique<Animator>();
 	walkAnimator_->Initialize(bronAnimationModel_, &walkAnimationData_["Armature|mixamo.com|Layer0"]);
 	
+	// 攻撃演出
+	testParticle_ = std::make_unique<ParticleBehavior>();
+	testParticle_->Initialize("TestEffect", 32);
+	testParticle_->Emit({ 0.0f,5.0f,0.0f });
 
 	// 値の保存の登録と適応(テスト)
 	RegisterBebugParam();
@@ -78,6 +82,9 @@ void GameScene::Update() {
 
 	// カメラの更新処理
 	mainCamera_->Update();
+
+	// テストパーティクルの更新処理
+	testParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
 #ifdef _DEBUG
 
@@ -124,10 +131,16 @@ void GameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
 
 	// アニメーションの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
+	//ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 
-	// アニメーションしているモデルを描画
-	ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_);
+	//// アニメーションしているモデルを描画
+	//ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_);
+
+	// 複数モデルの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
+
+	// テスト用のパーティクルを描画
+	ModelRenderer::DrawInstancing(planeModel_, testParticle_->GetCurrentNumInstance(), *testParticle_->GetWorldTransforms());
 }
 
 void GameScene::RegisterBebugParam() {

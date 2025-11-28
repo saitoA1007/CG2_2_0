@@ -105,6 +105,10 @@ void ALGameScene::Initialize(SceneContext* context) {
 	airParticle_ = std::make_unique<ParticleBehavior>();
 	airParticle_->Initialize("AirParticle", 128);
 	airParticle_->Emit({ 0.0f,0.0f,0.0f });
+
+	// 操作方法のUIを生成
+	guideSprite_ = Sprite::Create({ 16.0f,16.0f }, { 256.0f,128.0f }, { 0.0f,0.0f });
+	guideGH_ = context_->textureManager->GetHandleByName("guide.png");
 }
 
 void ALGameScene::Update() {
@@ -248,9 +252,10 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	//========================================================================
 
 	// 画像の描画前処理
-	//SpriteRenderer::PreDraw(RenderMode2D::Normal);
+	SpriteRenderer::PreDraw(RenderMode2D::Normal);
 
-	//SpriteRenderer::Draw(sprite_.get(), uvCheckerGH_);
+	// タイトル描画
+	SpriteRenderer::Draw(guideSprite_.get(), guideGH_);
 }
 
 void ALGameScene::InputRegisterCommand() {
