@@ -38,13 +38,10 @@ void PSOManager::RegisterPSO(const std::string& name, const CreatePSOData& psoDa
 
     // シェーダーをコンパイル
     LogManager::GetInstance().Log("Compiling vertex shader");
-    shaderCompiler_.CompileVsShader(psoData.vsPath);
+    Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = shaderCompiler_.CompileShader(ShaderCompiler::Type::VS, psoData.vsPath);
 
     LogManager::GetInstance().Log("Compiling pixel shader");
-    shaderCompiler_.CompilePsShader(psoData.psPath);
-
-    IDxcBlob* vsBlob = shaderCompiler_.GetVertexShaderBlob();
-    IDxcBlob* psBlob = shaderCompiler_.GetPixelShaderBlob();
+    Microsoft::WRL::ComPtr<IDxcBlob> psBlob = shaderCompiler_.CompileShader(ShaderCompiler::Type::PS, psoData.psPath);
 
     if (!vsBlob || !psBlob) {
         LogManager::GetInstance().Log("Shader compilation failed for: " + name);
@@ -133,13 +130,10 @@ void PSOManager::CreatePSO(const std::string& psoName, const CreatePSOData& psoD
 
     // シェーダーをコンパイル
     LogManager::GetInstance().Log("Compiling vertex shader");
-    shaderCompiler_.CompileVsShader(psoData.vsPath);
+    Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = shaderCompiler_.CompileShader(ShaderCompiler::Type::VS, psoData.vsPath);
 
     LogManager::GetInstance().Log("Compiling pixel shader");
-    shaderCompiler_.CompilePsShader(psoData.psPath);
-
-    IDxcBlob* vsBlob = shaderCompiler_.GetVertexShaderBlob();
-    IDxcBlob* psBlob = shaderCompiler_.GetPixelShaderBlob();
+    Microsoft::WRL::ComPtr<IDxcBlob> psBlob = shaderCompiler_.CompileShader(ShaderCompiler::Type::PS, psoData.psPath);
 
     if (!vsBlob || !psBlob) {
         LogManager::GetInstance().Log("Shader compilation failed for: " + psoName);
@@ -151,7 +145,7 @@ void PSOManager::CreatePSO(const std::string& psoName, const CreatePSOData& psoD
     RootSignatureBuilder rootSigBuilder;
     if (rootSignatureList_.find(psoData.rootSigName) == rootSignatureList_.end()) {
         rootSigBuilder.Initialize(device_);
-        rootSigBuilder.CreateRootSignatureFromReflection(dxc_->GetIDxcUtils(), vsBlob, psBlob);
+        rootSigBuilder.CreateRootSignatureFromReflection(dxc_->GetIDxcUtils(), vsBlob.Get(), psBlob.Get());
         RootSignatureData rootSignatureData;
         rootSignatureData.rootSignature = rootSigBuilder.GetRootSignature();
         rootSignatureData.parameterTypes = rootSigBuilder.GetParameterTypes();
@@ -161,7 +155,7 @@ void PSOManager::CreatePSO(const std::string& psoName, const CreatePSOData& psoD
 
     // InputLayoutの生成
     InputLayoutBuilder inputLayoutBuilder;
-    inputLayoutBuilder.CreateInputLayoutFromReflection(dxc_->GetIDxcUtils(), vsBlob);
+    inputLayoutBuilder.CreateInputLayoutFromReflection(dxc_->GetIDxcUtils(), vsBlob.Get());
     D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = inputLayoutBuilder.GetInputLayoutDesc();
 
     // DepthStencilStateの設定
