@@ -21,6 +21,7 @@ void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, Tex
 	// インスタンシング描画用のデータを取得する
 	psoList_[RenderMode3D::Instancing] = psoManager->GetDrawPsoData("Instancing3D");
 	psoList_[RenderMode3D::InstancingAdd] = psoManager->GetDrawPsoData("AdditiveInstancing3D");
+	psoList_[RenderMode3D::InstancingScreen] = psoManager->GetDrawPsoData("ScreenInstancing3D");
 	// グリッド描画用のデータを取得する
 	psoList_[RenderMode3D::Grid] = psoManager->GetDrawPsoData("Grid");
 	// アニメーション描画用のデータを取得する

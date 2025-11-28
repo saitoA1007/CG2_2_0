@@ -20,6 +20,7 @@ namespace GameEngine {
 		DefaultModelAdd,
 		Instancing,   // インスタンシング描画用
 		InstancingAdd,
+		InstancingScreen,
 		Grid,  // グリッド描画用
 		AnimationModel, // アニメーション描画用
 	};

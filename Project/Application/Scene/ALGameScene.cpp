@@ -71,9 +71,16 @@ void ALGameScene::Initialize(SceneContext* context) {
 	// 平面モデル
 	planeModel_ = context_->modelManager->GetNameByModel("Plane");
 
+	// ヒットダメージ演出
 	hitEffectParticle_ = std::make_unique<ParticleBehavior>();
 	hitEffectParticle_->Initialize("HitEffect", 32);
-	//hitEffectParticle_->Emit({ 0.0f,0.0f,0.0f });
+
+	// 攻撃演出
+	attackEffectParticle_ = std::make_unique<ParticleBehavior>();
+	attackEffectParticle_->Initialize("PlayerAttackEffect", 32);
+	// 攻撃演出のアクセント
+	attackAccentEffectParticle_ = std::make_unique<ParticleBehavior>();
+	attackAccentEffectParticle_->Initialize("PlayerAttackAccentEffect", 32);
 
 	// ボスモデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Cube");
@@ -148,6 +155,15 @@ void ALGameScene::Update() {
 		hitEffectParticle_->Emit(player_->GetPlayerPos());
 	}
 	hitEffectParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+
+	// 攻撃した時のエフェクト
+	if (player_->IsAttack()) {
+		attackEffectParticle_->Emit(player_->GetPlayerPos());
+		attackAccentEffectParticle_->Emit(player_->GetPlayerPos());
+	}
+	// 攻撃演出の更新処理
+	attackEffectParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+	attackAccentEffectParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 }
 
 void ALGameScene::Draw(const bool& isDebugView) {
@@ -184,6 +200,12 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
 
 	// 複数モデルの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::InstancingScreen);
+
+	// 攻撃の演出を描画
+	ModelRenderer::DrawInstancing(planeModel_, attackEffectParticle_->GetCurrentNumInstance(), *attackEffectParticle_->GetWorldTransforms());
+
+	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
 
 	// プレイヤーの移動パーティクルを描画
@@ -197,6 +219,9 @@ void ALGameScene::Draw(const bool& isDebugView) {
 
 	// 空気を演出するためのパーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, airParticle_->GetCurrentNumInstance(), *airParticle_->GetWorldTransforms());
+
+	// 攻撃のアクセント演出を描画
+	ModelRenderer::DrawInstancing(planeModel_, attackAccentEffectParticle_->GetCurrentNumInstance(), *attackAccentEffectParticle_->GetWorldTransforms());
 
 #ifdef _DEBUG
 

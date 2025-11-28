@@ -93,8 +93,11 @@ private: // シーン機能
 	// プレイやーの移動パーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> playerMoveParticle_;
 
-	// ダメージを与えた時のパーティクル
+	// ダメージを受けた時のパーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> hitEffectParticle_;
+	// ダメージを与えた時のパーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> attackEffectParticle_;
+	std::unique_ptr<GameEngine::ParticleBehavior> attackAccentEffectParticle_;
 	
 	// カメラコントローラークラス
 	std::unique_ptr<FollowCameraController> followCameraController_;
