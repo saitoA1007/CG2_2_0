@@ -11,7 +11,8 @@ namespace GameEngine {
 	// パラメータタイプを設定した
 	enum class ParameterType {
 		CBV,
-		SRV
+		SRV,
+		UAV
 	};
 
 	// パラメータの情報を保持するデータ
@@ -46,6 +47,8 @@ namespace GameEngine {
 		/// <param name="visibility">使用するシェーダー</param>
 		void AddSRVDescriptorTable(uint32_t shaderRegister, uint32_t arryNum, uint32_t spaceNum, D3D12_SHADER_VISIBILITY visibility);
 
+		void AddDescriptorTable(uint32_t shaderRegister, uint32_t arryNum, uint32_t spaceNum, D3D12_SHADER_VISIBILITY visibility, D3D12_DESCRIPTOR_RANGE_TYPE type);
+
 		/// <summary>
 		/// サンプラーを追加する
 		/// </summary>
@@ -55,7 +58,7 @@ namespace GameEngine {
 		/// <param name="visibility">使用するシェーダー</param>
 		void AddSampler(uint32_t shaderRegister, D3D12_FILTER filter, D3D12_TEXTURE_ADDRESS_MODE texAddress, D3D12_SHADER_VISIBILITY visibility);
 
-		void CreateRootSignature();
+		void CreateRootSignature(D3D12_ROOT_SIGNATURE_FLAGS flag = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 		/// <summary>
 		/// shaderReflectionを使用して自動生成

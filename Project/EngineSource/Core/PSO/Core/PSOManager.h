@@ -124,6 +124,9 @@ namespace GameEngine {
 
 		// PSOを作成する
 		void CreatePSO(const std::string& psoName,const CreatePSOData& psoData);
+
+		// コンピュートシェーダーのPSOを作成
+		void RegisterCSPSO(const std::string& psoName, RootSignatureBuilder* rootSignature, const std::wstring& csPath);
 	};
 }
 

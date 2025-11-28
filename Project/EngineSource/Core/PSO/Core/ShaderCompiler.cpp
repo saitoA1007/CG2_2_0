@@ -19,3 +19,20 @@ void ShaderCompiler::CompilePsShader(const std::wstring& psPath) {
 		L"ps_6_0", dxc_->dxcUtils_.Get(), dxc_->dxcCompiler_.Get(), dxc_->includeHandler_.Get());
 	assert(pixelShaderBlob_ != nullptr);
 }
+
+void ShaderCompiler::CompileCsShader(const std::wstring& csPath) {
+	// Shaderをコンパイルする
+	csShaderBlob_ = dxc_->CompileShader(csPath,
+		L"cs_6_0", dxc_->dxcUtils_.Get(), dxc_->dxcCompiler_.Get(), dxc_->includeHandler_.Get());
+	assert(csShaderBlob_ != nullptr);
+}
+
+Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileShader(const std::wstring& Path, CompileShaderType type) {
+	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob_;
+
+	// Shaderをコンパイルする
+	shaderBlob_ = dxc_->CompileShader(Path,
+		paths_[static_cast<size_t>(type)].c_str(), dxc_->dxcUtils_.Get(), dxc_->dxcCompiler_.Get(), dxc_->includeHandler_.Get());
+	assert(shaderBlob_ != nullptr);
+	return shaderBlob_;
+}
