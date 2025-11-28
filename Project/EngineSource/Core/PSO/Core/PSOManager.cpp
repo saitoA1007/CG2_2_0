@@ -407,3 +407,41 @@ void PSOManager::DeaultLoadPostEffectPSO() {
 
 
 }
+
+void PSOManager::RegisterCSPSO(const std::string& psoName, RootSignatureBuilder* rootSignature, const std::wstring& csPath) {
+    // 既に登録されていたら飛ばす
+    if (psoList_.find(psoName) != psoList_.end()) {
+        return;
+    }
+
+    // シェーダーをコンパイル
+    LogManager::GetInstance().Log("Compiling cs shader");
+    shaderCompiler_.CompileCsShader(csPath);
+
+    IDxcBlob* csBlob = shaderCompiler_.GetCsShaderBlob();
+
+    if (!csBlob) {
+        LogManager::GetInstance().Log("Shader compilation failed for: " + psoName);
+        return;
+    }
+
+    // PSOの生成
+    PSOData pso;
+    // リンクするルートシグネチャを保存
+    pso.rootSigName = "None";
+
+    // コンピュートパイプラインを設定
+    D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc{};
+    computePipelineStateDesc.CS = {
+        .pShaderBytecode = csBlob->GetBufferPointer(),
+        .BytecodeLength = csBlob->GetBufferSize(),
+    };
+    computePipelineStateDesc.pRootSignature = rootSignature->GetRootSignature();
+    HRESULT hr = device_->CreateComputePipelineState(&computePipelineStateDesc, IID_PPV_ARGS(&pso.graphicsPipelineState));
+    assert(SUCCEEDED(hr));
+
+    // PSOを保存
+    psoList_[psoName] = pso;
+
+    LogManager::GetInstance().Log("PSO registerd name : " + psoName);
+}

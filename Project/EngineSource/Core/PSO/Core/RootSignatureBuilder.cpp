@@ -28,13 +28,30 @@ void RootSignatureBuilder::AddSRVDescriptorTable(uint32_t shaderRegister, uint32
     range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // SRVを使う
     range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // offsetを自動計算
     descriptorRanges_.push_back(std::move(range));
-
+    
 	D3D12_ROOT_PARAMETER param{};
 	param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE; // DescriptorTableを使う
 	param.ShaderVisibility = visibility; // 使うシェーダー
 	param.DescriptorTable.pDescriptorRanges = &descriptorRanges_.back(); // Tableの中身の配列を指定
 	param.DescriptorTable.NumDescriptorRanges = 1; // Tableで利用する数
 	rootParameters_.push_back(param);
+}
+
+void RootSignatureBuilder::AddDescriptorTable(uint32_t shaderRegister, uint32_t arryNum, uint32_t spaceNum, D3D12_SHADER_VISIBILITY visibility, D3D12_DESCRIPTOR_RANGE_TYPE type) {
+    D3D12_DESCRIPTOR_RANGE range{};
+    range.BaseShaderRegister = shaderRegister; // 始まる番号
+    range.RegisterSpace = spaceNum; // 使用するスペース
+    range.NumDescriptors = arryNum; // 数
+    range.RangeType = type; // 使うタイプ
+    range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // offsetを自動計算
+    descriptorRanges_.push_back(std::move(range));
+
+    D3D12_ROOT_PARAMETER param{};
+    param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE; // DescriptorTableを使う
+    param.ShaderVisibility = visibility; // 使うシェーダー
+    param.DescriptorTable.pDescriptorRanges = &descriptorRanges_.back(); // Tableの中身の配列を指定
+    param.DescriptorTable.NumDescriptorRanges = 1; // Tableで利用する数
+    rootParameters_.push_back(param);
 }
 
 void RootSignatureBuilder::AddSampler(uint32_t shaderRegister, D3D12_FILTER filter, D3D12_TEXTURE_ADDRESS_MODE texAddress, D3D12_SHADER_VISIBILITY visibility) {
@@ -50,7 +67,7 @@ void RootSignatureBuilder::AddSampler(uint32_t shaderRegister, D3D12_FILTER filt
     staticSamplers_.push_back(samplerDesc);
 }
 
-void RootSignatureBuilder::CreateRootSignature() {
+void RootSignatureBuilder::CreateRootSignature(D3D12_ROOT_SIGNATURE_FLAGS flag) {
 	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob, errorBlob;
 
     // ルートシグネチャの作成
@@ -59,7 +76,7 @@ void RootSignatureBuilder::CreateRootSignature() {
     descriptionRootSignature.pParameters = rootParameters_.data();
     descriptionRootSignature.NumStaticSamplers = static_cast<UINT>(staticSamplers_.size());
     descriptionRootSignature.pStaticSamplers = staticSamplers_.data();
-    descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+    descriptionRootSignature.Flags = flag;
    
 	// シリアライズしてバイナリにする
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);

@@ -30,7 +30,7 @@ void ParticleCSPSO::CreateCS(ID3D12Device* device, DXC* dxc, LogManager* logMana
     // RootSignature作成
     D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
     descriptionRootSignature.Flags =
-        D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+		D3D12_ROOT_SIGNATURE_FLAG_NONE;
 
     // RootSignature
     D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
