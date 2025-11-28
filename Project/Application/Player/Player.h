@@ -87,6 +87,12 @@ public:
 	/// <returns></returns>
 	bool IsHit()const { return isHit_; }
 
+	/// <summary>
+	/// 攻撃フラグ
+	/// </summary>
+	/// <returns></returns>
+	bool IsAttack() const { return isAttack_; }
+
 private:
 
 	// 移動速度
@@ -137,7 +143,11 @@ private:
 	// プレイヤーが指定した状態を行うためのリセット処理
 	std::array<std::function<void()>, static_cast<size_t>(Behavior::MaxCount)> resetBehaviorParamTable_;
 
+	// ヒットフラグ
 	bool isHit_ = false;
+
+	// 攻撃フラグ
+	bool isAttack_ = false;
 
 	// 移動で使用する変数 ============================
 

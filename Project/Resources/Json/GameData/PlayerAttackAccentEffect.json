@@ -1,0 +1,100 @@
+{
+    "PlayerAttackAccentEffect": {
+        "ColorRange": {
+            "Max": [
+                0.8938869833946228,
+                0.9803921580314636,
+                0.0,
+                1.0
+            ],
+            "Min": [
+                0.8938869833946228,
+                0.3154895007610321,
+                0.0,
+                1.0
+            ]
+        },
+        "EndAlpha": 0.0,
+        "EndColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        ],
+        "EndSize": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "FieldAcceleration": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "IsBillBoard": true,
+        "IsEnableAlphaOverLifeTime": true,
+        "IsEnableColorOverLifeTime": false,
+        "IsEnableRotateZFromVelocity": true,
+        "IsEnableSizeOverLifeTime": false,
+        "IsEnableVelocityFromPosition": true,
+        "IsLoop": false,
+        "LifeTime": 0.5,
+        "MaxVelocity": 20.0,
+        "MinVelocity": 15.0,
+        "RotateRange": {
+            "Max": [
+                0.0,
+                0.0,
+                3.200000047683716
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "ScaleRange": {
+            "Max": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "SceneName": "ALGameScene",
+        "SpawnCoolTime": 1.0,
+        "SpawnMaxCount": 32,
+        "SpawnRange": {
+            "Max": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                -1.0,
+                -1.0,
+                -1.0
+            ]
+        },
+        "Textures": {
+            "attackEffect.png": 10,
+            "star.png": 16
+        },
+        "VelocityRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    }
+}

@@ -314,6 +314,10 @@ void PSOManager::DefaultLoadPSO() {
     instancing3D.blendMode = BlendMode::kBlendModeAdd;
     RegisterPSO("AdditiveInstancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
 
+    // インスタンシング描画のスクリーン合成用PSO
+    instancing3D.blendMode = BlendMode::kBlendModeScreen;
+    RegisterPSO("ScreenInstancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
+
     // グリッド描画用のPSO
     CreatePSOData grid;
     grid.rootSigName = "Grid";

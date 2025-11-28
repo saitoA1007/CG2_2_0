@@ -68,6 +68,7 @@ void Player::Update() {
 #endif
 
 	isHit_ = false;
+	isAttack_ = false;
 
 	// 状態遷移のリクエストがあった場合、切り替える処理
 	if (behaviorRequest_) {
@@ -244,6 +245,8 @@ void Player::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult
 
 	if (behavior_ != Behavior::Jump) {
 		isHit_ = true;
+	} else {
+		isAttack_ = true;
 	}
 
 	knockbackSpeed_ = 30.0f;
