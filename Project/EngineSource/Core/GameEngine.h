@@ -8,9 +8,6 @@
 #include"LinePSO.h"
 #include"PostProcess/CopyPSO.h"
 #include"PostProcess/BloomPSO.h"
-#include"PostProcess/ScanLinePSO.h"
-#include"PostProcess/VignettingPSO.h"
-#include"PostProcess/RadialBlurPSO.h"
 #include"PostProcess/OutLinePSO.h"
 #include"PSO/Core/PSOManager.h"
 #include"PostProcess/PostEffectManager.h"
@@ -120,15 +117,6 @@ namespace GameEngine {
 
 		// ブルーム用のPSO設定
 		std::unique_ptr<BloomPSO> bloomPSO_;
-
-		// ScanLine用のPSO設定
-		std::unique_ptr<ScanLinePSO> scanLinePSO_;
-
-		// ヴィネット用のPSO設定
-		std::unique_ptr<VignettingPSO> vignettingPSO_;
-
-		// ラジアルブルー用のPSO設定
-		std::unique_ptr<RadialBlurPSO> radialBlurPSO_;
 
 		// アウトライン用のPSO設定
 		std::unique_ptr<OutLinePSO> outLinePSO_;

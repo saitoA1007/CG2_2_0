@@ -204,15 +204,6 @@
     <ClCompile Include="EngineSource\Collision\CollisionUtils.cpp">
       <Filter>EngineSource\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.cpp">
-      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.cpp">
-      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.cpp">
-      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\BloomPSO.cpp">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClCompile>
@@ -480,15 +471,6 @@
     <ClInclude Include="EngineSource\Math\Quaternion.h">
       <Filter>EngineSource\Math</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.h">
-      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.h">
-      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.h">
-      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\BloomPSO.h">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClInclude>
@@ -602,6 +584,8 @@
     <ClInclude Include="EngineSource\3D\Extension\CustomRenderer.h" />
     <ClInclude Include="Application\Graphics\Terrain.h" />
     <ClInclude Include="Application\Graphics\PlaneProjectionShadow.h" />
+    <ClInclude Include="EngineSource\Core\PostProcess\ParameterResource.h" />
+    <ClInclude Include="EngineSource\Core\PostProcess\PostEffectData.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

@@ -388,7 +388,7 @@ void PSOManager::DeaultLoadPostEffectPSO() {
     RootSignatureBuilder rootSigBuilder;
     rootSigBuilder.Initialize(device_);
     rootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_PIXEL);
-    rootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.CreateRootSignature();
     InputLayoutBuilder inputLayoutBuilder;
@@ -403,7 +403,7 @@ void PSOManager::DeaultLoadPostEffectPSO() {
     // ラジアルブラーを作成
     defaultPostEffect.vsPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.VS.hlsl";
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.PS.hlsl";
-    RegisterPSO("ScanLine", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+    RegisterPSO("RadialBlur", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
 
 }

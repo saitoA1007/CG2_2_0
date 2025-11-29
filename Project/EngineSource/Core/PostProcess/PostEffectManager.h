@@ -6,10 +6,13 @@
 #include"Externals/DirectXTex/d3dx12.h"
 
 #include"PostProcess/BloomPSO.h"
-#include"PostProcess/ScanLinePSO.h"
-#include"PostProcess/VignettingPSO.h"
-#include"PostProcess/RadialBlurPSO.h"
 #include"PostProcess/OutLinePSO.h"
+
+#include"PSO/Core/PSOManager.h"
+#include"PSO/Core/DrawPSOData.h"
+
+#include"PostEffectData.h"
+#include"ParameterResource.h"
 
 #include"SrvManager.h"
 
@@ -25,11 +28,22 @@ namespace GameEngine {
             RadialBlur, // 中心に集中するぼかし
         };
 
+        // PSOのデータ
+        enum class PSOType {
+            Vignetting,
+            RadialBlur,
+            ScanLine,
+
+            MaxCount
+        };
+
         // ポストエフェクトデータ
         struct EffectData {
             Microsoft::WRL::ComPtr<ID3D12Resource> resource;
             D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle{};
             CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle{};
+
+            DrawPsoData* psoData; // 描画前処理のデータ
         };
 
     public:
@@ -39,7 +53,7 @@ namespace GameEngine {
         /// </summary>
         /// <param name="bloomPSO"></param>
         /// <param name="logManager"></param>
-        static void StaticInitialize(BloomPSO* bloomPSO,ScanLinePSO* scanLinePSO, VignettingPSO* vignettingPSO, RadialBlurPSO* radialBlurPSO, OutLinePSO* outLinePSO);
+        static void StaticInitialize(BloomPSO* bloomPSO, OutLinePSO* outLinePSO, PSOManager* psoManager);
 
         /// <summary>
         /// 初期化
@@ -94,17 +108,11 @@ namespace GameEngine {
         // ブルーム用PSO
         static BloomPSO* bloomPSO_;
 
-        // ヴィネット用のPSO;
-        static VignettingPSO* vignettingPSO_;
-
-        // ラジアルブラー用のPSO
-        static RadialBlurPSO* radialBlurPSO_;
-
-        // ライン用のPSO;
-        static ScanLinePSO* scanLinePSO_;
-
         // アウトライン用のPSO
         static OutLinePSO* outLinePSO_;
+
+        // psoデータのリスト
+        static std::unordered_map<PSOType, DrawPsoData> psoList_;
 
     private:
 
@@ -156,12 +164,15 @@ namespace GameEngine {
 
         // スキャンラインのデータ
         EffectData scanLineData_;
+        ParameterResource<ScanLineData> scanLineResource_;
 
         // ヴィネットのデータ
         EffectData vignettingData_;    
+        ParameterResource<VignettingData> vignettingResource_;
 
         // ラジアルブラーのデータ
         EffectData radialBlurData_;
+        ParameterResource<RadialBlurData> radialBlurResource_;
      
         // アウトラインのデータ
         EffectData outLineData_;
@@ -194,29 +205,13 @@ namespace GameEngine {
         void InitializePostEffectData(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV);
 
         /// <summary>
-        /// ラインの描画処理
-        /// </summary>
-        /// <param name="commandList"></param>
-        void DrawScanLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
-
-        /// <summary>
-        /// ヴィネットの描画処理
-        /// </summary>
-        /// <param name="commandList"></param>
-        void DrawVignetting(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
-
-        /// <summary>
-        /// ラジアルブルーの描画処理
-        /// </summary>
-        /// <param name="commandList"></param>
-        void DrawRadialBlur(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
-
-        /// <summary>
         /// アウトラインの描画
         /// </summary>
         /// <param name="commandList"></param>
         /// <param name="depthSRV"></param>
         void DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
+
+        void DrawEffect(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv, EffectData data, ID3D12Resource* resource);
 
         // ポストエフェクトを仕様するためのリソースを作成する
         void CreatePostEffectResources(
@@ -229,5 +224,12 @@ namespace GameEngine {
             D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle,             // 作成するrtvHandle
             D3D12_GPU_DESCRIPTOR_HANDLE& srvGpuHandle           // 作成するsrvHandle
         );
+
+        /// <summary>
+        /// PSOデータを取得
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        DrawPsoData* GetPSOData(PSOType type);
     };
 }

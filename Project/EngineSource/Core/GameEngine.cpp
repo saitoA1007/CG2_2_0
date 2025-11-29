@@ -40,10 +40,6 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	graphicsDevice_ = std::make_unique<GraphicsDevice>();
 	graphicsDevice_->Initialize(windowsApp_->GetHwnd(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight, srvManager_.get());
 
-	// 描画の流れを管理するクラスを初期化
-	renderPipeline_ = std::make_unique<RenderPipeline>();
-	renderPipeline_->Initialize(windowsApp_->kWindowWidth, windowsApp_->kWindowHeight, srvManager_.get(), graphicsDevice_.get());
-
 	// dxcCompilerの初期化
 	dxc_ = std::make_unique<DXC>();
 	dxc_->Initialize();
@@ -55,6 +51,15 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	psoManager_ = std::make_unique<PSOManager>();
 	psoManager_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
 	psoManager_->DefaultLoadPSO();
+	psoManager_->DeaultLoadPostEffectPSO();
+
+	// ポストエフェクトの初期化
+	PostEffectManager::StaticInitialize(bloomPSO_.get(), outLinePSO_.get(), psoManager_.get());
+
+	// 描画の流れを管理するクラスを初期化
+	renderPipeline_ = std::make_unique<RenderPipeline>();
+	renderPipeline_->Initialize(windowsApp_->kWindowWidth, windowsApp_->kWindowHeight, srvManager_.get(), graphicsDevice_.get());
+	renderPipeline_->SetCopyPSO(copyPSO_.get());
 
 	// ImGuiの初期化
 	imGuiManager_ = std::make_unique<ImGuiManager>();
@@ -81,9 +86,6 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	modelManager_ = std::make_unique<ModelManager>();
 	// アニメーションデータを管理するクラスを生成する
 	animationManager_ = std::make_unique<AnimationManager>();
-
-	// ポストエフェクトの初期化
-	PostEffectManager::StaticInitialize(bloomPSO_.get(), scanLinePSO_.get(), vignettingPSO_.get(), radialBlurPSO_.get(), outLinePSO_.get());
 
 	// 画像の初期化
 	Sprite::StaticInitialize(graphicsDevice_->GetDevice(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
@@ -269,7 +271,6 @@ void Engine::CreatePSO() {
 	// CopyPSOの初期化
 	copyPSO_ = std::make_unique<CopyPSO>();
 	copyPSO_->Initialize(graphicsDevice_->GetDevice(), L"Resources/Shaders/PostEffect/Copy.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc_.get());
-	renderPipeline_->SetCopyPSO(copyPSO_.get());
 
 	/// PostProcessのPSOを初期化
 
@@ -280,18 +281,6 @@ void Engine::CreatePSO() {
 		L"Resources/Shaders/PostEffect/Bloom.PS.hlsl",
 		L"Resources/Shaders/PostEffect/BloomResult.PS.hlsl",
 		L"Resources/Shaders/PostEffect/BloomComposite.hlsl");
-
-	// scanLinePSOの初期化
-	scanLinePSO_ = std::make_unique<ScanLinePSO>();
-	scanLinePSO_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
-
-	// ヴィネットPSOの初期化
-	vignettingPSO_ = std::make_unique<VignettingPSO>();
-	vignettingPSO_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
-
-	// ラジアルブルーPSOの初期化
-	radialBlurPSO_ = std::make_unique<RadialBlurPSO>();
-	radialBlurPSO_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
 
 	// アウトラインPSOの初期化
 	outLinePSO_ = std::make_unique<OutLinePSO>();
