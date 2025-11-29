@@ -79,6 +79,7 @@ void PostEffectManager::Initialize(ID3D12Device* device, float clearColor_[4], u
     uint32_t index = srvManager_->AllocateSrvIndex(SrvHeapType::System);
     D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(index);
     drawObjectSRVHandle_ = srvManager_->GetGPUHandle(index);
+    drawObjectIndex_ = index;
 
     // オブジェクト描画用SRV
     device_->CreateShaderResourceView(DrawObjectResource_.Get(), &srvDesc, srvCPUHandle);
@@ -144,8 +145,7 @@ void PostEffectManager::PostDraw(ID3D12GraphicsCommandList* commandList, const D
     currentInputSRV = bloomSRVHandle_[3];
 
     // ヴィネットの描画
-    //DrawVignetting(commandList, currentInputSRV);
-    DrawEffect(commandList, currentInputSRV, vignettingData_, vignettingResource_.GetResource());
+    DrawEffect(commandList, vignettingData_, vignettingResource_.GetResource());
     currentInputSRV = vignettingData_.srvHandle;
 
     switch (drawMode_)
@@ -155,13 +155,13 @@ void PostEffectManager::PostDraw(ID3D12GraphicsCommandList* commandList, const D
 
     case GameEngine::PostEffectManager::DrawMode::ScanLine:
         // scanLineを描画
-        DrawEffect(commandList, currentInputSRV, scanLineData_, scanLineResource_.GetResource());
+        DrawEffect(commandList, scanLineData_, scanLineResource_.GetResource());
         currentInputSRV = scanLineData_.srvHandle;
         break;
 
     case GameEngine::PostEffectManager::DrawMode::RadialBlur:
         // ラジアルブルーを描画
-        DrawEffect(commandList, currentInputSRV, radialBlurData_, radialBlurResource_.GetResource());
+        DrawEffect(commandList, radialBlurData_, radialBlurResource_.GetResource());
         currentInputSRV = radialBlurData_.srvHandle;
         break;
     }
@@ -427,7 +427,8 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
         width, height,
         vignettingData_.resource,
         vignettingData_.rtvHandle,
-        vignettingData_.srvHandle
+        vignettingData_.srvHandle,
+        vignettingData_.srvIndex
     );
 
     // psoデータを取得する
@@ -437,6 +438,7 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
     vignettingResource_.CreateResource(device_);
     vignettingResource_.GetData()->intensity = 16.0f;
     vignettingResource_.GetData()->time = 0.15f;
+    vignettingResource_.GetData()->textureHandle = drawObjectIndex_;
 
     LogManager::GetInstance().Log("End Create VignettingRenderTargets\n");
 
@@ -449,7 +451,8 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
         width, height,
         scanLineData_.resource,
         scanLineData_.rtvHandle,
-        scanLineData_.srvHandle
+        scanLineData_.srvHandle,
+        scanLineData_.srvIndex
     );
 
     // psoデータを取得する
@@ -461,6 +464,7 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
     scanLineResource_.GetData()->speed = -2.0f;
     scanLineResource_.GetData()->time = 0.0f;
     scanLineResource_.GetData()->lineColor = { 0.3f,0.3f,0.3f };
+    scanLineResource_.GetData()->textureHandle = drawObjectIndex_;
 
     LogManager::GetInstance().Log("End Create ScanLineRenderTargets\n");
 
@@ -473,7 +477,8 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
         width, height,
         radialBlurData_.resource,
         radialBlurData_.rtvHandle,
-        radialBlurData_.srvHandle
+        radialBlurData_.srvHandle,
+        radialBlurData_.srvIndex
     );
 
     // psoデータを取得する
@@ -484,6 +489,7 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
     radialBlurResource_.GetData()->centerPos = { 0.5f,0.5f };
     radialBlurResource_.GetData()->numSamles = 2;
     radialBlurResource_.GetData()->blurWidth = 0.01f;
+    radialBlurResource_.GetData()->textureHandle = drawObjectIndex_;
 
     LogManager::GetInstance().Log("End Create RadialBlurRenderTargets");
 
@@ -496,7 +502,8 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
         width, height,
         outLineData_.resource,
         outLineData_.rtvHandle,
-        outLineData_.srvHandle
+        outLineData_.srvHandle,
+        outLineData_.srvIndex
     );
     LogManager::GetInstance().Log("End Create OutLineRenderTargets");
 }
@@ -526,7 +533,7 @@ void  PostEffectManager::DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D
     commandList->ResourceBarrier(1, &barrier);
 }
 
-void PostEffectManager::DrawEffect(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv, EffectData data, ID3D12Resource* resource) {
+void PostEffectManager::DrawEffect(ID3D12GraphicsCommandList* commandList, EffectData data, ID3D12Resource* resource) {
     D3D12_RESOURCE_BARRIER barrier{};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -541,7 +548,7 @@ void PostEffectManager::DrawEffect(ID3D12GraphicsCommandList* commandList, D3D12
     commandList->OMSetRenderTargets(1, &data.rtvHandle, false, nullptr);
     commandList->SetGraphicsRootSignature(data.psoData->rootSignature);
     commandList->SetPipelineState(data.psoData->graphicsPipelineState);
-    commandList->SetGraphicsRootDescriptorTable(0, currentSrv);
+    commandList->SetGraphicsRootDescriptorTable(0, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     commandList->SetGraphicsRootConstantBufferView(1, resource->GetGPUVirtualAddress());
     commandList->DrawInstanced(3, 1, 0, 0);
 
@@ -559,7 +566,8 @@ void PostEffectManager::CreatePostEffectResources(
     uint32_t height,
     Microsoft::WRL::ComPtr<ID3D12Resource>& resource,
     D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle,
-    D3D12_GPU_DESCRIPTOR_HANDLE& srvGpuHandle
+    D3D12_GPU_DESCRIPTOR_HANDLE& srvGpuHandle,
+    uint32_t& srvIndex
 ) {
 
     // テクスチャリソース作成
@@ -605,7 +613,7 @@ void PostEffectManager::CreatePostEffectResources(
     srvDesc.Texture2D.MipLevels = 1;
 
     // SRVハンドル取得
-    uint32_t srvIndex = srvManager_->AllocateSrvIndex(SrvHeapType::System);
+    srvIndex = srvManager_->AllocateSrvIndex(SrvHeapType::System);
     D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(srvIndex);
     srvGpuHandle = srvManager_->GetGPUHandle(srvIndex);
 
