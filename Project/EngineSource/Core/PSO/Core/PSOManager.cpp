@@ -380,14 +380,15 @@ void PSOManager::DeaultLoadPostEffectPSO() {
     // ヴィネットを作成
     CreatePSOData defaultPostEffect;
     defaultPostEffect.rootSigName = "DefaultPostEffect";
-    defaultPostEffect.vsPath = L"Resources/Shaders/PostEffect/Vignetting/Vignetting.VS.hlsl";
+    defaultPostEffect.vsPath = L"Resources/Shaders/PostEffect/FullScreen.VS.hlsl";
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Vignetting/Vignetting.PS.hlsl";
     defaultPostEffect.drawMode = DrawModel::FillFront;
     defaultPostEffect.blendMode = BlendMode::kBlendModeNone;
     defaultPostEffect.isDepthEnable = false;
     RootSignatureBuilder rootSigBuilder;
     rootSigBuilder.Initialize(device_);
-    rootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount) + static_cast<uint32_t>(SrvHeapTypeCount::SystemMaxCount),
+        0, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.CreateRootSignature();
@@ -396,12 +397,10 @@ void PSOManager::DeaultLoadPostEffectPSO() {
     RegisterPSO("Vignetting", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // スキャンラインを作成
-    defaultPostEffect.vsPath = L"Resources/Shaders/PostEffect/ScanLine/ScanLine.VS.hlsl";
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/ScanLine/ScanLine.PS.hlsl";
     RegisterPSO("ScanLine", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // ラジアルブラーを作成
-    defaultPostEffect.vsPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.VS.hlsl";
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.PS.hlsl";
     RegisterPSO("RadialBlur", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 

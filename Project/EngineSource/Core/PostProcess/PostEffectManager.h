@@ -42,6 +42,7 @@ namespace GameEngine {
             Microsoft::WRL::ComPtr<ID3D12Resource> resource;
             D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle{};
             CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle{};
+            uint32_t srvIndex;
 
             DrawPsoData* psoData; // 描画前処理のデータ
         };
@@ -134,6 +135,9 @@ namespace GameEngine {
         // ポストエフェクト用のRTVヒープ
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> postProcessRTVHeap_;
 
+        // ハンドル
+        uint32_t drawObjectIndex_ = 0;
+
         // オブジェクトを描画する用のRTV
         D3D12_CPU_DESCRIPTOR_HANDLE drawObjectRTVHandle_;
 
@@ -211,7 +215,13 @@ namespace GameEngine {
         /// <param name="depthSRV"></param>
         void DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
 
-        void DrawEffect(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv, EffectData data, ID3D12Resource* resource);
+        /// <summary>
+        /// エフェクトを描画する
+        /// </summary>
+        /// <param name="commandList"></param>
+        /// <param name="data"></param>
+        /// <param name="resource"></param>
+        void DrawEffect(ID3D12GraphicsCommandList* commandList, EffectData data, ID3D12Resource* resource);
 
         // ポストエフェクトを仕様するためのリソースを作成する
         void CreatePostEffectResources(
@@ -222,7 +232,8 @@ namespace GameEngine {
             uint32_t height,
             Microsoft::WRL::ComPtr<ID3D12Resource>& resource,   // 作成するリソース
             D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle,             // 作成するrtvHandle
-            D3D12_GPU_DESCRIPTOR_HANDLE& srvGpuHandle           // 作成するsrvHandle
+            D3D12_GPU_DESCRIPTOR_HANDLE& srvGpuHandle,           // 作成するsrvHandle
+            uint32_t& srvIndex  // ヒープ上に存在するインデックス
         );
 
         /// <summary>

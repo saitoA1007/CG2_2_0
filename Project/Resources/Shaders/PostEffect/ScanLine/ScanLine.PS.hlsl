@@ -1,7 +1,7 @@
-#include"ScanLine.hlsli"
+#include"../FullScreen.hlsli"
 #define PI    3.14159265359f
 
-Texture2D<float32_t4> gTexture : register(t0);
+Texture2D<float32_t4> gTexture[] : register(t0);
 SamplerState gSampler : register(s0);
 
 struct Material
@@ -10,6 +10,7 @@ struct Material
     float32_t time;
     float32_t speed;
     float32_t3 lineColor;
+    uint32_t textureHandle;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 
@@ -21,7 +22,7 @@ struct PixelShaderOutput
 PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
-    float32_t4 texColor = gTexture.Sample(gSampler, input.texcoord);
+    float32_t4 texColor = gTexture[gMaterial.textureHandle].Sample(gSampler, input.texcoord);
     
     float scanline = input.texcoord.y * gMaterial.interval + gMaterial.time * gMaterial.speed;
     

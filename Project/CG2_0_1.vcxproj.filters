@@ -623,15 +623,6 @@
     <None Include="Resources\Shaders\PostEffect\PostProcessGrayScale.hlsli">
       <Filter>Shaders\PostEffect</Filter>
     </None>
-    <None Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.hlsli">
-      <Filter>Shaders\PostEffect\RadialBlur</Filter>
-    </None>
-    <None Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.hlsli">
-      <Filter>Shaders\PostEffect\ScanLine</Filter>
-    </None>
-    <None Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.hlsli">
-      <Filter>Shaders\PostEffect\Vignetting</Filter>
-    </None>
     <None Include="Resources\Shaders\PostEffect\FullScreen.hlsli">
       <Filter>Shaders\PostEffect</Filter>
     </None>
@@ -710,19 +701,10 @@
     <FxCompile Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.PS.hlsl">
       <Filter>Shaders\PostEffect\RadialBlur</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.VS.hlsl">
-      <Filter>Shaders\PostEffect\RadialBlur</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.PS.hlsl">
       <Filter>Shaders\PostEffect\ScanLine</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.VS.hlsl">
-      <Filter>Shaders\PostEffect\ScanLine</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.PS.hlsl">
-      <Filter>Shaders\PostEffect\Vignetting</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.VS.hlsl">
       <Filter>Shaders\PostEffect\Vignetting</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\OutLine\OutLine.PS.hlsl">

@@ -1,12 +1,13 @@
-#include"Vignetting.hlsli"
+#include"../FullScreen.hlsli"
 
-Texture2D<float32_t4> gTexture : register(t0);
+Texture2D<float32_t4> gTexture[] : register(t0);
 SamplerState gSampler : register(s0);
 
 struct Material
 {
     float32_t intensity;
     float32_t time;
+    uint32_t textureHandle;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 
@@ -18,7 +19,7 @@ struct PixelShaderOutput
 PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
-    output.color = gTexture.Sample(gSampler, input.texcoord);
+    output.color = gTexture[gMaterial.textureHandle].Sample(gSampler, input.texcoord);
     
     // 周囲を0に、中心になるほど明るくなるように計算で調整
     float32_t2 correct = input.texcoord * (1.0f - input.texcoord.yx);
