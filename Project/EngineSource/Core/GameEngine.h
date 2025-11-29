@@ -105,6 +105,9 @@ namespace GameEngine {
 		// srvメモリを管理する機能
 		std::unique_ptr<SrvManager> srvManager_;
 
+		// ポストエフェクト
+		std::unique_ptr<PostEffectManager> postEffectManager_;
+
 		/// PSO ======================================
 
 		// 線のPSO設定

@@ -26,7 +26,7 @@ namespace GameEngine {
         /// <param name="width">画面幅</param>
         /// <param name="height">画面高さ</param>
         /// <param name="srvManager">SRVマネージャー</param>
-        void Initialize(uint32_t width, uint32_t height, SrvManager* srvManager, GraphicsDevice* graphicsDevice);
+        void Initialize(GraphicsDevice* graphicsDevice, PostEffectManager* postEffectManager);
 
         /// <summary>
         /// 描画開始処理
