@@ -236,9 +236,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\BloomPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\CopyPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.cpp" />
     <ClCompile Include="EngineSource\Core\RandomGenerator.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\DXViewportState.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\SrvManager.cpp" />
@@ -401,6 +398,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Common\LogManager.h" />
     <ClInclude Include="EngineSource\Common\ResourceLeakChecker.h" />
     <ClInclude Include="EngineSource\Core\ComputePSO\ParticleCSPSO.h" />
+    <ClInclude Include="EngineSource\Core\PostProcess\ParameterResource.h" />
+    <ClInclude Include="EngineSource\Core\PostProcess\PostEffectData.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\IPostEffect.h" />
     <ClInclude Include="EngineSource\Graphics\DescriptorCounts.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\DXCommand.h" />
@@ -430,9 +429,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\BloomPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\CopyPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.h" />
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.h" />
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.h" />
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.h" />
     <ClInclude Include="EngineSource\Core\RandomGenerator.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\DXViewportState.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\SrvManager.h" />
