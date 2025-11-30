@@ -3,6 +3,8 @@
 #include<cassert>
 #include <filesystem>
 
+#include"LogManager.h"
+
 #pragma comment(lib,"xaudio2.lib")
 
 #pragma comment(lib, "Mf.lib")
@@ -309,4 +311,60 @@ bool AudioManager::IsPlay(const uint32_t& soundHandle) {
 
 	// state.BuffersQueued が 0 なら再生終了
 	return (state.BuffersQueued > 0);
+}
+
+void AudioManager::RegisterAudio(const std::string& fileName) {
+
+	std::string audioName = GetFileName(fileName);
+
+	// 同名のモデルが登録されている場合は早期リターン
+	auto getName = nameToHandles_.find(audioName);
+	if (getName != nameToHandles_.end()) {
+		return;
+	}
+
+	// ロードする
+	uint32_t handle = Load(fileName);
+
+	// 登録する
+	nameToHandles_[audioName] = handle;
+}
+
+void AudioManager::LoadAllAudio() {
+	namespace fs = std::filesystem;
+	const std::string kDirectoryPath = "Resources/Sounds/";
+
+	// Soundsのフォルダが存在するか確認する
+	if (!fs::exists(kDirectoryPath)) {
+		LogManager::GetInstance().Log("Audio directory not found, skipping LoadAllAudio: " + kDirectoryPath);
+		return;
+	}
+
+	LogManager::GetInstance().Log("Start Loading All Audios from: " + kDirectoryPath);
+
+	// Soundsのフォルダにある音声ファイルとフォルダを検索
+	for (const auto& entry : fs::recursive_directory_iterator(kDirectoryPath)) {
+
+		// 音声を登録、ロードする
+		if (entry.is_regular_file()) {
+			// ファイルパスを取得する
+			std::string filePath = entry.path().string();
+			// 登録
+			RegisterAudio(filePath);
+		}
+	}
+
+	LogManager::GetInstance().Log("End Loading All Audios");
+}
+
+std::string AudioManager::GetFileName(const std::string& fullPath) {
+	return std::filesystem::path(fullPath).filename().string();
+}
+
+uint32_t AudioManager::GetHandleByName(const std::string& name) const {
+	auto getHandle = nameToHandles_.find(name);
+	if (getHandle == nameToHandles_.end()) {
+		return 0;
+	}
+	return getHandle->second;
 }
