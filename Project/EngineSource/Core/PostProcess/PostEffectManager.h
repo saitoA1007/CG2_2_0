@@ -113,7 +113,7 @@ namespace GameEngine {
         static OutLinePSO* outLinePSO_;
 
         // psoデータのリスト
-        static std::array<DrawPsoData*,static_cast<size_t>(PSOType::MaxCount)> psoList_;
+        static std::array<DrawPsoData,static_cast<size_t>(PSOType::MaxCount)> psoList_;
 
     private:
 
