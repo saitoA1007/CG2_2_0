@@ -5,6 +5,7 @@
 #include"FPSCounter.h"
 #include"EasingManager.h"
 #include"RandomGenerator.h"
+#include"GameParamEditor.h"
 #include"LogManager.h"
 using namespace GameEngine;
 
@@ -438,11 +439,21 @@ void BossStateBattle::WaitUpdate() {
 }
 
 void BossStateBattle::RegisterBebugParam() {
+	// 突進攻撃
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "RushTime", rushMaxTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "OffestEndRush", offsetEndRush_);
 
+	// 氷柱攻撃
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "IceFallTime", maxWaitTime_);
 }
 
 void BossStateBattle::ApplyDebugParam() {
+	// 突進攻撃
+	rushMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "RushTime");
+	offsetEndRush_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "OffestEndRush");
 
+	// 氷柱攻撃
+	maxWaitTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "IceFallTime");
 }
 
 void BossStateBattle::Setup(uint32_t sampleCount) {

@@ -29,6 +29,13 @@ public:
 	/// <returns></returns>
 	GameEngine::WorldTransform& GetWorldTransform() { return worldTransform_; }
 
+	/// <summary>
+	/// コライダー取得
+	/// </summary>
+	GameEngine::Collider* GetCollider() { return bodyCollider_.get(); }
+
+	Sphere GetSphereData();
+
 private: // 調整項目
 
 	// 最大体力
@@ -53,6 +60,11 @@ private: // メンバ変数
 	// 両翼の当たり判定も追加する場合はstd::arrayにしてenumで管理する
 	// 体の当たり判定
 	std::unique_ptr<GameEngine::SphereCollider> bodyCollider_;
+
+	float bodyColliderSize_ = 3.0f;
+
+	// デバック用のグループ名
+	std::string kGroupName_ = "Boss";
 
 private:
 

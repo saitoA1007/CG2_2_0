@@ -251,7 +251,6 @@
     <ClCompile Include="Externals\imgui\crude_json.cpp" />
     <ClCompile Include="Externals\imgui\imgui_canvas.cpp" />
     <ClCompile Include="Externals\imgui\imgui_node_editor_api.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\MaterialEditor.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
     <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp" />
     <ClCompile Include="EngineSource\Collision\CollisionManager.cpp" />
@@ -292,6 +291,7 @@
     <ClCompile Include="EngineSource\3D\Extension\CustomRenderer.cpp" />
     <ClCompile Include="Application\Graphics\Terrain.cpp" />
     <ClCompile Include="Application\Graphics\PlaneProjectionShadow.cpp" />
+    <ClCompile Include="Application\Enemy\Effect\EnemyRushEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -523,7 +523,6 @@
     <ClInclude Include="Externals\imgui\imgui_extra_math.h" />
     <ClInclude Include="Externals\imgui\imgui_canvas.h" />
     <ClInclude Include="Externals\imgui\imgui_bezier_math.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\MaterialEditor.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\DrawPSOData.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
     <ClInclude Include="EngineSource\Editor\ParamEditorManager.h" />
@@ -586,6 +585,7 @@
     <ClInclude Include="Application\Graphics\PlaneProjectionShadow.h" />
     <ClInclude Include="EngineSource\Core\PostProcess\ParameterResource.h" />
     <ClInclude Include="EngineSource\Core\PostProcess\PostEffectData.h" />
+    <ClInclude Include="Application\Enemy\Effect\EnemyRushEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

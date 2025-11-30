@@ -281,6 +281,10 @@ void PSOManager::DefaultLoadPSO() {
     default3D.blendMode = BlendMode::kBlendModeAdd;
     RegisterPSO("Additive3D", default3D, &rootSigBuilder, &inputLayoutBuilder);
 
+    // 両面描画
+    default3D.drawMode = DrawModel::None;
+    RegisterPSO("BothSides3D", default3D, &rootSigBuilder, &inputLayoutBuilder);
+
     // デフォルトのスプライト用PSO
     CreatePSOData defaultSprite;
     defaultSprite.rootSigName = "Default2D";

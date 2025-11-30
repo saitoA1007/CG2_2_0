@@ -39,7 +39,7 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
 
     // 当たり判定を設定する
     bodyCollider_ = std::make_unique<SphereCollider>();
-    bodyCollider_->SetRadius(4.0f);
+    bodyCollider_->SetRadius(bodyColliderSize_);
     bodyCollider_->SetWorldPosition(worldTransform_.transform_.translate);
     bodyCollider_->SetCollisionAttribute(kCollisionAttributeEnemy);
     bodyCollider_->SetCollisionMask(~kCollisionAttributeEnemy);
@@ -47,9 +47,20 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
     bodyCollider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
         this->OnCollisionEnter(result);
     });
+
+#ifdef _DEBUG
+    // 値を登録する
+    RegisterBebugParam();
+#endif
+    // 値を適応させる
+    ApplyDebugParam();
 }
 
 void BossEnemy::Update(const Vector3& targetPos) {
+#ifdef _DEBUG
+    // 値を適応
+    ApplyDebugParam();
+#endif
 
     // 攻撃する目標の位置を取得する
     bossContext_.targetPos = targetPos;
@@ -90,14 +101,22 @@ void BossEnemy::Update(const Vector3& targetPos) {
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
     
     if (bossContext_.hp > 0) {
-        bossContext_.hp -= 1;
+        //bossContext_.hp -= 1;
     }
 }
 
-void BossEnemy::RegisterBebugParam() {
+Sphere BossEnemy::GetSphereData() {
+    return Sphere(bodyCollider_->GetWorldPosition(), bodyCollider_->GetRadius());
+}
 
+void BossEnemy::RegisterBebugParam() {
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "MaxHp", kMaxHp_);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "BodyColliderSize", bodyColliderSize_);
 }
 
 void BossEnemy::ApplyDebugParam() {
+    kMaxHp_ = GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupName_, "MaxHp");
+    bodyColliderSize_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "BodyColliderSize");
 
+    bodyCollider_->SetRadius(bodyColliderSize_);
 }

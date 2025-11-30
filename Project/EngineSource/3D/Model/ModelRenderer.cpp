@@ -18,6 +18,7 @@ void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, Tex
 	// 通常描画のpsoデータを取得する
 	psoList_[RenderMode3D::DefaultModel] = psoManager->GetDrawPsoData("Default3D");
 	psoList_[RenderMode3D::DefaultModelAdd] = psoManager->GetDrawPsoData("Additive3D");
+	psoList_[RenderMode3D::DefaultModelBoth] = psoManager->GetDrawPsoData("BothSides3D");
 	// インスタンシング描画用のデータを取得する
 	psoList_[RenderMode3D::Instancing] = psoManager->GetDrawPsoData("Instancing3D");
 	psoList_[RenderMode3D::InstancingAdd] = psoManager->GetDrawPsoData("AdditiveInstancing3D");

@@ -74,6 +74,12 @@ private:
 
 private:
 
+	// 保存するグループ名
+	const std::vector<std::string> kGroupNames = {
+		"Boss-Rush",
+		"Boss-IceFall",
+	};
+
 	// 回転の方向を保存する
 	Vector3 startDir_ = {};
 	Vector3 endDir_ = {};
@@ -158,49 +164,27 @@ private: // 各振る舞いの処理
 	/// </summary>
 	void ControllBehavior();
 
-	/// <summary>
-	/// 通常行動のリセット処理
-	/// </summary>
+	// 通常行動のリセット処理
 	void ResetNormal();
-
-	/// <summary>
-	/// 通常の行動処理
-	/// </summary>
+	// 通常の行動処理
 	void NormalUpdate();
 
-	/// <summary>
-	/// 突進攻撃のリセット処理
-	/// </summary>
+	// 突進攻撃のリセット処理
 	void ResetRush();
-
-	/// <summary>
-	/// 突進の攻撃処理
-	/// </summary>
+	// 突進の攻撃処理
 	void RushAttackUpdate();
 
-	/// <summary>
-	/// 弾を発射する攻撃処理
-	/// </summary>
+	// 弾を発射する攻撃処理
 	void ShotAttackUpdate();
 
-	/// <summary>
-	/// 氷柱を落とす行動のリセット処理
-	/// </summary>
+	// 氷柱を落とす行動のリセット処理
 	void ResetIceFall();
-
-	/// <summary>
-	/// 氷柱を落とす攻撃処理
-	/// </summary>
+	// 氷柱を落とす攻撃処理
 	void IceFallAttackUpdate();
 
-	/// <summary>
-	/// 待機行動のリセット処理
-	/// </summary>
+	// 待機行動のリセット処理
 	void ResetWait();
-
-	/// <summary>
-	/// 待機行動処理
-	/// </summary>
+	// 待機行動処理
 	void WaitUpdate();
 
 private:
@@ -241,5 +225,4 @@ namespace {
 	float EaseOutQuart(float t);
 
 	float EaseInBack(float t);
-
 }
