@@ -6,15 +6,15 @@ using namespace GameEngine;
 
 BloomPSO* PostEffectManager::bloomPSO_ = nullptr;
 OutLinePSO* PostEffectManager::outLinePSO_ = nullptr;
-std::array<DrawPsoData*, static_cast<size_t>(PostEffectManager::PSOType::MaxCount)> PostEffectManager::psoList_;
+std::array<DrawPsoData, static_cast<size_t>(PostEffectManager::PSOType::MaxCount)> PostEffectManager::psoList_;
 
 void PostEffectManager::StaticInitialize(BloomPSO* bloomPSO, OutLinePSO* outLinePSO, PSOManager* psoManager) {
     bloomPSO_ = bloomPSO;
     outLinePSO_ = outLinePSO;
 
-    psoList_[static_cast<size_t>(PSOType::Vignetting)] = &psoManager->GetDrawPsoData("Vignetting");
-    psoList_[static_cast<size_t>(PSOType::ScanLine)] = &psoManager->GetDrawPsoData("ScanLine");
-    psoList_[static_cast<size_t>(PSOType::RadialBlur)] = &psoManager->GetDrawPsoData("RadialBlur");
+    psoList_[static_cast<size_t>(PSOType::Vignetting)] = psoManager->GetDrawPsoData("Vignetting");
+    psoList_[static_cast<size_t>(PSOType::ScanLine)] = psoManager->GetDrawPsoData("ScanLine");
+    psoList_[static_cast<size_t>(PSOType::RadialBlur)] = psoManager->GetDrawPsoData("RadialBlur");
 }
 
 void PostEffectManager::Initialize(ID3D12Device* device, float clearColor_[4], uint32_t width, uint32_t height, uint32_t descriptorSizeRTV, SrvManager* srvManager) {
@@ -431,7 +431,7 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
     );
 
     // psoデータを取得する
-    vignettingData_.psoData = psoList_[static_cast<size_t>(PSOType::Vignetting)];
+    vignettingData_.psoData = &psoList_[static_cast<size_t>(PSOType::Vignetting)];
 
     // パラメータリソースを作成
     vignettingResource_.CreateResource(device_);
@@ -455,7 +455,7 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
     );
 
     // psoデータを取得する
-    scanLineData_.psoData = psoList_[static_cast<size_t>(PSOType::ScanLine)];
+    scanLineData_.psoData = &psoList_[static_cast<size_t>(PSOType::ScanLine)];
 
     // パラメータリソースを作成
     scanLineResource_.CreateResource(device_);
@@ -481,7 +481,7 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
     );
 
     // psoデータを取得する
-    radialBlurData_.psoData = psoList_[static_cast<size_t>(PSOType::RadialBlur)];
+    radialBlurData_.psoData = &psoList_[static_cast<size_t>(PSOType::RadialBlur)];
 
     // パラメータリソースを作成
     radialBlurResource_.CreateResource(device_);
