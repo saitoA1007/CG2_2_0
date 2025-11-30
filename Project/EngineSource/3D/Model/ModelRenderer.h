@@ -18,6 +18,7 @@ namespace GameEngine {
 	enum class RenderMode3D {
 		DefaultModel, // 通常モデルを描画用
 		DefaultModelAdd,
+		DefaultModelBoth, // 両面描画
 		Instancing,   // インスタンシング描画用
 		InstancingAdd,
 		Grid,  // グリッド描画用

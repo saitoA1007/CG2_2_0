@@ -82,6 +82,8 @@ void TDGameScene::Initialize(SceneContext* context) {
 			false, true, false);
 	});
 
+	// 敵の処理に関する初期化処理
+#pragma region EnemySystem 
 	// 敵の攻撃管理クラス
 	enemyAttackManager_ = std::make_unique<EnemyAttackManager>();
 	// ボス敵モデルを生成
@@ -101,9 +103,16 @@ void TDGameScene::Initialize(SceneContext* context) {
 	bossEnemyShadow_ = std::make_unique<PlaneProjectionShadow>();
 	bossEnemyShadow_->Initialize(&bossEnemy_->GetWorldTransform());
 
+	// ボスの突進攻撃の初期化
+	enemyRushEffect_ = std::make_unique<EnemyRushEffect>();
+	enemyRushEffect_->Initialize();
+	enemyRushEffect_->SetParent(&bossEnemy_->GetWorldTransform());
+
 	// 氷柱のモデルを取得
 	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
-
+	// 突進攻撃演出モデル
+	enemyRushModel_ = context_->modelManager->GetNameByModel("RushWave");
+#pragma endregion
 
 	//==================================================
 	// カメラアニメーション設定
@@ -200,6 +209,8 @@ void TDGameScene::Update() {
 	bossEnemyAnimator_->Update();
 	// 敵の影の更新処理
 	bossEnemyShadow_->Update();
+	// 突進攻撃演出の更新処理
+	enemyRushEffect_->Update();
 
 	// ステージの更新処理
 	//stageManager_->Update();
@@ -269,6 +280,13 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	CustomRenderer::PreDraw(CustomRenderMode::Ice);
 	CustomRenderer::DrawIce(icePlaneModel_, terrain_->GetWorldTransform(), sceneLightingController_->GetResource(), terrain_->GetMaterial());
 
+	// 3Dモデルの両面描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);
+
+	// ボスの突進攻撃演出の描画
+	for (auto& rushEffect : enemyRushEffect_->GetWorldTransforms()) {
+		ModelRenderer::Draw(enemyRushModel_, rushEffect);
+	}
 #ifdef _DEBUG
 
 	// デバック描画
@@ -313,6 +331,12 @@ void TDGameScene::UpdateCollision() {
     collisionManager_->AddCollider(player_->GetCollider());
 #ifdef _DEBUG
     debugRenderer_->AddSphere(player_->GetSphereData());
+#endif
+
+	// 敵の当たり判定を登録する
+	collisionManager_->AddCollider(bossEnemy_->GetCollider());
+#ifdef _DEBUG
+	debugRenderer_->AddSphere(bossEnemy_->GetSphereData(),{1.0f,1.0f,0.0f,1.0f});
 #endif
 
 	// 生存している壁の要素を取得する

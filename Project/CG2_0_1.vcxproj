@@ -170,6 +170,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="Application\Camera\CameraController.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
+    <ClCompile Include="Application\Enemy\Effect\EnemyRushEffect.cpp" />
     <ClCompile Include="Application\Enemy\EnemyAttackManager.cpp" />
     <ClCompile Include="Application\Enemy\LongLangeAttack\IceFall.cpp" />
     <ClCompile Include="Application\Enemy\States\BossStateBattle.cpp" />
@@ -225,7 +226,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\PostProcess\PostEffectManager.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\BlendBuilder.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\MaterialEditor.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\PSOManager.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\RasterizerBuilder.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.cpp" />
@@ -338,6 +338,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy\BossContext.h" />
     <ClInclude Include="Application\Enemy\BossEnemy.h" />
     <ClInclude Include="Application\Enemy\BossState.h" />
+    <ClInclude Include="Application\Enemy\Effect\EnemyRushEffect.h" />
     <ClInclude Include="Application\Enemy\EnemyAttackManager.h" />
     <ClInclude Include="Application\Enemy\LongLangeAttack\IceFall.h" />
     <ClInclude Include="Application\Enemy\States\BossStateBattle.h" />
@@ -418,7 +419,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\PSO\Core\BlendBuilder.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\DrawPSOData.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\MaterialEditor.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\PSOManager.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\RasterizerBuilder.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.h" />

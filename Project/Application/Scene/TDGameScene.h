@@ -20,6 +20,7 @@
 #include"Application/Enemy/EnemyAttackManager.h"
 #include"Application/Graphics/Terrain.h"
 #include"Application/Graphics/PlaneProjectionShadow.h"
+#include"Application/Enemy/Effect/EnemyRushEffect.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -117,9 +118,13 @@ private: // シーン機能
 
 	// ボスの遠距離攻撃管理クラス
 	std::unique_ptr<EnemyAttackManager> enemyAttackManager_;
+	// ボスの突進攻撃演出
+	std::unique_ptr<EnemyRushEffect> enemyRushEffect_;
 
 	// 氷柱のモデル
 	GameEngine::Model* iceFallModel_;
+	// 敵の突進攻撃演出のモデル
+	GameEngine::Model* enemyRushModel_;
 
 	// ボスロックオンフラグ
     bool isBossLockOn_ = false;
