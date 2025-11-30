@@ -7,6 +7,7 @@
 #include"ModelManager.h"
 #include"DebugCamera.h"
 #include"AnimationManager.h"
+#include"PostProcess/PostEffectManager.h"
 
 // シーンで使用するエンジン機能
 struct SceneContext {
@@ -18,4 +19,5 @@ struct SceneContext {
 	GameEngine::GraphicsDevice* graphicsDevice = nullptr; // DirectXのコア機能
 	GameEngine::DebugCamera* debugCamera_ = nullptr; // デバック描画機能
 	GameEngine::AnimationManager* animationManager = nullptr; // アニメーションデータを取得可能
+	GameEngine::PostEffectManager* postEffectManager_ = nullptr; // ポストエフェクトの管理
 };
