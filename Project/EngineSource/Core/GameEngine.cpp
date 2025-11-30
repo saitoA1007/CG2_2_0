@@ -129,6 +129,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneContext.audioManager = audioManager_.get();
 	sceneContext.graphicsDevice = graphicsDevice_.get();
 	sceneContext.animationManager = animationManager_.get();
+	sceneContext.postEffectManager_ = postEffectManager_.get();
 
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();

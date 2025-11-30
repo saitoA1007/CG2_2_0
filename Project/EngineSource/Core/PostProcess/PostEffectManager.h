@@ -1,5 +1,5 @@
 #pragma once
-#include<vector>
+#include<array>
 #include <wrl.h>
 #include <d3d12.h>
 
@@ -113,7 +113,7 @@ namespace GameEngine {
         static OutLinePSO* outLinePSO_;
 
         // psoデータのリスト
-        static std::unordered_map<PSOType, DrawPsoData> psoList_;
+        static std::array<DrawPsoData*,static_cast<size_t>(PSOType::MaxCount)> psoList_;
 
     private:
 
@@ -235,12 +235,5 @@ namespace GameEngine {
             D3D12_GPU_DESCRIPTOR_HANDLE& srvGpuHandle,           // 作成するsrvHandle
             uint32_t& srvIndex  // ヒープ上に存在するインデックス
         );
-
-        /// <summary>
-        /// PSOデータを取得
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        DrawPsoData* GetPSOData(PSOType type);
     };
 }
