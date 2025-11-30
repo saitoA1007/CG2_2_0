@@ -29,6 +29,9 @@ void SceneManager::Initialize(SceneContext* context) {
 	// アニメーションデータを読み込む
 	LoadAnimationData();
 
+	// 音声データを読み込む
+	LoadAudioData();
+
 	// デバックカメラを生成
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->graphicsDevice->GetDevice());
@@ -137,6 +140,10 @@ void SceneManager::LoadSpriteData() {
 void SceneManager::LoadAnimationData() {
 	// 歩くアニメーションデータを登録する
 	context_->animationManager->RegisterAnimation("Walk", "walk.gltf");
+}
+
+void SceneManager::LoadAudioData() {
+	context_->audioManager->LoadAllAudio();
 }
 
 void SceneManager::ChangeScene(SceneState nextSceneState) {

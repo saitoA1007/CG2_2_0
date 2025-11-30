@@ -98,6 +98,11 @@ private:
 	void LoadAnimationData();
 
 	/// <summary>
+	/// 使用する音声データを読み込む
+	/// </summary>
+	void LoadAudioData();
+
+	/// <summary>
 	/// シーンを作成する
 	/// </summary>
 	/// <param name="sceneState"></param>

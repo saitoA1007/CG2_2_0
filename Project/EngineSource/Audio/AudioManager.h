@@ -65,12 +65,32 @@ namespace GameEngine {
 		/// </summary>
 		void Finalize();
 
+	public:
+
+		/// <summary>
+		/// 全ての音声データを読み込む
+		/// </summary>
+		void LoadAllAudio();
+
+		/// <summary>
+		/// 音声データを登録する
+		/// </summary>
+		/// <param name="fileName"></param>
+		void RegisterAudio(const std::string& fileName);
+
 		/// <summary>
 		/// 音声をロード
 		/// </summary>
 		/// <param name="fileName"></param>
 		/// <returns></returns>
 		uint32_t Load(const std::string& fileName);
+
+		/// <summary>
+		/// 名前からハンドルを取得
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		uint32_t GetHandleByName(const std::string& name) const;
 
 		/// <summary>
 		/// 音声を再生
@@ -98,6 +118,9 @@ namespace GameEngine {
 
 		// s
 		std::vector<SoundData> soundData_;
+
+		// 音声データのハンドルを保存する
+		std::unordered_map<std::string, uint32_t> nameToHandles_;
 
 		// 再生中の音声を保存
 		std::unordered_map<uint32_t, IXAudio2SourceVoice*> activeVoices_;
@@ -134,5 +157,12 @@ namespace GameEngine {
 		/// 音声データの解放
 		/// </summary>
 		void SoundUnload();
+
+		/// <summary>
+		/// ファイルの名前を取得する
+		/// </summary>
+		/// <param name="fullPath"></param>
+		/// <returns></returns>
+		std::string GetFileName(const std::string& fullPath);
 	};
 }
