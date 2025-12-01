@@ -1,13 +1,20 @@
+#define NOMINMAX
 #include"ParticleBehavior.h"
 #include"FPSCounter.h"
 #include"RandomGenerator.h"
 #include"GameParamEditor.h"
+#include"EasingManager.h"
 #include"MyMath.h"
 using namespace GameEngine;
 
-void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum, uint32_t textureHandle) {
+TextureManager* ParticleBehavior::textureManager_ = nullptr;
+
+void ParticleBehavior::StatcInitialize(TextureManager* textureManager) {
+    textureManager_ = textureManager;
+}
+
+void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum) {
     maxNumInstance_ = maxNum;
-    textureHandle_ = textureHandle;
     name_ = name;
 
     // パーティクル配列を確保
@@ -32,7 +39,7 @@ void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum, uint3
     ApplyDebugParam();
 }
 
-void ParticleBehavior::Update(const Matrix4x4& cameraMatrix) {
+void ParticleBehavior::Update(const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix) {
 
 #ifdef _DEBUG
     // デバック結果を適応する
@@ -46,7 +53,7 @@ void ParticleBehavior::Update(const Matrix4x4& cameraMatrix) {
     }
 
     // 移動処理
-    Move(cameraMatrix);
+    Move(cameraMatrix, viewMatrix);
 }
 
 void ParticleBehavior::Emit(const Vector3& pos) {
@@ -65,19 +72,33 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     // srtを設定
     float scale = RandomGenerator::Get(particleEmitter_.scaleRange.min.x, particleEmitter_.scaleRange.max.x);
     tmpParticleData.transform.scale = { scale ,scale ,scale };
-    tmpParticleData.transform.rotate = {0.0f,0.0f,0.0f};
+    tmpParticleData.transform.rotate = {
+        RandomGenerator::Get(particleEmitter_.rotateRange.min.x, particleEmitter_.rotateRange.max.x),
+        RandomGenerator::Get(particleEmitter_.rotateRange.min.y, particleEmitter_.rotateRange.max.y),
+        RandomGenerator::Get(particleEmitter_.rotateRange.min.z, particleEmitter_.rotateRange.max.z),
+    };
     tmpParticleData.transform.translate = {
     RandomGenerator::Get(particleEmitter_.posRange.min.x, particleEmitter_.posRange.max.x),
     RandomGenerator::Get(particleEmitter_.posRange.min.y, particleEmitter_.posRange.max.y), 
     RandomGenerator::Get(particleEmitter_.posRange.min.z, particleEmitter_.posRange.max.z),
     };
     tmpParticleData.transform.translate += emitterPos_;
-    // 速度
-    tmpParticleData.velocity = {
-    RandomGenerator::Get(particleEmitter_.velocityRange.min.x, particleEmitter_.velocityRange.max.x),
-    RandomGenerator::Get(particleEmitter_.velocityRange.min.y, particleEmitter_.velocityRange.max.y),
-    RandomGenerator::Get(particleEmitter_.velocityRange.min.z, particleEmitter_.velocityRange.max.z), 
-    };
+
+    if (particleEmitter_.velocityFromPosition.isEnable) {
+        // 方向を求める
+        Vector3 dir = tmpParticleData.transform.translate - emitterPos_;
+        dir = Normalize(dir);
+        // 速度
+        tmpParticleData.velocity = dir * RandomGenerator::Get(particleEmitter_.velocityFromPosition.minVelocity, particleEmitter_.velocityFromPosition.maxVelocity);
+    } else {
+        // 速度
+        tmpParticleData.velocity = {
+        RandomGenerator::Get(particleEmitter_.velocityRange.min.x, particleEmitter_.velocityRange.max.x),
+        RandomGenerator::Get(particleEmitter_.velocityRange.min.y, particleEmitter_.velocityRange.max.y),
+        RandomGenerator::Get(particleEmitter_.velocityRange.min.z, particleEmitter_.velocityRange.max.z),
+        };
+    }
+
     // 色
     tmpParticleData.color = { 
     RandomGenerator::Get(particleEmitter_.colorRange.min.x, particleEmitter_.colorRange.max.x),
@@ -88,6 +109,19 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     // 生存時間
     tmpParticleData.currentTime = 0.0f;
     tmpParticleData.lifeTime = particleEmitter_.lifeTime;
+    // 初期値を保存
+    tmpParticleData.startSize = tmpParticleData.transform.scale;
+    tmpParticleData.startColor = Vector4(tmpParticleData.color.x, tmpParticleData.color.y, tmpParticleData.color.z,1.0f);
+    tmpParticleData.startAlpha = tmpParticleData.color.w;
+    // テクスチャを設定
+    if (particleEmitter_.textures_.size() == 0) {
+        // 何もない場合、エラーカラーを入れる
+        tmpParticleData.textureHandle = 1;
+    } else {
+        uint32_t index = RandomGenerator::Get(static_cast<uint32_t>(0),static_cast<uint32_t>(particleEmitter_.textures_.size()-1));
+        auto it = std::next(particleEmitter_.textures_.begin(), index);
+        tmpParticleData.textureHandle = it->second;
+    }
     return tmpParticleData;
 }
 
@@ -113,7 +147,7 @@ void ParticleBehavior::Create() {
     }
 }
 
-void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
+void ParticleBehavior::Move(const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix) {
     currentNumInstance_ = 0;
     for (uint32_t i = 0; i < maxNumInstance_; ++i) {
         ParticleData& particle = particles_[i];
@@ -128,15 +162,38 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         particle.velocity += particleEmitter_.fieldAcceleration * FpsCounter::deltaTime;
         particle.transform.translate += particle.velocity * FpsCounter::deltaTime;
 
+        // 大きさの変化
+        if (particleEmitter_.sizeOverLifeTime.isEnable) {
+            particle.transform.scale = Lerp(particle.startSize, particleEmitter_.sizeOverLifeTime.endSize, particle.currentTime / particle.lifeTime);
+        }
+
         // worldTransformsの更新
         if (particleEmitter_.isBillBoard) {
             // ビルボードを適応する
-            worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = MakeBillboardMatrix(particles_[i].transform.scale, particles_[i].transform.translate, cameraMatrix);
+            if (particleEmitter_.rotateZFromVelocity.isEnable) {
+                worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = MakeDirectionalBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix, viewMatrix, particle.velocity);
+            } else {
+                worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = MakeBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix, particle.transform.rotate.z);
+            }
         } else {
-            worldTransforms_->transformDatas_[currentNumInstance_].transform = particles_[i].transform;
+            worldTransforms_->transformDatas_[currentNumInstance_].transform = particle.transform;
         }
 
-        worldTransforms_->transformDatas_[currentNumInstance_].color = particles_[i].color;
+        // 色の変化
+        if (particleEmitter_.colorOverLifeTime.isEnable) {
+            Vector4 tmpColor = Lerp(particle.startColor, particleEmitter_.colorOverLifeTime.endColor, particle.currentTime / particle.lifeTime);
+            particle.color.x = tmpColor.x;
+            particle.color.y = tmpColor.y;
+            particle.color.z = tmpColor.z;
+        }
+
+        // 透明度の変化
+        if (particleEmitter_.alphaOverLifeTime.isEnable) {
+            particle.color.w = Lerp(particle.startAlpha, particleEmitter_.alphaOverLifeTime.endAlpha, particle.currentTime / particle.lifeTime);
+        }
+
+        worldTransforms_->transformDatas_[currentNumInstance_].color = particle.color;
+        worldTransforms_->transformDatas_[currentNumInstance_].textureHandle = particle.textureHandle;
         currentNumInstance_++;
     }
 
@@ -148,6 +205,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
 
 void ParticleBehavior::RegisterBebugParam() {
     int index = 0;
+    GameParamEditor::GetInstance()->AddItem(name_, "Textures", particleEmitter_.textures_, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "SpawnMaxCount", particleEmitter_.spawnMaxCount, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "SpawnCoolTime", particleEmitter_.spawnCoolTime, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "IsLoop", particleEmitter_.isLoop, index++);
@@ -157,10 +215,27 @@ void ParticleBehavior::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(name_, "VelocityRange", particleEmitter_.velocityRange, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "SpawnRange", particleEmitter_.posRange, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "ScaleRange", particleEmitter_.scaleRange, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "RotateRange", particleEmitter_.rotateRange, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "ColorRange", particleEmitter_.colorRange, index++);
+    // 拡張機能
+    GameParamEditor::GetInstance()->AddItem(name_, "IsEnableSizeOverLifeTime", particleEmitter_.sizeOverLifeTime.isEnable, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "EndSize", particleEmitter_.sizeOverLifeTime.endSize, index++);
+
+    GameParamEditor::GetInstance()->AddItem(name_, "IsEnableColorOverLifeTime", particleEmitter_.colorOverLifeTime.isEnable, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "EndColor", particleEmitter_.colorOverLifeTime.endColor, index++);
+
+    GameParamEditor::GetInstance()->AddItem(name_, "IsEnableAlphaOverLifeTime", particleEmitter_.alphaOverLifeTime.isEnable, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "EndAlpha", particleEmitter_.alphaOverLifeTime.endAlpha, index++);
+
+    GameParamEditor::GetInstance()->AddItem(name_, "IsEnableVelocityFromPosition", particleEmitter_.velocityFromPosition.isEnable, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "MinVelocity", particleEmitter_.velocityFromPosition.minVelocity, index++);
+    GameParamEditor::GetInstance()->AddItem(name_, "MaxVelocity", particleEmitter_.velocityFromPosition.maxVelocity, index++);
+
+    GameParamEditor::GetInstance()->AddItem(name_, "IsEnableRotateZFromVelocity", particleEmitter_.rotateZFromVelocity.isEnable, index++);
 }
 
 void ParticleBehavior::ApplyDebugParam() {
+    particleEmitter_.textures_ = GameParamEditor::GetInstance()->GetValue<std::map<std::string, uint32_t>>(name_, "Textures");
     particleEmitter_.spawnMaxCount = GameParamEditor::GetInstance()->GetValue<uint32_t>(name_, "SpawnMaxCount");
     particleEmitter_.spawnCoolTime = GameParamEditor::GetInstance()->GetValue<float>(name_, "SpawnCoolTime");
     particleEmitter_.isLoop = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsLoop");
@@ -170,10 +245,35 @@ void ParticleBehavior::ApplyDebugParam() {
     particleEmitter_.velocityRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "VelocityRange");
     particleEmitter_.posRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "SpawnRange");
     particleEmitter_.scaleRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "ScaleRange");
+    particleEmitter_.rotateRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "RotateRange");
     particleEmitter_.colorRange = GameParamEditor::GetInstance()->GetValue<Range4>(name_, "ColorRange");
+    // 拡張機能
+    particleEmitter_.sizeOverLifeTime.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableSizeOverLifeTime");
+    particleEmitter_.sizeOverLifeTime.endSize = GameParamEditor::GetInstance()->GetValue<Vector3>(name_, "EndSize");
+
+    particleEmitter_.colorOverLifeTime.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableColorOverLifeTime");
+    particleEmitter_.colorOverLifeTime.endColor = GameParamEditor::GetInstance()->GetValue<Vector4>(name_, "EndColor");
+
+    particleEmitter_.alphaOverLifeTime.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableAlphaOverLifeTime");
+    particleEmitter_.alphaOverLifeTime.endAlpha = GameParamEditor::GetInstance()->GetValue<float>(name_, "EndAlpha");
+
+    particleEmitter_.velocityFromPosition.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableVelocityFromPosition");
+    particleEmitter_.velocityFromPosition.minVelocity = GameParamEditor::GetInstance()->GetValue<float>(name_, "MinVelocity");
+    particleEmitter_.velocityFromPosition.maxVelocity = GameParamEditor::GetInstance()->GetValue<float>(name_, "MaxVelocity");
+    // 最小範囲が最大範囲を超えないようにする
+    particleEmitter_.velocityFromPosition.minVelocity = std::min(particleEmitter_.velocityFromPosition.minVelocity, particleEmitter_.velocityFromPosition.maxVelocity);
+
+    particleEmitter_.rotateZFromVelocity.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableRotateZFromVelocity");
 
     // 出現範囲を抑える
     if (maxNumInstance_ <= particleEmitter_.spawnMaxCount) {
         particleEmitter_.spawnMaxCount = maxNumInstance_;
+    }
+
+    if (particleEmitter_.textures_.size() >= 1) {
+        // 画像名からハンドルを取得
+        for (auto& it : particleEmitter_.textures_) {
+            it.second = textureManager_->GetHandleByName(it.first);
+        }
     }
 }

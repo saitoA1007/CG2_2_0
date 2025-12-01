@@ -196,6 +196,17 @@ void GameParamEditor::LoadFile(const std::string& groupName) {
 					};
 					SetValue(groupName, itemName, value);
 				}
+			} else {
+				std::map<std::string, uint32_t> mapValue;
+
+				for (auto& [key, val] : itItem->items()) {
+					// JSON が整数なら uint32_t として取得
+					if (val.is_number_unsigned() || val.is_number_integer()) {
+						mapValue[key] = val.get<uint32_t>();
+					}
+				}
+
+				SetValue(groupName, itemName, mapValue);
 			}
 			break;
 

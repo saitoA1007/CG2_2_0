@@ -2,15 +2,25 @@
 #include "IEditorWindow.h"
 #include "GameParamEditor.h"
 #include "ImGuiManager.h"
+#include"TextureManager.h"
 
 namespace GameEngine {
 
 	class InspectorWindow : public IEditorWindow {
 	public:
+		InspectorWindow(TextureManager* textureManager);
+
 		void Draw() override;
 		std::string GetName() const override { return "ParameterInspector"; }
 
+		static void EditTexutre(std::map<std::string, uint32_t>& value);
+
+		static TextureManager* textureManager_;
 	};
+
+	// 入力変数
+	static char nameBuffer[256] = "";
+	static std::string statusMessage = "";
 
 	// ImGuiで表示する用のパラメータを管理する
 	struct DebugParameterVisitor {
@@ -74,6 +84,13 @@ namespace GameEngine {
 		void operator()(std::string& value) const {
 			//ImGui::InputText(itemName.c_str(), value.data());
 			ImGui::Text(itemName.c_str(), &value);
+		}
+
+		void operator()(std::map<std::string, uint32_t>& value) const {
+			if (ImGui::TreeNode(itemName.c_str())) {
+				InspectorWindow::EditTexutre(value);
+				ImGui::TreePop();
+			}
 		}
 
 		// 対応出来ない型がきた場合の処理

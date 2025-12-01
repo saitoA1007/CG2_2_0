@@ -117,3 +117,8 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 /// <param name="cameraMatrix"></param>
 /// <returns></returns>
 Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix);
+
+Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix, const float& rotateZ);
+
+// 速度方向から回転を求める
+Matrix4x4 MakeDirectionalBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix, const Vector3& velocity);

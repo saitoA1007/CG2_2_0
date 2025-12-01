@@ -83,6 +83,8 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	textureManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), srvManager_.get());
 	// 初期の画像をロードする
 	textureManager_->Load("Resources/Textures/white2x2.png");
+	// エラーカラーをロードする
+	textureManager_->Load("Resources/Textures/errorColor.png");
 
 	// 入力処理のコマンドシステムを生成
 	inputCommand_ = std::make_unique<InputCommand>(input_.get());

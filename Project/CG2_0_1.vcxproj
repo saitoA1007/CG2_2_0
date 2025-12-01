@@ -378,6 +378,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Model\Particle.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleData.h" />
+    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleExtensionData.h" />
     <ClInclude Include="EngineSource\3D\Model\VertexData.h" />
     <ClInclude Include="EngineSource\3D\Model\WorldTransform.h" />
     <ClInclude Include="EngineSource\3D\Model\WorldTransforms.h" />
