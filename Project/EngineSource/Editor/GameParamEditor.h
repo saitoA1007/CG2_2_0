@@ -19,7 +19,7 @@ public:
 
 	// 項目
 	struct Item {
-		std::variant<int32_t, uint32_t, float, Vector2, Vector3,Vector4,Range3, Range4, bool, std::string> value;
+		std::variant<int32_t, uint32_t, float, Vector2, Vector3,Vector4,Range3, Range4, bool, std::string, std::map<std::string, uint32_t>> value;
 		int priority = INT_MAX; // 優先順位
 	};
 
@@ -187,6 +187,15 @@ private:
 				{ "Min", json::array({ value.min.x, value.min.y, value.min.z, value.min.w}) },
 				{ "Max", json::array({ value.max.x, value.max.y, value.max.z, value.max.w}) }
 				});
+		}
+
+		void operator()(const std::map<std::string, uint32_t>& value) const {
+			json j = json::object();
+			// キーと値をそのまま入れる
+			for (const auto& [key, val] : value) {
+				j[key] = val;  
+			}
+			jsonData = j;
 		}
 
 		void operator()(const Vector4& value) const {

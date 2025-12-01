@@ -2,6 +2,7 @@
 #include"ParticleData.h"
 #include "Matrix4x4.h"
 #include "WorldTransforms.h"
+#include"TextureManager.h"
 #include <vector>
 
 namespace GameEngine{
@@ -10,17 +11,23 @@ namespace GameEngine{
 	public:
 
 		/// <summary>
+		/// 静的初期化
+		/// </summary>
+		/// <param name="textureManager"></param>
+		static void StatcInitialize(TextureManager* textureManager);
+
+		/// <summary>
 		/// 初期化
 		/// </summary>
 		/// <param name="maxNum"></param>
 		/// <param name="textureHandle"></param>
 		/// <param name="particleEmitter"></param>
-		void Initialize(const std::string& name,uint32_t maxNum, uint32_t textureHandle);
+		void Initialize(const std::string& name,uint32_t maxNum);
 
 		/// <summary>
 		/// 更新処理
 		/// </summary>
-		void Update(const Matrix4x4& cameraMatrix);
+		void Update(const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix);
 
 		/// <summary>
 		/// パーティクルの生成
@@ -29,22 +36,27 @@ namespace GameEngine{
 		void Emit(const Vector3& pos);
 
 		/// <summary>
+		/// 速度を設定
+		/// </summary>
+		/// <param name="velocity"></param>
+		void SetVelocity(const Vector3& velocity) {
+			particleEmitter_.velocityRange.min = velocity;
+			particleEmitter_.velocityRange.max = velocity;
+		}
+
+		/// <summary>
+		/// フィールドの速度を設定する
+		/// </summary>
+		/// <param name="acceleration"></param>
+		void SetFieldAcceleration(const Vector3& acceleration) {
+			particleEmitter_.fieldAcceleration = acceleration;
+		}
+
+		/// <summary>
 		/// 行列のデータを取得
 		/// </summary>
 		/// <returns></returns>
 		WorldTransforms* GetWorldTransforms() const { return worldTransforms_.get(); }
-
-		/// <summary>
-		/// テクスチャを設定する
-		/// </summary>
-		/// <param name="texture"></param>
-		void SetTexture(const uint32_t& texture) { textureHandle_ = texture; }
-
-		/// <summary>
-		/// テクスチャの取得
-		/// </summary>
-		/// <returns></returns>
-		const uint32_t& GetTexture() const { return textureHandle_; }
 
 		/// <summary>
 		/// 現在の数
@@ -65,6 +77,9 @@ namespace GameEngine{
 		void SetParticleEmitter(const ParticelEmitter& particelEmitter) { particleEmitter_ = particelEmitter; }
 
 	private:
+
+		static TextureManager* textureManager_;
+
 		// パーティクルの配列
 		std::vector<ParticleData> particles_;           
 		// 描画用のトランスフォーム
@@ -73,8 +88,6 @@ namespace GameEngine{
 		uint32_t maxNumInstance_ = 0;                 
 		// 現在のパーティクルの数
 		uint32_t currentNumInstance_ = 0;
-
-		uint32_t textureHandle_ = 0;
 
 		// 発生位置
 		Vector3 emitterPos_ = { 0.0f,0.0f,0.0f };
@@ -104,7 +117,7 @@ namespace GameEngine{
 		/// <summary>
 		/// 移動処理
 		/// </summary>
-		void Move(const Matrix4x4& cameraMatrix);
+		void Move(const Matrix4x4& cameraMatrix,const Matrix4x4& viewMatrix);
 
 		/// <summary>
 		/// デバックした値を登録

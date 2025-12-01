@@ -586,6 +586,7 @@
     <ClInclude Include="EngineSource\Core\PostProcess\ParameterResource.h" />
     <ClInclude Include="EngineSource\Core\PostProcess\PostEffectData.h" />
     <ClInclude Include="Application\Enemy\Effect\EnemyRushEffect.h" />
+    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleExtensionData.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

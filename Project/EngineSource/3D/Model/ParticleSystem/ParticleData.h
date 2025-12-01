@@ -4,11 +4,16 @@
 #include "Transform.h"
 #include"Range.h"
 #include<cstdint>
+#include<string>
+#include<map>
+
+#include"ParticleExtensionData.h"
 
 namespace GameEngine {
 
 	// パーティクルの調整パラメータ
 	struct ParticelEmitter {
+		std::map<std::string, uint32_t> textures_; // 使用するテクスチャ
 		uint32_t spawnMaxCount = 1; // 出現する数
 		float spawnCoolTime = 1.0f; // 発生する時間
 		bool isLoop = true; // ループするかを判断する
@@ -18,7 +23,15 @@ namespace GameEngine {
 		Range3 velocityRange = { {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} }; // 速度の範囲
 		Range3 posRange = { {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} }; // 発生位置の範囲
 		Range3 scaleRange = { {1.0f,1.0f,1.0f},{1.0f,1.0f,1.0f} };  // 大きさの範囲
+		Range3 rotateRange = { {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} }; // 回転の範囲
 		Range4 colorRange = { {1.0f,1.0f,1.0f,1.0f},{1.0f,1.0f,1.0f,1.0f} }; // 色の範囲
+
+		SizeOverLifeTimeModule sizeOverLifeTime;   // 大きさの補間
+		ColorOverLifeTimeModule colorOverLifeTime; // 色の補間
+		AlphaOverLifeTimeModule alphaOverLifeTime; // 透明度の補間
+
+		VelocityFromPosition velocityFromPosition; // 生成位置から速度を求める
+		RotateZFromVelocity rotateZFromVelocity; // 速度方向から回転
 	};
 
 	// パーティクルデータ
@@ -28,5 +41,10 @@ namespace GameEngine {
 		Vector4 color;  // 色
 		float lifeTime; // 生存時間
 		float currentTime; // 現在の生存時間
-	};
+		uint32_t textureHandle = 0; // 使用するテクスチャ
+
+		Vector3 startSize;  // 最初の大きさ
+		Vector4 startColor; // 最初の色
+		float startAlpha;   // 最初の透明度
+	};	
 }
