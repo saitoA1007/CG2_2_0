@@ -126,6 +126,11 @@ private: // シーン機能
 	// 敵の突進攻撃演出のモデル
 	GameEngine::Model* enemyRushModel_;
 
+	// 平面モデル
+	GameEngine::Model* planeModel_;
+
+	std::unique_ptr<GameEngine::ParticleBehavior> particle_;
+
 	// ボスロックオンフラグ
     bool isBossLockOn_ = false;
 

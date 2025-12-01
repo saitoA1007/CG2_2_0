@@ -1,0 +1,99 @@
+{
+    "WaitIceFallParticle": {
+        "ColorRange": {
+            "Max": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "EndAlpha": 0.0,
+        "EndColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        ],
+        "EndSize": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "FieldAcceleration": [
+            0.0,
+            1.7100000381469727,
+            0.0
+        ],
+        "IsBillBoard": true,
+        "IsEnableAlphaOverLifeTime": false,
+        "IsEnableColorOverLifeTime": false,
+        "IsEnableRotateZFromVelocity": false,
+        "IsEnableSizeOverLifeTime": true,
+        "IsEnableVelocityFromPosition": false,
+        "IsLoop": true,
+        "LifeTime": 2.0,
+        "MaxVelocity": 0.0,
+        "MinVelocity": 0.0,
+        "RotateRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "ScaleRange": {
+            "Max": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "SceneName": "TDGameScene",
+        "SpawnCoolTime": 0.20000000298023224,
+        "SpawnMaxCount": 2,
+        "SpawnRange": {
+            "Max": [
+                1.0,
+                1.0,
+                0.5
+            ],
+            "Min": [
+                -1.0,
+                0.0,
+                -0.5
+            ]
+        },
+        "Textures": {
+            "smoke.png": 13
+        },
+        "VelocityRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    }
+}

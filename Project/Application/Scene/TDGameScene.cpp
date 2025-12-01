@@ -86,6 +86,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 #pragma region EnemySystem 
 	// 敵の攻撃管理クラス
 	enemyAttackManager_ = std::make_unique<EnemyAttackManager>();
+	enemyAttackManager_->Initialize();
 	// ボス敵モデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Walk");
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
@@ -113,6 +114,14 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// 突進攻撃演出モデル
 	enemyRushModel_ = context_->modelManager->GetNameByModel("RushWave");
 #pragma endregion
+
+	// 平面モデルを取得
+	planeModel_ = context_->modelManager->GetNameByModel("Plane");
+
+	// ボスの移動パーティクル
+	particle_ = std::make_unique<ParticleBehavior>();
+	particle_->Initialize("WaitIceFallParticle", 32);
+	particle_->Emit({ 0.0f,5.0f,0.0f });
 
 	//==================================================
 	// カメラアニメーション設定
@@ -205,7 +214,7 @@ void TDGameScene::Update() {
 
 	// 敵の移動処理
 	bossEnemy_->Update(player_->GetPlayerPos());
-	enemyAttackManager_->Update();
+	enemyAttackManager_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 	bossEnemyAnimator_->Update();
 	// 敵の影の更新処理
 	bossEnemyShadow_->Update();
@@ -214,6 +223,9 @@ void TDGameScene::Update() {
 
 	// ステージの更新処理
 	//stageManager_->Update();
+
+	// パーティクルの更新処理
+	particle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
 	// 当たり判定の更新処理
 	UpdateCollision();
@@ -284,9 +296,19 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);
 
 	// ボスの突進攻撃演出の描画
-	for (auto& rushEffect : enemyRushEffect_->GetWorldTransforms()) {
+	/*for (auto& rushEffect : enemyRushEffect_->GetWorldTransforms()) {
 		ModelRenderer::Draw(enemyRushModel_, rushEffect);
+	}*/
+
+	// 複数モデルの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
+
+	// 氷柱を落とすまでの演出を描画
+	for (auto& iceFallEffect : enemyAttackManager_->GetIceFallEffectDatas()) {
+		if (!iceFallEffect.isActive) { continue; }
+		ModelRenderer::DrawInstancing(planeModel_, iceFallEffect.particle->GetCurrentNumInstance(), *iceFallEffect.particle->GetWorldTransforms());
 	}
+
 #ifdef _DEBUG
 
 	// デバック描画

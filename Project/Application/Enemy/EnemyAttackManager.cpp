@@ -1,5 +1,6 @@
 #include"EnemyAttackManager.h"
 #include"RandomGenerator.h"
+#include"FPSCounter.h"
 #include<numbers>
 
 using namespace GameEngine;
@@ -8,7 +9,25 @@ EnemyAttackManager::~EnemyAttackManager() {
 	IceFallsList_.clear();
 }
 
-void EnemyAttackManager::Update() {
+void EnemyAttackManager::Initialize() {
+
+    // 演出用のメモリを確保しておく
+    iceFallEffectDatas_.reserve(3);
+
+    // 演出のパーティクルを生成
+    for (size_t i = 0; i < 3; ++i) {
+        IceFallEffectData  iceFallEffectData;
+        iceFallEffectData.timer = 0.0f;
+        iceFallEffectData.particle = std::make_unique<ParticleBehavior>();
+        iceFallEffectData.particle->Initialize("WaitIceFallParticle", 32);
+        iceFallEffectDatas_.push_back(std::move(iceFallEffectData));
+    }
+}
+
+void EnemyAttackManager::Update(const Matrix4x4& cameraWorldMatrix, const Matrix4x4& viewMatrix) {
+
+    // 演出の更新処理
+    EffectUpdate(cameraWorldMatrix, viewMatrix);
 
 	// 氷柱がデスフラグがたったら削除
 	IceFallsList_.remove_if([](const std::unique_ptr<IceFall>& iceFall) {
@@ -28,8 +47,6 @@ void EnemyAttackManager::AddIceFall(const Vector3& pos) {
 }
 
 void EnemyAttackManager::CreateIceFallPositions() {
-
-	//stageRadius_;
 
     if (IceFallsList_.size() != 0) { return; }
 
@@ -71,7 +88,35 @@ void EnemyAttackManager::CreateIceFallPositions() {
 
     // 求めた位置から氷を生成する
     for (size_t i = 0; i < points.size(); ++i) {
-        AddIceFall(Vector3(points[i].x, 10.0f, points[i].y));
+        //AddIceFall(Vector3(points[i].x, 10.0f, points[i].y));
+
+        // 氷柱を落とす位置に演出を発生させる
+        if (!iceFallEffectDatas_[i].isActive) {
+            iceFallEffectDatas_[i].particle->SetEmitterPos(Vector3(points[i].x, 10.0f, points[i].y));
+            iceFallEffectDatas_[i].isActive = true;
+            iceFallEffectDatas_[i].timer = 0.0f;
+        }
+    }
+}
+
+void EnemyAttackManager::EffectUpdate(const Matrix4x4& cameraWorldMatrix, const Matrix4x4& viewMatrix) {
+
+
+    for (auto& iceFallEffectData : iceFallEffectDatas_) {
+
+        if (!iceFallEffectData.isActive) { continue; }
+
+        iceFallEffectData.timer += FpsCounter::deltaTime / maxIceFallEmitTime_;
+
+        if (iceFallEffectData.timer >= 1.0f) {
+            iceFallEffectData.isActive = false;
+            
+            // 氷柱を落とす
+            AddIceFall(iceFallEffectData.particle->GetEmitterPos());
+        }
+
+        // 更新処理
+        iceFallEffectData.particle->Update(cameraWorldMatrix, viewMatrix);
     }
 }
 

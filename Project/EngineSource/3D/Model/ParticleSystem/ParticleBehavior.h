@@ -71,10 +71,22 @@ namespace GameEngine{
 		void SetEmitterPos(const Vector3& pos) { emitterPos_ = pos; }
 
 		/// <summary>
+		/// 発生位置を取得
+		/// </summary>
+		/// <returns></returns>
+		Vector3 GetEmitterPos() const { return emitterPos_; }
+
+		/// <summary>
 		/// パーティクルのパラメータを設定
 		/// </summary>
 		/// <param name="particelEmitter"></param>
 		void SetParticleEmitter(const ParticelEmitter& particelEmitter) { particleEmitter_ = particelEmitter; }
+
+		/// <summary>
+		/// ループの設定
+		/// </summary>
+		/// <param name="isLoop"></param>
+		void SetIsLoop(const bool& isLoop) { particleEmitter_.isLoop = isLoop;}
 
 	private:
 
