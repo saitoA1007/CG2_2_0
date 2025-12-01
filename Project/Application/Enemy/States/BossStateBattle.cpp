@@ -383,20 +383,17 @@ void BossStateBattle::IceFallAttackUpdate() {
 		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
 
 	} else {
-
-		waitTimer_ += FpsCounter::deltaTime / maxWaitTime_;
-
-		if (waitTimer_ >= 0.2f) {
-			if (!isActiveIceFall_) {
-				bossContext_.isActiveIceFall = true;
-				isActiveIceFall_ = true;
-			} else {
-				// 一度発射したらfalseにする
-				if (bossContext_.isActiveIceFall) {
-					bossContext_.isActiveIceFall = false;
-				}
+		if (!isActiveIceFall_) {
+			bossContext_.isActiveIceFall = true;
+			isActiveIceFall_ = true;
+		} else {
+			// 一度発射したらfalseにする
+			if (bossContext_.isActiveIceFall) {
+				bossContext_.isActiveIceFall = false;
 			}
 		}
+
+		waitTimer_ += FpsCounter::deltaTime / maxWaitTime_;
 
 		// 待機の終了
 		if (waitTimer_ >= 1.0f) {

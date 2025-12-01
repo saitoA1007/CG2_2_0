@@ -30,6 +30,9 @@ void WorldTransforms::StaticInitialize(ID3D12Device* device, SrvManager* srvMana
 
 void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& transform) {
 
+	// 先にメモリを確保
+	transformDatas_.reserve(kNumInstance);
+
 	TransformData transformData;
 	for (uint32_t i = 0; i < kNumInstance; ++i) {
 		transformData.transform = transform;

@@ -110,6 +110,9 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// 軸方向表示の初期化
 	AxisIndicator::StaticInitialize(graphicsDevice_->GetCommandList());
 
+	// 画像を取得
+	ParticleBehavior::StatcInitialize(textureManager_.get());
+
 	// カスタム描画機能
 	CustomRenderer::StaticInitialize(graphicsDevice_->GetDevice(),graphicsDevice_->GetCommandList(), srvManager_.get(), psoManager_.get());
 
