@@ -23,6 +23,7 @@ public:
 		MaxCount // 状態の数
 	};
 
+	// catmull用の点データ
 	struct SamplePoint {
 		float distance; // 始点からの累積距離
 		float rawT;     // その地点での元のt (0.0 - 1.0)

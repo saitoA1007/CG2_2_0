@@ -115,6 +115,8 @@ namespace GameEngine {
         // psoデータのリスト
         static std::array<DrawPsoData,static_cast<size_t>(PSOType::MaxCount)> psoList_;
 
+        ParameterResource<RadialBlurData> radialBlurResource_;
+
     private:
 
         // デバイス
@@ -176,7 +178,7 @@ namespace GameEngine {
 
         // ラジアルブラーのデータ
         EffectData radialBlurData_;
-        ParameterResource<RadialBlurData> radialBlurResource_;
+       
      
         // アウトラインのデータ
         EffectData outLineData_;
