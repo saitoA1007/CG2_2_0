@@ -129,8 +129,6 @@ private: // シーン機能
 	// 平面モデル
 	GameEngine::Model* planeModel_;
 
-	std::unique_ptr<GameEngine::ParticleBehavior> particle_;
-
 	// ボスロックオンフラグ
     bool isBossLockOn_ = false;
 

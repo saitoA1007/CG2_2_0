@@ -118,11 +118,6 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// 平面モデルを取得
 	planeModel_ = context_->modelManager->GetNameByModel("Plane");
 
-	// ボスの移動パーティクル
-	particle_ = std::make_unique<ParticleBehavior>();
-	particle_->Initialize("WaitIceFallParticle", 32);
-	particle_->Emit({ 0.0f,5.0f,0.0f });
-
 	//==================================================
 	// カメラアニメーション設定
 	//==================================================
@@ -224,9 +219,6 @@ void TDGameScene::Update() {
 	// ステージの更新処理
 	//stageManager_->Update();
 
-	// パーティクルの更新処理
-	particle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
-
 	// 当たり判定の更新処理
 	UpdateCollision();
 
@@ -296,9 +288,9 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);
 
 	// ボスの突進攻撃演出の描画
-	/*for (auto& rushEffect : enemyRushEffect_->GetWorldTransforms()) {
+	for (auto& rushEffect : enemyRushEffect_->GetWorldTransforms()) {
 		ModelRenderer::Draw(enemyRushModel_, rushEffect);
-	}*/
+	}
 
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
