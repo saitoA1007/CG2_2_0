@@ -90,7 +90,7 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine
 			} else if constexpr (std::is_same_v<T, std::vector<Vector3>>) {
 				UpdateTargetVector3Array(value);
 			}
-			}, target_);
+		}, target_);
 
 		// 座標系種類でカメラ位置追従 (補間前に回転入力反映)
 		switch (cameraCoordinateType_) {
@@ -103,7 +103,7 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine
 	const float t = 0.1f;
 	// 位置・回転(Euler)・FOV補間
 	if (isAnimationPlaying_) {
-		// アニメーション再生中はアニメーションの値をそのまま反映（補間しない）
+		// アニメーション再生中はアニメーションの値をそのまま反映
 		targetPos_ = desiredTargetPos_;
 		targetLookAt_ = desiredTargetLookAt_;
 		targetRotate_ = desiredTargetRotate_;
@@ -118,51 +118,82 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine
     Vector3 eye;
     Vector3 center;
 
-	// If lookAt animation exists during playback, treat position.z as distance from target
     if (isAnimationPlaying_ && !lookAtAnimationState_.keyframes.empty()) {
-        center = targetLookAt_; // center = animated lookAt
-        // use targetPos_ as the position keyframe values (x,y offsets, z = distance)
+        center = targetLookAt_;
         Vector3 posKey = targetPos_;
         if (!rotateAnimationState_.keyframes.empty()) {
-            // build basis from euler and place camera at center - forward * distance + right*x + up*y
             Vector3 s,u,f;
             BasisFromEuler(targetRotate_, s, u, f);
             float distance = posKey.z;
             eye = center - f * distance + s * posKey.x + u * posKey.y;
         } else {
-            // no rotation specified: treat position as world-offset from center
             eye = center + Vector3{ posKey.x, posKey.y, posKey.z };
         }
     } else {
-        // default behavior: eye = camera position, center = lookAt
         eye = targetLookAt_;
         center = targetPos_;
     }
 
-	// ターゲット移動による自動回転(Spherical時のみ有効) - アニメーション時は自動回転を適用しない
 	if (!isAnimationPlaying_) {
 		ApplyAutoRotate(eye, center);
 	}
 
-	// シェイク
+	// シェイク: 現在のオフセットを更新する（実際の適用はworldMatrix構築後に行う）
 	if (cameraShakePower_ > 0.0f && cameraShakeElapsedTime_ < cameraShakeMaxTime_) {
 		cameraShakeElapsedTime_ += FpsCounter::deltaTime;
 		float tn = std::clamp(cameraShakeElapsedTime_ / std::max(cameraShakeMaxTime_, 0.0001f), 0.0f, 1.0f);
-		float amp = EaseOutQuad(cameraShakePower_, 0.0f, tn);
+		float amp = shakeEnableDecay_ ? EaseOutQuad(cameraShakePower_, 0.0f, tn) : cameraShakePower_;
 		float currentDistance = Length(center - eye);
 		float distanceScale = std::clamp(kDistance_ / std::max(currentDistance, 0.0001f), 0.1f, 1.0f);
 		amp *= distanceScale;
+
 		static thread_local std::mt19937 rng{ std::random_device{}() };
 		std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
-		Vector3 noise{ dist(rng), dist(rng) * 0.5f, dist(rng) };
-		if (!enableShakeX_) noise.x = 0.0f; if (!enableShakeY_) noise.y = 0.0f; if (!enableShakeZ_) noise.z = 0.0f;
-		switch (shakeOrigin_) {
-		case ShakeOrigin::CameraPosition: eye.x += noise.x * amp; eye.y += noise.y * amp; eye.z += noise.z * amp; break;
-		case ShakeOrigin::TargetPosition: center.x += noise.x * amp; center.y += noise.y * amp; center.z += noise.z * amp; break;
-		case ShakeOrigin::TargetAndCameraPosition:
-			eye.x += noise.x * amp * 0.5f; eye.y += noise.y * amp * 0.5f; eye.z += noise.z * amp * 0.5f;
-			center.x += noise.x * amp * 0.5f; center.y += noise.y * amp * 0.5f; center.z += noise.z * amp * 0.5f; break;
+
+		// 新しいターゲットが必要なら生成
+ 		if (shakeNeedNewTarget_) {
+ 			shakeTargetOffset_.x = (enableShakeX_ ? dist(rng) : 0.0f) * amp;
+ 			shakeTargetOffset_.y = (enableShakeY_ ? dist(rng) * 0.5f : 0.0f) * amp;
+ 			shakeTargetOffset_.z = (enableShakeZ_ ? dist(rng) : 0.0f) * amp;
+ 			// record start offset and reset progress
+			shakeStartOffset_ = shakeCurrentOffset_;
+			shakeEaseProgress_ = 0.0f;
+			shakeFadingOut_ = false;
+			shakeNeedNewTarget_ = false;
+ 		}
+
+ 		// イージングで現在値をターゲットへ近づける
+        shakeEaseProgress_ = std::clamp(shakeEaseProgress_ + FpsCounter::deltaTime * shakeEaseSpeed_, 0.0f, 1.0f);
+		if (shakeEaseFunc_) {
+			shakeCurrentOffset_ = shakeEaseFunc_(shakeStartOffset_, shakeTargetOffset_, shakeEaseProgress_);
+		} else {
+			shakeCurrentOffset_ = Lerp(shakeCurrentOffset_, shakeTargetOffset_, shakeEaseProgress_);
 		}
+
+		// 目標になったら次の目標を要求する
+        if (shakeEaseProgress_ >= 1.0f) {
+			shakeNeedNewTarget_ = true;
+		}
+	} else {
+		// シェイクが終了または無効な場合、オフセットをゼロへフェードアウト
+		shakeEaseProgress_ = std::clamp(shakeEaseProgress_ + FpsCounter::deltaTime * shakeEaseSpeed_, 0.0f, 1.0f);
+		if (shakeEaseFunc_) {
+			if (!shakeFadingOut_) {
+				// start fade from current offset
+				shakeStartOffset_ = shakeCurrentOffset_;
+				shakeEaseProgress_ = 0.0f;
+				shakeFadingOut_ = true;
+			}
+			shakeCurrentOffset_ = shakeEaseFunc_(shakeStartOffset_, Vector3{ 0.0f,0.0f,0.0f }, shakeEaseProgress_);
+		} else {
+			shakeCurrentOffset_ = Lerp(shakeCurrentOffset_, Vector3{ 0.0f,0.0f,0.0f }, shakeEaseProgress_);
+		}
+		shakeTargetOffset_ = Vector3{ 0.0f,0.0f,0.0f };
+		shakeNeedNewTarget_ = true;
+		if (shakeEaseProgress_ >= 1.0f) {
+			shakeCurrentOffset_ = Vector3{ 0.0f,0.0f,0.0f };
+			cameraShakePower_ = 0.0f;
+        }
 	}
 
 	Matrix4x4 rotateMatrix;
@@ -174,6 +205,35 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine
 	}
 	Matrix4x4 worldMatrix = rotateMatrix;
 	worldMatrix.m[3][0] = eye.x; worldMatrix.m[3][1] = eye.y; worldMatrix.m[3][2] = eye.z;
+
+	// Apply shake offsets to final world matrix so shake is visible even during animations
+	if (Length(shakeCurrentOffset_) > 0.0f) {
+		switch (shakeOrigin_) {
+		case ShakeOrigin::CameraPosition:
+			worldMatrix.m[3][0] += shakeCurrentOffset_.x;
+			worldMatrix.m[3][1] += shakeCurrentOffset_.y;
+			worldMatrix.m[3][2] += shakeCurrentOffset_.z;
+			break;
+		case ShakeOrigin::TargetPosition: {
+			// Recompute rotation so camera looks at shifted target
+			Matrix4x4 shakenRotate = LookAt(eye, Vector3{ center.x + shakeCurrentOffset_.x, center.y + shakeCurrentOffset_.y, center.z + shakeCurrentOffset_.z }, {0.0f,1.0f,0.0f});
+			worldMatrix = shakenRotate;
+			worldMatrix.m[3][0] = eye.x; worldMatrix.m[3][1] = eye.y; worldMatrix.m[3][2] = eye.z;
+			break;
+		}
+		case ShakeOrigin::TargetAndCameraPosition:
+			worldMatrix.m[3][0] += shakeCurrentOffset_.x * 0.5f;
+			worldMatrix.m[3][1] += shakeCurrentOffset_.y * 0.5f;
+			worldMatrix.m[3][2] += shakeCurrentOffset_.z * 0.5f;
+			// also nudge rotation slightly by looking at partially shifted center
+			Matrix4x4 partialRotate = LookAt(Vector3{ worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2] }, Vector3{ center.x + shakeCurrentOffset_.x * 0.5f, center.y + shakeCurrentOffset_.y * 0.5f, center.z + shakeCurrentOffset_.z * 0.5f }, {0.0f,1.0f,0.0f});
+			// Keep translation but apply new rotation axes
+			partialRotate.m[3][0] = worldMatrix.m[3][0]; partialRotate.m[3][1] = worldMatrix.m[3][1]; partialRotate.m[3][2] = worldMatrix.m[3][2];
+			worldMatrix = partialRotate;
+			break;
+		}
+	}
+
 	camera_->SetWorldMatrix(worldMatrix);
 	camera_->SetProjectionMatrix(targetFov_, 1280, 720, 0.1f, 1000.0f);
 	camera_->UpdateFromWorldMatrix();
@@ -288,7 +348,7 @@ void CameraController::UpdateAnimation() {
 		size_t &idx = lookAtAnimationState_.currentIndex;
 		while (idx + 1 < lookAtAnimationState_.keyframes.size() &&
 			animationTime_ >= lookAtAnimationState_.keyframes[idx + 1].time) {
-			idx++;
+		 idx++;
 		}
 	}
 	if (!fovAnimationState_.keyframes.empty()) {

@@ -9,14 +9,12 @@ TitleScene::~TitleScene() {
 
 void TitleScene::Initialize(SceneContext* context) {
 	// ゲームシーンに必要な低レイヤー機能
-#pragma region SceneSystem 
+#pragma region SceneSystem
 	// エンジン機能を取得
 	context_ = context;
-
 	// 登録するパラメータを設定
 	GameParamEditor::GetInstance()->SetActiveScene("TitleScene");
-
-	#pragma endregion
+#pragma endregion
 
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
@@ -27,9 +25,7 @@ void TitleScene::Initialize(SceneContext* context) {
 }
 
 void TitleScene::Update() {
-	
-
-	if(context_->input->TriggerKey(DIK_U)) {
+    if (context_->inputCommand->IsCommandActive("Start")) {
 		isFinished_ = true;
 	}
 

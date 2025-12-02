@@ -126,10 +126,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// 壁衝突時のカメラシェイク設定
 	player_->SetOnWallHit([this]() {
-		// 強度と時間は調整可能
-		cameraController_->StartCameraShake(3.0f, 0.5f,
+		cameraController_->StartCameraShake(3.0f, 0.5f, 1000.0f,
+            [](const Vector3 &a, const Vector3 &b, float t) { return Lerp(a, b, t); },
 			CameraController::ShakeOrigin::TargetPosition,
-			false, true, false);
+			true, false, true, false);
 	});
 
 	// 敵の処理に関する初期化処理
@@ -204,6 +204,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 		cameraController_->SetAnimationKeyframes(positionKeys, rotateKeys, lookAtKeys, fovKeys);
 		cameraController_->PlayAnimation();
+		cameraController_->StartCameraShake(0.5f, 10.0f, 20.0f,
+            [](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutSine(a, b, t); },
+			CameraController::ShakeOrigin::TargetPosition,
+			false, true, true, true);
 	}
 
 	// 入力コマンドを設定する

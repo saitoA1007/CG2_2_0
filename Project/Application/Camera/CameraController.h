@@ -73,17 +73,26 @@ public:
 	/// </summary>
 	/// <param name="power">強度</param>
 	/// <param name="time">時間</param>
+    /// <param name="shakeEaseSpeed">イージングの速度</param>
+    /// <param name="easeFunc">イージング関数 (引数: 開始値, 終了値, 0~1の補間値)</param>
 	/// <param name="origin">揺らす対象</param>
-	void StartCameraShake(float power, float time, ShakeOrigin origin = ShakeOrigin::CameraPosition,
-        bool enableX = true, bool enableY = true, bool enableZ = true) {
+    /// <param name="enableDecay">減衰有効フラグ</param>
+    /// <param name="enableX">X軸シェイク有効フラグ</param>
+    /// <param name="enableY">Y軸シェイク有効フラグ</param>
+    /// <param name="enableZ">Z軸シェイク有効フラグ</param>
+	void StartCameraShake(float power, float time, float shakeEaseSpeed = 1000.0f, std::function<Vector3(const Vector3 &, const Vector3 &, float)> easeFunc = nullptr, ShakeOrigin origin = ShakeOrigin::CameraPosition,
+		bool enableDecay = true, bool enableX = true, bool enableY = true, bool enableZ = true) {
 		cameraShakePower_ = power;
 		cameraShakeMaxTime_ = time;
 		cameraShakeElapsedTime_ = 0.0f;
-        shakeOrigin_ = origin;
-        enableShakeX_ = enableX;
-        enableShakeY_ = enableY;
-        enableShakeZ_ = enableZ;
-    }
+		shakeOrigin_ = origin;
+		enableShakeX_ = enableX;
+		enableShakeY_ = enableY;
+		enableShakeZ_ = enableZ;
+		shakeEaseSpeed_ = shakeEaseSpeed;
+		shakeEaseFunc_ = easeFunc;
+		shakeEnableDecay_ = enableDecay;
+	}
 
 	/// <summary>
 	/// 自動回転の全体倍率設定
@@ -183,17 +192,36 @@ private:
 
 	//--------- アニメーション用 ---------//
 
-    // カメラのアニメーション状態
-    AnimationState<Vector3> positionAnimationState_;
-    AnimationState<Vector3> rotateAnimationState_;
-    AnimationState<Vector3> lookAtAnimationState_;
-    AnimationState<float> fovAnimationState_;
-    // アニメーション時間
-    float animationTime_ = 0.0f;
+	// シェイクのイージング速度 (大きいほど早く目標へ到達)
+	float shakeEaseSpeed_ = 10.0f;
+	// 現在のシェイクオフセット
+	Vector3 shakeCurrentOffset_ = { 0.0f,0.0f,0.0f };
+	// 目標のシェイクオフセット
+	Vector3 shakeTargetOffset_ = { 0.0f,0.0f,0.0f };
+	// フラグ: 新しい目標を生成する必要があるか
+	bool shakeNeedNewTarget_ = true;
+    // イージング関数。nullptrならLerpを使う。シグネチャ: (start,target,t)->Vector3
+    std::function<Vector3(const Vector3&, const Vector3&, float)> shakeEaseFunc_ = nullptr;
+    // 目標へのイージング進行度（0..1）を蓄積する
+    float shakeEaseProgress_ = 0.0f;
+    // フェードアウト中フラグ
+    bool shakeFadingOut_ = false;
+    // イージング開始時のオフセット（start値）
+    Vector3 shakeStartOffset_ = { 0.0f,0.0f,0.0f };
+    // シェイク強度を時間経過で減衰させるか
+    bool shakeEnableDecay_ = true;
+
+	// カメラのアニメーション状態
+	AnimationState<Vector3> positionAnimationState_;
+	AnimationState<Vector3> rotateAnimationState_;
+	AnimationState<Vector3> lookAtAnimationState_;
+	AnimationState<float> fovAnimationState_;
+	// アニメーション時間
+	float animationTime_ = 0.0f;
 	// アニメーション再生速度
-    float animationPlaySpeed_ = 1.0f;
-    // 再生中フラグ
-    bool isAnimationPlaying_ = false;
+	float animationPlaySpeed_ = 1.0f;
+	// 再生中フラグ
+	bool isAnimationPlaying_ = false;
 
 private:
 	void UpdateTargetVector3(const Vector3& v);
