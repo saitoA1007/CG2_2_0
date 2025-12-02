@@ -1,8 +1,11 @@
 #pragma once
 #include<list>
 
+// エンジン機能
+#include"PostProcess/PostEffectManager.h"
 #include"ParticleSystem/ParticleBehavior.h"
 
+// アプリ機能
 #include"LongLangeAttack/IceFall.h"
 
 // ボスの遠距離攻撃を管理する
@@ -22,7 +25,7 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Initialize();
+	void Initialize(GameEngine::PostEffectManager* postEffectManager);
 
 	/// <summary>
 	/// 更新処理
@@ -60,7 +63,13 @@ public:
 	/// <returns></returns>
 	std::vector<IceFallEffectData>& GetIceFallEffectDatas() { return iceFallEffectDatas_; }
 
+	// 咆哮を設定
+	void SetIsRoat(const bool& isRoat);
+
 private:
+
+	// ポストエフェクトの管理
+	static GameEngine::PostEffectManager* postEffectManager_;
 
 	// 氷柱攻撃
 	std::list<std::unique_ptr<IceFall>> IceFallsList_;
@@ -74,12 +83,20 @@ private:
 	// 氷柱を落とすまでの時間
 	float maxIceFallEmitTime_ = 1.0f;
 
+	// 咆哮したかのフラグ
+	bool isRoat_ = false;
+
+	float roatTimer_ = 0.0f;
+
 private:
 
 	/// <summary>
 	/// 演出の更新処理
 	/// </summary>
 	void EffectUpdate(const Matrix4x4& cameraWorldMatrix, const Matrix4x4& viewMatrix);
+
+	// 咆哮演出の更新処理
+	void RoatUpdate();
 
 };
 
@@ -88,4 +105,7 @@ namespace {
 
 	// 2点の距離を計算する
 	float GetDistance(const Vector2& c1, const Vector2& c2);
+
+	float EaseOutBounce(float t);
+
 }

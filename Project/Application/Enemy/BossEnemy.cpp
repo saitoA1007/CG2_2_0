@@ -87,8 +87,8 @@ void BossEnemy::Update(const Vector3& targetPos) {
 
     // 氷柱の発射をする
     if (bossContext_.isActiveIceFall) {
-        //enemyAttackManager_->AddIceFall(worldTransform_.transform_.translate);
         enemyAttackManager_->CreateIceFallPositions();
+        enemyAttackManager_->SetIsRoat(true);
     }
 
     // 行列を更新する

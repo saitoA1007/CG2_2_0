@@ -86,7 +86,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 #pragma region EnemySystem 
 	// 敵の攻撃管理クラス
 	enemyAttackManager_ = std::make_unique<EnemyAttackManager>();
-	enemyAttackManager_->Initialize();
+	enemyAttackManager_->Initialize(context_->postEffectManager_);
 	// ボス敵モデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Walk");
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
