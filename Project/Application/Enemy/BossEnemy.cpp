@@ -8,6 +8,9 @@ using namespace GameEngine;
 
 void BossEnemy::Initialize() {
 
+	// hpを設定
+	hp_ = maxHp_;
+
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,10.0f} });
 
@@ -77,7 +80,7 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 
 		if (player->GetPlayerBehavior() == Player::Behavior::Jump) {
 			Log("isHitBoss");
-			//hp_ -= 1;
+			hp_ -= 1;
 			isHit_ = true;
 			if (hp_ <= 0) {
 				isAlive_ = false;

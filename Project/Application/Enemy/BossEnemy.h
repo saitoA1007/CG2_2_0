@@ -29,34 +29,28 @@ public:
 	/// <returns></returns>
 	GameEngine::Collider* GetCollider() { return collider_.get(); }
 
-	/// <summary>
-	/// 球のデータを取得
-	/// </summary>
-	/// <returns></returns>
+	// 球のデータを取得
 	Sphere GetSphereData();
 
-	/// <summary>
-	/// 生存フラグを取得する
-	/// </summary>
-	/// <returns></returns>
+	// 生存フラグを取得する
 	bool GetIsAlive() const { return isAlive_; }
 
-	/// <summary>
-	/// 透明度を取得
-	/// </summary>
-	/// <returns></returns>
+	// 透明度を取得
 	float GetAlpha() const { return alpha_; }
 
-	/// <summary>
-	/// ワールド座標を取得する
-	/// </summary>
-	/// <returns></returns>
+	// ワールド座標を取得する
 	Vector3 GetPosition() const { return worldTransform_.GetWorldPosition(); }
+
+	// 最大hpを取得する
+	uint32_t GetMaxHp() const { return maxHp_; }
+
+	// 現在のhp
+	uint32_t GetCurrentHp() const { return hp_; }
 
 private:
 
 	// 最大hp
-	uint32_t maxHp_ = 5;
+	uint32_t maxHp_ = 10;
 
 	// 当たり判定の大きさ
 	float collisionRadius_ = 2.5f;

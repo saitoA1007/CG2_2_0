@@ -15,6 +15,7 @@
 #include"Application/Camera/FollowCameraController.h"
 #include"Application/Light/SceneLightingController.h"
 #include"Application/Enemy/BossEnemy.h"
+#include"Application/UI/BossHpUI.h"
 
 
 class ALGameScene : public BaseScene {
@@ -115,6 +116,9 @@ private: // シーン機能
 	float airTimer_ = 0.0f;
 	float maxAirTime_ = 4.0f;
 	float airSpeed_ = 2.0f;
+
+	// ボスのHpを表示
+	std::unique_ptr<BossHpUI> bossHpUI_;
 
 private:
 

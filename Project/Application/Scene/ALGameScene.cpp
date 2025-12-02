@@ -99,6 +99,10 @@ void ALGameScene::Initialize(SceneContext* context) {
 	airParticle_ = std::make_unique<ParticleBehavior>();
 	airParticle_->Initialize("AirParticle", 128);
 	airParticle_->Emit({ 0.0f,0.0f,0.0f });
+
+	// ボスのhpUIを初期化
+	bossHpUI_ = std::make_unique<BossHpUI>();
+	bossHpUI_->Initialize(bossEnemy_->GetMaxHp());
 }
 
 void ALGameScene::Update() {
@@ -164,6 +168,15 @@ void ALGameScene::Update() {
 	// 攻撃演出の更新処理
 	attackEffectParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 	attackAccentEffectParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+
+	// UIの更新処理
+#pragma region UIUpdate
+
+	// ボスのHpUIの更新処理
+	bossHpUI_->SetCurrentHp(bossEnemy_->GetCurrentHp());
+	bossHpUI_->Update();
+
+#pragma endregion
 }
 
 void ALGameScene::Draw(const bool& isDebugView) {
@@ -234,9 +247,9 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	//========================================================================
 
 	// 画像の描画前処理
-	//SpriteRenderer::PreDraw(RenderMode2D::Normal);
+	SpriteRenderer::PreDraw(RenderMode2D::Normal);
 
-	//SpriteRenderer::Draw(sprite_.get(), uvCheckerGH_);
+	SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
 }
 
 void ALGameScene::InputRegisterCommand() {
