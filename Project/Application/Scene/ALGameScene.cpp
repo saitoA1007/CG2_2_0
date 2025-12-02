@@ -249,6 +249,8 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// 画像の描画前処理
 	SpriteRenderer::PreDraw(RenderMode2D::Normal);
 
+	// ボスのHPUIを表示
+	SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
 	SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
 }
 
