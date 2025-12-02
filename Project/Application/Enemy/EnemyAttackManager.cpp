@@ -1,15 +1,22 @@
 #include"EnemyAttackManager.h"
 #include"RandomGenerator.h"
 #include"FPSCounter.h"
+#include"EasingManager.h"
 #include<numbers>
 
 using namespace GameEngine;
+
+GameEngine::PostEffectManager* EnemyAttackManager::postEffectManager_ = nullptr;
 
 EnemyAttackManager::~EnemyAttackManager() {
 	IceFallsList_.clear();
 }
 
-void EnemyAttackManager::Initialize() {
+void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectManager) {
+
+    // ポストエフェクトの管理クラスを受け取る
+    postEffectManager_ = postEffectManager;
+    //postEffectManager_->radialBlurResource_.GetData()->numSamles = 5;
 
     // 演出用のメモリを確保しておく
     iceFallEffectDatas_.reserve(3);
@@ -38,6 +45,9 @@ void EnemyAttackManager::Update(const Matrix4x4& cameraWorldMatrix, const Matrix
 	for (std::unique_ptr<IceFall>& iceFall : IceFallsList_) {
 		iceFall->Update();
 	}
+
+    // 咆哮演出の更新処理
+    RoatUpdate();
 }
 
 void EnemyAttackManager::AddIceFall(const Vector3& pos) {
@@ -120,9 +130,51 @@ void EnemyAttackManager::EffectUpdate(const Matrix4x4& cameraWorldMatrix, const 
     }
 }
 
+void EnemyAttackManager::SetIsRoat(const bool& isRoat) {
+    if (!isRoat_) {
+        isRoat_ = isRoat;
+        postEffectManager_->SetDrawMode(PostEffectManager::DrawMode::RadialBlur);
+        roatTimer_ = 0.0f;
+    }
+}
+
+void EnemyAttackManager::RoatUpdate() {
+    if (!isRoat_) { return; }
+
+    roatTimer_ += FpsCounter::deltaTime;
+
+    if (roatTimer_ <= 0.5f) {
+        float localT = roatTimer_ / 0.5f;
+        postEffectManager_->radialBlurResource_.GetData()->blurWidth = Lerp(0.0f, -0.06f, EaseOutBounce(localT));
+    } else {
+        float localT = (roatTimer_ - 0.5f) / 0.5f;
+        postEffectManager_->radialBlurResource_.GetData()->blurWidth = Lerp(-0.06f, 0.0f, EaseOutBounce(localT));
+    }
+
+    if (roatTimer_ >= 1.0f) {
+        isRoat_ = false;
+        postEffectManager_->SetDrawMode(PostEffectManager::DrawMode::Default);
+    }
+}
+
 namespace {
 
 	float GetDistance(const Vector2& c1, const Vector2& c2) {
 		return std::powf(c1.x - c2.x, 2) + std::powf(c1.y - c2.y, 2);
 	}
+
+    float EaseOutBounce(float t) {
+        const float n1 = 7.5625f;
+        const float d1 = 2.75f;
+
+        if (t < 1.0f / d1) {
+            return n1 * t * t;
+        } else if (t < 2.0f / d1) {
+            return n1 * (t -= 1.5f / d1) * t + 0.75f;
+        } else if (t < 2.5f / d1) {
+            return n1 * (t -= 2.25f / d1) * t + 0.9375f;
+        } else {
+            return n1 * (t -= 2.625f / d1) * t + 0.984375f;
+        }
+    }
 }
