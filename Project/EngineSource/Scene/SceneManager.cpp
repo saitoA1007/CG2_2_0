@@ -163,6 +163,16 @@ void SceneManager::LoadSpriteData() {
 void SceneManager::LoadAnimationData() {
 	// 歩くアニメーションデータを登録する
 	context_->animationManager->RegisterAnimation("Walk", "walk.gltf");
+
+	// ボスのアニメーションを読み込む
+	context_->animationManager->RegisterAnimations("BossBird.IceBreath", "BossBird.IceBreath.gltf", "Resources/Animations");
+	context_->animationManager->RegisterAnimations("BossBirdBaseMove", "BossBirdBaseMove.gltf", "Resources/Animations");
+	context_->animationManager->RegisterAnimations("BossBirdRush", "BossBirdRush.gltf", "Resources/Animations");
+	context_->animationManager->RegisterAnimations("BossBirdScream", "BossBird.Screamgltf.gltf", "Resources/Animations");
+
+	// プレイヤーのアニメーションを読み込む
+	context_->animationManager->RegisterAnimations("PlayerRush", "PlayerRush.gltf", "Resources/Animations");
+	context_->animationManager->RegisterAnimations("PlayerWalk", "PlayerWalk.gltf", "Resources/Animations");
 }
 
 void SceneManager::ChangeScene(SceneState nextSceneState) {

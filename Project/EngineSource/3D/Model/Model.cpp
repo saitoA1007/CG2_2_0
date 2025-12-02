@@ -473,14 +473,14 @@ AnimationData Model::LoadAnimationFile(const std::string& objFilename, const std
 }
 
 [[nodiscard]]
-std::map<std::string, AnimationData> Model::LoadAnimationsFile(const std::string& objFilename, const std::string& filename) {
+std::map<std::string, AnimationData> Model::LoadAnimationsFile(const std::string& objFilename, const std::string& filename,const std::string& directory) {
 	// Assimpを使ったモデルの生成するログを出す
 	LogManager::GetInstance().Log("Load AnimationData From Assimp : Start loading Model file: " + filename + objFilename);
 
 	std::map<std::string, AnimationData> loadedAnimations;
 
 	Assimp::Importer importer;
-	std::string filePath = kDirectoryPath_ + "/" + filename + "/" + objFilename;
+	std::string filePath = directory + "/" + filename + "/" + objFilename;
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), 0);
 	assert(scene->mNumAnimations != 0); // アニメーションがない
 
