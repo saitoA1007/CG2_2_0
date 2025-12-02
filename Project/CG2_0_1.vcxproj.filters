@@ -293,6 +293,7 @@
     <ClCompile Include="Application\Stage\StageWallPlane.cpp" />
     <ClCompile Include="Application\Graphics\PlaneProjectionShadow.cpp" />
     <ClCompile Include="Application\Enemy\Effect\EnemyRushEffect.cpp" />
+    <ClCompile Include="EngineSource\Scene\SceneTransition.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -589,6 +590,7 @@
     <ClInclude Include="EngineSource\Core\PostProcess\PostEffectData.h" />
     <ClInclude Include="Application\Enemy\Effect\EnemyRushEffect.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleExtensionData.h" />
+    <ClInclude Include="EngineSource\Scene\SceneTransition.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

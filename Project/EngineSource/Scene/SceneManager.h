@@ -3,6 +3,8 @@
 #include"BaseScene.h"
 #include"Camera.h"
 
+#include"SceneTransition.h"
+
 /// <summary>
 /// シーンの管理
 /// </summary>
@@ -79,6 +81,9 @@ private: // シーン機能
 
 	// デバックカメラとの切り替えを管理
 	bool isDebugView_ = true;
+
+	// シーン遷移
+	std::unique_ptr<SceneTransition> sceneTransition_;
 
 private:
 
