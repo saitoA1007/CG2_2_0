@@ -280,6 +280,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
     <ClCompile Include="EngineSource\Math\EasingManager.cpp" />
     <ClCompile Include="EngineSource\Math\MyMath.cpp" />
+    <ClCompile Include="EngineSource\Scene\SceneTransition.cpp" />
     <ClCompile Include="Externals\imgui\crude_json.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -476,6 +477,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Scene\SceneChangeRequest.h" />
     <ClInclude Include="EngineSource\Scene\SceneContext.h" />
     <ClInclude Include="EngineSource\Scene\SceneState.h" />
+    <ClInclude Include="EngineSource\Scene\SceneTransition.h" />
     <ClInclude Include="Externals\imgui\crude_json.h" />
     <ClInclude Include="Externals\imgui\imconfig.h" />
     <ClInclude Include="Externals\imgui\imgui.h" />
