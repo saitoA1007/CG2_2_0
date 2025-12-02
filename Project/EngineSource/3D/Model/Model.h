@@ -88,7 +88,7 @@ namespace GameEngine {
 		static AnimationData LoadAnimationFile(const std::string& objFilename, const std::string& filename);
 
 		[[nodiscard]]
-		static std::map<std::string, AnimationData> LoadAnimationsFile(const std::string& objFilename, const std::string& filename);
+		static std::map<std::string, AnimationData> LoadAnimationsFile(const std::string& objFilename, const std::string& filename, const std::string& directory = kDirectoryPath_);
 
 		/// <summary>
 		/// スケルトンを作成する

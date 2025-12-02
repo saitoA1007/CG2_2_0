@@ -19,6 +19,8 @@ namespace GameEngine {
 		/// <param name="objFilename"></param>
 		void RegisterAnimation(const std::string& filename,const std::string& objFilename);
 
+		void RegisterAnimations(const std::string& filename, const std::string& objFilename,const std::string& directory);
+
 		/// <summary>
 		/// 登録を外す
 		/// </summary>
