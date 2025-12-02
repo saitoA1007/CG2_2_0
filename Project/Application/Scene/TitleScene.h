@@ -56,4 +56,9 @@ private: // シーン機能
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
+
+	/// <summary>
+	/// 入力コマンドを登録する
+	/// </summary>
+	void InputRegisterCommand();
 };
