@@ -138,18 +138,18 @@ void TDGameScene::Initialize(SceneContext* context) {
 	enemyAttackManager_ = std::make_unique<EnemyAttackManager>();
 	enemyAttackManager_->Initialize(context_->postEffectManager_);
 	// ボス敵モデルを生成
-	bossEnemyModel_ = context_->modelManager->GetNameByModel("Walk");
-	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
+	bossEnemyModel_ = context_->modelManager->GetNameByModel("Boss");
+	//bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
 	bossEnemyModel_->SetDefaultIsEnableLight(true);
 	// ボス敵クラスを初期化
 	bossEnemy_ = std::make_unique<BossEnemy>();
 	bossEnemy_->Initialize(stageManager_->GetRadius(), enemyAttackManager_.get(), debugRenderer_.get());
 
 	// ボスのアニメーションデータを取得する
-	bossEnemyAnimationData_ = context_->animationManager->GetNameByAnimations("Walk");
+	bossEnemyAnimationData_ = context_->animationManager->GetNameByAnimations("BossBirdBaseMove");
 	// ボスのアニメーションの再生を管理する
 	bossEnemyAnimator_ = std::make_unique<Animator>();
-	bossEnemyAnimator_->Initialize(bossEnemyModel_, &bossEnemyAnimationData_["Armature|mixamo.com|Layer0"]);
+	bossEnemyAnimator_->Initialize(bossEnemyModel_, &bossEnemyAnimationData_["基本移動"]);
 	// ボスの影
 	bossEnemyShadow_ = std::make_unique<PlaneProjectionShadow>();
 	bossEnemyShadow_->Initialize(&bossEnemy_->GetWorldTransform());
