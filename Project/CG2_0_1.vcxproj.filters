@@ -292,6 +292,7 @@
     <ClCompile Include="Application\Camera\FollowCameraController.cpp" />
     <ClCompile Include="Application\Weapon\Sword.cpp" />
     <ClCompile Include="Application\UI\BossHpUI.cpp" />
+    <ClCompile Include="EngineSource\Scene\SceneTransition.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -582,6 +583,7 @@
     <ClInclude Include="Application\CollisionTypeID.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleExtensionData.h" />
     <ClInclude Include="Application\UI\BossHpUI.h" />
+    <ClInclude Include="EngineSource\Scene\SceneTransition.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

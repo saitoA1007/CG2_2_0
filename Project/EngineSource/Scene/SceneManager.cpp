@@ -38,6 +38,10 @@ void SceneManager::Initialize(SceneContext* context) {
 	gridModel_ = context_->modelManager->GetNameByModel("Grid");
 	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
+	//　シーン遷移システムを初期化
+	sceneTransition_ = std::make_unique<SceneTransition>();
+	sceneTransition_->Initialize();
+
 	// 使用するカメラのフラグ
 #ifdef _DEBUG
 	isDebugView_ = true;
@@ -54,19 +58,27 @@ void SceneManager::Update() {
 	// 入力処理のコマンドシステムを更新処理
 	context_->inputCommand->Update();
 
-	// 終了したらシーンの切り替え処理を有効
-	if (currentScene_->IsFinished() && !isChangeScene_) {
-		isChangeScene_ = true;
+	// シーン遷移の更新処理
+	sceneTransition_->Update();
+
+	// シーンの切り替え
+	if (sceneTransition_->IsMidTransition() && isChangeScene_) {
+		isChangeScene_ = false;
+		ChangeScene(currentScene_->NextSceneState());
 	}
 
-	// シーンが終了した時、切り替える
-	if (isChangeScene_) {
+	// シーン遷移の開始
+	if (currentScene_->IsFinished() && !isChangeScene_ && !sceneTransition_->IsActive()) {
+		if (isChangeScene_ || sceneTransition_->IsActive()) {
+			return;
+		}
+		isChangeScene_ = true;
+		// トランジション開始
+		sceneTransition_->Start(TransitionType::Fade, 1.0f);
+	}
 
-		// シーンを切り替える
-		ChangeScene(currentScene_->NextSceneState());
-		isChangeScene_ = false;
-	} else {
-
+	// 遷移演出中でなければシーンを更新
+	if (!sceneTransition_->IsActive()) {
 		// 現在シーンの更新処理
 		currentScene_->Update();
 	}
@@ -111,6 +123,9 @@ void SceneManager::Draw() {
 
 	// 現在シーンの描画処理
 	currentScene_->Draw(isDebugView_);
+
+	// シーン遷移演出を描画
+	sceneTransition_->Draw();
 }
 
 void SceneManager::LoadModelData() {
