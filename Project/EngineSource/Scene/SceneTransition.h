@@ -1,10 +1,6 @@
 #pragma once
+#include"ITransitionEffect.h"
 #include"Sprite.h"
-
-// シーン遷移の演出タイプ
-enum class TransitionType {
-	Fade,        // フェード
-};
 
 class SceneTransition {
 public:
@@ -31,7 +27,7 @@ public:
 	/// </summary>
 	/// <param name="type">演出タイプ</param>
 	/// <param name="duration">演出時間（秒）</param>
-	void Start(TransitionType type, float maxTime);
+	void Start(std::unique_ptr<ITransitionEffect> effect);
 
 	/// <summary>
 	/// トランジション中かどうか
@@ -41,29 +37,17 @@ public:
 	/// <summary>
 	/// フェードアウトが完了したか
 	/// </summary>
-	bool IsMidTransition() const { return isActive_ && timer_ >= maxTime_ * 0.5f; }
+	bool IsMidTransition() const { return isActive_ && currentEffect_ && currentEffect_->IsMidTransition(timer_); }
 
 private:
 	// トランジションが有効か
 	bool isActive_ = false;
 
-	// 演出タイプ
-	TransitionType type_ = TransitionType::Fade;
-
 	// 経過時間
 	float timer_ = 0.0f;
-
 	// 演出時間
 	float maxTime_ = 1.0f;
 
-	// 画像データ
-	std::unique_ptr<GameEngine::Sprite> sprite_;
-
-private:
-
-	/// <summary>
-	/// フェードの更新処理
-	/// </summary>
-	void Fade();
-
+	// 現在の演出オブジェクト
+	std::unique_ptr<ITransitionEffect> currentEffect_;
 };

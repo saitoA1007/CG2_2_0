@@ -7,6 +7,8 @@
 #include"Model.h"
 #include"WorldTransform.h"
 
+#include"Application/Scene/Transition/Fade.h"
+
 class ResultScene : public BaseScene {
 public:
 
@@ -44,6 +46,8 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	SceneState NextSceneState() override { return SceneState::Title; }
+
+	std::unique_ptr<ITransitionEffect> GetTransitionEffect() override { return std::make_unique<Fade>(); }
 
 private: // シーン機能
 
