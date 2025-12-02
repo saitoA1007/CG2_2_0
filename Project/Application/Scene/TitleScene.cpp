@@ -25,6 +25,10 @@ void TitleScene::Initialize(SceneContext* context) {
 
 void TitleScene::Update() {
 
+	if(context_->input->TriggerKey(DIK_U)) {
+		isFinished_ = true;
+	}
+
 	// カメラの更新処理
 	mainCamera_->Update();
 }

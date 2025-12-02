@@ -1,6 +1,7 @@
 #pragma once
 #include"SceneState.h"
 #include"SceneContext.h"
+#include"ITransitionEffect.h"
 
 /// <summary>
 /// 各シーンの元
@@ -44,6 +45,9 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	virtual SceneState NextSceneState() = 0;
+
+	// 遷移クラス
+	virtual std::unique_ptr<ITransitionEffect> GetTransitionEffect() = 0;
 
 protected:
 	// エンジン機能

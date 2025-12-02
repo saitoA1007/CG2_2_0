@@ -60,6 +60,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// ステージを生成を初期化
 	stageManager_ = std::make_unique<StageManager>();
 	stageManager_->Initialize();
+	stageManager_->Update();
 
 	// StageWallPlane用モデル
 	stageWallPlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
@@ -210,6 +211,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 }
 
 void TDGameScene::Update() {
+
+	if (context_->input->TriggerKey(DIK_U)) {
+		isFinished_ = true;
+	}
 
 	// デバックリストを削除
 	debugRenderer_->Clear();

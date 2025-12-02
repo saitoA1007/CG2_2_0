@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include"BaseScene.h"
 
 // エンジン機能をインクルード
@@ -23,6 +23,7 @@
 #include <array>
 #include"Application/Graphics/PlaneProjectionShadow.h"
 #include"Application/Enemy/Effect/EnemyRushEffect.h"
+#include"Application/Scene/Transition/Fade.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -61,6 +62,9 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	SceneState NextSceneState() override { return SceneState::Title; }
+
+	// 遷移するクラス
+	std::unique_ptr<ITransitionEffect> GetTransitionEffect() override { return std::make_unique<Fade>(); }
 
 private: // エンジンの低レイヤー機能を取得
 

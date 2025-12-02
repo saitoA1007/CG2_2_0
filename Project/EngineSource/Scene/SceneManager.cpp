@@ -6,6 +6,9 @@
 #include"Application/Scene/TDGameScene.h"
 #include"Application/Scene/ResultScene.h"
 
+// シーン遷移
+#include"Application/Scene/Transition/Fade.h"
+
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
 
@@ -74,7 +77,7 @@ void SceneManager::Update() {
 		}
 		isChangeScene_ = true;
 		// トランジション開始
-		sceneTransition_->Start(TransitionType::Fade, 1.0f);
+		sceneTransition_->Start(currentScene_->GetTransitionEffect());
 	}
 
 	// 遷移演出中でなければシーンを更新

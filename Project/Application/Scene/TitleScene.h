@@ -7,6 +7,8 @@
 #include"Model.h"
 #include"WorldTransform.h"
 
+#include"Application/Scene/Transition/Fade.h"
+
 class TitleScene : public BaseScene {
 public:
 
@@ -43,7 +45,9 @@ public:
 	/// 次のシーン遷移する場面の値を取得
 	/// </summary>
 	/// <returns></returns>
-	SceneState NextSceneState() override { return SceneState::Game; }
+	SceneState NextSceneState() override { return SceneState::TDGame; }
+
+	std::unique_ptr<ITransitionEffect> GetTransitionEffect() override { return std::make_unique<Fade>(); }
 
 private: // シーン機能
 

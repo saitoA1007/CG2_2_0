@@ -8,8 +8,9 @@
 #include"WorldTransform.h"
 #include"LightManager.h"
 #include"DirectionalLight.h"
-
 #include"Animator.h"
+
+#include"Application/Scene/Transition/Fade.h"
 
 class GameScene : public BaseScene {
 public:
@@ -47,7 +48,9 @@ public:
 	/// 次のシーン遷移する場面の値を取得
 	/// </summary>
 	/// <returns></returns>
-	SceneState NextSceneState() override { return SceneState::Title; }	
+	SceneState NextSceneState() override { return SceneState::Title; }
+
+	std::unique_ptr<ITransitionEffect> GetTransitionEffect() override { return std::make_unique<Fade>(); }
 
 private: // シーン機能
 
