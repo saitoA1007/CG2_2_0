@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include"BaseScene.h"
 
 // エンジン機能をインクルード
@@ -19,6 +19,8 @@
 #include"Application/Enemy/BossEnemy.h"
 #include"Application/Enemy/EnemyAttackManager.h"
 #include"Application/Graphics/Terrain.h"
+#include"Application/Stage/StageWallPlane.h"
+#include <array>
 #include"Application/Graphics/PlaneProjectionShadow.h"
 #include"Application/Enemy/Effect/EnemyRushEffect.h"
 
@@ -103,6 +105,14 @@ private: // シーン機能
 	// ステージを生成する
 	GameEngine::Model* wallModel_;
 	std::unique_ptr<StageManager> stageManager_;
+
+	// StageWallPlane用のモデル
+	GameEngine::Model* stageWallPlaneModel_;
+	// 板ポリ壁（6つ）
+	static inline const size_t kNumStageWalls = 6;
+	std::array<StageWallPlane, kNumStageWalls> stageWallPlanes_;
+    // Stage wall shared material
+    std::unique_ptr<IceMaterial> stageWallPlaneMaterial_;
 
 	// ボス敵モデル
 	GameEngine::Model* bossEnemyModel_;

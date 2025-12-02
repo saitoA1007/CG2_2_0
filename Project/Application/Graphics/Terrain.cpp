@@ -55,7 +55,7 @@ void Terrain::ApplyDebugParam() {
 	iceMaterial_->materialData_->rimColor.y = rimColor.y;
 	iceMaterial_->materialData_->rimColor.z = rimColor.z;
 
-	iceMaterial_->materialData_->specularColor.x = rimColor.x;
-	iceMaterial_->materialData_->specularColor.y = rimColor.y;
-	iceMaterial_->materialData_->specularColor.z = rimColor.z;
+	iceMaterial_->materialData_->specularColor.x = specularColor.x;
+	iceMaterial_->materialData_->specularColor.y = specularColor.y;
+	iceMaterial_->materialData_->specularColor.z = specularColor.z;
 }

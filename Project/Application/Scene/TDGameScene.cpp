@@ -61,6 +61,55 @@ void TDGameScene::Initialize(SceneContext* context) {
 	stageManager_ = std::make_unique<StageManager>();
 	stageManager_->Initialize();
 
+	// StageWallPlane用モデル
+	stageWallPlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
+
+	// Create a single shared material for all StageWallPlane and copy terrain textures
+	stageWallPlaneMaterial_ = std::make_unique<IceMaterial>();
+	stageWallPlaneMaterial_->Initialize();
+	{
+		IceMaterial* terrainMat = terrain_->GetMaterial();
+		if (terrainMat) {
+			stageWallPlaneMaterial_->materialData_->baseTextureHandle = terrainMat->materialData_->baseTextureHandle;
+			stageWallPlaneMaterial_->materialData_->textureHandle = terrainMat->materialData_->textureHandle;
+			stageWallPlaneMaterial_->materialData_->normalTextureHandle = terrainMat->materialData_->normalTextureHandle;
+			stageWallPlaneMaterial_->materialData_->baseColor = terrainMat->materialData_->baseColor;
+			stageWallPlaneMaterial_->materialData_->color = terrainMat->materialData_->color;
+			stageWallPlaneMaterial_->materialData_->specularColor = terrainMat->materialData_->specularColor;
+			stageWallPlaneMaterial_->materialData_->shininess = terrainMat->materialData_->shininess;
+		}
+	}
+#ifdef _DEBUG
+    StageWallPlane::RegisterDebugParam(stageWallPlaneMaterial_.get());
+#else
+    StageWallPlane::ApplyDebugParam(stageWallPlaneMaterial_.get());
+#endif
+
+	// StageWallPlaneを6つ初期化
+	{
+		// Align StageWallPlane transforms with StageManager's Wall objects
+		auto& walls = stageManager_->GetWalls();
+		size_t count = std::min(stageWallPlanes_.size(), walls.size());
+		for (size_t i = 0; i < count; ++i) {
+			// Use the same transform as the Wall but flip Y rotation by 180 degrees
+			const Transform& wallTransform = walls[i]->GetWorldTransform().transform_;
+			Transform t = wallTransform;
+			// add PI to Y rotation to reverse facing
+			t.rotate.y += static_cast<float>(std::numbers::pi);
+			// XZ平明のモデルを使うので、壁として使うために回転
+            t.rotate.x -= static_cast<float>(std::numbers::pi) / 2.0f;
+			t.scale.z = 32.0f;
+			t.translate.y = 16.0f;
+			stageWallPlanes_[i].Initialilze(t);
+		}
+		// If there are more StageWallPlane entries than walls, initialize remaining with default invisible scale
+		for (size_t i = count; i < stageWallPlanes_.size(); ++i) {
+			Transform t; // default unit transform
+			t.scale = { 0.0f,0.0f,0.0f };
+			stageWallPlanes_[i].Initialilze(t);
+		}
+	}
+
 	// プレイヤーモデルを生成
 	playerModel_ = context_->modelManager->GetNameByModel("Triangular");
 	playerModel_->SetDefaultIsEnableLight(true);
@@ -219,6 +268,14 @@ void TDGameScene::Update() {
 	// ステージの更新処理
 	//stageManager_->Update();
 
+	// StageWallPlaneの更新
+#ifdef _DEBUG
+    StageWallPlane::ApplyDebugParam(stageWallPlaneMaterial_.get());
+#endif
+	for (auto &plane : stageWallPlanes_) {
+		plane.Update();
+	}
+
 	// 当たり判定の更新処理
 	UpdateCollision();
 
@@ -252,6 +309,14 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// ステージを描画する
 	stageManager_->Draw(wallModel_);
 
+	// StageWallPlaneの描画 (IceMaterial via CustomRenderer)
+	// Set CustomRenderer camera and draw
+	if (isDebugView) {
+		CustomRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	} else {
+		CustomRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
+	}
+
 	// プレイヤーを描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
@@ -283,6 +348,11 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	}
 	CustomRenderer::PreDraw(CustomRenderMode::Ice);
 	CustomRenderer::DrawIce(icePlaneModel_, terrain_->GetWorldTransform(), sceneLightingController_->GetResource(), terrain_->GetMaterial());
+	/*for (auto &plane : stageWallPlanes_) {
+		if (plane.GetIsAlive()) {
+			CustomRenderer::DrawIce(icePlaneModel_, plane.GetWorldTransform(), sceneLightingController_->GetResource(), stageWallPlaneMaterial_.get());
+		}
+	}*/
 
 	// 3Dモデルの両面描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);
