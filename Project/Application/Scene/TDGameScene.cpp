@@ -165,6 +165,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// 氷柱のモデルを取得
 	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
+	iceFallModel_->SetDefaultIsEnableLight(true);
 	// 突進攻撃演出モデル
 	enemyRushModel_ = context_->modelManager->GetNameByModel("RushWave");
 	// 風攻撃演出モデル
@@ -359,6 +360,7 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	const std::list<std::unique_ptr<IceFall>>& iceFalls = enemyAttackManager_->GetIceFalls();
 	for (auto& iceFall : iceFalls) {
 		if (iceFall->IsAlive()) {
+			ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 			ModelRenderer::Draw(iceFallModel_, iceFall->GetWorldTransform());
 			ModelRenderer::Draw(iceFallModel_, iceFall->GetShadowWorldTransform(),&iceFall->GetShadowMaterial());
 		}
