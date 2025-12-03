@@ -4,11 +4,22 @@
 
 #include"Collider.h"
 #include"DebugRenderer.h"
+#include"Animator.h"
 
 #include"BossContext.h"
 #include"States/IBossState.h"
 
 #include"EnemyAttackManager.h"
+
+// 敵のアニメーション
+enum enemyAnimationType : size_t {
+	BaseMove,  // 基本移動
+	Rush,      // 突進
+	Scream,    // 叫ぶ
+	IceBreath, // ブレス
+	
+	MaxCount
+};
 
 class BossEnemy {
 public:
@@ -16,7 +27,8 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager, GameEngine::DebugRenderer* debugRenderer);
+	void Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager, GameEngine::Animator* animator,
+		std::array<std::map<std::string, AnimationData>, enemyAnimationType::MaxCount> animationData, GameEngine::DebugRenderer* debugRenderer);
 
 	/// <summary>
 	/// 更新処理
@@ -51,6 +63,11 @@ private: // メンバ変数
 
 	// 遠距離などの攻撃を管理
 	EnemyAttackManager* enemyAttackManager_ = nullptr;
+
+	// アニメーション
+	GameEngine::Animator* animator_ = nullptr;
+	// アニメーションデータ
+	std::array<std::map<std::string, AnimationData>, enemyAnimationType::MaxCount> animationData_;
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;

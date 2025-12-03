@@ -141,15 +141,22 @@ void TDGameScene::Initialize(SceneContext* context) {
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Boss");
 	//bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
 	bossEnemyModel_->SetDefaultIsEnableLight(true);
-	// ボス敵クラスを初期化
-	bossEnemy_ = std::make_unique<BossEnemy>();
-	bossEnemy_->Initialize(stageManager_->GetRadius(), enemyAttackManager_.get(), debugRenderer_.get());
 
-	// ボスのアニメーションデータを取得する
-	bossEnemyAnimationData_ = context_->animationManager->GetNameByAnimations("BossBirdBaseMove");
+	// 敵のアニメーションデータを取得する
+	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::BaseMove)] = context_->animationManager->GetNameByAnimations("BossBirdBaseMove");
+	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::IceBreath)] = context_->animationManager->GetNameByAnimations("BossBird.IceBreath");
+	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::Rush)] = context_->animationManager->GetNameByAnimations("BossBirdRush");
+	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::Scream)] = context_->animationManager->GetNameByAnimations("BossBirdScream");
+
 	// ボスのアニメーションの再生を管理する
 	bossEnemyAnimator_ = std::make_unique<Animator>();
-	bossEnemyAnimator_->Initialize(bossEnemyModel_, &bossEnemyAnimationData_["基本移動"]);
+	bossEnemyAnimator_->Initialize(bossEnemyModel_, &enemyAnimationData_[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
+
+	// ボス敵クラスを初期化
+	bossEnemy_ = std::make_unique<BossEnemy>();
+	bossEnemy_->Initialize(stageManager_->GetRadius(), enemyAttackManager_.get(), bossEnemyAnimator_.get(), 
+		enemyAnimationData_,debugRenderer_.get());
+	
 	// ボスの影
 	bossEnemyShadow_ = std::make_unique<PlaneProjectionShadow>();
 	bossEnemyShadow_->Initialize(&bossEnemy_->GetWorldTransform());
@@ -275,7 +282,6 @@ void TDGameScene::Update() {
 	// 敵の移動処理
 	bossEnemy_->Update(player_->GetPlayerPos());
 	enemyAttackManager_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
-	bossEnemyAnimator_->Update();
 	// 敵の影の更新処理
 	bossEnemyShadow_->Update();
 	// 突進攻撃演出の更新処理
@@ -344,11 +350,6 @@ void TDGameScene::Draw(const bool& isDebugView) {
 
 	// StageWallPlaneの描画 (IceMaterial via CustomRenderer)
 	// Set CustomRenderer camera and draw
-	if (isDebugView) {
-		CustomRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
-	} else {
-		CustomRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
-	}
 
 	// プレイヤーを描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
