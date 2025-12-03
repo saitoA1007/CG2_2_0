@@ -11,7 +11,9 @@
 #include "LogManager.h"
 using namespace GameEngine;
 
-void Player::Initialize() {
+void Player::Initialize(GameEngine::Animator *animator, const std::array<std::map<std::string, AnimationData>, kPlayerAnimationCount>& animationData) {
+	(void)animator;
+	(void)animationData;
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
 	// コライダー生成・設定
@@ -21,12 +23,12 @@ void Player::Initialize() {
 	collider_->SetCollisionAttribute(kCollisionAttributePlayer);
 	collider_->SetCollisionMask(~kCollisionAttributePlayer);
 	// ユーザーデータ設定（IDのみ暫定）
-    UserData userData;
-    userData.typeID = static_cast<uint32_t>(CollisionTypeID::Player);
-    userData.object = this;
+	UserData userData;
+	userData.typeID = static_cast<uint32_t>(CollisionTypeID::Player);
+	userData.object = this;
 	collider_->SetUserData(userData);
 	// コールバック登録
-	collider_->SetOnCollisionCallback([this](const CollisionResult& result) { this->OnCollision(result); });
+	collider_->SetOnCollisionCallback([this](const CollisionResult &result) { this->OnCollision(result); });
 #ifdef _DEBUG
 	//===========================================================
 	// 

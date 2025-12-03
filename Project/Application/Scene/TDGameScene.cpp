@@ -144,9 +144,28 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// プレイヤーモデルを生成
 	playerModel_ = context_->modelManager->GetNameByModel("Player");
 	playerModel_->SetDefaultIsEnableLight(true);
+	// プレイヤー用アニメーターを作成してアニメーションデータをロード
+	playerAnimator_ = std::make_unique<Animator>();
+	// Player アニメーション群を取得(モデル名は "Player" と仮定)
+	auto playerAnimationData = context_->animationManager->GetNameByAnimations("PlayerRush");
+	// 初期アニメーションとして適当なキーを選ぶ（存在するキーを選択）
+	const AnimationData* initialAnim = nullptr;
+	if (!playerAnimationData.empty()) {
+		initialAnim = &playerAnimationData.begin()->second;
+	}
+	if (initialAnim) {
+		playerAnimator_->Initialize(playerModel_, initialAnim);
+	}
+
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();
-	player_->Initialize();
+	// Player::Initialize のシグネチャに合わせて animator と animationData 配列を渡す
+	// ここでは PlayerAnimationType::MaxPlayerAnimationType サイズの配列を作成し、必要なアニメーションを格納する
+	std::array<std::map<std::string, AnimationData>, kPlayerAnimationCount> playerAnims{};
+	// Map 全体を渡せるように、存在するキーのアニメーション群をいくつか割り当てる
+	// ここでは単純に playerAnimationData を BaseMove に割り当てる
+	playerAnims[static_cast<size_t>(PlayerAnimationType::BaseMove)] = playerAnimationData;
+	player_->Initialize(playerAnimator_.get(), playerAnims);
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
 
@@ -423,7 +442,7 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// 3Dモデルの両面描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);
 
-	// ボスの突進攻撃演出の描画
+	// ボスの突進攻撃の描画
 	for (auto& rushEffect : enemyRushEffect_->GetWorldTransforms()) {
 		ModelRenderer::Draw(enemyRushModel_, rushEffect);
 	}

@@ -111,6 +111,8 @@ private: // シーン機能
 	std::unique_ptr<Player> player_;
 	// プレイヤーの影
 	std::unique_ptr<PlaneProjectionShadow> playerShadow_;
+	// プレイヤー用アニメーター
+	std::unique_ptr<GameEngine::Animator> playerAnimator_;
 
 	// カメラコントローラークラス
 	std::unique_ptr<CameraController> cameraController_;

@@ -5,7 +5,7 @@
 #include"Animator.h"
 
 // 敵のアニメーション
-enum enemyAnimationType : size_t {
+enum class enemyAnimationType : size_t {
 	BaseMove,  // 基本移動
 	Rush,      // 突進
 	Scream,    // 叫ぶ
@@ -38,7 +38,7 @@ struct BossContext {
 	bool isWindAttack_ = false;
 
 	// アニメーションデータ
-	std::array<std::map<std::string, AnimationData>, enemyAnimationType::MaxCount>* animationData_;
+	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)>* animationData_;
 	GameEngine::Animator* animator_ = nullptr;
 
 	float animationTimer_ = 0.0f;

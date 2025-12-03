@@ -3,15 +3,32 @@
 #include"InputCommand.h"
 #include"Collider.h"
 #include"Camera.h"
+#include"Animator.h"
 #include <functional>
+#include <cstddef>
+
+enum class PlayerAnimationType : std::size_t {
+    None,       // 無効
+	BaseMove,   // 基本移動
+	RushCharge, // 突進溜め
+	RushStart,  // 突進開始
+	Rushing,    // 突進中
+	WallBounce, // 壁跳ね返り
+	AttackDown, // 攻撃ダウン
+
+    MaxCount
+};
+
+// 型安全に配列サイズを使うための定数
+static constexpr std::size_t kPlayerAnimationCount = static_cast<std::size_t>(PlayerAnimationType::MaxCount);
 
 class Player : public GameEngine::GameObject {
 public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	/// <param name="model"></param>
-	void Initialize();
+	void Initialize(GameEngine::Animator *animator,
+		const std::array<std::map<std::string, AnimationData>, kPlayerAnimationCount>& animationData);
 
 	/// <summary>
 	/// 更新処理 (カメラ基準移動)

@@ -18,7 +18,7 @@ public:
 	/// 初期化処理
 	/// </summary>
 	void Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager, GameEngine::Animator* animator,
-		std::array<std::map<std::string, AnimationData>, enemyAnimationType::MaxCount> animationData, GameEngine::DebugRenderer* debugRenderer);
+		std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)> animationData, GameEngine::DebugRenderer* debugRenderer);
 
 	/// <summary>
 	/// 更新処理
