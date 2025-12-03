@@ -194,6 +194,9 @@ void EnemyAttackManager::StartWindAttack(const Vector3& pos) {
     startAngle_ = std::atan2f(startDir.x, startDir.z);
     endAngle_ = std::atan2f(endDir.x, endDir.z);
 
+    // 最初の速度を設定する
+    windVelocity_ = startDir * windSpeed_;
+
     // 当たり判定位置をリセット
     for (auto& collider : windColliders_) {
         collider->SetWorldPosition(pos);
@@ -224,13 +227,16 @@ void EnemyAttackManager::WindUpdate() {
             point.radius = Lerp(point.startRadius, point.endRadius, localT);
         }
 
-        point.pos = { cos * (point.radius), 0.0f,sin * (point.radius) };
+        point.pos = { cos * (point.radius), 1.0f,sin * (point.radius) };
         point.pos += centerPos_;
 
         // 当たり判定の更新
         windColliders_[i]->SetWorldPosition(point.pos);
         i++;
     }
+
+    // 速度を求める
+    windVelocity_ = Normalize(windPositions_[static_cast<size_t>(windPositions_.size() - 1)].pos - windPositions_[0].pos) * windSpeed_;
 
     if (windTimer_ >= 1.0f) {
         isWind_ = false;

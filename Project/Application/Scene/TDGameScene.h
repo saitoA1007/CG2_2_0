@@ -1,4 +1,6 @@
 #pragma once
+#include <array>
+
 #include"BaseScene.h"
 
 // エンジン機能をインクルード
@@ -16,13 +18,13 @@
 #include"Application/Camera/CameraController.h"
 #include"Application/Light/SceneLightingController.h"
 #include"Application/Stage/StageManager.h"
+#include"Application/Stage/StageWallPlane.h"
 #include"Application/Enemy/BossEnemy.h"
 #include"Application/Enemy/EnemyAttackManager.h"
-#include"Application/Graphics/Terrain.h"
-#include"Application/Stage/StageWallPlane.h"
-#include <array>
-#include"Application/Graphics/PlaneProjectionShadow.h"
 #include"Application/Enemy/Effect/EnemyRushEffect.h"
+#include"Application/Enemy/Effect/EnemyWindAttackParticle.h"
+#include"Application/Graphics/Terrain.h"
+#include"Application/Graphics/PlaneProjectionShadow.h"
 #include"Application/Scene/Transition/Fade.h"
 
 class TDGameScene : public BaseScene {
@@ -134,6 +136,8 @@ private: // シーン機能
 	std::unique_ptr<EnemyAttackManager> enemyAttackManager_;
 	// ボスの突進攻撃演出
 	std::unique_ptr<EnemyRushEffect> enemyRushEffect_;
+	// ボスの風攻撃演出
+	std::unique_ptr<EnemyWindAttackParticle> enemyWindAttackParticle_;
 
 	// 氷柱のモデル
 	GameEngine::Model* iceFallModel_;
