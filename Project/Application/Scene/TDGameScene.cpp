@@ -144,28 +144,17 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// プレイヤーモデルを生成
 	playerModel_ = context_->modelManager->GetNameByModel("Player");
 	playerModel_->SetDefaultIsEnableLight(true);
-	// プレイヤー用アニメーターを作成してアニメーションデータをロード
-	playerAnimator_ = std::make_unique<Animator>();
-	// Player アニメーション群を取得(モデル名は "Player" と仮定)
-	auto playerAnimationData = context_->animationManager->GetNameByAnimations("PlayerRush");
-	// 初期アニメーションとして適当なキーを選ぶ（存在するキーを選択）
-	const AnimationData* initialAnim = nullptr;
-	if (!playerAnimationData.empty()) {
-		initialAnim = &playerAnimationData.begin()->second;
-	}
-	if (initialAnim) {
-		playerAnimator_->Initialize(playerModel_, initialAnim);
-	}
-
+	// プレイヤー用アニメーターを作成
+    playerAnimator_ = std::make_unique<Animator>();
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();
-	// Player::Initialize のシグネチャに合わせて animator と animationData 配列を渡す
-	// ここでは PlayerAnimationType::MaxPlayerAnimationType サイズの配列を作成し、必要なアニメーションを格納する
-	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(PlayerAnimationType::MaxCount)> playerAnims{};
-	// Map 全体を渡せるように、存在するキーのアニメーション群をいくつか割り当てる
-	// ここでは単純に playerAnimationData を BaseMove に割り当てる
-	playerAnims[static_cast<size_t>(PlayerAnimationType::BaseMove)] = playerAnimationData;
-	player_->Initialize(playerAnimator_.get(), playerAnims);
+	playerAnimationData_[static_cast<size_t>(PlayerAnimationType::Walk)] = context_->animationManager->GetNameByAnimations("PlayerWalk");
+	playerAnimationData_[static_cast<size_t>(PlayerAnimationType::Rush)] = context_->animationManager->GetNameByAnimations("PlayerRush");
+	playerAnimationData_[static_cast<size_t>(PlayerAnimationType::DownAttack)] = context_->animationManager->GetNameByAnimations("PlayerDownAttack");
+    playerAnimator_->Initialize(playerModel_, &playerAnimationData_[static_cast<size_t>(PlayerAnimationType::Walk)]["歩き"]);
+	player_->Initialize(playerAnimator_.get(), playerAnimationData_);
+	
+    // カメラコントローラークラスを初期化
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
 
@@ -406,11 +395,11 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// StageWallPlaneの描画 (IceMaterial via CustomRenderer)
 	// Set CustomRenderer camera and draw
 
-	// プレイヤーを描画
-	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
-	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
-	// プレイヤーの影描画
-	ModelRenderer::Draw(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
+	//// プレイヤーを描画
+	//ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+	//ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
+	//// プレイヤーの影描画
+	//ModelRenderer::Draw(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
 
 	// 氷柱のモデルを描画
 	const std::list<std::unique_ptr<IceFall>>& iceFalls = enemyAttackManager_->GetIceFalls();
@@ -424,6 +413,11 @@ void TDGameScene::Draw(const bool& isDebugView) {
 
 	// アニメーションの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
+
+    // プレイヤーのアニメーションを描画
+    ModelRenderer::DrawAnimationWithLight(playerModel_, player_->GetWorldTransform(), sceneLightingController_->GetResource());
+    // プレイヤーの影を描画する
+    ModelRenderer::DrawAnimation(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
 
 	// 敵を描画
 	ModelRenderer::DrawAnimationWithLight(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource());

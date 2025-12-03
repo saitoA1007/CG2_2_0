@@ -113,6 +113,8 @@ private: // シーン機能
 	std::unique_ptr<PlaneProjectionShadow> playerShadow_;
 	// プレイヤー用アニメーター
 	std::unique_ptr<GameEngine::Animator> playerAnimator_;
+    // プレイヤーのアニメーションデータ
+    std::array<std::map<std::string, AnimationData>, static_cast<size_t>(kPlayerAnimationCount)> playerAnimationData_;
 
 	// カメラコントローラークラス
 	std::unique_ptr<CameraController> cameraController_;

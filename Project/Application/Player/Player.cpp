@@ -11,9 +11,22 @@
 #include "LogManager.h"
 using namespace GameEngine;
 
+void Player::PlayAnimation(PlayerAnimationType type, const std::string& name) {
+    if (!animator_) return;
+    size_t idx = static_cast<size_t>(type);
+    if (idx >= animationData_.size()) return;
+    const auto& mapRef = animationData_[idx];
+    auto it = mapRef.find(name);
+    if (it == mapRef.end()) return;
+    animator_->SetAnimationData(&it->second);
+    currentAnimationType_ = type;
+    currentAnimationName_ = name;
+}
+
 void Player::Initialize(GameEngine::Animator *animator, const std::array<std::map<std::string, AnimationData>, kPlayerAnimationCount>& animationData) {
-	(void)animator;
-	(void)animationData;
+	// アニメーション設定
+	SetAnimator(animator);
+	SetAnimationData(animationData);
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
 	// コライダー生成・設定
@@ -29,6 +42,12 @@ void Player::Initialize(GameEngine::Animator *animator, const std::array<std::ma
 	collider_->SetUserData(userData);
 	// コールバック登録
 	collider_->SetOnCollisionCallback([this](const CollisionResult &result) { this->OnCollision(result); });
+
+	// 初期アニメーションをセット
+	if (animator_) {
+        PlayAnimation(PlayerAnimationType::Rush, "PlayerRush");
+	}
+
 #ifdef _DEBUG
 	//===========================================================
 	// 
@@ -61,6 +80,8 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 	HandleRushCharge(inputCommand);
 	HandleRushStart(inputCommand);
 	RushUpdate();
+
+    animator_->Update();
 
 	// 重力（常時適応）
 	velocity_.y += kFallAcceleration_ * FpsCounter::deltaTime;
@@ -109,7 +130,7 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
         sphereData_.center = worldTransform_.transform_.translate;
 	}
 
-	// 追加: 保留中の当たり判定を処理
+	// 保留中の当たり判定を処理
 	ProcessPendingCollisions();
 }
 

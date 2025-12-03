@@ -6,15 +6,14 @@
 #include"Animator.h"
 #include <functional>
 #include <cstddef>
+#include <array>
+#include <map>
 
 enum class PlayerAnimationType : std::size_t {
     None,       // 無効
-	BaseMove,   // 基本移動
-	RushCharge, // 突進溜め
-	RushStart,  // 突進開始
-	Rushing,    // 突進中
-	WallBounce, // 壁跳ね返り
-	AttackDown, // 攻撃ダウン
+    Walk,		// 歩き
+    Rush,       // 突進
+    DownAttack, // 攻撃
 
     MaxCount
 };
@@ -216,6 +215,14 @@ private:
 	// プレイヤー用コライダー（球）
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
 
+	// アニメーション管理用
+	GameEngine::Animator* animator_ = nullptr; // 非所有
+	std::array<std::map<std::string, AnimationData>, kPlayerAnimationCount> animationData_{}; // コピー保持
+
+	// 現在再生中のアニメーション情報
+	PlayerAnimationType currentAnimationType_ = PlayerAnimationType::None;
+	std::string currentAnimationName_;
+
 	// 壁衝突イベント
 	std::function<void()> onWallHit_;
 	// 着地衝突イベント
@@ -234,8 +241,14 @@ private:
 	void BounceUpdate();
 	void Bounce(const Vector3 &bounceDirection, float bounceStrength, bool isIceFall = false);
 	void OnCollision(const GameEngine::CollisionResult& result);
-	void RegisterBebugParam();
-	void ApplyDebugParam();
+
+	// アニメーション再生の準備/制御
+	void SetAnimator(GameEngine::Animator* animator) { animator_ = animator; }
+	void SetAnimationData(const std::array<std::map<std::string, AnimationData>, kPlayerAnimationCount>& data) { animationData_ = data; }
+	void PlayAnimation(PlayerAnimationType type, const std::string& name);
+
+ 	void RegisterBebugParam();
+ 	void ApplyDebugParam();
 
 	// カメラ基準ベクトル更新
 	void UpdateCameraBasis(const GameEngine::Camera* camera);
