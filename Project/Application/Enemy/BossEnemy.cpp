@@ -14,7 +14,7 @@
 using namespace GameEngine;
 
 void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager, GameEngine::Animator* animator,
-    std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)> animationData, GameEngine::DebugRenderer* debugRenderer) {
+    std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)>* animationData, GameEngine::DebugRenderer* debugRenderer) {
 
     // 取得
     enemyAttackManager_ = enemyAttackManager;
@@ -27,7 +27,7 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
     bossContext_.worldTransform = &worldTransform_;
     bossContext_.hp = kMaxHp_;
     bossContext_.bossStateRequest_ = std::nullopt;
-    bossContext_.animationData_ = &animationData;
+    bossContext_.animationData_ = animationData;
     bossContext_.animator_ = animator;
 
     // 状態の生成
@@ -106,8 +106,11 @@ void BossEnemy::Update(const Vector3& targetPos) {
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
     
-    if (bossContext_.hp > 0) {
-        //bossContext_.hp -= 1;
+    // ヒットした相手がプレイヤーの時
+    if (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Player)) {
+        if (bossContext_.hp > 0) {
+            //bossContext_.hp -= 1;
+        }
     }
 }
 

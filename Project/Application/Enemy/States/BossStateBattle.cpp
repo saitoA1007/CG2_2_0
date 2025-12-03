@@ -231,6 +231,11 @@ void BossStateBattle::ResetRush() {
 	// 上下移動する回数を求める
 	float angleDiff = std::fabs(Length(CatmullRomPosition(controlPoints_, 1.0f) - CatmullRomPosition(controlPoints_, 0.0f)));
 	cycleCount_ = angleDiff / (stageRadius_ * 0.5f);
+
+	// 突進前の挙動を取得
+	AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"];
+	bossContext_.animationMaxTime = animation.duration;
+	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"]);
 }
 
 void BossStateBattle::RushAttackUpdate() {

@@ -41,5 +41,6 @@ struct BossContext {
 	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)>* animationData_;
 	GameEngine::Animator* animator_ = nullptr;
 
-	float animationTimer_ = 0.0f;
+	float animationTimer = 0.0f;
+	float animationMaxTime = 0.0f;
 };
