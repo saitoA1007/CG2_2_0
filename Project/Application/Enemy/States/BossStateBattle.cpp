@@ -19,14 +19,14 @@ BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius,
 	// 各振る舞いの更新処理を設定
 	behaviorsTable_[static_cast<size_t>(ButtleBehavior::Normal)] = [this]() { NormalUpdate(); };
 	behaviorsTable_[static_cast<size_t>(ButtleBehavior::RushAttack)] = [this]() { RushAttackUpdate(); };
-	behaviorsTable_[static_cast<size_t>(ButtleBehavior::ShotAttack)] = [this]() { ShotAttackUpdate(); };
+	behaviorsTable_[static_cast<size_t>(ButtleBehavior::WindAttack)] = [this]() { WindAttackUpdate(); };
 	behaviorsTable_[static_cast<size_t>(ButtleBehavior::IceFallAttack)] = [this]() { IceFallAttackUpdate(); };
 	behaviorsTable_[static_cast<size_t>(ButtleBehavior::Wait)] = [this]() { WaitUpdate(); };
 
 	// 各振る舞いのリセット処理を設定する
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::Normal)] = [this]() {ResetNormal(); };
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::RushAttack)] = [this]() {ResetRush(); };
-	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::ShotAttack)] = [this]() {};
+	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::WindAttack)] = [this]() {ResetWind(); };
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::IceFallAttack)] = [this]() {ResetIceFall();};
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::Wait)] = [this]() {ResetWait(); };
 
@@ -352,8 +352,51 @@ void BossStateBattle::RushAttackUpdate() {
 	}	
 }
 
-void BossStateBattle::ShotAttackUpdate() {
+void BossStateBattle::ResetWind() {
+	// 時間をリセット
+	windTimer_ = 0.0f;
+	bossContext_.isWindAttack_ = false;
+	isActiveWind_ = false;
 
+	// 円の中心から自分へのベクトルを求める
+	Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
+	startDir_ = myDir;
+	endDir_ = myDir * -1.0f;
+
+	// リセットする
+	rotateTimer_ = 0.0f;
+}
+
+void BossStateBattle::WindAttackUpdate() {
+
+	if (rotateTimer_ <= 1.0f) {
+
+		rotateTimer_ += FpsCounter::deltaTime / maxRotateTime_;
+
+		// 回転
+		Vector3 dir = Slerp(startDir_, endDir_, rotateTimer_);
+		// Y軸周りの角度
+		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+
+	} else {
+		if (!isActiveWind_) {
+			bossContext_.isWindAttack_ = true;
+			isActiveWind_ = true;
+		} else {
+			// 一度発射したらfalseにする
+			if (bossContext_.isWindAttack_) {
+				bossContext_.isWindAttack_ = false;
+			}
+		}
+
+		windTimer_ += FpsCounter::deltaTime / maxWaitTime_;
+
+		// 待機の終了
+		if (windTimer_ >= 1.0f) {
+			// 振る舞いの切り替えをリクエスト
+			behaviorRequest_ = ButtleBehavior::Wait;
+		}
+	}
 }
 
 void BossStateBattle::ResetIceFall() {
@@ -372,13 +415,12 @@ void BossStateBattle::ResetIceFall() {
 
 void BossStateBattle::IceFallAttackUpdate() {
 
-
 	if (rotateTimer_ <= 1.0f) {
 
 		rotateTimer_ += FpsCounter::deltaTime / maxRotateTime_;
 
 		// 回転
-		Vector3 dir = Slerp(startDir_, endDir_, backTimer_);
+		Vector3 dir = Slerp(startDir_, endDir_, rotateTimer_);
 		// Y軸周りの角度
 		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
 

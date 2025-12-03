@@ -23,6 +23,9 @@ struct BossContext {
 	// 突進攻撃の演出を管理
 	bool isRushAttack_ = false;
 
+	// 風攻撃の演出を管理
+	bool isWindAttack_ = false;
+
 	// アニメーションの状態のリクエストデータ
 
 };
