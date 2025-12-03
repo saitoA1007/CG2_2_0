@@ -19,15 +19,15 @@ void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectMan
     postEffectManager_ = postEffectManager;
     
     // 風の当たり判定の位置を設定する
-    windPositions_.reserve(3);
-    windColliders_.reserve(3);
+    windPositions_.reserve(5);
+    windColliders_.reserve(5);
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 5; ++i) {
         windPositions_.push_back(windPoint({ 0.0f,0.0f,0.0f }, 0.0f));
 
         // 当たり判定を設定
         std::unique_ptr<GameEngine::SphereCollider> collider = std::make_unique<GameEngine::SphereCollider>();
-        collider->SetRadius(1.0f);
+        collider->SetRadius(2.0f);
         collider->SetWorldPosition({0.0f,0.0f,0.0f});
         collider->SetCollisionAttribute(kCollisionAttributeEnemy);
         collider->SetCollisionMask(~kCollisionAttributeEnemy);
@@ -63,6 +63,9 @@ void EnemyAttackManager::Update(const Matrix4x4& cameraWorldMatrix, const Matrix
 
     // 咆哮演出の更新処理
     RoatUpdate();
+
+    // 風攻撃の更新処理
+    WindUpdate();
 }
 
 void EnemyAttackManager::AddIceFall(const Vector3& pos) {
@@ -177,7 +180,7 @@ void EnemyAttackManager::StartWindAttack(const Vector3& pos) {
     centerPos_ = pos;
     // 円の中心へのベクトルを求める
     Vector3 dir = Normalize(Vector3(-pos.x, 0.0f, -pos.z));
-    float division = (stageRadius_ * 2.0f) / static_cast<float>(windPositions_.size());
+    float division = (stageRadius_ * 1.2f) / static_cast<float>(windPositions_.size());
     for (size_t i = 0; i < windPositions_.size(); ++i) {
         windPositions_[i].pos = pos;
         windPositions_[i].radius = 0.0f;
@@ -227,8 +230,9 @@ void EnemyAttackManager::WindUpdate() {
             point.radius = Lerp(point.startRadius, point.endRadius, localT);
         }
 
-        point.pos = { cos * (point.radius), 1.0f,sin * (point.radius) };
-        point.pos += centerPos_;
+        point.pos = { cos * (point.radius), centerPos_.y * (static_cast<float>(4-i) / 4),sin * (point.radius)};
+        point.pos.x += centerPos_.x;
+        point.pos.z += centerPos_.z;
 
         // 当たり判定の更新
         windColliders_[i]->SetWorldPosition(point.pos);
@@ -236,7 +240,9 @@ void EnemyAttackManager::WindUpdate() {
     }
 
     // 速度を求める
-    windVelocity_ = Normalize(windPositions_[static_cast<size_t>(windPositions_.size() - 1)].pos - windPositions_[0].pos) * windSpeed_;
+    Vector3 tmp = Vector3(windPositions_[static_cast<size_t>(windPositions_.size() - 1)].pos.x, windPositions_[static_cast<size_t>(windPositions_.size() - 1)].pos.y + 1.0f,
+        windPositions_[static_cast<size_t>(windPositions_.size() - 1)].pos.z);
+    windVelocity_ = Normalize(tmp - windPositions_[0].pos) * windSpeed_;
 
     if (windTimer_ >= 1.0f) {
         isWind_ = false;

@@ -127,7 +127,8 @@ void BossStateBattle::NormalUpdate() {
 	// 元の場所に戻る処理を終了
 	if (backTimer_ >= 1.0f) {
 		// 振る舞いの切り替えをリクエスト
-		behaviorRequest_ = ButtleBehavior::IceFallAttack;
+		//behaviorRequest_ = ButtleBehavior::IceFallAttack;
+		behaviorRequest_ = ButtleBehavior::WindAttack;
 		/*if (tmpIndex == 0) {
 			
 			tmpIndex++;
@@ -453,7 +454,7 @@ void BossStateBattle::WindAttackUpdate() {
 		// 待機の終了
 		if (windTimer_ >= 1.0f) {
 			// 振る舞いの切り替えをリクエスト
-			behaviorRequest_ = ButtleBehavior::Wait;
+			behaviorRequest_ = ButtleBehavior::Normal;
 		}
 	}
 }

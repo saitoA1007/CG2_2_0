@@ -94,6 +94,11 @@ void BossEnemy::Update(const Vector3& targetPos) {
         //enemyAttackManager_->SetIsRoat(true);
     }
 
+    // 風を発射する
+    if (bossContext_.isWindAttack_) {
+        enemyAttackManager_->StartWindAttack(worldTransform_.transform_.translate);
+    }
+
     // 行列を更新する
     worldTransform_.UpdateTransformMatrix();
 

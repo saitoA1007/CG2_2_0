@@ -55,7 +55,7 @@ public:
 private:
 
 	// 最大描画数
-	static inline const uint32_t kNumMaxInstance = 32;
+	static inline const uint32_t kNumMaxInstance = 64;
 
 	// 画像を取得
 	uint32_t particleGH_ = 0u;

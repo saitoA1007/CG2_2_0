@@ -49,7 +49,7 @@ void EnemyWindAttackParticle::Update() {
 EnemyWindAttackParticle::ParticleData EnemyWindAttackParticle::MakeNewParticle() {
 	ParticleData particleData;
 	// SRTを設定
-	particleData.transform.scale = { 1.0f,1.0f,1.0f };
+	particleData.transform.scale = { 2.0f,2.0f,2.0f };
 	particleData.transform.rotate = { 0.0f,0.0f,0.0f };
 	particleData.transform.translate = RandomGenerator::GetVector3(-0.4f, 0.4f) + emitterPos_;
 	// 速度
@@ -99,13 +99,18 @@ void EnemyWindAttackParticle::Move() {
 		// 移動
 		particle.transform.translate += particle.velocity * FpsCounter::deltaTime;
 
+		// 速度方向に向きを設定する
+		Vector3 dir = Normalize(Vector3(particle.velocity.x, 0.0f, particle.velocity.z));
+		particle.transform.rotate.y = std::atan2f(dir.x, dir.z);
+
 		// トラスフォームの適応
 		worldTransforms_->transformDatas_[numInstance_].transform = particle.transform;
 
 		// 色を適応
 		particle.color.w = 1.0f - (particle.currentTime / particle.lifeTime);
 		worldTransforms_->transformDatas_[numInstance_].color = particle.color;
-		worldTransforms_->transformDatas_[numInstance_].textureHandle = particle.textureHandle;
+		//worldTransforms_->transformDatas_[numInstance_].textureHandle = particle.textureHandle;
+		worldTransforms_->transformDatas_[numInstance_].textureHandle = 0;
 		numInstance_++; // 生きているParticleの数を1つカウントする
 	}
 }

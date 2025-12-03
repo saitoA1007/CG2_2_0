@@ -317,6 +317,10 @@ void TDGameScene::Update() {
 	cameraController_->Update(context_->inputCommand, context_->input);
 	mainCamera_->SetCamera(cameraController_->GetCamera());
 
+	//========================================
+	// 敵の更新処理
+	//========================================
+
 	// 敵の移動処理
 	bossEnemy_->Update(player_->GetPlayerPos());
 	enemyAttackManager_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
@@ -523,6 +527,10 @@ void TDGameScene::UpdateCollision() {
     debugRenderer_->AddSphere(player_->GetSphereData());
 #endif
 
+	//=================================
+	// 敵の当たり判定
+	//=================================
+#pragma region EnemyCollider
 	// 敵の当たり判定を登録する
 	collisionManager_->AddCollider(bossEnemy_->GetCollider());
 #ifdef _DEBUG
@@ -545,9 +553,26 @@ void TDGameScene::UpdateCollision() {
 	for (auto& iceFall : iceFalls) {
 		if (iceFall->IsAlive()) {
 			collisionManager_->AddCollider(iceFall->GetCollider());
+#ifdef _DEBUG
 			debugRenderer_->AddSphere(iceFall->GetSphereData(), { 1.0f,1.0f,0.0f,1.0f });
+#endif
 		}
 	}
+
+	// 敵の風攻撃の当たり判定を登録する
+	if (enemyAttackManager_->IsWind()) {
+		for (auto& collider : enemyAttackManager_->GetWindColliders()) {
+			collisionManager_->AddCollider(collider.get());
+#ifdef _DEBUG
+			debugRenderer_->AddSphere({ collider->GetWorldPosition(),collider->GetRadius()}, {1.0f,1.0f,0.0f,1.0f});
+#endif
+		}
+	}
+#pragma endregion
+
+	//=====================================
+	// オブジェクトの当たり判定
+	//=====================================
 
     // 床の当たり判定を登録する
     collisionManager_->AddCollider(terrain_->GetCollider());
