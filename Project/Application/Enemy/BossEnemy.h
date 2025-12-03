@@ -45,6 +45,8 @@ private: // 調整項目
 	// 最大体力
 	uint32_t kMaxHp_ = 10;
 
+	float scale_ = 1.0f;
+
 private: // メンバ変数
 
 	// 遠距離などの攻撃を管理
