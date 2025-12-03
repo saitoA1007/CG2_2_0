@@ -112,7 +112,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	}
 
 	// プレイヤーモデルを生成
-	playerModel_ = context_->modelManager->GetNameByModel("Triangular");
+	playerModel_ = context_->modelManager->GetNameByModel("Player");
 	playerModel_->SetDefaultIsEnableLight(true);
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();

@@ -16,10 +16,6 @@ using namespace GameEngine;
 void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager, GameEngine::Animator* animator,
     std::array<std::map<std::string, AnimationData>, enemyAnimationType::MaxCount> animationData, GameEngine::DebugRenderer* debugRenderer) {
 
-    // アニメーションの再生機能を取得
-    animator_ = animator;
-    animationData_ = animationData;
-
     // 取得
     enemyAttackManager_ = enemyAttackManager;
     enemyAttackManager_->SetStageRadius(stageRadius);
@@ -31,6 +27,8 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
     bossContext_.worldTransform = &worldTransform_;
     bossContext_.hp = kMaxHp_;
     bossContext_.bossStateRequest_ = std::nullopt;
+    bossContext_.animationData_ = &animationData;
+    bossContext_.animator_ = animator;
 
     // 状態の生成
     statesTable_[static_cast<size_t>(BossState::In)] = std::make_unique<BossStateIn>(bossContext_);
@@ -103,7 +101,7 @@ void BossEnemy::Update(const Vector3& targetPos) {
     bodyCollider_->SetWorldPosition(worldTransform_.transform_.translate);
 
     // アニメーションの更新処理
-    animator_->Update();
+    bossContext_.animator_->Update();
 }
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {

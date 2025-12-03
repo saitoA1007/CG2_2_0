@@ -11,16 +11,6 @@
 
 #include"EnemyAttackManager.h"
 
-// 敵のアニメーション
-enum enemyAnimationType : size_t {
-	BaseMove,  // 基本移動
-	Rush,      // 突進
-	Scream,    // 叫ぶ
-	IceBreath, // ブレス
-	
-	MaxCount
-};
-
 class BossEnemy {
 public:
 
@@ -63,11 +53,6 @@ private: // メンバ変数
 
 	// 遠距離などの攻撃を管理
 	EnemyAttackManager* enemyAttackManager_ = nullptr;
-
-	// アニメーション
-	GameEngine::Animator* animator_ = nullptr;
-	// アニメーションデータ
-	std::array<std::map<std::string, AnimationData>, enemyAnimationType::MaxCount> animationData_;
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
