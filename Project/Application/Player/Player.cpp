@@ -235,6 +235,8 @@ void Player::HandleRushCharge(GameEngine::InputCommand* inputCommand) {
 		Vector3 rushDirXZ = lastMoveDir_;
 		if (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) { rushDirXZ = { velocity_.x, 0.0f, velocity_.z }; }
 		rushDirection_ = (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) ? cameraForwardXZ_ : Normalize(rushDirXZ);
+		// 溜め開始時はレベルをリセット
+		rushChargeLevel_ = 0;
 	}
 }
 
@@ -246,6 +248,14 @@ void Player::HandleRushStart(GameEngine::InputCommand* inputCommand) {
 	if (inputCommand->IsCommandActive("RushStart")) {
 		// 予備動作時間を溜め比率で決定
 		chargeRatio_ = std::clamp(chargeTimer_ / kRushChargeMaxTime_, 0.0f, 1.0f);
+		// 溜め比率に応じてレベル決定（1-3）
+		if (chargeRatio_ < kRushChargeLevel2Ratio_) {
+			rushChargeLevel_ = 1;
+		} else if (chargeRatio_ < kRushChargeLevel3Ratio_) {
+			rushChargeLevel_ = 2;
+		} else {
+			rushChargeLevel_ = 3;
+		}
 		preRushDuration_ = Lerp(0.0f, kPreRushMaxTime_, chargeRatio_);
 		rushActiveTimer_ = Lerp(0.0f, kRushLockMaxTime_, chargeRatio_);
 		isCharging_ = false;
@@ -259,8 +269,15 @@ void Player::RushUpdate() {
 	if (isCharging_) {
 		chargeTimer_ += FpsCounter::deltaTime;
 		chargeTimer_ = std::min(chargeTimer_, kRushChargeMaxTime_);
-		// 視覚/内部用に比率更新
+		// 視覚/内部用に比率とレベル更新
 		chargeRatio_ = std::clamp(chargeTimer_ / kRushChargeMaxTime_, 0.0f, 1.0f);
+		if (chargeRatio_ < kRushChargeLevel2Ratio_) {
+			rushChargeLevel_ = 1;
+		} else if (chargeRatio_ < kRushChargeLevel3Ratio_) {
+			rushChargeLevel_ = 2;
+		} else {
+			rushChargeLevel_ = 3;
+		}
 		return;
 	}
 
@@ -270,18 +287,25 @@ void Player::RushUpdate() {
 		float waitTime = (preRushDuration_ > 0.0f ? preRushDuration_ : kPreRushMaxTime_);
 		if (rushTimer_ >= waitTime) { 
 			isPreRushing_ = false; isRushing_ = true;
-			// 突進は初速のみ設定（溜めに応じて速度をLerp）
-			float rushSpeed = Lerp(0.0f, kRushMaxSpeed_, chargeRatio_);
-			Vector3 initVel = rushDirection_ * rushSpeed;
-			velocity_.x = initVel.x; velocity_.z = initVel.z; // 慣性に任せる
+			// 突進は初速のみ設定（溜めのレベルのみで速度を決定）
+			float levelMultiplier = 1.0f;
+	switch (rushChargeLevel_) {
+	case 1: levelMultiplier = kRushStrengthLevel1_; break;
+	case 2: levelMultiplier = kRushStrengthLevel2_; break;
+	case 3: levelMultiplier = kRushStrengthLevel3_; break;
+	default: levelMultiplier = kRushStrengthLevel1_; break;
+	}
+	float rushSpeed = kRushMaxSpeed_ * levelMultiplier;
+	Vector3 initVel = rushDirection_ * rushSpeed;
+	velocity_.x = initVel.x; velocity_.z = initVel.z; // 慣性に任せる
 		}
 		return;
 	}
 	if (isRushing_) {
 		rushActiveTimer_ -= FpsCounter::deltaTime;
-        // 突進時間が終了したら突進終了
-        if (rushActiveTimer_ <= 0.0f) {
-            isRushing_ = false;
+		// 突進時間が終了したら突進終了
+		if (rushActiveTimer_ <= 0.0f) {
+			isRushing_ = false;
 		}
 	}
 }
@@ -299,7 +323,16 @@ void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength) {
 	if (isPreRushing_ || !isRushing_) { return; }
 	isPreRushing_ = false; isJump_ = true;
 	isBounceLock_ = true; bounceLockTimer_ = 0.0f; bounceAwayDir_ = { -bounceDirection.x, 0.0f, -bounceDirection.z }; bounceAwayDir_ = Normalize(bounceAwayDir_);
-	velocity_ = bounceAwayDir_ * (kWallBounceAwaySpeed_ * bounceStrength); velocity_.y = kWallBounceUpSpeed_ * bounceStrength; currentBounceLockTime_ = kWallBounceLockTime_;
+	// 既存の bounceStrength に加えて溜めレベルに応じた倍率を適用
+	float levelMultiplier = 1.0f;
+	switch (rushChargeLevel_) {
+	case 1: levelMultiplier = kWallBounceStrengthLevel1_; break;
+	case 2: levelMultiplier = kWallBounceStrengthLevel2_; break;
+	case 3: levelMultiplier = kWallBounceStrengthLevel3_; break;
+	default: levelMultiplier = kWallBounceStrengthLevel1_; break;
+	}
+	velocity_ = bounceAwayDir_ * (kWallBounceAwaySpeed_ * bounceStrength * levelMultiplier);
+	velocity_.y = kWallBounceUpSpeed_ * bounceStrength * levelMultiplier; currentBounceLockTime_ = kWallBounceLockTime_;
 }
 
 void Player::OnCollision(const CollisionResult &result) {
@@ -419,11 +452,24 @@ void Player::RegisterBebugParam() {
 	// 突撃設定
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "PreRushTime", kPreRushMaxTime_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushSpeed", kRushMaxSpeed_);
+    // レベルまでの突進溜め比率
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushChargeLevel1Ratio", kRushChargeLevel1Ratio_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushChargeLevel2Ratio", kRushChargeLevel2Ratio_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushChargeLevel3Ratio", kRushChargeLevel3Ratio_);
+
+	// レベル毎の突進強さ
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushStrengthLevel1", kRushStrengthLevel1_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushStrengthLevel2", kRushStrengthLevel2_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushStrengthLevel3", kRushStrengthLevel3_);
 
 	// 通常壁跳ね返り設定
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceUpSpeed", kWallBounceUpSpeed_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceAwaySpeed", kWallBounceAwaySpeed_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceLockTime", kWallBounceLockTime_);
+	// レベル毎の壁跳ね返り強さ
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceStrengthLevel1", kWallBounceStrengthLevel1_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceStrengthLevel2", kWallBounceStrengthLevel2_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceStrengthLevel3", kWallBounceStrengthLevel3_);
 
 	// Attack（空中急降下）設定
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackPreDownTime", kAttackPreDownTime_);
@@ -447,11 +493,23 @@ void Player::ApplyDebugParam() {
 	// 突撃設定
 	kPreRushMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "PreRushTime");
 	kRushMaxSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushSpeed");
+    // レベルまでの突進溜め比率
+    kRushChargeLevel1Ratio_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushChargeLevel1Ratio");
+    kRushChargeLevel2Ratio_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushChargeLevel2Ratio");
+    kRushChargeLevel3Ratio_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushChargeLevel3Ratio");
+	// レベル毎の突進強さ
+	kRushStrengthLevel1_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushStrengthLevel1");
+	kRushStrengthLevel2_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushStrengthLevel2");
+	kRushStrengthLevel3_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushStrengthLevel3");
 
 	// 通常壁跳ね返り設定
 	kWallBounceUpSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceUpSpeed");
 	kWallBounceAwaySpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceAwaySpeed");
 	kWallBounceLockTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceLockTime");
+	// レベル毎の壁跳ね返り強さ
+	kWallBounceStrengthLevel1_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceStrengthLevel1");
+	kWallBounceStrengthLevel2_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceStrengthLevel2");
+	kWallBounceStrengthLevel3_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceStrengthLevel3");
 
 	// Attack（空中急降下）設定
 	kAttackPreDownTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackPreDownTime");

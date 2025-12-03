@@ -50,6 +50,8 @@ public:
 
     // 溜め時間の比率取得
     float GetChargeRatio() const { return std::min<float>(chargeTimer_ / kRushChargeMaxTime_, 1.0f); }
+    // 突進レベル取得
+    int GetRushChargeLevel() const { return rushChargeLevel_; }
 
 	// 壁ヒット時コールバック設定
 	void SetOnWallHit(std::function<void()> cb) { onWallHit_ = std::move(cb); }
@@ -102,6 +104,17 @@ private:
     float kRushLockMaxTime_ = 1.0f;
 	// 突進溜め最大時間
     float kRushChargeMaxTime_ = 2.0f;
+	// 突進の強さLv1になるまでの時間の割合
+    float kRushChargeLevel1Ratio_ = 0.0f;
+    // 突進の強さLv2になるまでの時間の割合
+    float kRushChargeLevel2Ratio_ = 0.5f;
+	// 突進の強さLv3になるまでの時間の割合
+    float kRushChargeLevel3Ratio_ = 1.0f;
+
+	// 突撃の強さLv（溜めレベルごとの強さ倍率）
+	float kRushStrengthLevel1_ = 0.5f;
+	float kRushStrengthLevel2_ = 0.8f;
+	float kRushStrengthLevel3_ = 1.0f;
 
 	//--------- 通常壁への跳ね返り設定 ---------//
 
@@ -111,6 +124,11 @@ private:
     float kWallBounceAwaySpeed_ = 5.0f;
 	// 跳ね返り直後の硬直時間
     float kWallBounceLockTime_ = 0.8f;
+
+	// 壁衝突時の跳ね上がり強さ（溜めレベルごとの倍率）
+	float kWallBounceStrengthLevel1_ = 0.5f;
+	float kWallBounceStrengthLevel2_ = 0.75f;
+	float kWallBounceStrengthLevel3_ = 1.0f;
 
 	//--------- Attack（空中急降下）の設定 ---------//
 
@@ -157,13 +175,15 @@ private:
 	bool isPreRushing_ = false;
 	bool isRushing_ = false;
     bool isRushLock_ = false;
+    // 突進タイマー
 	float rushTimer_ = 0.0f;
 	float rushActiveTimer_ = 0.0f;
 	Vector3 rushDirection_ = { 0.0f,0.0f,1.0f };
 	// 溜め関連
-	float chargeTimer_ = 0.0f;        // 溜め時間
-	float chargeRatio_ = 0.0f;        // 0.0-1.0
-	float preRushDuration_ = 0.0f;    // 予備動作の実時間
+	float chargeTimer_ = 0.0f;      // 溜め時間
+	float chargeRatio_ = 0.0f;      // 0.0-1.0
+	float preRushDuration_ = 0.0f;  // 予備動作の実時間
+    int rushChargeLevel_ = 0;		// 溜めレベル（0-3）
 
 	// 壁跳ね返り（硬直）関連
 	bool isBounceLock_ = false;

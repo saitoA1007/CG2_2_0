@@ -270,9 +270,9 @@ void TDGameScene::Update() {
 	if (player_->IsRushing()) {
 		desiredFov = 1.0f; // 突進中
 	} else if (player_->IsCharging() || player_->IsPreRushing()) {
-		// 溜め比率 0.0 -> 0.6f, 1.0 -> 0.4f に線形補間
-		float chargeRatio = player_->GetChargeRatio();
-        desiredFov = Lerp(0.6f, 0.4f, chargeRatio);
+        // 突進レベルに応じてFOVを変化させる
+        int rushLevel = player_->GetRushChargeLevel();
+        desiredFov = 0.4f + static_cast<float>(3 - rushLevel) * 0.1f;
 	}
 	cameraController_->SetDesiredFov(desiredFov);
 
