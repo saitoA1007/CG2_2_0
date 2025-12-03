@@ -6,8 +6,8 @@ using namespace GameEngine;
 void EnemyRushEffect::Initialize() {
 	for (size_t i = 0; i < worldTransforms_.size(); ++i) {
 		float index = static_cast<float>(i);
-		float scale = -index * 0.4f + 1.0f;
-		worldTransforms_[i].Initialize({ { scale, scale, scale},{0.0f,0.0f,0.0f},{0.0f,0.0f,-0.5f + index * 0.5f}});
+		float scale = -index * 0.4f + 1.5f;
+		worldTransforms_[i].Initialize({ { scale, scale, scale},{0.0f,0.0f,0.0f},{0.0f,0.5f,0.5f + index * 0.5f}});
 	}
 }
 
