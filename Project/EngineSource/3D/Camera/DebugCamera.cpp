@@ -15,7 +15,7 @@ DebugCamera::~DebugCamera() {
 void DebugCamera::Initialize(const Vector3& translate,int width, int height, ID3D12Device* device) {
 	translate_ = translate;
 	viewMatrix_ = InverseMatrix(MakeAffineMatrix(scale_, rotate_, translate_));
-	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 200.0f);
+	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 500.0f);
 	rotateMatrix_ = LookAt(translate_, targetPos_, { 0.0f,1.0f,0.0f });
 
 	// カメラリソースを作成
