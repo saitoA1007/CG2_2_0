@@ -367,17 +367,24 @@ void BossStateBattle::RushAttackUpdate() {
 
 		if (isEndANimation_) {
 
-			if (bossContext_.animationTimer <= 1.0f) {
-				bossContext_.animationTimer += FpsCounter::deltaTime / bossContext_.animationMaxTime;
-				bossContext_.animationTimer = std::min(bossContext_.animationTimer, 1.0f);
+			// 突進行動
+			if (rushTimer_ <= 0.8f) {
+				if (bossContext_.animationTimer <= 0.8f) {
+					bossContext_.animationTimer += FpsCounter::deltaTime / rushMaxTime_;
+					bossContext_.animationTimer = std::min(bossContext_.animationTimer, 1.0f);
+				}
+			} else {
+				if (bossContext_.animationTimer <= 1.0f) {
+					bossContext_.animationTimer += FpsCounter::deltaTime / rushMaxTime_;
+					bossContext_.animationTimer = std::min(bossContext_.animationTimer, 1.0f);
+				}
 			}
 		} else {
-
 			// 中間
-			bossContext_.animationTimer += FpsCounter::deltaTime / bossContext_.animationMaxTime;
+			bossContext_.animationTimer += FpsCounter::deltaTime / 0.2f;
 			
+			// 突進行動に移行
 			if (bossContext_.animationTimer >= 1.0f) {
-				bossContext_.animationTimer = std::min(bossContext_.animationTimer, 1.0f);
 				isEndANimation_ = true;
 				bossContext_.animationTimer = 0.0f;
 				AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_End"];
@@ -388,17 +395,15 @@ void BossStateBattle::RushAttackUpdate() {
 	} else {
 
 		// 回転するまでの動き
-		bossContext_.animationTimer += FpsCounter::deltaTime / bossContext_.animationMaxTime;
+		bossContext_.animationTimer += FpsCounter::deltaTime / 0.5f;
 
+		// 中間動作に移行
 		if (bossContext_.animationTimer >= 1.0f) {
 			isMidAnimation_ = true;
 			bossContext_.animationTimer = 0.0f;
-			AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"];
-			bossContext_.animationMaxTime = animation.duration;
 			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"]);
 		}
 	}
-
 #pragma endregion
 }
 

@@ -102,7 +102,6 @@ void BossEnemy::Update(const Vector3& targetPos) {
 
     // アニメーションの更新処理
     bossContext_.animator_->NormalizeUpdate(bossContext_.animationTimer);
-    //bossContext_.animator_->Update();
 }
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
