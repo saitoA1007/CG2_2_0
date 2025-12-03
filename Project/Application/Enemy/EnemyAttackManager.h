@@ -1,9 +1,11 @@
 #pragma once
 #include<list>
+#include<vector>
 
 // エンジン機能
 #include"PostProcess/PostEffectManager.h"
 #include"ParticleSystem/ParticleBehavior.h"
+#include"Collider.h"
 
 // アプリ機能
 #include"LongLangeAttack/IceFall.h"
@@ -16,6 +18,13 @@ public:
 		float timer = 0.0f;
 		bool isActive = false;
 		std::unique_ptr<GameEngine::ParticleBehavior> particle;
+	};
+
+	struct windPoint {
+		Vector3 pos;
+		float radius = 0.0f;
+		float startRadius;
+		float endRadius;
 	};
 
 public:
@@ -46,6 +55,11 @@ public:
 	void CreateIceFallPositions();
 
 	/// <summary>
+	/// 風ブレスを開始する
+	/// </summary>
+	void StartWindAttack(const Vector3& pos);
+
+	/// <summary>
 	/// 氷柱のリスト
 	/// </summary>
 	/// <returns></returns>
@@ -65,6 +79,12 @@ public:
 
 	// 咆哮を設定
 	void SetIsRoat(const bool& isRoat);
+
+	// 風ブレスの状態を取得
+	bool IsWind() const { return isWind_; }
+
+	// 当たり判定の取得
+	std::vector<std::unique_ptr<GameEngine::SphereCollider>>& GetWindColliders() { return windColliders_; }
 
 private:
 
@@ -88,6 +108,19 @@ private:
 
 	float roatTimer_ = 0.0f;
 
+	// 風ブレスに使う変数
+	bool isWind_ = false;
+	std::vector<windPoint> windPositions_;
+	float windTimer_ = 0.0f;
+	float maxWindTime_ = 2.0f;
+	
+	Vector3 centerPos_ = {0.0f,0.0f,0.0f};
+	float startAngle_ = 0.0f;
+	float endAngle_ = 0.0f;
+
+	// 当たり判定
+	std::vector<std::unique_ptr<GameEngine::SphereCollider>> windColliders_;
+
 private:
 
 	/// <summary>
@@ -98,6 +131,8 @@ private:
 	// 咆哮演出の更新処理
 	void RoatUpdate();
 
+	// 風攻撃の更新処理
+	void WindUpdate();
 };
 
 // ヘルプ関数
@@ -108,4 +143,5 @@ namespace {
 
 	float EaseOutBounce(float t);
 
+	float LerpShortAngle(float a, float b, float t);
 }

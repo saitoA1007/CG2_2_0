@@ -2,8 +2,9 @@
 #include"RandomGenerator.h"
 #include"FPSCounter.h"
 #include"EasingManager.h"
+#include"MyMath.h"
 #include<numbers>
-
+#include"CollisionConfig.h"
 using namespace GameEngine;
 
 GameEngine::PostEffectManager* EnemyAttackManager::postEffectManager_ = nullptr;
@@ -16,11 +17,25 @@ void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectMan
 
     // ポストエフェクトの管理クラスを受け取る
     postEffectManager_ = postEffectManager;
-    //postEffectManager_->radialBlurResource_.GetData()->numSamles = 5;
+    
+    // 風の当たり判定の位置を設定する
+    windPositions_.reserve(3);
+    windColliders_.reserve(3);
+
+    for (int i = 0; i < 3; ++i) {
+        windPositions_.push_back(windPoint({ 0.0f,0.0f,0.0f }, 0.0f));
+
+        // 当たり判定を設定
+        std::unique_ptr<GameEngine::SphereCollider> collider = std::make_unique<GameEngine::SphereCollider>();
+        collider->SetRadius(1.0f);
+        collider->SetWorldPosition({0.0f,0.0f,0.0f});
+        collider->SetCollisionAttribute(kCollisionAttributeEnemy);
+        collider->SetCollisionMask(~kCollisionAttributeEnemy);
+        windColliders_.push_back(std::move(collider));
+    }
 
     // 演出用のメモリを確保しておく
     iceFallEffectDatas_.reserve(3);
-
     // 演出のパーティクルを生成
     for (size_t i = 0; i < 3; ++i) {
         IceFallEffectData  iceFallEffectData;
@@ -157,6 +172,71 @@ void EnemyAttackManager::RoatUpdate() {
     }
 }
 
+void EnemyAttackManager::StartWindAttack(const Vector3& pos) {
+    if (isWind_) { return; }
+    centerPos_ = pos;
+    // 円の中心へのベクトルを求める
+    Vector3 dir = Normalize(Vector3(-pos.x, 0.0f, -pos.z));
+    float division = (stageRadius_ * 2.0f) / static_cast<float>(windPositions_.size());
+    for (size_t i = 0; i < windPositions_.size(); ++i) {
+        windPositions_[i].pos = pos;
+        windPositions_[i].radius = 0.0f;
+        windPositions_[i].startRadius = 0.0f;
+        windPositions_[i].endRadius = static_cast<float>(i + 1) * division;
+    }
+
+    // 始点と終点の角度を求める
+    float angle = std::numbers::pi_v<float> / 4.0f;
+    float cos = std::cosf(angle);
+    float sin = std::sinf(angle);
+    Vector3 startDir = { dir.x * cos - dir.z * sin,0.0f,dir.x * sin + dir.z * cos };
+    Vector3 endDir = { dir.x * cos - dir.z * -sin,0.0f,dir.x * -sin + dir.z * cos };
+    startAngle_ = std::atan2f(startDir.x, startDir.z);
+    endAngle_ = std::atan2f(endDir.x, endDir.z);
+
+    // 当たり判定位置をリセット
+    for (auto& collider : windColliders_) {
+        collider->SetWorldPosition(pos);
+    }
+
+    // タイマーをリセット
+    windTimer_ = 0.0f;
+    // フラグをリセット
+    isWind_ = true;
+}
+
+void EnemyAttackManager::WindUpdate() {
+    if (!isWind_) { return; }
+
+    windTimer_ += FpsCounter::deltaTime / maxWindTime_;
+
+    // 角度を求める
+    float angle = LerpShortAngle(startAngle_, endAngle_, windTimer_);
+    float cos = std::cosf(angle);
+    float sin = std::sinf(angle);
+
+    // 風の攻撃
+    size_t i = 0;
+    for (auto& point : windPositions_) {
+
+        if (windTimer_ <= 0.2f) {
+            float localT = windTimer_ / 0.2f;
+            point.radius = Lerp(point.startRadius, point.endRadius, localT);
+        }
+
+        point.pos = { cos * (point.radius), 0.0f,sin * (point.radius) };
+        point.pos += centerPos_;
+
+        // 当たり判定の更新
+        windColliders_[i]->SetWorldPosition(point.pos);
+        i++;
+    }
+
+    if (windTimer_ >= 1.0f) {
+        isWind_ = false;
+    }
+}
+
 namespace {
 
 	float GetDistance(const Vector2& c1, const Vector2& c2) {
@@ -176,5 +256,20 @@ namespace {
         } else {
             return n1 * (t -= 2.625f / d1) * t + 0.984375f;
         }
+    }
+
+    float LerpShortAngle(float a, float b, float t) {
+        float diff = b - a;
+
+        // -2pi-2piに補正する
+        diff = std::fmodf(diff, std::numbers::pi_v<float> *2.0f);
+        // -pi-piに補正する
+        if (diff < -std::numbers::pi_v<float>) {
+            diff += std::numbers::pi_v<float> *2.0f;
+        } else if (diff > std::numbers::pi_v<float>) {
+            diff -= std::numbers::pi_v<float> *2.0f;
+        }
+
+        return a + diff * t;
     }
 }
