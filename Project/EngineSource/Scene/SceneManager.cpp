@@ -173,6 +173,7 @@ void SceneManager::LoadAnimationData() {
 	// プレイヤーのアニメーションを読み込む
 	context_->animationManager->RegisterAnimations("PlayerRush", "PlayerRush.gltf", "Resources/Animations");
 	context_->animationManager->RegisterAnimations("PlayerWalk", "PlayerWalk.gltf", "Resources/Animations");
+	context_->animationManager->RegisterAnimations("PlayerDownAttack", "PlayerRush.gltf", "Resources/Animations");
 }
 
 void SceneManager::ChangeScene(SceneState nextSceneState) {
