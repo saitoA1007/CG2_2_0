@@ -146,6 +146,8 @@ private: // シーン機能
 
 	// 平面モデル
 	GameEngine::Model* planeModel_;
+	// 風の演出用モデル
+	GameEngine::Model* windModel_;
 
 	// ボスロックオンフラグ
     bool isBossLockOn_ = false;

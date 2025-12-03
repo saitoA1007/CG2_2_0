@@ -1,6 +1,7 @@
 #include"EnemyWindAttackParticle.h"
 #include"FPSCounter.h"
 #include"RandomGenerator.h"
+#include"GameParamEditor.h"
 using namespace GameEngine;
 
 void EnemyWindAttackParticle::Initialize(const uint32_t& texture) {
@@ -8,7 +9,7 @@ void EnemyWindAttackParticle::Initialize(const uint32_t& texture) {
 	particleGH_ = texture;
 
 	// パーティクルが発生する位置を設定
-	emitterPos_ = {0.0f,0.0f,0.0f};
+	emitterPos_ = {0.0f,-10.0f,0.0f};
 
 	// ワールド行列の初期化
 	worldTransforms_ = std::make_unique<WorldTransforms>();
@@ -19,9 +20,19 @@ void EnemyWindAttackParticle::Initialize(const uint32_t& texture) {
 	for (uint32_t i = 0; i < kNumMaxInstance; ++i) {
 		particleDatas_.push_back(MakeNewParticle());
 	}
+
+#ifdef _DEBUG
+	// パラメータを登録する
+	RegisterBebugParam();
+#endif
+	// 保存したデータを取得する
+	ApplyDebugParam();
 }
 
 void EnemyWindAttackParticle::Update() {
+#ifdef _DEBUG
+	ApplyDebugParam();
+#endif
 
 	if (isLoop_) {
 		// パーティクルの生成
@@ -40,14 +51,13 @@ EnemyWindAttackParticle::ParticleData EnemyWindAttackParticle::MakeNewParticle()
 	// SRTを設定
 	particleData.transform.scale = { 1.0f,1.0f,1.0f };
 	particleData.transform.rotate = { 0.0f,0.0f,0.0f };
-	particleData.transform.translate = RandomGenerator::GetVector3(-0.2f, 0.2f) + emitterPos_;
+	particleData.transform.translate = RandomGenerator::GetVector3(-0.4f, 0.4f) + emitterPos_;
 	// 速度
-	particleData.velocity = RandomGenerator::GetVector3(-0.8f, 0.8f);
-	particleData.velocity.z = 0.0f;
+	particleData.velocity = baseVelocity_;
 	// 色
 	particleData.color = {1.0f,1.0f,1.0f,1.0f};
 	// 時間の設定
-	particleData.lifeTime = RandomGenerator::Get<float>(2.0f, 3.0f);
+	particleData.lifeTime = lifeTime_;
 	particleData.currentTime = 0.0f;
 	// テクスチャ
 	particleData.textureHandle = particleGH_;
@@ -60,7 +70,7 @@ void EnemyWindAttackParticle::Create() {
 
 	// 0.1秒経過したら生成処理
 	if (timer_ >= coolTime_) {
-		int spawnCount = 2; // まとめて出す数
+		int spawnCount = 1; // まとめて出す数
 		for (uint32_t i = 0; i < kNumMaxInstance && spawnCount > 0; ++i) {
 			if (particleDatas_[i].lifeTime < particleDatas_[i].currentTime) {
 				particleDatas_[i] = MakeNewParticle();
@@ -95,7 +105,18 @@ void EnemyWindAttackParticle::Move() {
 		// 色を適応
 		particle.color.w = 1.0f - (particle.currentTime / particle.lifeTime);
 		worldTransforms_->transformDatas_[numInstance_].color = particle.color;
-
+		worldTransforms_->transformDatas_[numInstance_].textureHandle = particle.textureHandle;
 		numInstance_++; // 生きているParticleの数を1つカウントする
 	}
+}
+
+void EnemyWindAttackParticle::RegisterBebugParam() {
+	int index = 0;
+	GameParamEditor::GetInstance()->AddItem(name_, "SpawnCoolTime", coolTime_, index++);
+	GameParamEditor::GetInstance()->AddItem(name_, "LifeTime", lifeTime_, index++);
+}
+
+void EnemyWindAttackParticle::ApplyDebugParam() {
+	coolTime_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "SpawnCoolTime");
+	lifeTime_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "LifeTime");
 }

@@ -167,6 +167,8 @@ void TDGameScene::Initialize(SceneContext* context) {
 	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
 	// 突進攻撃演出モデル
 	enemyRushModel_ = context_->modelManager->GetNameByModel("RushWave");
+	// 風攻撃演出モデル
+	windModel_ = context_->modelManager->GetNameByModel("Wind");
 #pragma endregion
 
 	// 平面モデルを取得
@@ -287,7 +289,7 @@ void TDGameScene::Update() {
 	}
 	
 	// 風攻撃演出の更新処理
-	//enemyWindAttackParticle_->Update();
+	enemyWindAttackParticle_->Update();
 
 	// ステージの更新処理
 	//stageManager_->Update();
@@ -318,6 +320,12 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	} else {
 		// 描画に使用するカメラを設定
 		ModelRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
+	}
+
+	if (isDebugView) {
+		CustomRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	} else {
+		CustomRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
 	}
 
 	//===========================================================
@@ -365,11 +373,6 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::DrawAnimation(bossEnemyModel_, bossEnemyShadow_->GetWorldTransform(), &bossEnemyShadow_->GetMaterial());
 
 	// 氷のテスト描画
-	if (isDebugView) {
-		CustomRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
-	} else {
-		CustomRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
-	}
 	CustomRenderer::PreDraw(CustomRenderMode::Ice);
 	CustomRenderer::DrawIce(icePlaneModel_, terrain_->GetWorldTransform(), sceneLightingController_->GetResource(), terrain_->GetMaterial());
 	/*for (auto &plane : stageWallPlanes_) {
@@ -386,6 +389,12 @@ void TDGameScene::Draw(const bool& isDebugView) {
 		ModelRenderer::Draw(enemyRushModel_, rushEffect);
 	}
 
+	// インスタンシング描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::InstancingBoth);
+
+	// ボスの風攻撃を描画
+	ModelRenderer::DrawInstancing(windModel_, enemyWindAttackParticle_->GetCurrentNumInstance(), *enemyWindAttackParticle_->GetWorldTransforms());
+	
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
 

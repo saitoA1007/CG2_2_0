@@ -75,13 +75,16 @@ private:
 	// 時間
 	float timer_ = 0.0f;
 
-	float coolTime_ = 0.0f;
+	float coolTime_ = 0.2f;
 
 	// ループの判定
 	bool isLoop_ = true;
 
 	// 速度
 	Vector3 baseVelocity_ = {};
+
+	float lifeTime_ = 2.0f;
+	std::string name_ = "EnemyWindAttackParticle";
 
 private:
 
@@ -100,4 +103,14 @@ private:
 	/// 移動処理
 	/// </summary>
 	void Move();
+
+	/// <summary>
+	/// デバックした値を登録
+	/// </summary>
+	void RegisterBebugParam();
+
+	/// <summary>
+	/// デバックした値を取得
+	/// </summary>
+	void ApplyDebugParam();
 };
