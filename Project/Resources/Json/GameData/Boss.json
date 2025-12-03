@@ -1,0 +1,8 @@
+{
+    "Boss": {
+        "BodyColliderSize": 3.0,
+        "MaxHp": 10,
+        "Scale": 3.0,
+        "SceneName": "TDGameScene"
+    }
+}
