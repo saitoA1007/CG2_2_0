@@ -423,8 +423,23 @@ void BossStateBattle::ResetWind() {
 	startDir_ = myDir;
 	endDir_ = myDir * -1.0f;
 
+	// 角度を求める
+	Vector3 dir = Normalize(Vector3(-bossContext_.worldTransform->transform_.translate.x, 0.0f, -bossContext_.worldTransform->transform_.translate.z));
+	float angle = std::numbers::pi_v<float> / 4.0f;
+	float cos = std::cosf(angle);
+	float sin = std::sinf(angle);
+	startPos_ = { dir.x * cos - dir.z * sin,0.0f,dir.x * sin + dir.z * cos };
+	endPos_ = { dir.x * cos - dir.z * -sin,0.0f,dir.x * -sin + dir.z * cos };
+
 	// リセットする
 	rotateTimer_ = 0.0f;
+
+	// アニメーション
+	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_Prepare"]);
+	bossContext_.animationTimer = 0.0f;
+
+	isMidAnimation_ = false;
+	isEndANimation_ = false;
 }
 
 void BossStateBattle::WindAttackUpdate() {
@@ -439,22 +454,64 @@ void BossStateBattle::WindAttackUpdate() {
 		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
 
 	} else {
-		if (!isActiveWind_) {
-			bossContext_.isWindAttack_ = true;
-			isActiveWind_ = true;
+
+		// 予備動作のアニメーション
+#pragma region BreathAnimation
+
+		if (isMidAnimation_) {
+
+			if (!isEndANimation_) {
+				// 中間
+				bossContext_.animationTimer += FpsCounter::deltaTime / 0.5f;
+
+				// 突進行動に移行
+				if (bossContext_.animationTimer >= 1.0f) {
+					isEndANimation_ = true;
+					bossContext_.animationTimer = 0.0f;
+					AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_End"];
+					bossContext_.animationMaxTime = animation.duration;
+					bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_End"]);
+				}
+			} 
 		} else {
-			// 一度発射したらfalseにする
-			if (bossContext_.isWindAttack_) {
-				bossContext_.isWindAttack_ = false;
+
+			// 回転するまでの動き
+			bossContext_.animationTimer += FpsCounter::deltaTime / 2.0f;
+
+			// 中間動作に移行
+			if (bossContext_.animationTimer >= 1.0f) {
+				isMidAnimation_ = true;
+				bossContext_.animationTimer = 0.0f;
+				bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_Main"]);
 			}
 		}
+#pragma endregion
 
-		windTimer_ += FpsCounter::deltaTime / maxWaitTime_;
+		if (isMidAnimation_ && isEndANimation_) {
 
-		// 待機の終了
-		if (windTimer_ >= 1.0f) {
-			// 振る舞いの切り替えをリクエスト
-			behaviorRequest_ = ButtleBehavior::Normal;
+			if (!isActiveWind_) {
+				bossContext_.isWindAttack_ = true;
+				isActiveWind_ = true;
+			} else {
+				// 一度発射したらfalseにする
+				if (bossContext_.isWindAttack_) {
+					bossContext_.isWindAttack_ = false;
+				}
+			}
+
+			windTimer_ += FpsCounter::deltaTime / maxWindTime_;
+			bossContext_.animationTimer = windTimer_;
+
+			// 回転
+			Vector3 dir = Slerp(endPos_,startPos_, windTimer_);
+			// Y軸周りの角度
+			bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+
+			// 待機の終了
+			if (windTimer_ >= 1.0f) {
+				// 振る舞いの切り替えをリクエスト
+				behaviorRequest_ = ButtleBehavior::Normal;
+			}
 		}
 	}
 }
