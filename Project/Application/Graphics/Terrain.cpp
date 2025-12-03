@@ -1,5 +1,7 @@
 #include"Terrain.h"
 #include"GameParamEditor.h"
+#include"CollisionConfig.h"
+#include"Application/CollisionTypeID.h"
 using namespace GameEngine;
 
 void Terrain::Initialize(const uint32_t& baseTexture, const uint32_t& iceTexture, const uint32_t& iceNormalTex) {
@@ -12,6 +14,24 @@ void Terrain::Initialize(const uint32_t& baseTexture, const uint32_t& iceTexture
 	iceMaterial_->materialData_->textureHandle = iceTexture;
 	iceMaterial_->materialData_->normalTextureHandle = iceNormalTex;
 	iceMaterial_->materialData_->baseTextureHandle = baseTexture;
+
+	// コライダーの初期化 (XZ平面を広く覆うAABB)
+	collider_ = std::make_unique<GameEngine::AABBCollider>();
+    // サイズは水平方向はワールド行列のスケールに合わせ、高さは大き目に取る
+	Vector3 size = {
+		worldTransform_.transform_.scale.x * 1.0f,
+        64.0f,
+		worldTransform_.transform_.scale.z * 1.0f
+	};
+	collider_->SetSize(size);
+    Vector3 pos = worldTransform_.GetWorldPosition();
+    pos.y -= 32.0f; // 地面の中心をY=0に合わせるためにオフセット
+	collider_->SetWorldPosition(pos);
+	collider_->SetCollisionAttribute(kCollisionAttributeTerrain);
+	collider_->SetCollisionMask(~kCollisionAttributeTerrain);
+	UserData ud = {};
+	ud.typeID = static_cast<uint32_t>(::CollisionTypeID::Ground);
+	collider_->SetUserData(ud);
 
 #ifdef _DEBUG
 	rimColor = Vector4(iceMaterial_->materialData_->rimColor.x,iceMaterial_->materialData_->rimColor.y, iceMaterial_->materialData_->rimColor.z, 1.0f);

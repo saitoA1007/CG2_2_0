@@ -1,6 +1,7 @@
 #pragma once
 #include"WorldTransform.h"
 #include"Extension/CustomMaterial/IceMaterial.h"
+#include "Collider.h"
 
 /// <summary>
 /// 地面オブジェクト
@@ -33,12 +34,18 @@ public:
 	/// <returns></returns>
 	IceMaterial* GetMaterial() { return iceMaterial_.get(); }
 
+	// コライダーを取得
+	GameEngine::Collider* GetCollider() { return collider_.get(); }
+
 private:
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
 
 	// マテリアル
 	std::unique_ptr<IceMaterial> iceMaterial_;
+
+	// コライダー
+	std::unique_ptr<GameEngine::AABBCollider> collider_;
 
 	// デバック用
 	Vector4 rimColor;

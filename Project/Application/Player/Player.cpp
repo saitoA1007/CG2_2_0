@@ -100,14 +100,6 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
         worldTransform_.transform_.rotate.y = currentYaw_;
     }
 
-	// 地面との当たり（仮）
-	if (worldTransform_.transform_.translate.y <= 0.0f) {
-		worldTransform_.transform_.translate.y = 0.0f;
-		if (velocity_.y < 0.0f) { velocity_.y = 0.0f; }
-		isJump_ = false;
-        isAttackDown_ = false;
-	}
-
 	// 行列の更新
 	worldTransform_.UpdateTransformMatrix();
 
@@ -453,6 +445,7 @@ void Player::ProcessPendingCollisions() {
 		bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall));
 		bool isIceFall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::IceFall));
 		bool isBoundary = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::BoundaryWall));
+		bool isGround = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Ground));
 
 		// 壁との衝突処理
 		if (isWall && isRushing_) {
@@ -532,6 +525,25 @@ void Player::ProcessPendingCollisions() {
 			worldTransform_.transform_.translate.x += correction.x;
 			worldTransform_.transform_.translate.y += correction.y;
 			worldTransform_.transform_.translate.z += correction.z;
+			if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
+			continue;
+		}
+
+		if (isGround) {
+			// 地面にめり込んでいる分だけ押し戻す
+			Vector3 n = result.contactNormal;
+			if (n.x != 0.0f || n.y != 0.0f || n.z != 0.0f) { n = Normalize(n); }
+			float depth = std::max(result.penetrationDepth, 0.0f);
+			Vector3 correction = n * depth;
+			worldTransform_.transform_.translate.x -= correction.x;
+			worldTransform_.transform_.translate.y -= correction.y;
+			worldTransform_.transform_.translate.z -= correction.z;
+			// 下向き速度をリセット
+			if (velocity_.y < 0.0f) velocity_.y = 0.0f;
+			if (!hasWallCollision && !isRushing_ && !isBounceLock_) {
+				isJump_ = false;
+				isAttackDown_ = false;
+			}
 			if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
 			continue;
 		}

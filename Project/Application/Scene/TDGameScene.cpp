@@ -161,7 +161,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	player_ = std::make_unique<Player>();
 	// Player::Initialize のシグネチャに合わせて animator と animationData 配列を渡す
 	// ここでは PlayerAnimationType::MaxPlayerAnimationType サイズの配列を作成し、必要なアニメーションを格納する
-	std::array<std::map<std::string, AnimationData>, kPlayerAnimationCount> playerAnims{};
+	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(PlayerAnimationType::MaxCount)> playerAnims{};
 	// Map 全体を渡せるように、存在するキーのアニメーション群をいくつか割り当てる
 	// ここでは単純に playerAnimationData を BaseMove に割り当てる
 	playerAnims[static_cast<size_t>(PlayerAnimationType::BaseMove)] = playerAnimationData;
@@ -551,6 +551,9 @@ void TDGameScene::UpdateCollision() {
 			debugRenderer_->AddSphere(iceFall->GetSphereData(), { 1.0f,1.0f,0.0f,1.0f });
 		}
 	}
+
+    // 床の当たり判定を登録する
+    collisionManager_->AddCollider(terrain_->GetCollider());
 
 	// 衝突判定
 	collisionManager_->CheckAllCollisions();
