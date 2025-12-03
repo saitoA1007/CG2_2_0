@@ -474,6 +474,7 @@ void TDGameScene::UpdateCollision() {
 	for (auto& iceFall : iceFalls) {
 		if (iceFall->IsAlive()) {
 			collisionManager_->AddCollider(iceFall->GetCollider());
+			debugRenderer_->AddSphere(iceFall->GetSphereData(), { 1.0f,1.0f,0.0f,1.0f });
 		}
 	}
 
