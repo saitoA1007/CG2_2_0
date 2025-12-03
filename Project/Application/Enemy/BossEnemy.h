@@ -50,7 +50,7 @@ public:
 private:
 
 	// 最大hp
-	uint32_t maxHp_ = 2;
+	uint32_t maxHp_ = 5;
 
 	// 当たり判定の大きさ
 	float collisionRadius_ = 2.5f;
