@@ -222,6 +222,7 @@ private:
 	// 現在再生中のアニメーション情報
 	PlayerAnimationType currentAnimationType_ = PlayerAnimationType::None;
 	std::string currentAnimationName_;
+    float animationTimer_ = 0.0f;
 
 	// 壁衝突イベント
 	std::function<void()> onWallHit_;

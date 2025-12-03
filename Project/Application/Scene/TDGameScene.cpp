@@ -151,7 +151,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	playerAnimationData_[static_cast<size_t>(PlayerAnimationType::Walk)] = context_->animationManager->GetNameByAnimations("PlayerWalk");
 	playerAnimationData_[static_cast<size_t>(PlayerAnimationType::Rush)] = context_->animationManager->GetNameByAnimations("PlayerRush");
 	playerAnimationData_[static_cast<size_t>(PlayerAnimationType::DownAttack)] = context_->animationManager->GetNameByAnimations("PlayerDownAttack");
-    playerAnimator_->Initialize(playerModel_, &playerAnimationData_[static_cast<size_t>(PlayerAnimationType::Walk)]["歩き"]);
+    playerAnimator_->Initialize(playerModel_, &playerAnimationData_[static_cast<size_t>(PlayerAnimationType::DownAttack)]["DownAttack_Main"]);
 	player_->Initialize(playerAnimator_.get(), playerAnimationData_);
 	
     // カメラコントローラークラスを初期化

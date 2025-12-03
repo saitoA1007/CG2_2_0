@@ -45,7 +45,7 @@ void Player::Initialize(GameEngine::Animator *animator, const std::array<std::ma
 
 	// 初期アニメーションをセット
 	if (animator_) {
-        PlayAnimation(PlayerAnimationType::Rush, "PlayerRush");
+        PlayAnimation(PlayerAnimationType::Walk, "PlayerWalk");
 	}
 
 #ifdef _DEBUG
@@ -80,8 +80,6 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 	HandleRushCharge(inputCommand);
 	HandleRushStart(inputCommand);
 	RushUpdate();
-
-    animator_->Update();
 
 	// 重力（常時適応）
 	velocity_.y += kFallAcceleration_ * FpsCounter::deltaTime;
@@ -132,6 +130,8 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 
 	// 保留中の当たり判定を処理
 	ProcessPendingCollisions();
+
+	animator_->Update();
 }
 
 void Player::UpdateCameraBasis(const Camera* camera) {
@@ -231,10 +231,12 @@ void Player::ProcessAttackDownInput(GameEngine::InputCommand *inputCommand) {
 	if (inputCommand->IsCommandActive("AttackDown")) {
 		if (isAttackDown_) {
 			velocity_.y = -kMaxFallSpeed_;
+            PlayAnimation(PlayerAnimationType::Walk, "PlayerWalk");
 		} else {
 			velocity_.y = -kAttackDownSpeed_;
             velocity_.x = 0.0f;
             velocity_.z = 0.0f;
+            PlayAnimation(PlayerAnimationType::DownAttack, "PlayerDownAttack");
 		}
         isAttackDown_ = !isAttackDown_;
     }
@@ -303,19 +305,20 @@ void Player::RushUpdate() {
 	if (isPreRushing_) {
 		rushTimer_ += FpsCounter::deltaTime;
 		float waitTime = (preRushDuration_ > 0.0f ? preRushDuration_ : kPreRushMaxTime_);
-		if (rushTimer_ >= waitTime) { 
+		if (rushTimer_ >= waitTime) {
 			isPreRushing_ = false; isRushing_ = true;
 			// 突進は初速のみ設定（溜めのレベルのみで速度を決定）
 			float levelMultiplier = 1.0f;
-	switch (rushChargeLevel_) {
-	case 1: levelMultiplier = kRushStrengthLevel1_; break;
-	case 2: levelMultiplier = kRushStrengthLevel2_; break;
-	case 3: levelMultiplier = kRushStrengthLevel3_; break;
-	default: levelMultiplier = kRushStrengthLevel1_; break;
-	}
-	float rushSpeed = kRushMaxSpeed_ * levelMultiplier;
-	Vector3 initVel = rushDirection_ * rushSpeed;
-	velocity_.x = initVel.x; velocity_.z = initVel.z; // 慣性に任せる
+			switch (rushChargeLevel_) {
+				case 1: levelMultiplier = kRushStrengthLevel1_; break;
+				case 2: levelMultiplier = kRushStrengthLevel2_; break;
+				case 3: levelMultiplier = kRushStrengthLevel3_; break;
+				default: levelMultiplier = kRushStrengthLevel1_; break;
+			}
+			float rushSpeed = kRushMaxSpeed_ * levelMultiplier;
+			Vector3 initVel = rushDirection_ * rushSpeed;
+			velocity_.x = initVel.x; velocity_.z = initVel.z; // 慣性に任せる
+            PlayAnimation(PlayerAnimationType::Rush, "PlayerRush");
 		}
 		return;
 	}
@@ -324,6 +327,7 @@ void Player::RushUpdate() {
 		// 突進時間が終了したら突進終了
 		if (rushActiveTimer_ <= 0.0f) {
 			isRushing_ = false;
+            PlayAnimation(PlayerAnimationType::Walk, "PlayerWalk");
 		}
 	}
 }
