@@ -117,8 +117,12 @@ private: // シーン機能
 	// 板ポリ壁（6つ）
 	static inline const size_t kNumStageWalls = 6;
 	std::array<StageWallPlane, kNumStageWalls> stageWallPlanes_;
-    // Stage wall shared material
-    std::unique_ptr<IceMaterial> stageWallPlaneMaterial_;
+    // ステージ用の板ポリ壁で共有するマテリアル
+	std::unique_ptr<IceMaterial> stageWallPlaneMaterial_;
+
+	// プレイヤーの移動範囲を制限するためのコライダー群
+	static inline const float kBoundaryHalfHeight = 10000.0f; // 縦方向には到達不可能なほど高く設定
+	std::array<std::unique_ptr<GameEngine::OBBCollider>, kNumStageWalls> boundaryColliders_;
 
 	// ボス敵モデル
 	GameEngine::Model* bossEnemyModel_;

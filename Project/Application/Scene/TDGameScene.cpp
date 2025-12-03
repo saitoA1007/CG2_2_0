@@ -5,8 +5,10 @@
 #include"GameParamEditor.h"
 #include"EasingManager.h"
 #include"LogManager.h"
+#include"CollisionConfig.h"
 #include<numbers>
 
+#include"Application/CollisionTypeID.h"
 #include"Extension/CustomRenderer.h"
 
 using namespace GameEngine;
@@ -65,7 +67,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// StageWallPlane用モデル
 	stageWallPlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
 
-	// Create a single shared material for all StageWallPlane and copy terrain textures
+	// ステージ用の板ポリ壁用のマテリアルを生成し、地面のテクスチャをコピー
 	stageWallPlaneMaterial_ = std::make_unique<IceMaterial>();
 	stageWallPlaneMaterial_->Initialize();
 	{
@@ -88,26 +90,45 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// StageWallPlaneを6つ初期化
 	{
-		// Align StageWallPlane transforms with StageManager's Wall objects
+		// StageManager の Wall オブジェクトに合わせて StageWallPlane の変換を揃える
 		auto& walls = stageManager_->GetWalls();
 		size_t count = std::min(stageWallPlanes_.size(), walls.size());
 		for (size_t i = 0; i < count; ++i) {
-			// Use the same transform as the Wall but flip Y rotation by 180 degrees
+			// Wall と同じ変換を使いつつ、Y 回転を 180 度回して向きを反転させる
 			const Transform& wallTransform = walls[i]->GetWorldTransform().transform_;
 			Transform t = wallTransform;
-			// add PI to Y rotation to reverse facing
+			// Y 回転に PI を加えて向きを反転
 			t.rotate.y += static_cast<float>(std::numbers::pi);
-			// XZ平明のモデルを使うので、壁として使うために回転
+			// XZ 平面モデルを壁として使うために回転を調整
             t.rotate.x -= static_cast<float>(std::numbers::pi) / 2.0f;
 			t.scale.z = 32.0f;
 			t.translate.y = 16.0f;
 			stageWallPlanes_[i].Initialilze(t);
+
+			// 壁の向きに合わせた移動範囲制限用の大きな OBB コライダーを作成
+			boundaryColliders_[i] = std::make_unique<GameEngine::OBBCollider>();
+			// コライダーの位置を板ポリの中心に合わせる
+			boundaryColliders_[i]->SetWorldPosition(wallTransform.translate);
+			// 壁のスケールに基づいて、縦方向に大きく、横方向は適切な範囲を覆うサイズを設定
+			Vector3 colliderSize = { wallTransform.scale.x, kBoundaryHalfHeight, wallTransform.scale.z * 0.5f };
+			boundaryColliders_[i]->SetSize(colliderSize);
+			// 壁の回転を使ってコライダーの向きを設定
+            boundaryColliders_[i]->UpdateOrientationsFromRotate(wallTransform.rotate);
+			// 地形属性に設定してプレイヤーが当たるようにする
+			boundaryColliders_[i]->SetCollisionAttribute(kCollisionAttributeTerrain);
+			boundaryColliders_[i]->SetCollisionMask(~kCollisionAttributeTerrain);
+			UserData data;
+            data.typeID = static_cast<uint32_t>(CollisionTypeID::BoundaryWall);
+			boundaryColliders_[i]->SetUserData(data);
 		}
-		// If there are more StageWallPlane entries than walls, initialize remaining with default invisible scale
+		// 壁の数より StageWallPlane のエントリ数が多い場合、残りは見えないスケールで初期化
 		for (size_t i = count; i < stageWallPlanes_.size(); ++i) {
-			Transform t; // default unit transform
+			Transform t; // デフォルトの単位変換
 			t.scale = { 0.0f,0.0f,0.0f };
 			stageWallPlanes_[i].Initialilze(t);
+			boundaryColliders_[i] = std::make_unique<GameEngine::OBBCollider>();
+			boundaryColliders_[i]->SetWorldPosition(t.translate);
+			boundaryColliders_[i]->SetSize({0.0f,0.0f,0.0f});
 		}
 	}
 
@@ -449,6 +470,24 @@ void TDGameScene::InputRegisterCommand() {
 
 void TDGameScene::UpdateCollision() {
     collisionManager_->AddCollider(player_->GetCollider());
+#ifdef _DEBUG
+    debugRenderer_->AddSphere(player_->GetSphereData());
+#endif
+
+	for (auto &bc : boundaryColliders_) {
+		if (bc && bc->GetSize().x > 0.0f) {
+			collisionManager_->AddCollider(bc.get());
+#ifdef _DEBUG
+			OBB o = {};
+			o.center = bc->GetWorldPosition();
+			const Vector3* ors = bc->GetOrientations();
+			for (int i=0;i<3;++i) o.orientations[i] = ors[i];
+			o.size = bc->GetSize();
+			debugRenderer_->AddBox(o, {0.0f,1.0f,0.0f,0.25f});
+#endif
+		}
+	}
+
 #ifdef _DEBUG
     debugRenderer_->AddSphere(player_->GetSphereData());
 #endif

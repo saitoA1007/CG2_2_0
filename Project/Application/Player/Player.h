@@ -204,12 +204,18 @@ private:
 	// 着地衝突イベント
     std::function<void()> onLandHit_;
 
+	// 後処理用に保管する当たり判定のリスト
+	std::vector<GameEngine::CollisionResult> pendingCollisions_;
+
+private:
+	void ProcessPendingCollisions();
+
 private:
 	void ProcessMoveInput(GameEngine::InputCommand* inputCommand);
     void ProcessAttackDownInput(GameEngine::InputCommand *inputCommand);
 	void RushUpdate();
 	void BounceUpdate();
-	void Bounce(const Vector3 &bounceDirection, float bounceStrength);
+	void Bounce(const Vector3 &bounceDirection, float bounceStrength, bool isIceFall = false);
 	void OnCollision(const GameEngine::CollisionResult& result);
 	void RegisterBebugParam();
 	void ApplyDebugParam();

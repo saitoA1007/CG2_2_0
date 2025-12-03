@@ -8,6 +8,7 @@ enum class CollisionTypeID : uint32_t {
 	Default, // 通常
 	Player,  // プレイヤー
 	Boss,    // ボス
-    Wall,    // 壁
+	Wall,    // 壁
+	BoundaryWall, // 移動範囲制限用の壁
 	IceFall, // つらら
 };

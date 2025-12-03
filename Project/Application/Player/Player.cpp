@@ -114,6 +114,9 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 		collider_->SetWorldPosition(worldTransform_.transform_.translate);
         sphereData_.center = worldTransform_.transform_.translate;
 	}
+
+	// 追加: 保留中の当たり判定を処理
+	ProcessPendingCollisions();
 }
 
 void Player::UpdateCameraBasis(const Camera* camera) {
@@ -319,10 +322,17 @@ void Player::BounceUpdate() {
 	}
 }
 
-void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength) {
+void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength, bool isIceFall) {
 	if (isPreRushing_ || !isRushing_) { return; }
 	isPreRushing_ = false; isJump_ = true;
 	isBounceLock_ = true; bounceLockTimer_ = 0.0f; bounceAwayDir_ = { -bounceDirection.x, 0.0f, -bounceDirection.z }; bounceAwayDir_ = Normalize(bounceAwayDir_);
+	// IceFall の場合は溜めレベルに依存せず一定の強さで跳ね返す
+	if (isIceFall) {
+		velocity_ = bounceAwayDir_ * (kWallBounceAwaySpeed_ * bounceStrength);
+		velocity_.y = kWallBounceUpSpeed_ * bounceStrength;
+		currentBounceLockTime_ = kWallBounceLockTime_;
+		return;
+	}
 	// 既存の bounceStrength に加えて溜めレベルに応じた倍率を適用
 	float levelMultiplier = 1.0f;
 	switch (rushChargeLevel_) {
@@ -336,102 +346,8 @@ void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength) {
 }
 
 void Player::OnCollision(const CollisionResult &result) {
-	// 壁との衝突から跳ね返りを誘発（突進中のみ）
-	if (!result.isHit) {
-		return;
-	}
-	
-	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall));
-    bool isIceFall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::IceFall));
-
-	//==================================================
-    // 壁との衝突処理
-	//==================================================
-
-	if (isWall && isRushing_) {
-		// 接触法線を利用して跳ね返り
-		Vector3 normal = result.contactNormal;
-		// XZ成分で跳ね返り方向作成
-		Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
-		if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
-		// カメラシェイク通知
-		if (onWallHit_) { onWallHit_(); }
-		Bounce(bounceDir, 1.0f); // 跳ね返りの強さを1.0fで呼び出し
-		return;
-	}
-
-	// 通常時の壁との衝突: めり込み分だけ押し戻す（XZ 平面）
-	if (isWall && !isRushing_) {
-		Vector3 n = result.contactNormal;
-		// XZ 成分のみを使って反射を計算
-		Vector3 nXZ = { n.x, 0.0f, n.z };
-		if (nXZ.x != 0.0f || nXZ.z != 0.0f) { nXZ = Normalize(nXZ); }
-		// めり込み分だけ押し戻す
-		float depth = std::max(result.penetrationDepth, 0.0f);
-		Vector3 correction = { nXZ.x * depth, 0.0f, nXZ.z * depth };
-		worldTransform_.transform_.translate.x += correction.x;
-		worldTransform_.transform_.translate.z += correction.z;
-
-		// 水平方向の速度を反射（光の反射のように）
-		Vector3 velXZ = { velocity_.x, 0.0f, velocity_.z };
-		float dot = velXZ.x * nXZ.x + velXZ.z * nXZ.z;
-		// 進行方向が壁に向かっている場合のみ反射を行う
-		if (dot < 0.0f) {
-			Vector3 reflected = {
-				velXZ.x - 2.0f * dot * nXZ.x,
-				0.0f,
-				velXZ.z - 2.0f * dot * nXZ.z
-			};
-			velocity_.x = reflected.x * kWallHitReflectFactor_;
-			velocity_.z = reflected.z * kWallHitReflectFactor_;
-			// 反射した向きを移動方向として保存（正規化）
-			Vector3 newDir = { reflected.x, 0.0f, reflected.z };
-			float len = Length(newDir);
-			if (len > 0.00001f) {
-				lastMoveDir_ = Normalize(newDir);
-			}
-		}
-		// コライダー位置も同期
-		if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
-		return;
-	}
-
-	//==================================================
-    // 氷柱との衝突処理
-    //==================================================
-
-	if (isIceFall && isRushing_) {
-		// 接触法線を利用して跳ね返り
-		Vector3 normal = result.contactNormal;
-		// XZ成分で跳ね返り方向作成
-		Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
-		if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
-		// カメラシェイク通知
-		if (onWallHit_) { onWallHit_(); }
-		Bounce(bounceDir, 0.5f);
-		return;
-	}
-
-	// 通常移動時のつららとの衝突: めり込み分だけ押し戻す（XZ 平面）
-	if (isIceFall && !isRushing_) {
-		Vector3 n = result.contactNormal;
-		if (n.x != 0.0f || n.y != 0.0f || n.z != 0.0f) { n = Normalize(n); }
-		float depth = -result.penetrationDepth;
-		Vector3 correction = n * depth;
-		worldTransform_.transform_.translate.x += correction.x;
-		worldTransform_.transform_.translate.y += correction.y;
-		worldTransform_.transform_.translate.z += correction.z;
-		// 速度の方向成分を除去して連続めり込みを防止
-		float dot = velocity_.x * n.x + velocity_.y * n.y + velocity_.z * n.z;
-		if (dot < 0.0f) {
-			velocity_.x -= n.x * dot;
-			velocity_.y -= n.y * dot;
-			velocity_.z -= n.z * dot;
-		}
-		// コライダー位置も同期
-		if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
-		return;
-	}
+	// 当たり判定が発生したらその場では処理せず保存して後で処理する
+	pendingCollisions_.push_back(result);
 }
 
 void Player::RegisterBebugParam() {
@@ -514,4 +430,111 @@ void Player::ApplyDebugParam() {
 	// Attack（空中急降下）設定
 	kAttackPreDownTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackPreDownTime");
 	kAttackDownSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackDownSpeed");
+}
+
+void Player::ProcessPendingCollisions() {
+	if (pendingCollisions_.empty()) return;
+
+	// 先に通常の壁との衝突があるかを確認し、あれば BoundaryWall を無視する
+	bool hasWallCollision = false;
+	for (const auto &r : pendingCollisions_) {
+		if (r.isHit && r.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall)) {
+			hasWallCollision = true;
+			break;
+		}
+	}
+
+	// 各当たり判定を順に処理する
+	for (const auto &result : pendingCollisions_) {
+		if (!result.isHit) continue;
+
+		bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall));
+		bool isIceFall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::IceFall));
+		bool isBoundary = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::BoundaryWall));
+
+		// 壁との衝突処理
+		if (isWall && isRushing_) {
+			Vector3 normal = result.contactNormal;
+			Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
+			if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
+			if (onWallHit_) { onWallHit_(); }
+			Bounce(bounceDir, 1.0f);
+			continue;
+		}
+
+		if (isWall && !isRushing_) {
+			Vector3 n = result.contactNormal;
+			Vector3 nXZ = { n.x, 0.0f, n.z };
+			if (nXZ.x != 0.0f || nXZ.z != 0.0f) { nXZ = Normalize(nXZ); }
+			float depth = std::max(result.penetrationDepth, 0.0f);
+			Vector3 correction = { nXZ.x * depth, 0.0f, nXZ.z * depth };
+			worldTransform_.transform_.translate.x += correction.x;
+			worldTransform_.transform_.translate.z += correction.z;
+
+			Vector3 velXZ = { velocity_.x, 0.0f, velocity_.z };
+			float dot = velXZ.x * nXZ.x + velXZ.z * nXZ.z;
+			if (dot < 0.0f) {
+				Vector3 reflected = {
+					velXZ.x - 2.0f * dot * nXZ.x,
+					0.0f,
+					velXZ.z - 2.0f * dot * nXZ.z
+				};
+				velocity_.x = reflected.x * kWallHitReflectFactor_;
+				velocity_.z = reflected.z * kWallHitReflectFactor_;
+				Vector3 newDir = { reflected.x, 0.0f, reflected.z };
+				float len = Length(newDir);
+				if (len > 0.00001f) { lastMoveDir_ = Normalize(newDir); }
+			}
+			if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
+			continue;
+		}
+
+		// 氷柱との衝突処理
+		if (isIceFall && isRushing_) {
+			Vector3 normal = result.contactNormal;
+			Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
+			if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
+			if (onWallHit_) { onWallHit_(); }
+			Bounce(bounceDir, 0.5f, true);
+			continue;
+		}
+
+		if (isIceFall && !isRushing_) {
+			Vector3 n = result.contactNormal;
+			if (n.x != 0.0f || n.y != 0.0f || n.z != 0.0f) { n = Normalize(n); }
+			float depth = -result.penetrationDepth;
+			Vector3 correction = n * depth;
+			worldTransform_.transform_.translate.x += correction.x;
+			worldTransform_.transform_.translate.y += correction.y;
+			worldTransform_.transform_.translate.z += correction.z;
+			float dot = velocity_.x * n.x + velocity_.y * n.y + velocity_.z * n.z;
+			if (dot < 0.0f) {
+				velocity_.x -= n.x * dot;
+				velocity_.y -= n.y * dot;
+				velocity_.z -= n.z * dot;
+			}
+			if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
+			continue;
+		}
+
+		// BoundaryWall の処理: 通常の壁が存在する場合は無視する
+		if (isBoundary) {
+			if (hasWallCollision) {
+				// 通常の壁が別にヒットしているので Boundary は無視
+				continue;
+			}
+			Vector3 n = result.contactNormal;
+			if (n.x != 0.0f || n.y != 0.0f || n.z != 0.0f) { n = Normalize(n); }
+			float depth = std::max(result.penetrationDepth, 0.0f);
+			Vector3 correction = n * depth;
+			worldTransform_.transform_.translate.x += correction.x;
+			worldTransform_.transform_.translate.y += correction.y;
+			worldTransform_.transform_.translate.z += correction.z;
+			if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
+			continue;
+		}
+	}
+
+	// 全て処理したらクリア
+	pendingCollisions_.clear();
 }
