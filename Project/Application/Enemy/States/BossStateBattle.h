@@ -16,7 +16,7 @@ public:
 	enum class ButtleBehavior {
 		Normal, // 通常状態
 		RushAttack, // 突進攻撃
-		ShotAttack, // 弾の発射
+		WindAttack, // 弾の発射
 		IceFallAttack, // 氷柱を落とす攻撃
 		Wait, // その場で留まる。攻撃と攻撃の小休憩
 
@@ -79,6 +79,7 @@ private:
 	const std::vector<std::string> kGroupNames = {
 		"Boss-Rush",
 		"Boss-IceFall",
+		"Boss-Wind"
 	};
 
 	// 回転の方向を保存する
@@ -158,6 +159,13 @@ private:
 	float moveWaitTimer_ = 0.0f; 
 	float maxMoveWaitTime_ = 2.0f;
 
+	// 風の攻撃 ================================
+
+	float windTimer_ = 0.0f;
+	float maxWindTime_ = 2.0f;
+
+	bool isActiveWind_ = false;
+
 private: // 各振る舞いの処理
 
 	/// <summary>
@@ -175,8 +183,10 @@ private: // 各振る舞いの処理
 	// 突進の攻撃処理
 	void RushAttackUpdate();
 
-	// 弾を発射する攻撃処理
-	void ShotAttackUpdate();
+	// 風攻撃のリセット処理
+	void ResetWind();
+	// 風攻撃処理
+	void WindAttackUpdate();
 
 	// 氷柱を落とす行動のリセット処理
 	void ResetIceFall();
