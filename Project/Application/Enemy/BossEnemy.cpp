@@ -112,11 +112,17 @@ Sphere BossEnemy::GetSphereData() {
 void BossEnemy::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(kGroupName_, "MaxHp", kMaxHp_);
     GameParamEditor::GetInstance()->AddItem(kGroupName_, "BodyColliderSize", bodyColliderSize_);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "Scale", scale_);
 }
 
 void BossEnemy::ApplyDebugParam() {
     kMaxHp_ = GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupName_, "MaxHp");
     bodyColliderSize_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "BodyColliderSize");
+    scale_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "Scale");
+
 
     bodyCollider_->SetRadius(bodyColliderSize_);
+
+    // スケールを設定
+    worldTransform_.transform_.scale = { scale_ ,scale_ ,scale_ };
 }
