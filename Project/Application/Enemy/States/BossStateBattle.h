@@ -165,7 +165,10 @@ private:
 	// 風の攻撃 ================================
 
 	float windTimer_ = 0.0f;
-	float maxWindTime_ = 2.0f;
+	float maxWindTime_ = 5.0f;
+
+	Vector3 startPos_;
+	Vector3 endPos_;
 
 	bool isActiveWind_ = false;
 
