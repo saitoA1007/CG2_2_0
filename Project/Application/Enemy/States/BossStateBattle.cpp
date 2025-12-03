@@ -233,8 +233,6 @@ void BossStateBattle::ResetRush() {
 	cycleCount_ = angleDiff / (stageRadius_ * 0.5f);
 
 	// 突進前の挙動を取得
-	AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Prepare"];
-	bossContext_.animationMaxTime = animation.duration;
 	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Prepare"]);
 	bossContext_.animationTimer = 0.0f;
 
@@ -483,6 +481,10 @@ void BossStateBattle::IceFallAttackUpdate() {
 		if (!isActiveIceFall_) {
 			bossContext_.isActiveIceFall = true;
 			isActiveIceFall_ = true;
+
+			//　アニメーション
+			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Scream)]["Scream"]);
+			bossContext_.animationTimer = 0.0f;
 		} else {
 			// 一度発射したらfalseにする
 			if (bossContext_.isActiveIceFall) {
@@ -491,6 +493,7 @@ void BossStateBattle::IceFallAttackUpdate() {
 		}
 
 		waitTimer_ += FpsCounter::deltaTime / maxWaitTime_;
+		bossContext_.animationTimer = waitTimer_;
 
 		// 待機の終了
 		if (waitTimer_ >= 1.0f) {
