@@ -11,7 +11,7 @@
         "Radius": 20.0,
         "SceneName": "TDGameScene",
         "WallDepth": 1.0,
-        "WallHeight": 2.0,
+        "WallHeight": 5.0,
         "WallMaxHp": 2,
         "WallRespawnTime": 3.0
     }

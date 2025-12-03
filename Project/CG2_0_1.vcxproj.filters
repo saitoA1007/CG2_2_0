@@ -296,6 +296,7 @@
     <ClCompile Include="EngineSource\Scene\SceneTransition.cpp" />
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
     <ClCompile Include="Application\Enemy\Effect\EnemyWindAttackParticle.cpp" />
+    <ClCompile Include="Application\Graphics\BgRock.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -596,6 +597,7 @@
     <ClInclude Include="EngineSource\Scene\ITransitionEffect.h" />
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
     <ClInclude Include="Application\Enemy\Effect\EnemyWindAttackParticle.h" />
+    <ClInclude Include="Application\Graphics\BgRock.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

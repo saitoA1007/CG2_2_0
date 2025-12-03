@@ -51,6 +51,15 @@ void TDGameScene::Initialize(SceneContext* context) {
 	terrain_->Initialize(context_->textureManager->GetHandleByName("gras.png"),
 		context_->textureManager->GetHandleByName("ice.png"), context_->textureManager->GetHandleByName("iceNormal.png"));
 
+	// 背景の岩モデルを生成する
+	bgIceRockModel_ = context_->modelManager->GetNameByModel("IceRock");
+	bgIceRockModel_->SetDefaultIsEnableLight(true);
+	bgRockModel_  = context_->modelManager->GetNameByModel("Rock");
+	bgRockModel_->SetDefaultIsEnableLight(true);
+	// 背景の岩オブジェクトの初期化
+	bgRock_ = std::make_unique<BgRock>();
+	bgRock_->Initialize();
+
 	// ライトの生成
 	sceneLightingController_ = std::make_unique<SceneLightingController>();
 	sceneLightingController_->Initialize(context_->graphicsDevice->GetDevice());
@@ -345,6 +354,12 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// 天球の描画
 	ModelRenderer::Draw(skyDomeModel_, skyDomeWorldTransform_);
 
+	// 背景のオブジェクトを描画
+	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+	ModelRenderer::Draw(bgIceRockModel_, bgRock_->GetWorldTransform());
+	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+	ModelRenderer::Draw(bgRockModel_, bgRock_->GetWorldTransform());
+
 	// ステージを描画する
 	stageManager_->Draw(wallModel_);
 
@@ -500,6 +515,9 @@ void TDGameScene::DebugUpdate() {
 
 	// 地面マテリアルの更新処理
 	terrain_->Update();
+
+	// 背景の岩オブジェクトの更新処理
+	bgRock_->Update();
 
 	// 当たり判定の表示管理
 	ImGui::Begin("DebugCollision");

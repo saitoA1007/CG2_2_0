@@ -19,6 +19,7 @@
             1.0
         ],
         "RimIntensity": 1.5,
+        "Scale": 50.0,
         "SceneName": "TDGameScene",
         "Shininess": 8.0,
         "SpecularColor": [
