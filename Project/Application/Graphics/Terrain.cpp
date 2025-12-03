@@ -4,7 +4,7 @@ using namespace GameEngine;
 
 void Terrain::Initialize(const uint32_t& baseTexture, const uint32_t& iceTexture, const uint32_t& iceNormalTex) {
 	// ワールド行列の初期化
-	worldTransform_.Initialize({ { 30.0f,30.0f,30.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f } });
+	worldTransform_.Initialize({ { 50.0f,50.0f,50.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f } });
 
 	// マテリアルの初期化
 	iceMaterial_ = std::make_unique<IceMaterial>();
@@ -40,6 +40,7 @@ void Terrain::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "Shininess", iceMaterial_->materialData_->shininess);
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "RimIntensity", iceMaterial_->materialData_->rimIntensity);
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "Time", iceMaterial_->materialData_->time);
+	GameParamEditor::GetInstance()->AddItem("IceTerrain", "Scale", scale_);
 }
 
 void Terrain::ApplyDebugParam() {
@@ -50,6 +51,7 @@ void Terrain::ApplyDebugParam() {
 	iceMaterial_->materialData_->shininess = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "Shininess");
 	iceMaterial_->materialData_->rimIntensity = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "RimIntensity");
 	iceMaterial_->materialData_->time = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "Time");
+	scale_ = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "Scale");
 
 	iceMaterial_->materialData_->rimColor.x = rimColor.x;
 	iceMaterial_->materialData_->rimColor.y = rimColor.y;
@@ -58,4 +60,7 @@ void Terrain::ApplyDebugParam() {
 	iceMaterial_->materialData_->specularColor.x = specularColor.x;
 	iceMaterial_->materialData_->specularColor.y = specularColor.y;
 	iceMaterial_->materialData_->specularColor.z = specularColor.z;
+	
+	worldTransform_.transform_.scale = { scale_ ,scale_,scale_ };
+	worldTransform_.UpdateTransformMatrix();
 }

@@ -177,6 +177,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Enemy\States\BossStateBattle.cpp" />
     <ClCompile Include="Application\Enemy\States\BossStateIn.cpp" />
     <ClCompile Include="Application\Enemy\States\BossStateOut.cpp" />
+    <ClCompile Include="Application\Graphics\BgRock.cpp" />
     <ClCompile Include="Application\Graphics\PlaneProjectionShadow.cpp" />
     <ClCompile Include="Application\Graphics\Terrain.cpp" />
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
@@ -350,6 +351,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy\States\BossStateIn.h" />
     <ClInclude Include="Application\Enemy\States\BossStateOut.h" />
     <ClInclude Include="Application\Enemy\States\IBossState.h" />
+    <ClInclude Include="Application\Graphics\BgRock.h" />
     <ClInclude Include="Application\Graphics\PlaneProjectionShadow.h" />
     <ClInclude Include="Application\Graphics\Terrain.h" />
     <ClInclude Include="Application\Light\SceneLightingController.h" />

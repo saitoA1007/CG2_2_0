@@ -25,6 +25,7 @@
 #include"Application/Enemy/Effect/EnemyWindAttackParticle.h"
 #include"Application/Graphics/Terrain.h"
 #include"Application/Graphics/PlaneProjectionShadow.h"
+#include"Application/Graphics/BgRock.h"
 #include"Application/Scene/Transition/Fade.h"
 
 class TDGameScene : public BaseScene {
@@ -94,6 +95,12 @@ private: // シーン機能
 	GameEngine::Model* icePlaneModel_;
 	// 地面
 	std::unique_ptr<Terrain> terrain_;
+
+	// 背景モデル
+	GameEngine::Model* bgIceRockModel_;
+	GameEngine::Model* bgRockModel_;
+	// 背景の岩オブジェクト
+	std::unique_ptr<BgRock> bgRock_;
 
 	// ライト
 	std::unique_ptr<SceneLightingController> sceneLightingController_;
