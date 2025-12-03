@@ -115,14 +115,14 @@ private:
 	bool isWind_ = false;
 	std::vector<windPoint> windPositions_;
 	float windTimer_ = 0.0f;
-	float maxWindTime_ = 2.0f;
+	float maxWindTime_ = 5.0f;
 	Vector3 centerPos_ = {0.0f,0.0f,0.0f};
 	float startAngle_ = 0.0f;
 	float endAngle_ = 0.0f;
 
 	// 風の速度
 	Vector3 windVelocity_ = {};
-	float windSpeed_ = 20.0f;
+	float windSpeed_ = 50.0f;
 
 	// 当たり判定
 	std::vector<std::unique_ptr<GameEngine::SphereCollider>> windColliders_;
