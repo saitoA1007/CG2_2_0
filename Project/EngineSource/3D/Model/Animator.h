@@ -28,6 +28,12 @@ namespace GameEngine {
 		void Update(const float& time);
 
 		/// <summary>
+		/// 更新処理(0.0f ~ 1.0f)に正規化
+		/// </summary>
+		/// <param name="time"></param>
+		void NormalizeUpdate(const float& time);
+
+		/// <summary>
 		/// 最大再生時間を取得
 		/// </summary>
 		/// <returns></returns>
@@ -89,6 +95,8 @@ namespace GameEngine {
 		/// <param name="animation"></param>
 		/// <param name="animationTime"></param>
 		static void ApplyAnimation(Skeleton& skeleton, const AnimationData& animation, float animationTime);
+
+		void NormalizeApplyAnimation(Skeleton& skeleton, const AnimationData& animation, float animationTime);
 
 		void SkeletonUpdate(Skeleton& skeleton);
 

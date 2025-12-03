@@ -233,9 +233,13 @@ void BossStateBattle::ResetRush() {
 	cycleCount_ = angleDiff / (stageRadius_ * 0.5f);
 
 	// 突進前の挙動を取得
-	AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"];
+	AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Prepare"];
 	bossContext_.animationMaxTime = animation.duration;
-	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"]);
+	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Prepare"]);
+	bossContext_.animationTimer = 0.0f;
+
+	isMidAnimation_ = false;
+	isEndANimation_ = false;
 }
 
 void BossStateBattle::RushAttackUpdate() {
@@ -355,6 +359,47 @@ void BossStateBattle::RushAttackUpdate() {
 			behaviorRequest_ = ButtleBehavior::Normal;
 		}
 	}	
+
+	// アニメーション処理
+#pragma region RushAnimation
+
+	if (isMidAnimation_) {
+
+		if (isEndANimation_) {
+
+			if (bossContext_.animationTimer <= 1.0f) {
+				bossContext_.animationTimer += FpsCounter::deltaTime / bossContext_.animationMaxTime;
+				bossContext_.animationTimer = std::min(bossContext_.animationTimer, 1.0f);
+			}
+		} else {
+
+			// 中間
+			bossContext_.animationTimer += FpsCounter::deltaTime / bossContext_.animationMaxTime;
+			
+			if (bossContext_.animationTimer >= 1.0f) {
+				bossContext_.animationTimer = std::min(bossContext_.animationTimer, 1.0f);
+				isEndANimation_ = true;
+				bossContext_.animationTimer = 0.0f;
+				AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_End"];
+				bossContext_.animationMaxTime = animation.duration;
+				bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_End"]);
+			}
+		}
+	} else {
+
+		// 回転するまでの動き
+		bossContext_.animationTimer += FpsCounter::deltaTime / bossContext_.animationMaxTime;
+
+		if (bossContext_.animationTimer >= 1.0f) {
+			isMidAnimation_ = true;
+			bossContext_.animationTimer = 0.0f;
+			AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"];
+			bossContext_.animationMaxTime = animation.duration;
+			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"]);
+		}
+	}
+
+#pragma endregion
 }
 
 void BossStateBattle::ResetWind() {

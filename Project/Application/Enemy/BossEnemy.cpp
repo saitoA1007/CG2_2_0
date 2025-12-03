@@ -101,7 +101,8 @@ void BossEnemy::Update(const Vector3& targetPos) {
     bodyCollider_->SetWorldPosition(worldTransform_.transform_.translate);
 
     // アニメーションの更新処理
-    bossContext_.animator_->Update();
+    bossContext_.animator_->NormalizeUpdate(bossContext_.animationTimer);
+    //bossContext_.animator_->Update();
 }
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {

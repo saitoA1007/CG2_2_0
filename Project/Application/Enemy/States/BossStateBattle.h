@@ -134,6 +134,9 @@ private:
 
 	bool isRotMove_ = true;
 
+	bool isMidAnimation_ = false;
+	bool isEndANimation_ = false;
+
 	// Catmull-Rom曲線の制御点
 	std::vector<Vector3> controlPoints_;
 	// 距離テーブル
