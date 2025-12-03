@@ -34,7 +34,11 @@ public:
 	/// </summary>
 	GameEngine::Collider* GetCollider() { return bodyCollider_.get(); }
 
+	// 当たり判定の球データ
 	Sphere GetSphereData();
+
+	// ワールド座標
+	Vector3 GetWorldPosition() { return worldTransform_.GetWorldPosition(); }
 
 private: // 調整項目
 

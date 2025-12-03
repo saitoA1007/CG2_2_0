@@ -159,6 +159,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 	enemyRushEffect_->Initialize();
 	enemyRushEffect_->SetParent(&bossEnemy_->GetWorldTransform());
 
+	// ボスの風攻撃の初期化
+	enemyWindAttackParticle_ = std::make_unique<EnemyWindAttackParticle>();
+	enemyWindAttackParticle_->Initialize(context_->textureManager->GetHandleByName("noise.png"));
+
 	// 氷柱のモデルを取得
 	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
 	// 突進攻撃演出モデル
@@ -273,6 +277,17 @@ void TDGameScene::Update() {
 	bossEnemyShadow_->Update();
 	// 突進攻撃演出の更新処理
 	enemyRushEffect_->Update();
+
+	if (enemyAttackManager_->IsWind()) {
+		enemyWindAttackParticle_->SetIsLoop(true);
+		enemyWindAttackParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition());
+		enemyWindAttackParticle_->SetVelocity(enemyAttackManager_->GetWindVelocity());
+	} else {
+		enemyWindAttackParticle_->SetIsLoop(false);
+	}
+	
+	// 風攻撃演出の更新処理
+	//enemyWindAttackParticle_->Update();
 
 	// ステージの更新処理
 	//stageManager_->Update();

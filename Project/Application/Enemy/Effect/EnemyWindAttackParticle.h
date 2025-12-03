@@ -15,8 +15,15 @@ public:
 
 public:
 
+	/// <summary>
+	/// 初期化処理
+	/// </summary>
+	/// <param name="texture"></param>
 	void Initialize(const uint32_t& texture);
 
+	/// <summary>
+	/// 更新処理
+	/// </summary>
 	void Update();
 
 public:
@@ -41,6 +48,9 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	uint32_t GetCurrentNumInstance() const { return numInstance_; }
+
+	// 速度を設定する
+	void SetVelocity(const Vector3& velocity) { baseVelocity_ = velocity; }
 
 private:
 
@@ -69,6 +79,9 @@ private:
 
 	// ループの判定
 	bool isLoop_ = true;
+
+	// 速度
+	Vector3 baseVelocity_ = {};
 
 private:
 

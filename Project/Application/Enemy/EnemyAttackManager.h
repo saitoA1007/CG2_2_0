@@ -86,6 +86,9 @@ public:
 	// 当たり判定の取得
 	std::vector<std::unique_ptr<GameEngine::SphereCollider>>& GetWindColliders() { return windColliders_; }
 
+	// 風の速度を取得
+	Vector3 GetWindVelocity() const { return windVelocity_; }
+
 private:
 
 	// ポストエフェクトの管理
@@ -113,10 +116,13 @@ private:
 	std::vector<windPoint> windPositions_;
 	float windTimer_ = 0.0f;
 	float maxWindTime_ = 2.0f;
-	
 	Vector3 centerPos_ = {0.0f,0.0f,0.0f};
 	float startAngle_ = 0.0f;
 	float endAngle_ = 0.0f;
+
+	// 風の速度
+	Vector3 windVelocity_ = {};
+	float windSpeed_ = 20.0f;
 
 	// 当たり判定
 	std::vector<std::unique_ptr<GameEngine::SphereCollider>> windColliders_;
