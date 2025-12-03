@@ -11,7 +11,7 @@ void PlaneProjectionShadow::Initialize(GameEngine::WorldTransform* casterWorldTr
 	// 影の初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 	// マテリアルを初期化
-	material_.Initialize({ 0.5f,0.5f,0.5f,0.4f }, { 1.0f,1.0f,1.0f }, 250.0f, false);
+	material_.Initialize({ 0.2f,0.2f,0.2f,0.4f }, { 1.0f,1.0f,1.0f }, 250.0f, false);
 
     // 平面投影行列の初期化
     shadowMatrix_ = MakeIdentity4x4();

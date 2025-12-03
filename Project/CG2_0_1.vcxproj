@@ -171,6 +171,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Camera\CameraController.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
     <ClCompile Include="Application\Enemy\Effect\EnemyRushEffect.cpp" />
+    <ClCompile Include="Application\Enemy\Effect\EnemyWindAttackParticle.cpp" />
     <ClCompile Include="Application\Enemy\EnemyAttackManager.cpp" />
     <ClCompile Include="Application\Enemy\LongLangeAttack\IceFall.cpp" />
     <ClCompile Include="Application\Enemy\States\BossStateBattle.cpp" />
@@ -342,6 +343,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy\BossEnemy.h" />
     <ClInclude Include="Application\Enemy\BossState.h" />
     <ClInclude Include="Application\Enemy\Effect\EnemyRushEffect.h" />
+    <ClInclude Include="Application\Enemy\Effect\EnemyWindAttackParticle.h" />
     <ClInclude Include="Application\Enemy\EnemyAttackManager.h" />
     <ClInclude Include="Application\Enemy\LongLangeAttack\IceFall.h" />
     <ClInclude Include="Application\Enemy\States\BossStateBattle.h" />
