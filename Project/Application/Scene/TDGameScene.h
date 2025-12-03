@@ -126,7 +126,8 @@ private: // シーン機能
 	std::unique_ptr<BossEnemy> bossEnemy_;
 
 	// ボスのアニメーションデータ
-	std::map<std::string, AnimationData> bossEnemyAnimationData_;
+	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)> enemyAnimationData_;
+
 	// ボスのアニメーションを再生するクラス
 	std::unique_ptr<GameEngine::Animator> bossEnemyAnimator_;
 	// ボスの影

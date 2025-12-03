@@ -13,7 +13,12 @@
 
 using namespace GameEngine;
 
-void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager, GameEngine::DebugRenderer* debugRenderer) {
+void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager, GameEngine::Animator* animator,
+    std::array<std::map<std::string, AnimationData>, enemyAnimationType::MaxCount> animationData, GameEngine::DebugRenderer* debugRenderer) {
+
+    // アニメーションの再生機能を取得
+    animator_ = animator;
+    animationData_ = animationData;
 
     // 取得
     enemyAttackManager_ = enemyAttackManager;
@@ -96,6 +101,9 @@ void BossEnemy::Update(const Vector3& targetPos) {
 
     // 体の当たり判定の位置を設定する
     bodyCollider_->SetWorldPosition(worldTransform_.transform_.translate);
+
+    // アニメーションの更新処理
+    animator_->Update();
 }
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
