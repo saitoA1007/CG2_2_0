@@ -102,6 +102,10 @@ void BossStateBattle::ResetNormal() {
 
 	// 時間をリセット
 	backTimer_ = 0.0f;
+
+	// アニメーション
+	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
+	bossContext_.animationTimer = 0.0f;
 }
 
 void BossStateBattle::NormalUpdate() {
@@ -109,6 +113,8 @@ void BossStateBattle::NormalUpdate() {
 	// 元の場所に戻る
 	backTimer_ += FpsCounter::deltaTime / backMaxTime_;
 	Vector3 tmpPos = Lerp(startBackPos_, endBackPos_, EaseInBack(backTimer_));
+
+	bossContext_.animationTimer = backTimer_;
 
 	// 移動処理
 	bossContext_.worldTransform->transform_.translate = tmpPos;
@@ -464,6 +470,10 @@ void BossStateBattle::ResetIceFall() {
 
 	// リセットする
 	rotateTimer_ = 0.0f;
+
+	// アニメーション
+	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
+	bossContext_.animationTimer = 0.0f;
 }
 
 void BossStateBattle::IceFallAttackUpdate() {
@@ -471,6 +481,7 @@ void BossStateBattle::IceFallAttackUpdate() {
 	if (rotateTimer_ <= 1.0f) {
 
 		rotateTimer_ += FpsCounter::deltaTime / maxRotateTime_;
+		bossContext_.animationTimer = rotateTimer_;
 
 		// 回転
 		Vector3 dir = Slerp(startDir_, endDir_, rotateTimer_);
@@ -499,12 +510,20 @@ void BossStateBattle::IceFallAttackUpdate() {
 		if (waitTimer_ >= 1.0f) {
 			// 振る舞いの切り替えをリクエスト
 			behaviorRequest_ = ButtleBehavior::Wait;
+			bossContext_.animationTimer = 1.0f;
 		}
 	}
 }
 
 void BossStateBattle::ResetWait() {
 	moveWaitTimer_ = 0.0f;
+
+	// アニメーション
+
+	// 基本移動の最大は1.3秒
+	//bossContext_.animationMaxTime = 1.3f;
+	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
+	bossContext_.animationTimer = 0.0f;
 }
 
 void BossStateBattle::WaitUpdate() {
@@ -512,6 +531,7 @@ void BossStateBattle::WaitUpdate() {
 	//Log("WaitPhase");
 
 	moveWaitTimer_ += FpsCounter::deltaTime / maxMoveWaitTime_;
+	bossContext_.animationTimer = moveWaitTimer_;
 
 	// 縦移動
 	float posY = 0.0f;
