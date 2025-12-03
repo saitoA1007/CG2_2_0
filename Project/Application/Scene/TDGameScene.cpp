@@ -204,7 +204,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// ボス敵クラスを初期化
 	bossEnemy_ = std::make_unique<BossEnemy>();
 	bossEnemy_->Initialize(stageManager_->GetRadius(), enemyAttackManager_.get(), bossEnemyAnimator_.get(), 
-		enemyAnimationData_,debugRenderer_.get());
+		&enemyAnimationData_,debugRenderer_.get());
 	
 	// ボスの影
 	bossEnemyShadow_ = std::make_unique<PlaneProjectionShadow>();
