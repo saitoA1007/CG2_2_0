@@ -222,7 +222,27 @@ private:
 	// 現在再生中のアニメーション情報
 	PlayerAnimationType currentAnimationType_ = PlayerAnimationType::None;
 	std::string currentAnimationName_;
-    float animationTimer_ = 0.0f;
+
+	// アニメーション制御用フラグ/タイマー
+	bool animCustomActive_ = false;
+	float animCustomTimer_ = 0.0f;
+	float animCustomTotal_ = 0.0f; // カスタム時間(★指定時に使用)
+	float animTargetAnimMaxTime_ = 0.0f; // 対象アニメーションの元々の長さ
+
+	// 前フレームの状態を記録して遷移検出に使う
+	bool prevIsPreRushing_ = false;
+	bool prevIsRushing_ = false;
+	bool prevIsBounceLock_ = false;
+	bool prevIsAttackDown_ = false;
+	bool wasJumping_ = false;
+
+	// シーン等から初期再生を要求するフラグ
+	bool requestPlayWalk_ = true;
+
+	// アニメーション制御関数
+	void UpdateAnimation();
+	void StartNormalAnim(PlayerAnimationType type, const std::string& name, bool loop = true);
+	void StartCustomAnim(PlayerAnimationType type, const std::string& name, float totalDuration);
 
 	// 壁衝突イベント
 	std::function<void()> onWallHit_;

@@ -52,6 +52,12 @@ namespace GameEngine {
 		void SetIsLoop(const bool& isLoop) { isLoop_ = isLoop; }
 
 		/// <summary>
+		/// 再生時間を設定（外部からアニメータのタイマーをリセットしたい場合に使用）
+		/// </summary>
+		/// <param name="t"></param>
+		void SetTimer(const float& t) { timer_ = t; }
+
+		/// <summary>
 		/// アニメーションデータを設定
 		/// </summary>
 		/// <param name="animationData"></param>

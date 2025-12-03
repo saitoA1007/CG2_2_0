@@ -11,16 +11,47 @@
 #include "LogManager.h"
 using namespace GameEngine;
 
-void Player::PlayAnimation(PlayerAnimationType type, const std::string& name) {
+void Player::PlayAnimation(PlayerAnimationType type, const std::string &name) {
+	if (!animator_ || type == PlayerAnimationType::None || name.empty() ||
+		(currentAnimationType_ == type && currentAnimationName_ == name)) {
+		return;
+	}
+	size_t idx = static_cast<size_t>(type);
+	if (idx >= animationData_.size()) return;
+	const auto &mapRef = animationData_[idx];
+	auto it = mapRef.find(name);
+	if (it == mapRef.end()) return;
+	animator_->SetAnimationData(&it->second);
+	animator_->SetTimer(0.0f);
+	currentAnimationType_ = type;
+	currentAnimationName_ = name;
+}
+
+void Player::StartNormalAnim(PlayerAnimationType type, const std::string& name, bool loop) {
+    PlayAnimation(type, name);
+    if (animator_) {
+        animator_->SetIsLoop(loop);
+        animCustomActive_ = false;
+    }
+}
+
+void Player::StartCustomAnim(PlayerAnimationType type, const std::string& name, float totalDuration) {
+    PlayAnimation(type, name);
     if (!animator_) return;
+    animator_->SetIsLoop(false);
+    animCustomActive_ = true;
+    animCustomTimer_ = 0.0f;
+    // 優先的に外部指定時間を使う
+    animCustomTotal_ = totalDuration;
+    // もしanimationData_に該当する実時間が取れるなら格納しておく
     size_t idx = static_cast<size_t>(type);
-    if (idx >= animationData_.size()) return;
-    const auto& mapRef = animationData_[idx];
-    auto it = mapRef.find(name);
-    if (it == mapRef.end()) return;
-    animator_->SetAnimationData(&it->second);
-    currentAnimationType_ = type;
-    currentAnimationName_ = name;
+    if (idx < animationData_.size()) {
+        const auto &m = animationData_[idx];
+        auto it = m.find(name);
+        if (it != m.end()) {
+            animTargetAnimMaxTime_ = it->second.duration;
+        }
+    }
 }
 
 void Player::Initialize(GameEngine::Animator *animator, const std::array<std::map<std::string, AnimationData>, kPlayerAnimationCount>& animationData) {
@@ -131,7 +162,82 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 	// 保留中の当たり判定を処理
 	ProcessPendingCollisions();
 
+	// アニメーションの状態更新
+	UpdateAnimation();
+
 	animator_->Update();
+}
+
+void Player::UpdateAnimation() {
+    // 状態遷移検出
+    // 突進予備から突進開始へ移るタイミング
+    if (isPreRushing_ && !prevIsPreRushing_) {
+        // 予備動作開始: 再生時間を preRushDuration_ として突進_Prepare を再生(★)
+        StartCustomAnim(PlayerAnimationType::Rush, "突進_Prepare", std::max(preRushDuration_, 0.001f));
+    }
+
+    // 予備が終わって突進が始まった瞬間
+    if (isRushing_ && !prevIsRushing_) {
+        // 突進開始: Main を通常再生（ループ）
+        StartNormalAnim(PlayerAnimationType::Rush, "突進_Main", true);
+    }
+
+    // 突進終了時
+    if (!isRushing_ && prevIsRushing_) {
+        // 突進終了: End を通常再生
+        StartNormalAnim(PlayerAnimationType::Rush, "突進_End", false);
+    }
+
+    // 壁衝突でのバウンス硬直開始
+    if (isBounceLock_ && !prevIsBounceLock_) {
+        // 壁衝突時は End をアニメーション全体時間で再生(★)
+        // 使用する時間は currentBounceLockTime_
+        StartCustomAnim(PlayerAnimationType::Rush, "突進_End", std::max(currentBounceLockTime_, 0.001f));
+    }
+
+    // 空中急降下開始 (isAttackDown_ が true になった瞬間)
+    if (isAttackDown_ && !prevIsAttackDown_) {
+        StartNormalAnim(PlayerAnimationType::DownAttack, "DownAttack_Prepare", false);
+        // Prepare の終了で Main を開始するのは下で判定
+    }
+
+    // Prepare->Main の自動遷移: 判定は animator の時間か既知の duration を使う
+    if (currentAnimationType_ == PlayerAnimationType::DownAttack && currentAnimationName_ == "DownAttack_Prepare") {
+        float cur = animator_->GetTimer();
+        float max = animTargetAnimMaxTime_ > 0.0f ? animTargetAnimMaxTime_ : animator_->GetMaxTime();
+        if (cur >= max) {
+            StartNormalAnim(PlayerAnimationType::DownAttack, "DownAttack_Main", false);
+        }
+    }
+
+    // 着地判定: 落下中(false)->着地(true) の遷移で Walk を再生
+    if (!isJump_ && wasJumping_) {
+        StartNormalAnim(PlayerAnimationType::Walk, "歩き", true);
+    }
+
+    // カスタム再生時間が有効なら進めて、終了で次の再生を決める
+    if (animCustomActive_) {
+        animCustomTimer_ += FpsCounter::deltaTime;
+        if (animCustomTimer_ >= animCustomTotal_) {
+            animCustomActive_ = false;
+            // カスタム再生が終わった場合の処理
+            // もし現在が Rush の Prepare -> 次は Main
+            if (currentAnimationType_ == PlayerAnimationType::Rush && currentAnimationName_ == "突進_Prepare") {
+                StartNormalAnim(PlayerAnimationType::Rush, "突進_Main", true);
+            }
+            // 壁での End のカスタム再生終了後は通常Walkへ
+            if (currentAnimationType_ == PlayerAnimationType::Rush && currentAnimationName_ == "突進_End" && isBounceLock_) {
+                // 硬直が続いている場合は何もしない
+            }
+        }
+    }
+
+    // prev 状態更新
+    prevIsPreRushing_ = isPreRushing_;
+    prevIsRushing_ = isRushing_;
+    prevIsBounceLock_ = isBounceLock_;
+    prevIsAttackDown_ = isAttackDown_;
+    wasJumping_ = isJump_;
 }
 
 void Player::UpdateCameraBasis(const Camera* camera) {
