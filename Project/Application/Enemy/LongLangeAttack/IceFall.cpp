@@ -3,6 +3,7 @@
 #include"CollisionConfig.h"
 #include"Application/CollisionTypeID.h"
 #include"Application/Player/Player.h"
+#include"GameParamEditor.h"
 
 using namespace GameEngine;
 
@@ -29,9 +30,20 @@ void IceFall::Initialize(const Vector3& pos) {
     collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
         this->OnCollision(result);
     });
+
+#ifdef _DEBUG
+    // 値を登録する
+    RegisterBebugParam();
+#endif
+    // 値を適応させる
+    ApplyDebugParam();
 }
 
 void IceFall::Update() {
+#ifdef _DEBUG
+    ApplyDebugParam();
+#endif
+
     if (isDeadNotified_) {
         isAlive_ = false;
         return;
@@ -55,6 +67,10 @@ void IceFall::Update() {
         // 当たり判定の位置を更新
         collider_->SetWorldPosition(worldTransform_.transform_.translate);
     }    
+
+#ifdef _DEBUG
+    worldTransform_.UpdateTransformMatrix();
+#endif
 }
 
 void IceFall::OnCollision([[maybe_unused]] const GameEngine::CollisionResult& result) {
@@ -66,4 +82,21 @@ void IceFall::OnCollision([[maybe_unused]] const GameEngine::CollisionResult& re
     if (player->IsRushing()) {
         isDeadNotified_ = true;
     }
+}
+
+void IceFall::RegisterBebugParam() {
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "FallAcceleration", fallAcceleration_);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "ColliderSize", colliderSize_);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "Scale", scale_);
+}
+
+void IceFall::ApplyDebugParam() {
+    fallAcceleration_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "FallAcceleration");
+    colliderSize_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "ColliderSize");
+    scale_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "Scale");
+
+    // 当たり判定を適応
+    collider_->SetRadius(colliderSize_);
+    // スケールを設定
+    worldTransform_.transform_.scale = { scale_ ,scale_ ,scale_ };
 }

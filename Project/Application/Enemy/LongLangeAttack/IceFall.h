@@ -46,6 +46,9 @@ public:
 	/// <returns></returns>
 	GameEngine::Material& GetShadowMaterial() { return shadow_->GetMaterial(); }
 
+	// 当たり判定の球データ
+	Sphere GetSphereData() { return Sphere(collider_->GetWorldPosition(), collider_->GetRadius()); }
+
 private:
 
 	// ワールド行列
@@ -65,8 +68,15 @@ private:
 	// 速度
 	Vector3 velocity_ = {0.0f,0.0f,0.0f};
 
+private: // 調整項目
+
 	// 落下加速度
 	float fallAcceleration_ = 0.2f;
+
+	float colliderSize_ = 2.0f;
+	float scale_ = 1.0f;
+
+	std::string kGroupName_ = "IceFall";
 
 private:
 
@@ -74,4 +84,14 @@ private:
 	/// 当たり判定
 	/// </summary>
 	void OnCollision([[maybe_unused]] const GameEngine::CollisionResult& result);
+
+	/// <summary>
+	/// 値を登録する
+	/// </summary>
+	void RegisterBebugParam();
+
+	/// <summary>
+	/// 値を適応する
+	/// </summary>
+	void ApplyDebugParam();
 };
