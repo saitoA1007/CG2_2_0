@@ -2,6 +2,17 @@
 #include <optional>
 #include"WorldTransform.h"
 #include"BossState.h"
+#include"Animator.h"
+
+// 敵のアニメーション
+enum enemyAnimationType : size_t {
+	BaseMove,  // 基本移動
+	Rush,      // 突進
+	Scream,    // 叫ぶ
+	IceBreath, // ブレス
+
+	MaxCount
+};
 
 // ボスの共通するパラメータ
 struct BossContext {
@@ -26,6 +37,9 @@ struct BossContext {
 	// 風攻撃の演出を管理
 	bool isWindAttack_ = false;
 
-	// アニメーションの状態のリクエストデータ
+	// アニメーションデータ
+	std::array<std::map<std::string, AnimationData>, enemyAnimationType::MaxCount>* animationData_;
+	GameEngine::Animator* animator_ = nullptr;
 
+	float animationTimer_ = 0.0f;
 };
