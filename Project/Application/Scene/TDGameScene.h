@@ -166,6 +166,8 @@ private: // シーン機能
 	// ボスロックオンフラグ
     bool isBossLockOn_ = false;
 
+	bool isTest = false;
+
 private:
 
 	/// <summary>

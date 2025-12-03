@@ -21,6 +21,11 @@ namespace GameEngine {
         PadRelease,
 		PadLeftStick,  // パッドの左スティック
 		PadRightStick, // パッドの右スティック
+
+		PadLeftTriggerPush,    // L2 押しっぱなし
+		PadLeftTriggerTrigger, // L2 押した瞬間
+		PadRightTriggerPush,    // R2 押しっぱなし
+		PadRightTriggerTrigger, // R2 押した瞬間
 	};
 
 	// コマンドを入力する状態

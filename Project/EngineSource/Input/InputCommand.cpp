@@ -115,6 +115,31 @@ bool InputCommand::CheckCondition(const InputCondition& condition) {
 		break;
 	}
 
+	case GameEngine::InputState::PadLeftTriggerPush: {
+		// XInputのトリガー範囲は0-255なので、threshold(0.0-1.0)を変換する
+		float triggerThreshold = condition.threshold * 255.0f;
+		return input_->GetPushPadLeftTrigger(triggerThreshold);
+		break;
+	}
+
+	case GameEngine::InputState::PadLeftTriggerTrigger: {
+		float triggerThreshold = condition.threshold * 255.0f;
+		return input_->GetTriggerPadLeftTrigger(triggerThreshold);
+		break;
+	}
+
+	case GameEngine::InputState::PadRightTriggerPush: {
+		float triggerThreshold = condition.threshold * 255.0f;
+		return input_->GetPushPadRightTrigger(triggerThreshold);
+		break;
+	}
+
+	case GameEngine::InputState::PadRightTriggerTrigger: {
+		float triggerThreshold = condition.threshold * 255.0f;
+		return input_->GetTriggerPadRightTrigger(triggerThreshold);
+		break;
+	}	
+
 	default:
 		return false;
 		break;

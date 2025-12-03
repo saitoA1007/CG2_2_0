@@ -215,6 +215,26 @@ Vector2 Input::GetRightStick() {
 	return result;
 }
 
+bool Input::GetTriggerPadLeftTrigger(const float& value) {
+	float lt = static_cast<float>(controllerState_.Gamepad.bLeftTrigger);
+	float preLt = static_cast<float>(preControllerState_.Gamepad.bLeftTrigger);
+	// 今フレーム閾値を超えている かつ 前フレーム閾値以下
+	if (lt > value && preLt <= value) {
+		return true;
+	}
+	return false;
+}
+
+bool Input::GetTriggerPadRightTrigger(const float& value) {
+	float rt = static_cast<float>(controllerState_.Gamepad.bRightTrigger);
+	float preRt = static_cast<float>(preControllerState_.Gamepad.bRightTrigger);
+	// 今フレーム閾値を超えている かつ 前フレーム閾値以下
+	if (rt > value && preRt <= value) {
+		return true;
+	}
+	return false;
+}
+
 bool Input::GetPushPadLeftTrigger(const float& value) {
 
 	float lt = static_cast<float>(controllerState_.Gamepad.bLeftTrigger);

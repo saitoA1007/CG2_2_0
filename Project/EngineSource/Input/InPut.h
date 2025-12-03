@@ -119,6 +119,16 @@ namespace GameEngine {
 		Vector2 GetRightStick();
 
 		/// <summary>
+		/// LeftTriggerのトリガー（押した瞬間）をチェック(デフォルト値は30.0f)
+		/// </summary>
+		bool GetTriggerPadLeftTrigger(const float& value = static_cast<float>(XINPUT_GAMEPAD_TRIGGER_THRESHOLD));
+
+		/// <summary>
+		/// RightTriggerのトリガー（押した瞬間）をチェック(デフォルト値は30.0f)
+		/// </summary>
+		bool GetTriggerPadRightTrigger(const float& value = static_cast<float>(XINPUT_GAMEPAD_TRIGGER_THRESHOLD));
+
+		/// <summary>
 		/// LeftTriggerの押下をチェック (デフォルト値は30.0f)
 		/// </summary>
 		/// <param name="value">どこから押下を判定するかの値。範囲 : (0~255), 0:完全に離している, 255:完全に引き切る</param>

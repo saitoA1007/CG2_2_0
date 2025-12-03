@@ -494,6 +494,9 @@ void TDGameScene::InputRegisterCommand() {
     // RushStartコマンド
     context_->inputCommand->RegisterCommand("RushStart", { {InputState::MouseRelease, 0}, {InputState::PadRelease, XINPUT_GAMEPAD_X} });
 
+	// トリガーのテスト
+	context_->inputCommand->RegisterCommand("TestTrigger", { {InputState::PadLeftTriggerTrigger,0,{0.0f,0.0f},0.2f} });
+
 	// ロックオンコマンド
 	context_->inputCommand->RegisterCommand("LockOnBoss", { {InputState::KeyTrigger, DIK_TAB }, {InputState::PadTrigger, XINPUT_GAMEPAD_RIGHT_THUMB} });
 	
