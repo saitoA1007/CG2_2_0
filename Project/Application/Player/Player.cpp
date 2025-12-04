@@ -541,6 +541,7 @@ void Player::PlayAnimation(PlayerAnimationType type, const std::string &name) {
 	animator_->SetTimer(0.0f);
 	currentAnimationType_ = type;
 	currentAnimationName_ = name;
+    Log("Play Animation: " + name);
 }
 
 void Player::StartNormalAnim(PlayerAnimationType type, const std::string &name, bool loop) {

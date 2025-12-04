@@ -243,7 +243,7 @@ private:
 
 	// アニメーション制御関数
 	void UpdateAnimation();
-	void StartNormalAnim(PlayerAnimationType type, const std::string& name, bool loop = true);
+	void StartNormalAnim(PlayerAnimationType type, const std::string& name, bool loop);
 	void StartCustomAnim(PlayerAnimationType type, const std::string& name, float totalDuration);
 
 	// 壁衝突イベント
