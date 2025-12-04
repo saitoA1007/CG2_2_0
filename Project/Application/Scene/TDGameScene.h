@@ -170,6 +170,10 @@ private: // シーン機能
 
 	bool isTest = false;
 
+	// 仮の操作方法UI
+	std::unique_ptr<GameEngine::Sprite> playGuideSprite_;
+	uint32_t playGuideGH_ = 0;
+
 private:
 
 	/// <summary>
