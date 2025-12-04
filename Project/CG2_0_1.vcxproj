@@ -330,7 +330,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
     <ClCompile Include="Application\ColorEditor.cpp" />
     <ClCompile Include="EngineSource\Scene\SceneManager.cpp" />
-    <ClCompile Include="Application\Scene\GameScene.cpp" />
     <ClCompile Include="Application\Scene\TitleScene.cpp" />
     <ClCompile Include="EngineSource\Editor\GameParamEditor.cpp" />
     <ClCompile Include="main.cpp">
@@ -524,7 +523,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\ColorEditor.h" />
     <ClInclude Include="EngineSource\Scene\SceneManager.h" />
     <ClInclude Include="EngineSource\Scene\BaseScene.h" />
-    <ClInclude Include="Application\Scene\GameScene.h" />
     <ClInclude Include="Application\Scene\TitleScene.h" />
     <ClInclude Include="EngineSource\Editor\GameParamEditor.h" />
   </ItemGroup>

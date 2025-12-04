@@ -2,7 +2,6 @@
 
 // 各シーン
 #include"Application/Scene/TitleScene.h"
-#include"Application/Scene/GameScene.h"
 #include"Application/Scene/TDGameScene.h"
 #include"Application/Scene/ResultScene.h"
 
@@ -56,7 +55,7 @@ void SceneManager::Initialize(SceneContext* context) {
 #endif
 	
 	// シーンの初期化。
-	ChangeScene(SceneState::Title);
+	ChangeScene(SceneState::TDGame);
 }
 
 void SceneManager::Update() {
@@ -217,10 +216,6 @@ std::unique_ptr<BaseScene> SceneManager::CreateScene(SceneState sceneState) {
 	case SceneState::Unknown:
 	case SceneState::Title:
 		return std::make_unique<TitleScene>();
-		break;
-
-	case SceneState::Game:
-		return std::make_unique<GameScene>();
 		break;
 
 	case SceneState::TDGame:
