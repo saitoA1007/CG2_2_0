@@ -48,6 +48,9 @@ public:
 	/// <returns></returns>
 	bool IsRushAttack() const { return bossContext_.isRushAttack_; }
 
+	// 現在のhpを取得
+	uint32_t GetCurrentHP() const { return bossContext_.hp; }
+
 private: // 調整項目
 
 	// 最大体力

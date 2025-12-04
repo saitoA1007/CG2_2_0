@@ -272,7 +272,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 void TDGameScene::Update() {
 
-	if (context_->input->TriggerKey(DIK_U)) {
+	if (context_->input->TriggerKey(DIK_U) || (bossEnemy_->GetCurrentHP() == 0)) {
 		isFinished_ = true;
 	}
 
