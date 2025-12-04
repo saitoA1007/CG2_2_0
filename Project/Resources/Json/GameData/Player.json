@@ -1,8 +1,8 @@
 {
     "Player": {
-        "AirAcceleration": 2.0,
-        "AirDeceleration": 1.0,
-        "AirMoveSpeed": 16.0,
+        "AirAcceleration": 5.0,
+        "AirDeceleration": 0.0,
+        "AirMoveSpeed": 10.0,
         "FallAcceleration": -9.600000381469727,
         "GroundAcceleration": 8.0,
         "GroundDeceleration": 2.0,
