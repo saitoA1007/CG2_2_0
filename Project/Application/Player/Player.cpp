@@ -290,8 +290,28 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 		}
 		float maxSpeed = (isJump_ ? kAirMoveSpeed_ : kMoveSpeed_);
 		// 入力から算出される到達可能最大速度（XZのみ）。ここで既に上限を規定するため、直接 velocity を clamp する必要はない。
-		desiredVelXZ_.x = dir.x * maxSpeed;
-		desiredVelXZ_.z = dir.z * maxSpeed;
+		// 変更: 入力による加速が既に現在の移動速度を超えないようにする。ただし、既存のvelocityが
+		// 既にmaxSpeedを超えている場合はそのままにし、inputによってさらに増加させないようにする。
+		if (dir.x != 0.0f || dir.z != 0.0f) {
+			// 現在の水平速度を取得
+			Vector3 horiz = { velocity_.x, 0.0f, velocity_.z };
+			// dirは正規化済み
+			Vector3 dirNorm = dir;
+			float proj = horiz.x * dirNorm.x + horiz.z * dirNorm.z; // 現在速度のdir方向成分
+			float horizLen = Length(horiz);
+			if (horizLen >= maxSpeed) {
+				// 既に水平速度がmaxSpeed以上あるなら、入力でそれ以上増やさない
+				desiredVelXZ_.x = dirNorm.x * proj;
+				desiredVelXZ_.z = dirNorm.z * proj;
+			} else {
+				// まだmax未満なら通常通り目標速度を設定
+				desiredVelXZ_.x = dir.x * maxSpeed;
+				desiredVelXZ_.z = dir.z * maxSpeed;
+			}
+		} else {
+			desiredVelXZ_.x = 0.0f;
+			desiredVelXZ_.z = 0.0f;
+		}
 	}
 
 	// ここで加速と減速を分離する
@@ -316,18 +336,6 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 
 	applyAxis(velocity_.x, desiredVelXZ_.x, isJump_);
 	applyAxis(velocity_.z, desiredVelXZ_.z, isJump_);
-
-	// 最大速度の安全確認（念のため）
-	float maxSpeedGround = kMoveSpeed_;
-	float maxSpeedAir = kAirMoveSpeed_;
-	float maxSpeed = isJump_ ? maxSpeedAir : maxSpeedGround;
-	Vector3 horiz = { velocity_.x, 0.0f, velocity_.z };
-	float horizLen = Length(horiz);
-	if (horizLen > maxSpeed) {
-		Vector3 n = Normalize(horiz);
-		velocity_.x = n.x * maxSpeed;
-		velocity_.z = n.z * maxSpeed;
-	}
 }
 
 void Player::ProcessAttackDownInput(GameEngine::InputCommand *inputCommand) {

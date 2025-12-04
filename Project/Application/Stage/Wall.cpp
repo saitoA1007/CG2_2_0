@@ -40,7 +40,7 @@ void Wall::Initialilze(const Transform& transform, float respawnTime, int32_t ma
     collider_->SetUserData(userData);
 
 	// コールバック関数に登録する
-	collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
+	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 	});
 }
