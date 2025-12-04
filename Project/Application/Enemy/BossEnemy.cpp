@@ -115,9 +115,20 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
     
     // ヒットした相手がプレイヤーの時
     if (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Player)) {
-        if (bossContext_.hp > 0) {
-            //bossContext_.hp -= 1;
-        }
+
+        // プレイヤーデータを取得
+        Player* player = nullptr;
+        player = result.userData.As<Player>();
+        if (player == nullptr) { return; }
+
+        // 突進、または上からの攻撃の時のみダメージ
+        if (player->IsRushing() || player->IsAttackDown()) {
+            if (bossContext_.hp > 0) {
+                bossContext_.hp -= 1;
+
+                Log("CurrentHp : " + std::to_string(bossContext_.hp), "Enemy");
+            }
+        } 
     }
 }
 

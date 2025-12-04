@@ -9,7 +9,7 @@ using namespace GameEngine;
 void Engine::RunEngine(HINSTANCE& hInstance) {
 
 	// 初期化
-	Initialize(L"LE2A_07_サイトウ_アオイ", 1280, 720, hInstance);
+	Initialize(L"2205_vs氷大怪鳥ジークアース", 1280, 720, hInstance);
 
 	// 更新処理
 	Update();
