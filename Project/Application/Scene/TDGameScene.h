@@ -11,6 +11,7 @@
 #include"DebugRenderer.h"
 #include"CollisionManager.h"
 #include"Extension/CustomMaterial/IceMaterial.h"
+#include"ParticleSystem/ParticleBehavior.h"
 #include"Animator.h"
 
 // アプリ機能をインクルード
@@ -169,7 +170,8 @@ private: // シーン機能
 	// ボスロックオンフラグ
     bool isBossLockOn_ = false;
 
-	bool isTest = false;
+	// 空気を演出するためのパーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> airParticle_;
 
 	// 仮の操作方法UI
 	std::unique_ptr<GameEngine::Sprite> playGuideSprite_;
