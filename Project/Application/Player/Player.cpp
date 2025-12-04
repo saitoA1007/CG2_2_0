@@ -358,7 +358,7 @@ void Player::ProcessAttackDownInput(GameEngine::InputCommand *inputCommand) {
 }
 
 void Player::HandleRushCharge(GameEngine::InputCommand* inputCommand) {
-	if (isCharging_ || isJump_ || isRushing_) {
+    if (isCharging_ || isJump_ || isRushing_ || isPreRushing_ || isBounceLock_ || isRushLock_) {
 		return;
 	}
 	// 溜め開始/継続
