@@ -1,0 +1,7 @@
+{
+    "Player-Attack": {
+        "AttackDownSpeed": 20.0,
+        "AttackPreDownTime": 0.30000001192092896,
+        "SceneName": "TDGameScene"
+    }
+}

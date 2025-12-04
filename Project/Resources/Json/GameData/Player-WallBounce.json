@@ -1,0 +1,11 @@
+{
+    "Player-WallBounce": {
+        "SceneName": "TDGameScene",
+        "WallBounceAwaySpeed": 5.0,
+        "WallBounceLockTime": 0.800000011920929,
+        "WallBounceStrengthLevel1": 0.5,
+        "WallBounceStrengthLevel2": 0.75,
+        "WallBounceStrengthLevel3": 1.0,
+        "WallBounceUpSpeed": 20.0
+    }
+}

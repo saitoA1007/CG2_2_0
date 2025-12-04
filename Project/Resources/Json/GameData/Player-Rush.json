@@ -4,10 +4,12 @@
         "RushChargeLevel1Ratio": 0.0,
         "RushChargeLevel2Ratio": 0.20000000298023224,
         "RushChargeLevel3Ratio": 0.5,
-        "RushSpeed": 50.0,
-        "RushStrengthLevel1": 0.5,
-        "RushStrengthLevel2": 0.800000011920929,
-        "RushStrengthLevel3": 3.0,
+        "RushChargeMaxTime": 2.0,
+        "RushLockMaxTime": 1.5,
+        "RushSpeed": 30.0,
+        "RushStrengthLevel1": 0.4000000059604645,
+        "RushStrengthLevel2": 0.5,
+        "RushStrengthLevel3": 1.0,
         "SceneName": "TDGameScene"
     }
 }

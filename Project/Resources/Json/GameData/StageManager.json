@@ -5,14 +5,14 @@
             1.0,
             0.0
         ],
-        "IsCreate": false,
+        "IsCreate": true,
         "MaxSideNum": 6,
         "OffsetWallWidth": 2.0,
         "Radius": 20.0,
         "SceneName": "TDGameScene",
         "WallDepth": 1.0,
-        "WallHeight": 5.0,
+        "WallHeight": 8.0,
         "WallMaxHp": 2,
-        "WallRespawnTime": 3.0
+        "WallRespawnTime": 10.0
     }
 }
