@@ -12,6 +12,9 @@ void BgRock::Initialize() {
 #endif
 	// 値を適応させる
 	ApplyDebugParam();
+
+	// 行列の更新処理
+	worldTransform_.UpdateTransformMatrix();
 }
 
 void BgRock::Update() {
