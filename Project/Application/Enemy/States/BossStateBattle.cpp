@@ -242,6 +242,8 @@ void BossStateBattle::ResetRush() {
 
 	isMidAnimation_ = false;
 	isEndANimation_ = false;
+
+	bossContext_.isRushAttack_ = true;
 }
 
 void BossStateBattle::RushAttackUpdate() {
@@ -357,6 +359,7 @@ void BossStateBattle::RushAttackUpdate() {
 
 		// 突進終了
 		if (rushTimer_ >= 1.0f) {
+			bossContext_.isRushAttack_ = false;
 			// 振る舞いの切り替えをリクエスト
 			behaviorRequest_ = ButtleBehavior::Normal;
 		}
