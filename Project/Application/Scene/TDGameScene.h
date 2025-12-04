@@ -27,6 +27,7 @@
 #include"Application/Graphics/PlaneProjectionShadow.h"
 #include"Application/Graphics/BgRock.h"
 #include"Application/Scene/Transition/Fade.h"
+#include"Application/UI/BossHpUI.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -173,6 +174,9 @@ private: // シーン機能
 	// 仮の操作方法UI
 	std::unique_ptr<GameEngine::Sprite> playGuideSprite_;
 	uint32_t playGuideGH_ = 0;
+
+	// ボスのHpを表示
+	std::unique_ptr<BossHpUI> bossHpUI_;
 
 private:
 
