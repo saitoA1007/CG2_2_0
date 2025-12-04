@@ -93,11 +93,10 @@ void BossStateBattle::ResetNormal() {
 	Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
 	startDir_ = myDir;
 	endDir_ = myDir * -1.0f;
-	myDir = myDir * stageRadius_;
 
 	// 戻る位置の始点と終点を決める
 	startBackPos_ = bossContext_.worldTransform->transform_.translate;
-	endBackPos_ = myDir;
+	endBackPos_ = myDir * (stageRadius_ - (stageRadius_ / 6.0f));
 	endBackPos_.y = defalutPosY_;
 
 	// 時間をリセット
