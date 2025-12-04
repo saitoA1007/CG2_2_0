@@ -14,6 +14,7 @@ enum class PlayerAnimationType : std::size_t {
     Walk,		// 歩き
     Rush,       // 突進
     DownAttack, // 攻撃
+    AirMove,    // 空中移動
 
     MaxCount
 };
