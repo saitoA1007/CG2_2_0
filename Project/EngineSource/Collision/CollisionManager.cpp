@@ -75,6 +75,8 @@ void  CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collid
 			// 衝突した瞬間に呼び出す
 			colliderA->OnCollisionEnter(result);
 			colliderB->OnCollisionEnter(resultB);
+			colliderA->OnCollision(result);
+			colliderB->OnCollision(resultB);
 		}
 	}
 }
