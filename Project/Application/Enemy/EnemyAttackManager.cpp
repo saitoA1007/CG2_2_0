@@ -217,7 +217,7 @@ void EnemyAttackManager::WindUpdate() {
     windTimer_ += FpsCounter::deltaTime / maxWindTime_;
 
     // 角度を求める
-    float angle = LerpShortAngle(startAngle_, endAngle_, windTimer_);
+    float angle = LerpShortAngle(endAngle_,startAngle_, windTimer_);
     float cos = std::cosf(angle);
     float sin = std::sinf(angle);
 
@@ -230,7 +230,7 @@ void EnemyAttackManager::WindUpdate() {
             point.radius = Lerp(point.startRadius, point.endRadius, localT);
         }
 
-        point.pos = { cos * (point.radius), centerPos_.y * (static_cast<float>(4-i) / 4),sin * (point.radius)};
+        point.pos = { sin * (point.radius), centerPos_.y * (static_cast<float>(4-i) / 4),cos * (point.radius)};
         point.pos.x += centerPos_.x;
         point.pos.z += centerPos_.z;
 

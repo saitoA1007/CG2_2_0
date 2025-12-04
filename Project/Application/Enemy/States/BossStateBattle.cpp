@@ -127,15 +127,12 @@ void BossStateBattle::NormalUpdate() {
 	// 元の場所に戻る処理を終了
 	if (backTimer_ >= 1.0f) {
 		// 振る舞いの切り替えをリクエスト
-		//behaviorRequest_ = ButtleBehavior::IceFallAttack;
-		behaviorRequest_ = ButtleBehavior::WindAttack;
-		/*if (tmpIndex == 0) {
-			
-			tmpIndex++;
+		if (RandomGenerator::Get(0, 1) == 0) {
+			behaviorRequest_ = ButtleBehavior::WindAttack;
 		} else {
-			behaviorRequest_ = ButtleBehavior::RushAttack;
-			tmpIndex = 0;
-		}*/	
+			behaviorRequest_ = ButtleBehavior::IceFallAttack;
+		}
+
 	}
 }
 
@@ -422,6 +419,8 @@ void BossStateBattle::ResetWind() {
 	Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
 	startDir_ = myDir;
 	endDir_ = myDir * -1.0f;
+	// リセットする
+	rotateTimer_ = 0.0f;
 
 	// 角度を求める
 	Vector3 dir = Normalize(Vector3(-bossContext_.worldTransform->transform_.translate.x, 0.0f, -bossContext_.worldTransform->transform_.translate.z));
@@ -430,9 +429,6 @@ void BossStateBattle::ResetWind() {
 	float sin = std::sinf(angle);
 	startPos_ = { dir.x * cos - dir.z * sin,0.0f,dir.x * sin + dir.z * cos };
 	endPos_ = { dir.x * cos - dir.z * -sin,0.0f,dir.x * -sin + dir.z * cos };
-
-	// リセットする
-	rotateTimer_ = 0.0f;
 
 	// アニメーション
 	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_Prepare"]);
