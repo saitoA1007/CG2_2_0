@@ -10,6 +10,18 @@ void StageManager::Initialize() {
 	// 生成する
 	GenerateWalls();
 
+	aliveWalls_.clear();
+
+	// 更新処理
+	for (auto &wall : walls_) {
+		// 壁の更新処理
+		//wall->Update();
+
+		// 生存している壁をリストに追加する
+		if (wall->GetIsAlive()) {
+			aliveWalls_.push_back(wall.get());
+		}
+	}
 #ifdef _DEBUG
 	// 値を登録する
 	RegisterBebugParam();
@@ -24,7 +36,7 @@ void StageManager::Initialize() {
 void StageManager::Update() {
 
 	// 生存リストをクリア
-	aliveWalls_.clear();
+	//aliveWalls_.clear();
 
 	// 更新処理
 	for (auto& wall : walls_) {
@@ -32,9 +44,9 @@ void StageManager::Update() {
 		wall->Update();
 
 		// 生存している壁をリストに追加する
-		if (wall->GetIsAlive()) {
+		/*if (wall->GetIsAlive()) {
 			aliveWalls_.push_back(wall.get());
-		}
+		}*/
 	}
 }
 
@@ -42,7 +54,10 @@ void StageManager::Draw(GameEngine::Model* wallModel) {
 
 	// 生存している壁を描画
 	for (auto& wall : aliveWalls_) {
-		ModelRenderer::Draw(wallModel, wall->GetWorldTransform(), &wall->GetMaterial());
+		if (wall->GetIsAlive()) {
+			ModelRenderer::Draw(wallModel, wall->GetWorldTransform(), &wall->GetMaterial());
+		}
+		
 	}
 }
 

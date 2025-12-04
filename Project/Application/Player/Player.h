@@ -226,7 +226,7 @@ private:
 	// アニメーション制御用フラグ/タイマー
 	bool animCustomActive_ = false;
 	float animCustomTimer_ = 0.0f;
-	float animCustomTotal_ = 0.0f; // カスタム時間(★指定時に使用)
+	float animCustomTotal_ = 0.0f; // カスタム時間
 	float animTargetAnimMaxTime_ = 0.0f; // 対象アニメーションの元々の長さ
 
 	// 前フレームの状態を記録して遷移検出に使う

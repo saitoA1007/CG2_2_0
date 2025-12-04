@@ -2,10 +2,12 @@
 #include"CollisionConfig.h"
 #include"FPSCounter.h"
 #include"Application/CollisionTypeID.h"
+#include"Application/Player/Player.h"
+#include"Application/Enemy/BossEnemy.h"
 #include "LogManager.h"
 using namespace GameEngine;
 
-void Wall::Initialilze(const Transform& transform, float respawnTime, uint32_t maxHp) {
+void Wall::Initialilze(const Transform& transform, float respawnTime, int32_t maxHp) {
 
 	// 復活までの時間を取得
 	respawnTime_ = respawnTime;
@@ -34,15 +36,19 @@ void Wall::Initialilze(const Transform& transform, float respawnTime, uint32_t m
 	collider_->SetCollisionMask(~kCollisionAttributeTerrain);
     UserData userData;
     userData.typeID = static_cast<uint32_t>(CollisionTypeID::Wall);
+    userData.object = this;
     collider_->SetUserData(userData);
 
 	// コールバック関数に登録する
-	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
+	collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 	});
 }
 
 void Wall::Update() {
+	if (currentHp_ <= 0) {
+		isAlive_ = false;
+    }
 
 	// 生存フラグがtrueなら早期リターン
 	if (isAlive_) {return;}
@@ -60,19 +66,50 @@ void Wall::Update() {
 }
 
 void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
-
-	Log("is hit Wall");
-
 	// 生存フラグがfalseなら早期リターン
 	if (!isAlive_) { return; }
 
-	// hpを削る
-	if (currentHp_ > 0) {
-		currentHp_ -= 1;
-	} else{
-		// hpが0であれば生存フラグをオフ
-		isAlive_ = false;
+    // 当たったのがプレイヤーまたはボスでなければ早期リターン
+    if (result.userData.typeID != static_cast<uint32_t>(CollisionTypeID::Player) &&
+		result.userData.typeID != static_cast<uint32_t>(CollisionTypeID::Boss)) {
+		return;
+    }
 
+    // プレイヤーまたはボスのポインタを取得
+    Player *player = nullptr;
+	BossEnemy *boss = nullptr;
+	if (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Player)) {
+		player = result.userData.As<Player>();
+	} else if (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss)) {
+		boss = result.userData.As<BossEnemy>();
+    }
+
+    // どちらもnullptrなら早期リターン
+	if (player == nullptr && boss == nullptr) {
+		return;
+    }
+    // プレイヤーの場合、突進中でなければ早期リターン
+    if (player != nullptr && !player->IsRushing()) {
+		return;
+    }
+
+	// hpを削る
+    // プレイヤーの場合、突進溜めレベルに応じてダメージを変える
+	if (player != nullptr) {
+		int rushLevel = player->GetRushChargeLevel();
+		switch (rushLevel) {
+			case 1: currentHp_ -= 1; break;
+			case 2: currentHp_ -= 2; break;
+			case 3: currentHp_ -= 3; break;
+			default: currentHp_ -= 1; break;
+		}
+    } else if (boss != nullptr) {
+        // ボスの場合、固定ダメージ
+        currentHp_ -= 2;
+    }
+
+	if (currentHp_ <= 0) {
+		currentHp_ = 0;
 		// 誰が破壊するかによって状態を変える
 		wallState_ = WallState::Normal;
 	}

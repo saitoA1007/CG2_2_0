@@ -10,7 +10,7 @@ enum class WallState {
 	None, // 空
 };
 
-class Wall {
+class Wall : public GameEngine::GameObject {
 public:
 
 	/// <summary>
@@ -19,7 +19,7 @@ public:
 	/// <param name="transform"></param>
 	/// <param name="respawnTime"></param>
 	/// <param name="maxHp"></param>
-	void Initialilze(const Transform& transform,float respawnTime, uint32_t maxHp);
+	void Initialilze(const Transform& transform,float respawnTime, int32_t maxHp);
 
 	/// <summary>
 	/// 更新処理
@@ -70,7 +70,7 @@ private: // 固定値
 	float respawnTime_ = 1.0f;
 
 	// 壁の耐久地
-	uint32_t maxHp_ = 1;
+	int32_t maxHp_ = 1;
 
 private:
 	// ワールド行列
@@ -85,7 +85,7 @@ private:
 	float respawnTimer_ = 0.0f;
 
 	// 現在のhp
-	uint32_t currentHp_ = 1;
+	int32_t currentHp_ = 1;
 
 	// 生存フラグ
 	bool isAlive_ = true;

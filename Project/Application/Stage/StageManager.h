@@ -62,7 +62,7 @@ private:
 	float respawnTime_ = 3.0f;
 
 	// 最大hp
-	uint32_t maxHp_ = 2;
+	int32_t maxHp_ = 3;
 
 	// 壁の奥行(1.0f = 1m)
 	float wallDepth_ = 1.0f;

@@ -341,7 +341,7 @@ void TDGameScene::Update() {
 	enemyWindAttackParticle_->Update();
 
 	// ステージの更新処理
-	//stageManager_->Update();
+	stageManager_->Update();
 
 	// StageWallPlaneの更新
 #ifdef _DEBUG
@@ -508,20 +508,20 @@ void TDGameScene::UpdateCollision() {
 #ifdef _DEBUG
     debugRenderer_->AddSphere(player_->GetSphereData());
 #endif
-
-	for (auto &bc : boundaryColliders_) {
-		if (bc && bc->GetSize().x > 0.0f) {
-			collisionManager_->AddCollider(bc.get());
-#ifdef _DEBUG
-			OBB o = {};
-			o.center = bc->GetWorldPosition();
-			const Vector3* ors = bc->GetOrientations();
-			for (int i=0;i<3;++i) o.orientations[i] = ors[i];
-			o.size = bc->GetSize();
-			debugRenderer_->AddBox(o, {0.0f,1.0f,0.0f,0.25f});
-#endif
-		}
-	}
+//
+//	for (auto &bc : boundaryColliders_) {
+//		if (bc && bc->GetSize().x > 0.0f) {
+//			collisionManager_->AddCollider(bc.get());
+//#ifdef _DEBUG
+//			OBB o = {};
+//			o.center = bc->GetWorldPosition();
+//			const Vector3* ors = bc->GetOrientations();
+//			for (int i=0;i<3;++i) o.orientations[i] = ors[i];
+//			o.size = bc->GetSize();
+//			debugRenderer_->AddBox(o, {0.0f,1.0f,0.0f,0.25f});
+//#endif
+//		}
+//	}
 
 #ifdef _DEBUG
     debugRenderer_->AddSphere(player_->GetSphereData());
