@@ -20,6 +20,8 @@ public:
 		IceFallAttack, // 氷柱を落とす攻撃
 		Wait, // その場で留まる。攻撃と攻撃の小休憩
 
+		InMove, // 最初の時に取る行動
+
 		MaxCount // 状態の数
 	};
 
@@ -75,6 +77,13 @@ private:
 
 private:
 
+	// 突進のフェーズ
+	enum class RushPhase {
+		In,   // 回転移動
+		Main, // 突進
+		Out,  // 元の位置に戻る
+	};
+
 	// 保存するグループ名
 	const std::vector<std::string> kGroupNames = {
 		"Boss-Rush",
@@ -85,6 +94,10 @@ private:
 	// 回転の方向を保存する
 	Vector3 startDir_ = {};
 	Vector3 endDir_ = {};
+
+	// アニメーションで使用するフラグ
+	bool isMidAnimation_ = false;
+	bool isEndANimation_ = false;
 
 	// Behavior : Normal
 	// 行動をおこなうための繋ぎの行動に使用する変数============
@@ -104,27 +117,25 @@ private:
 
 	// 回転の時に移動する速度
 	float rotSpeed_ = 20.0f;
-
-	// 回転する時間
-	float rotMoveTimer_ = 0.0f;
-	float rotMaxMoveTime_ = 0.0f;
-	// 上下移動する回数
-	float cycleCount_ = 0;
-
-	// 傾ける最大角度
-	float maxTiltAngle_ = std::numbers::pi_v<float> / 6.0f;
-	// 傾き
-	float targetTilt_ = 0.0f;
-
 	// 開始の回転角度
 	Vector3 startRotEndDir_ = {};
 	// 終わりの回転角度
 	Vector3 endRotStartDir_ = {};
 
+	// 上下移動する回数
+	float cycleCount_ = 0;
+	// 傾ける最大角度
+	float maxTiltAngle_ = std::numbers::pi_v<float> / 6.0f;
+	// 傾き
+	float targetTilt_ = 0.0f;
+
 	// 突進する時間
 	float rushTimer_ = 0.0f;
 	float fallTimer_ = 0.0f;
-	float rushMaxTime_ = 2.0f;
+
+	float rushInTime_ = 0.0f; // 調整不可
+	float rushMainTime_ = 2.0f;
+	float rushOutTime_ = 2.0f;
 
 	// 突進する位置
 	Vector3 startRushPos_ = {};
@@ -132,16 +143,18 @@ private:
 	// 突進の終わる位置の距離をどれだけ伸ばすか
 	float offsetEndRush_ = 5.0f;
 
-	bool isRotMove_ = true;
-
-	bool isMidAnimation_ = false;
-	bool isEndANimation_ = false;
+	// 突進の終わりの位置
+	Vector3 rushOutStartPos_ = {};
+	Vector3 rushOutEndPos_ = {};
 
 	// Catmull-Rom曲線の制御点
 	std::vector<Vector3> controlPoints_;
 	// 距離テーブル
 	std::vector<SamplePoint> lookupTable; 
 	float totalLength = 0.0f;
+
+	// 突進のフェーズ
+	RushPhase rushPhase_ = RushPhase::In;
 
 	// 氷柱落とし =============================
 
@@ -203,6 +216,10 @@ private: // 各振る舞いの処理
 	void ResetWait();
 	// 待機行動処理
 	void WaitUpdate();
+
+	// 最初の入りにとる行動
+	void ResetInMove();
+	void InMoveUpdate();
 
 private:
 

@@ -505,8 +505,8 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_);
 
 	// ボスのHPUIを表示
-	SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
-	SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
+	//SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
+	//SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
 }
 
 void TDGameScene::InputRegisterCommand() {

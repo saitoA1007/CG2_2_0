@@ -31,6 +31,9 @@ float EaseInOut(const float& t);
 Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t);
 Vector3 Slerp(const Vector3& start, const Vector3& end, const float& t);
 
+// ベジェ曲線
+Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const float& t);
+
 // Catmull-romスプライン上の点を求める
 Vector3 CatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t);
 Vector3 CatmullRomPosition(const std::vector<Vector3>& points, float t);
