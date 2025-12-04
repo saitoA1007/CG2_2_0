@@ -263,8 +263,13 @@ void TDGameScene::Initialize(SceneContext* context) {
 			false, true, true, true);
 	}
 
+	// 仮UI
 	playGuideSprite_ = Sprite::Create({ 16.0f,580.0f }, { 300.0f,150.0f }, { 0.0f,0.0f });
 	playGuideGH_ = context_->textureManager->GetHandleByName("playerGuide.png");
+
+	// ボスのhpUIを初期化
+	bossHpUI_ = std::make_unique<BossHpUI>();
+	bossHpUI_->Initialize(bossEnemy_->GetMaxHp());
 
 	// 入力コマンドを設定する
 	InputRegisterCommand();
@@ -357,6 +362,11 @@ void TDGameScene::Update() {
 
 	// 当たり判定の更新処理
 	UpdateCollision();
+
+
+	// ボスのHpUIの更新処理
+	bossHpUI_->SetCurrentHp(bossEnemy_->GetCurrentHP());
+	bossHpUI_->Update();
 
 #ifdef _DEBUG
 	// 地面マテリアルの更新処理
@@ -481,6 +491,10 @@ void TDGameScene::Draw(const bool& isDebugView) {
 
 	// タイトル描画
 	SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_);
+
+	// ボスのHPUIを表示
+	SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
+	SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
 }
 
 void TDGameScene::InputRegisterCommand() {

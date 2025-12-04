@@ -188,6 +188,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="Application\Stage\StageWallPlane.cpp" />
     <ClCompile Include="Application\Stage\Wall.cpp" />
+    <ClCompile Include="Application\UI\BossHpUI.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
@@ -362,6 +363,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\Stage\StageWallPlane.h" />
     <ClInclude Include="Application\Stage\Wall.h" />
+    <ClInclude Include="Application\UI\BossHpUI.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
