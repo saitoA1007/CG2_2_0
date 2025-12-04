@@ -209,7 +209,7 @@ void BossStateBattle::ResetRush() {
 	isMidAnimation_ = false;
 	isEndANimation_ = false;
 
-	bossContext_.isRushAttack_ = true;
+	bossContext_.isRushAttack_ = false;
 }
 
 void BossStateBattle::RushAttackUpdate() {
@@ -303,6 +303,11 @@ void BossStateBattle::RushAttackUpdate() {
 		bossContext_.worldTransform->transform_.rotate.z = targetTilt_ * tiltPower;
 #pragma endregion
 
+
+		// アニメーション
+		bossContext_.animationTimer += FpsCounter::deltaTime;
+		bossContext_.animationTimer = std::fmodf(bossContext_.animationTimer, 1.0f);
+
 		// 回転移動が終了
 		if (rushTimer_ >= 1.0f) {
 			// 突進の最初の位置を設定
@@ -310,6 +315,10 @@ void BossStateBattle::RushAttackUpdate() {
 			// 突進のメインに移動
 			rushPhase_ = RushPhase::Main;
 			rushTimer_ = 0.0f;
+
+			// アニメーション
+			bossContext_.animationTimer = 0.0f;
+			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"]);
 		}
 #pragma endregion
 		break;
@@ -332,6 +341,28 @@ void BossStateBattle::RushAttackUpdate() {
 		// 移動処理
 		bossContext_.worldTransform->transform_.translate = { tmpPos.x,tmpPosY,tmpPos.z };
 
+		// アニメーション
+		if (rushTimer_ <= 0.2f) {
+			float localT = rushTimer_ / 0.2f;
+			bossContext_.animationTimer = localT;
+			bossContext_.isRushAttack_ = true;
+		} else if (rushTimer_ <= 0.6f) {
+			float localT = ((rushTimer_ - 0.2f) / 0.4f) * 0.8f;
+			bossContext_.animationTimer = localT;
+		} else if (rushTimer_ <= 0.9f) {
+			float localT = ((rushTimer_ - 0.9f) / 0.1f) * 0.1f + 0.8f;
+			bossContext_.animationTimer = localT;
+		}
+
+		// アニメーションを変更
+		if (!isMidAnimation_) {
+			if (rushTimer_ >= 0.2f) {
+				//bossContext_.animationTimer = 0.0f;
+				bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_End"]);
+				isMidAnimation_ = true;
+			}
+		}
+
 		// 突進終了
 		if (rushTimer_ >= 1.0f) {
 			bossContext_.isRushAttack_ = false;
@@ -340,6 +371,10 @@ void BossStateBattle::RushAttackUpdate() {
 			rushTimer_ = 0.0f;
 			// 最後の位置を取得
 			rushOutStartPos_ = bossContext_.worldTransform->transform_.translate;
+
+			// アニメーション
+			bossContext_.animationTimer = 0.0f;
+			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
 
 			// 戻るための回転方向を求める
 			Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
@@ -367,6 +402,10 @@ void BossStateBattle::RushAttackUpdate() {
 			bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
 		}
 
+		// アニメーション
+		bossContext_.animationTimer += FpsCounter::deltaTime;
+		bossContext_.animationTimer = std::fmodf(bossContext_.animationTimer, 1.0f);
+
 		// 突進の終了
 		if (rushTimer_ >= 1.0f) {
 			// 振る舞いの切り替えをリクエスト
@@ -376,60 +415,6 @@ void BossStateBattle::RushAttackUpdate() {
 		break;
 	}
 	}
-
-	// アニメーション処理
-#pragma region RushAnimation
-
-	if (rushPhase_ == RushPhase::In || rushPhase_ == RushPhase::Main) {
-		if (isMidAnimation_) {
-
-			if (isEndANimation_) {
-
-				// 突進行動
-				if (rushTimer_ <= 0.8f) {
-					if (bossContext_.animationTimer <= 0.8f) {
-						bossContext_.animationTimer += FpsCounter::deltaTime / rushMainTime_;
-						bossContext_.animationTimer = std::min(bossContext_.animationTimer, 1.0f);
-					}
-				} else {
-
-					bossContext_.animationTimer += FpsCounter::deltaTime / rushMainTime_;
-					bossContext_.animationTimer = std::min(bossContext_.animationTimer, 1.0f);
-
-					if (bossContext_.animationTimer >= 1.0f) {
-						bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
-						bossContext_.animationTimer = 0.0f;
-					}
-				}
-			} else {
-				// 中間
-				bossContext_.animationTimer += FpsCounter::deltaTime / 0.2f;
-
-				// 突進行動に移行
-				if (bossContext_.animationTimer >= 1.0f) {
-					isEndANimation_ = true;
-					bossContext_.animationTimer = 0.0f;
-					AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_End"];
-					bossContext_.animationMaxTime = animation.duration;
-					bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_End"]);
-				}
-			}
-		} else {
-
-			// 回転するまでの動き
-			bossContext_.animationTimer += FpsCounter::deltaTime / 0.5f;
-
-			// 中間動作に移行
-			if (bossContext_.animationTimer >= 1.0f) {
-				isMidAnimation_ = true;
-				bossContext_.animationTimer = 0.0f;
-				bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"]);
-			}
-		}
-	} else {
-		bossContext_.animationTimer = rushTimer_;
-	}
-#pragma endregion
 }
 
 void BossStateBattle::ResetWind() {
