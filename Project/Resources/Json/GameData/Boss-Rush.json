@@ -1,0 +1,7 @@
+{
+    "Boss-Rush": {
+        "OffestEndRush": 5.0,
+        "RushTime": 2.0,
+        "SceneName": "TDGameScene"
+    }
+}

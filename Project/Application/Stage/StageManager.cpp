@@ -7,6 +7,15 @@
 using namespace GameEngine;
 
 void StageManager::Initialize() {
+
+#ifdef _DEBUG
+	// 値を登録する
+	RegisterBebugParam();
+#endif
+
+	// 値を適応させる
+	ApplyDebugParam();
+
 	// 生成する
 	GenerateWalls();
 
@@ -22,15 +31,6 @@ void StageManager::Initialize() {
 			aliveWalls_.push_back(wall.get());
 		}
 	}
-#ifdef _DEBUG
-	// 値を登録する
-	RegisterBebugParam();
-	// 値を適応する
-	ApplyDebugParam();
-#else
-	// 値を適応させる
-	ApplyDebugParam();
-#endif
 }
 
 void StageManager::Update() {
