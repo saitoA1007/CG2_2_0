@@ -5,6 +5,8 @@
 
 #include"SceneTransition.h"
 
+#include"AudioManager.h"
+
 /// <summary>
 /// シーンの管理
 /// </summary>
@@ -101,6 +103,11 @@ private:
 	/// 使用するアニメーションデータを読み込む
 	/// </summary>
 	void LoadAnimationData();
+
+	/// <summary>
+	/// 使用する音声データを読み込む
+	/// </summary>
+	void LoadAudioData();
 
 	/// <summary>
 	/// シーンを作成する
