@@ -64,7 +64,7 @@ public:
 	/// 次のシーン遷移する場面の値を取得
 	/// </summary>
 	/// <returns></returns>
-	SceneState NextSceneState() override { return SceneState::Title; }
+	SceneState NextSceneState() override { return SceneState::Result; }
 
 	// 遷移するクラス
 	std::unique_ptr<ITransitionEffect> GetTransitionEffect() override { return std::make_unique<Fade>(); }

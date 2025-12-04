@@ -5,6 +5,7 @@
 #include"Camera.h"
 #include"DebugCamera.h"
 #include"Model.h"
+#include"Sprite.h"
 #include"WorldTransform.h"
 
 #include"Application/Scene/Transition/Fade.h"
@@ -56,6 +57,16 @@ private: // シーン機能
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
+
+	// タイトル画像(仮)
+	std::unique_ptr<GameEngine::Sprite> titleSprite_;
+	uint32_t titleGH_ = 0;
+
+	// スペース画像(仮)
+	std::unique_ptr<GameEngine::Sprite> spaceSprite_;
+	uint32_t spaceGH_ = 0;
+
+private:
 
 	/// <summary>
 	/// 入力コマンドを登録する
