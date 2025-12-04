@@ -22,6 +22,7 @@ BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius,
 	behaviorsTable_[static_cast<size_t>(ButtleBehavior::WindAttack)] = [this]() { WindAttackUpdate(); };
 	behaviorsTable_[static_cast<size_t>(ButtleBehavior::IceFallAttack)] = [this]() { IceFallAttackUpdate(); };
 	behaviorsTable_[static_cast<size_t>(ButtleBehavior::Wait)] = [this]() { WaitUpdate(); };
+	behaviorsTable_[static_cast<size_t>(ButtleBehavior::InMove)] = [this]() { InMoveUpdate(); };
 
 	// 各振る舞いのリセット処理を設定する
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::Normal)] = [this]() {ResetNormal(); };
@@ -29,6 +30,7 @@ BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius,
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::WindAttack)] = [this]() {ResetWind(); };
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::IceFallAttack)] = [this]() {ResetIceFall();};
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::Wait)] = [this]() {ResetWait(); };
+	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::InMove)] = [this]() {ResetInMove(); };
 
 #ifdef _DEBUG
 	// 値を登録する
@@ -40,7 +42,7 @@ BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius,
 
 void BossStateBattle::Enter() {
 	// 初期状態を設定
-	currentBehavior_ = ButtleBehavior::Normal;
+	currentBehavior_ = ButtleBehavior::InMove;
 	resetBehaviorParamTable_[static_cast<size_t>(currentBehavior_)]();
 	// リクエストをリセット
 	behaviorRequest_ = std::nullopt;
@@ -89,50 +91,12 @@ void BossStateBattle::ControllBehavior() {
 }
 
 void BossStateBattle::ResetNormal() {
-	// 円の中心から自分へのベクトルを求める
-	Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
-	startDir_ = myDir;
-	endDir_ = myDir * -1.0f;
-
-	// 戻る位置の始点と終点を決める
-	startBackPos_ = bossContext_.worldTransform->transform_.translate;
-	endBackPos_ = myDir * (stageRadius_ - (stageRadius_ / 6.0f));
-	endBackPos_.y = defalutPosY_;
-
-	// 時間をリセット
-	backTimer_ = 0.0f;
-
-	// アニメーション
-	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
-	bossContext_.animationTimer = 0.0f;
+	
 }
 
 void BossStateBattle::NormalUpdate() {
 
-	// 元の場所に戻る
-	backTimer_ += FpsCounter::deltaTime / backMaxTime_;
-	Vector3 tmpPos = Lerp(startBackPos_, endBackPos_, EaseInBack(backTimer_));
-
-	bossContext_.animationTimer = backTimer_;
-
-	// 移動処理
-	bossContext_.worldTransform->transform_.translate = tmpPos;
-
-	// 回転
-	Vector3 dir = Slerp(startDir_, endDir_, backTimer_);
-	// Y軸周りの角度
-	bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
-
-	// 元の場所に戻る処理を終了
-	if (backTimer_ >= 1.0f) {
-		// 振る舞いの切り替えをリクエスト
-		if (RandomGenerator::Get(0, 1) == 0) {
-			behaviorRequest_ = ButtleBehavior::WindAttack;
-		} else {
-			behaviorRequest_ = ButtleBehavior::IceFallAttack;
-		}
-
-	}
+	behaviorRequest_ = ButtleBehavior::IceFallAttack;
 }
 
 void BossStateBattle::ResetRush() {
@@ -149,6 +113,9 @@ void BossStateBattle::ResetRush() {
 	float tmpAngle = std::atan2f(targetDir.z, targetDir.x);
 	endRushPos_ = {std::cosf(tmpAngle)* (stageRadius_ + offsetEndRush_),0.0f,std::sinf(tmpAngle)* (stageRadius_ + offsetEndRush_) };
 	
+	// 突進の終わりの戻る位置
+	rushOutEndPos_ = { std::cosf(tmpAngle) * (stageRadius_ - (stageRadius_ / 6.0f)),defalutPosY_,std::sinf(tmpAngle) * (stageRadius_ - (stageRadius_ / 6.0f)) };
+
 	// 移動する角度
 	float startAngle = 0.0f;
 	float endAngle = 0.0f;
@@ -167,13 +134,15 @@ void BossStateBattle::ResetRush() {
 #pragma region MakeRotateMovePos
 	float maxR = 0.0f;
 
+	rushTimer_ = 0.0f;
+
 	// 回る時間を求める
 	if (startAngle == endAngle) {
-		rotMoveTimer_ = 1.0f;
-		rotMaxMoveTime_ = 0.0f;
+		rushTimer_ = 1.0f;
+		rushInTime_ = 1.0f;
 	} else {
-		rotMaxMoveTime_ = GetMoveTimeDistance(startAngle, endAngle, stageRadius_, rotSpeed_);
-		maxR = rotMaxMoveTime_ * rotMaxMoveTime_;
+		rushInTime_ = GetMoveTimeDistance(startAngle, endAngle, stageRadius_, rotSpeed_);
+		maxR = rushInTime_ * rushInTime_;
 	}
 
 	float r = 0.0f;
@@ -208,15 +177,13 @@ void BossStateBattle::ResetRush() {
 	}
 #pragma endregion
 
-	// 時間をリセット
-	rotMoveTimer_ = 0.0f;
+	
 	fallTimer_ = 0.0f;
-	rushTimer_ = 0.0f;
 
 	/// 自分自体の回転要素
 
-	// 回転から始まるようにする
-	isRotMove_ = true;
+	// ラッシュフェーズ
+	rushPhase_ = RushPhase::In;
 
 	// 最初の回転各
 	float rot = LerpShortAngle(startAngle, endAngle, EaseInOut(0.2f));
@@ -252,17 +219,20 @@ void BossStateBattle::RushAttackUpdate() {
 	CreateCatmullRom();
 #endif
 
-	if (isRotMove_) {
-		// 移動する
-		rotMoveTimer_ += FpsCounter::deltaTime / rotMaxMoveTime_;
+	switch (rushPhase_)
+	{
+	case BossStateBattle::RushPhase::In: {
+#pragma region RushIn
 
+		// 移動する
+		rushTimer_ += FpsCounter::deltaTime / rushInTime_;
 		// 移動
 #pragma region Move
 
 		// 縦移動
 		float posY = 0.0f;
-		float totalCycle = rotMoveTimer_ * cycleCount_;
-		float localTimer = std::fmodf(totalCycle,1.0f);
+		float totalCycle = rushTimer_ * cycleCount_;
+		float localTimer = std::fmodf(totalCycle, 1.0f);
 
 		if (localTimer <= 0.5f) {
 			float t = localTimer / 0.5f;
@@ -272,8 +242,8 @@ void BossStateBattle::RushAttackUpdate() {
 			posY = Lerp(2.0f, 0.0f, EaseInOut(t));
 		}
 
-		rotMoveTimer_ = std::min(rotMoveTimer_, 1.0f);
-		Vector3 pos = CatmullRomPosition(controlPoints_, EaseInOut(rotMoveTimer_));
+		rushTimer_ = std::min(rushTimer_, 1.0f);
+		Vector3 pos = CatmullRomPosition(controlPoints_, EaseInOut(rushTimer_));
 
 		// 移動
 		bossContext_.worldTransform->transform_.translate = pos;
@@ -283,12 +253,12 @@ void BossStateBattle::RushAttackUpdate() {
 		// 回転移動
 #pragma region Rotate
 		// 計算用の進行方向ベクトル
-		Vector3 dir = { 0,0,1 }; 
+		Vector3 dir = { 0,0,1 };
 		float tiltPower = 0.0f;
 
 		// 回転の処理
-		if (rotMoveTimer_ <= 0.2f) {
-			float localT = rotMoveTimer_ / 0.2f;
+		if (rushTimer_ <= 0.2f) {
+			float localT = rushTimer_ / 0.2f;
 
 			// 回転
 			dir = Slerp(startDir_, startRotEndDir_, EaseIn(localT));
@@ -298,10 +268,10 @@ void BossStateBattle::RushAttackUpdate() {
 			// 徐々に傾ける
 			tiltPower = EaseIn(localT);
 
-		} else if (rotMoveTimer_ <= 0.8f) {
+		} else if (rushTimer_ <= 0.8f) {
 			bossContext_.worldTransform->transform_.rotate.z = 0.2f;
 			// 進行方向に向ける
-			Vector3 prePos = CatmullRomPosition(controlPoints_, EaseInOut(rotMoveTimer_ + FpsCounter::deltaTime / rotMaxMoveTime_));
+			Vector3 prePos = CatmullRomPosition(controlPoints_, EaseInOut(rushTimer_ + FpsCounter::deltaTime / rushInTime_));
 			dir = Normalize(prePos - pos);
 			// Y軸周りの角度
 			bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
@@ -311,7 +281,7 @@ void BossStateBattle::RushAttackUpdate() {
 			endRotStartDir_ = dir;
 		} else {
 
-			float localT = (rotMoveTimer_ - 0.8f) / 0.2f;
+			float localT = (rushTimer_ - 0.8f) / 0.2f;
 			// 回転
 			dir = Slerp(endRotStartDir_, endDir_, EaseOut(localT));
 			// Y軸周りの角度
@@ -334,23 +304,29 @@ void BossStateBattle::RushAttackUpdate() {
 #pragma endregion
 
 		// 回転移動が終了
-		if (rotMoveTimer_ >= 1.0f) {
-			//bossContext_.worldTransform->transform_.rotate.z = 0.0f;
-			isRotMove_ = false;
+		if (rushTimer_ >= 1.0f) {
 			// 突進の最初の位置を設定
 			startRushPos_ = bossContext_.worldTransform->transform_.translate;
+			// 突進のメインに移動
+			rushPhase_ = RushPhase::Main;
+			rushTimer_ = 0.0f;
 		}
-	} else {
+#pragma endregion
+		break;
+	}
+
+	case BossStateBattle::RushPhase::Main: {
+#pragma region RushMain
 
 		// y軸の動き
 		float tmpPosY = size_.y * 0.5f;
 		if (fallTimer_ <= 1.0f) {
-			fallTimer_ += FpsCounter::deltaTime / ((rushMaxTime_ * 3.0f) / 3.0f);
+			fallTimer_ += FpsCounter::deltaTime / ((rushMainTime_ * 3.0f) / 3.0f);
 			tmpPosY = Lerp(startRushPos_.y, size_.y * 0.5f, EaseOutQuart(fallTimer_));
 		}
 
 		// 突進移動
-		rushTimer_ += FpsCounter::deltaTime / rushMaxTime_;
+		rushTimer_ += FpsCounter::deltaTime / rushMainTime_;
 		Vector3 tmpPos = Lerp(startRushPos_, endRushPos_, EaseIn(rushTimer_));
 
 		// 移動処理
@@ -359,54 +335,99 @@ void BossStateBattle::RushAttackUpdate() {
 		// 突進終了
 		if (rushTimer_ >= 1.0f) {
 			bossContext_.isRushAttack_ = false;
+			// 突進のアウトに移行
+			rushPhase_ = RushPhase::Out;
+			rushTimer_ = 0.0f;
+			// 最後の位置を取得
+			rushOutStartPos_ = bossContext_.worldTransform->transform_.translate;
+
+			// 戻るための回転方向を求める
+			Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
+			startDir_ = myDir;
+			endDir_ = myDir * -1.0f;
+		}
+#pragma endregion
+		break;
+	}
+
+	case BossStateBattle::RushPhase::Out: {
+#pragma region RushOut
+
+		rushTimer_ += FpsCounter::deltaTime / rushOutTime_;
+
+		// 移動
+		Vector3 tmpPos = Lerp(rushOutStartPos_, rushOutEndPos_, EaseIn(rushTimer_));
+		bossContext_.worldTransform->transform_.translate = tmpPos;
+
+		// 回転
+		if (rushTimer_ <= 0.3f) {
+			float localT = rushTimer_ / 0.3f;
+			Vector3 dir = Slerp(startDir_, endDir_, localT);
+			// Y軸周りの角度
+			bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+		}
+
+		// 突進の終了
+		if (rushTimer_ >= 1.0f) {
 			// 振る舞いの切り替えをリクエスト
 			behaviorRequest_ = ButtleBehavior::Normal;
 		}
-	}	
+#pragma endregion
+		break;
+	}
+	}
 
 	// アニメーション処理
 #pragma region RushAnimation
 
-	if (isMidAnimation_) {
+	if (rushPhase_ == RushPhase::In || rushPhase_ == RushPhase::Main) {
+		if (isMidAnimation_) {
 
-		if (isEndANimation_) {
+			if (isEndANimation_) {
 
-			// 突進行動
-			if (rushTimer_ <= 0.8f) {
-				if (bossContext_.animationTimer <= 0.8f) {
-					bossContext_.animationTimer += FpsCounter::deltaTime / rushMaxTime_;
+				// 突進行動
+				if (rushTimer_ <= 0.8f) {
+					if (bossContext_.animationTimer <= 0.8f) {
+						bossContext_.animationTimer += FpsCounter::deltaTime / rushMainTime_;
+						bossContext_.animationTimer = std::min(bossContext_.animationTimer, 1.0f);
+					}
+				} else {
+
+					bossContext_.animationTimer += FpsCounter::deltaTime / rushMainTime_;
 					bossContext_.animationTimer = std::min(bossContext_.animationTimer, 1.0f);
+
+					if (bossContext_.animationTimer >= 1.0f) {
+						bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
+						bossContext_.animationTimer = 0.0f;
+					}
 				}
 			} else {
-				if (bossContext_.animationTimer <= 1.0f) {
-					bossContext_.animationTimer += FpsCounter::deltaTime / rushMaxTime_;
-					bossContext_.animationTimer = std::min(bossContext_.animationTimer, 1.0f);
+				// 中間
+				bossContext_.animationTimer += FpsCounter::deltaTime / 0.2f;
+
+				// 突進行動に移行
+				if (bossContext_.animationTimer >= 1.0f) {
+					isEndANimation_ = true;
+					bossContext_.animationTimer = 0.0f;
+					AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_End"];
+					bossContext_.animationMaxTime = animation.duration;
+					bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_End"]);
 				}
 			}
 		} else {
-			// 中間
-			bossContext_.animationTimer += FpsCounter::deltaTime / 0.2f;
-			
-			// 突進行動に移行
+
+			// 回転するまでの動き
+			bossContext_.animationTimer += FpsCounter::deltaTime / 0.5f;
+
+			// 中間動作に移行
 			if (bossContext_.animationTimer >= 1.0f) {
-				isEndANimation_ = true;
+				isMidAnimation_ = true;
 				bossContext_.animationTimer = 0.0f;
-				AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_End"];
-				bossContext_.animationMaxTime = animation.duration;
-				bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_End"]);
+				bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"]);
 			}
 		}
 	} else {
-
-		// 回転するまでの動き
-		bossContext_.animationTimer += FpsCounter::deltaTime / 0.5f;
-
-		// 中間動作に移行
-		if (bossContext_.animationTimer >= 1.0f) {
-			isMidAnimation_ = true;
-			bossContext_.animationTimer = 0.0f;
-			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"]);
-		}
+		bossContext_.animationTimer = rushTimer_;
 	}
 #pragma endregion
 }
@@ -418,11 +439,9 @@ void BossStateBattle::ResetWind() {
 	isActiveWind_ = false;
 
 	// 円の中心から自分へのベクトルを求める
-	Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
-	startDir_ = myDir;
-	endDir_ = myDir * -1.0f;
-	// リセットする
-	rotateTimer_ = 0.0f;
+	//Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
+	//startDir_ = myDir;
+	//endDir_ = myDir * -1.0f;
 
 	// 角度を求める
 	Vector3 dir = Normalize(Vector3(-bossContext_.worldTransform->transform_.translate.x, 0.0f, -bossContext_.worldTransform->transform_.translate.z));
@@ -442,74 +461,62 @@ void BossStateBattle::ResetWind() {
 
 void BossStateBattle::WindAttackUpdate() {
 
-	if (rotateTimer_ <= 1.0f) {
+	// 予備動作のアニメーション
+#pragma region BreathAnimation
 
-		rotateTimer_ += FpsCounter::deltaTime / maxRotateTime_;
+	if (isMidAnimation_) {
+
+		if (!isEndANimation_) {
+			// 中間
+			bossContext_.animationTimer += FpsCounter::deltaTime / 0.5f;
+
+			// 突進行動に移行
+			if (bossContext_.animationTimer >= 1.0f) {
+				isEndANimation_ = true;
+				bossContext_.animationTimer = 0.0f;
+				AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_End"];
+				bossContext_.animationMaxTime = animation.duration;
+				bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_End"]);
+			}
+		}
+	} else {
+
+		// 回転するまでの動き
+		bossContext_.animationTimer += FpsCounter::deltaTime / 2.0f;
+
+		// 中間動作に移行
+		if (bossContext_.animationTimer >= 1.0f) {
+			isMidAnimation_ = true;
+			bossContext_.animationTimer = 0.0f;
+			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_Main"]);
+		}
+	}
+#pragma endregion
+
+	if (isMidAnimation_ && isEndANimation_) {
+
+		if (!isActiveWind_) {
+			bossContext_.isWindAttack_ = true;
+			isActiveWind_ = true;
+		} else {
+			// 一度発射したらfalseにする
+			if (bossContext_.isWindAttack_) {
+				bossContext_.isWindAttack_ = false;
+			}
+		}
+
+		windTimer_ += FpsCounter::deltaTime / maxWindTime_;
+		bossContext_.animationTimer = windTimer_;
 
 		// 回転
-		Vector3 dir = Slerp(startDir_, endDir_, rotateTimer_);
+		Vector3 dir = Slerp(endPos_, startPos_, windTimer_);
 		// Y軸周りの角度
 		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
 
-	} else {
-
-		// 予備動作のアニメーション
-#pragma region BreathAnimation
-
-		if (isMidAnimation_) {
-
-			if (!isEndANimation_) {
-				// 中間
-				bossContext_.animationTimer += FpsCounter::deltaTime / 0.5f;
-
-				// 突進行動に移行
-				if (bossContext_.animationTimer >= 1.0f) {
-					isEndANimation_ = true;
-					bossContext_.animationTimer = 0.0f;
-					AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_End"];
-					bossContext_.animationMaxTime = animation.duration;
-					bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_End"]);
-				}
-			} 
-		} else {
-
-			// 回転するまでの動き
-			bossContext_.animationTimer += FpsCounter::deltaTime / 2.0f;
-
-			// 中間動作に移行
-			if (bossContext_.animationTimer >= 1.0f) {
-				isMidAnimation_ = true;
-				bossContext_.animationTimer = 0.0f;
-				bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_Main"]);
-			}
-		}
-#pragma endregion
-
-		if (isMidAnimation_ && isEndANimation_) {
-
-			if (!isActiveWind_) {
-				bossContext_.isWindAttack_ = true;
-				isActiveWind_ = true;
-			} else {
-				// 一度発射したらfalseにする
-				if (bossContext_.isWindAttack_) {
-					bossContext_.isWindAttack_ = false;
-				}
-			}
-
-			windTimer_ += FpsCounter::deltaTime / maxWindTime_;
-			bossContext_.animationTimer = windTimer_;
-
-			// 回転
-			Vector3 dir = Slerp(endPos_,startPos_, windTimer_);
-			// Y軸周りの角度
-			bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
-
-			// 待機の終了
-			if (windTimer_ >= 1.0f) {
-				// 振る舞いの切り替えをリクエスト
-				behaviorRequest_ = ButtleBehavior::Normal;
-			}
+		// 待機の終了
+		if (windTimer_ >= 1.0f) {
+			// 振る舞いの切り替えをリクエスト
+			behaviorRequest_ = ButtleBehavior::Normal;
 		}
 	}
 }
@@ -520,54 +527,56 @@ void BossStateBattle::ResetIceFall() {
 	isActiveIceFall_ = false;
 
 	// 円の中心から自分へのベクトルを求める
-	Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
-	startDir_ = myDir;
-	endDir_ = myDir * -1.0f;
+	//Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
+	//startDir_ = myDir;
+	//endDir_ = myDir * -1.0f;
 
 	// リセットする
-	rotateTimer_ = 0.0f;
+	//rotateTimer_ = 0.0f;
 
 	// アニメーション
-	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
+	//bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
+	//bossContext_.animationTimer = 0.0f;
+
+	//　アニメーション
+	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Scream)]["Scream"]);
 	bossContext_.animationTimer = 0.0f;
 }
 
 void BossStateBattle::IceFallAttackUpdate() {
 
-	if (rotateTimer_ <= 1.0f) {
+	//if (rotateTimer_ <= 1.0f) {
 
-		rotateTimer_ += FpsCounter::deltaTime / maxRotateTime_;
-		bossContext_.animationTimer = rotateTimer_;
+	//	rotateTimer_ += FpsCounter::deltaTime / maxRotateTime_;
+	//	bossContext_.animationTimer = rotateTimer_;
 
-		// 回転
-		Vector3 dir = Slerp(startDir_, endDir_, rotateTimer_);
-		// Y軸周りの角度
-		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+	//	// 回転
+	//	Vector3 dir = Slerp(startDir_, endDir_, rotateTimer_);
+	//	// Y軸周りの角度
+	//	bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
 
+	//} else {
+	//	
+	//}
+
+	if (!isActiveIceFall_) {
+		bossContext_.isActiveIceFall = true;
+		isActiveIceFall_ = true;
 	} else {
-		if (!isActiveIceFall_) {
-			bossContext_.isActiveIceFall = true;
-			isActiveIceFall_ = true;
-
-			//　アニメーション
-			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Scream)]["Scream"]);
-			bossContext_.animationTimer = 0.0f;
-		} else {
-			// 一度発射したらfalseにする
-			if (bossContext_.isActiveIceFall) {
-				bossContext_.isActiveIceFall = false;
-			}
+		// 一度発射したらfalseにする
+		if (bossContext_.isActiveIceFall) {
+			bossContext_.isActiveIceFall = false;
 		}
+	}
 
-		waitTimer_ += FpsCounter::deltaTime / maxWaitTime_;
-		bossContext_.animationTimer = waitTimer_;
+	waitTimer_ += FpsCounter::deltaTime / maxWaitTime_;
+	bossContext_.animationTimer = waitTimer_;
 
-		// 待機の終了
-		if (waitTimer_ >= 1.0f) {
-			// 振る舞いの切り替えをリクエスト
-			behaviorRequest_ = ButtleBehavior::Wait;
-			bossContext_.animationTimer = 1.0f;
-		}
+	// 待機の終了
+	if (waitTimer_ >= 1.0f) {
+		// 振る舞いの切り替えをリクエスト
+		behaviorRequest_ = ButtleBehavior::Wait;
+		bossContext_.animationTimer = 1.0f;
 	}
 }
 
@@ -611,9 +620,50 @@ void BossStateBattle::WaitUpdate() {
 	}
 }
 
+void BossStateBattle::ResetInMove() {
+	// 円の中心から自分へのベクトルを求める
+	Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
+	startDir_ = myDir;
+	endDir_ = myDir * -1.0f;
+
+	// 戻る位置の始点と終点を決める
+	startBackPos_ = bossContext_.worldTransform->transform_.translate;
+	endBackPos_ = myDir * (stageRadius_ - (stageRadius_ / 6.0f));
+	endBackPos_.y = defalutPosY_;
+
+	// 時間をリセット
+	backTimer_ = 0.0f;
+
+	// アニメーション
+	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
+	bossContext_.animationTimer = 0.0f;
+}
+
+void BossStateBattle::InMoveUpdate() {
+	// 元の場所に戻る
+	backTimer_ += FpsCounter::deltaTime / backMaxTime_;
+	Vector3 tmpPos = Lerp(startBackPos_, endBackPos_, EaseInBack(backTimer_));
+
+	bossContext_.animationTimer = backTimer_;
+
+	// 移動処理
+	bossContext_.worldTransform->transform_.translate = tmpPos;
+
+	// 回転
+	Vector3 dir = Slerp(startDir_, endDir_, backTimer_);
+	// Y軸周りの角度
+	bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+
+	// 元の場所に戻る処理を終了
+	if (backTimer_ >= 1.0f) {
+		// 振る舞いの切り替えをリクエスト
+		behaviorRequest_ = ButtleBehavior::Normal;
+	}
+}
+
 void BossStateBattle::RegisterBebugParam() {
 	// 突進攻撃
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "RushTime", rushMaxTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "RushTime", rushMainTime_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "OffestEndRush", offsetEndRush_);
 
 	// 氷柱攻撃
@@ -622,7 +672,7 @@ void BossStateBattle::RegisterBebugParam() {
 
 void BossStateBattle::ApplyDebugParam() {
 	// 突進攻撃
-	rushMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "RushTime");
+	rushMainTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "RushTime");
 	offsetEndRush_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "OffestEndRush");
 
 	// 氷柱攻撃

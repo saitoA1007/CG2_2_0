@@ -99,9 +99,16 @@ Vector3 Slerp(const Vector3& start, const Vector3& end, const float& t) {
 		// 線形補間して正規化
 		interpVec = Normalize(Lerp(startNorm, endNorm, t));
 	} else if(dot < -0.9995f) {
-		// 少し軸をずらす
-		Vector3 tempMid = Normalize(startNorm + Vector3(1, 0, 0) * 0.1f);
-		interpVec = Normalize(Lerp(Lerp(startNorm, tempMid, t), endNorm, t));
+		//// 少し軸をずらす
+		Vector3 ortho = Cross(startNorm, Vector3(1.0f, 0.0f, 0.0f));
+
+		if (Length(ortho) < 0.01f) {
+			ortho = Cross(startNorm, Vector3(0.0f, 1.0f, 0.0f));
+		}
+		// 回転の基準となる垂直ベクトルを正規化
+		ortho = Normalize(ortho);
+		float theta = PI * t;
+		interpVec = startNorm * std::cosf(theta) + ortho * std::sinf(theta);
 	}else {
 		// Slerpの計算
 		float theta = std::acosf(dot);
@@ -117,6 +124,13 @@ Vector3 Slerp(const Vector3& start, const Vector3& end, const float& t) {
 	float magnitudeLerp = Lerp(startMag, endMag, t);
 	return interpVec * magnitudeLerp;
 
+}
+
+Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const float& t) {
+	Vector3 p0p1 = Lerp(p0, p1, t);
+	Vector3 p1p2 = Lerp(p1, p2, t);
+	Vector3 p = Lerp(p0p1, p1p2, t);
+	return p;
 }
 
 Vector3 CatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t) {

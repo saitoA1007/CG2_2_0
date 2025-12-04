@@ -5,8 +5,7 @@ using namespace GameEngine;
 
 void BossHpUI::Initialize(const uint32_t& maxHp) {
 
-	maxHp;
-	maxHp_ = 2;
+	maxHp_ = maxHp;
 	currentHp_ = maxHp_;
 
 	// 初期化
