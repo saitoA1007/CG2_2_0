@@ -225,9 +225,6 @@
     <ClCompile Include="Application\Scene\TitleScene.cpp">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Scene\GameScene.cpp">
-      <Filter>GameSource\Core\SceneSystem\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="Application\Camera\CameraController.cpp" />
@@ -499,9 +496,6 @@
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Application\Scene\TitleScene.h">
-      <Filter>GameSource\Core\SceneSystem\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scene\GameScene.h">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Input\InputCommand.h" />
