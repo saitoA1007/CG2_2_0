@@ -11,6 +11,8 @@
 #include"CollisionConfig.h"
 #include"Application/CollisionTypeID.h"
 
+#include"Application/Player/Player.h"
+
 using namespace GameEngine;
 
 void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager, GameEngine::Animator* animator,

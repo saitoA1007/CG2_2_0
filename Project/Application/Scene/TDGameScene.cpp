@@ -4,6 +4,7 @@
 #include"SpriteRenderer.h"
 #include"GameParamEditor.h"
 #include"EasingManager.h"
+#include"SpriteRenderer.h"
 #include"LogManager.h"
 #include"CollisionConfig.h"
 #include<numbers>
@@ -262,6 +263,9 @@ void TDGameScene::Initialize(SceneContext* context) {
 			false, true, true, true);
 	}
 
+	playGuideSprite_ = Sprite::Create({ 16.0f,580.0f }, { 300.0f,150.0f }, { 0.0f,0.0f });
+	playGuideGH_ = context_->textureManager->GetHandleByName("playerGuide.png");
+
 	// 入力コマンドを設定する
 	InputRegisterCommand();
 }
@@ -468,14 +472,15 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	debugRenderer_->DrawAll(isDebugView ? context_->debugCamera_->GetVPMatrix() : mainCamera_->GetVPMatrix());
 #endif
 
-	//========================================================================
+	//======================================================
 	// 2D描画
-	//========================================================================
+	//======================================================
 
 	// 画像の描画前処理
-	//SpriteRenderer::PreDraw(RenderMode2D::Normal);
+	SpriteRenderer::PreDraw(RenderMode2D::Normal);
 
-	//SpriteRenderer::Draw(sprite_.get(), uvCheckerGH_);
+	// タイトル描画
+	SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_);
 }
 
 void TDGameScene::InputRegisterCommand() {
