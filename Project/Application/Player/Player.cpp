@@ -127,7 +127,8 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 void Player::UpdateAnimation() {
     // 突進溜め開始時
     if (isCharging_ && !prevIsCharging_) {
-        StartCustomAnim(PlayerAnimationType::Rush, "突進_Prepare", kRushChargeMaxTime_);
+        StartCustomAnim(PlayerAnimationType::Rush, "突進_Prepare",
+			kRushChargeMaxTime_ * kRushChargeLevel3Ratio_);
     }
 
     // 予備が終わって突進が始まった瞬間
@@ -173,18 +174,6 @@ void Player::UpdateAnimation() {
     if (animCustomActive_) {
         animator_->Update(animCustomTotal_ > 0.0f ? (animCustomTimer_ / animCustomTotal_) : 1.0f);
         animCustomTimer_ += FpsCounter::deltaTime;
-        if (animCustomTimer_ >= animCustomTotal_) {
-            animCustomActive_ = false;
-            // カスタム再生が終わった場合の処理
-            // もし現在が Rush の Prepare -> 次は Main
-            if (currentAnimationType_ == PlayerAnimationType::Rush && currentAnimationName_ == "突進_Prepare") {
-                StartNormalAnim(PlayerAnimationType::Rush, "突進_Main", true);
-            }
-            // 壁での End のカスタム再生終了後は通常Walkへ
-            if (currentAnimationType_ == PlayerAnimationType::Rush && currentAnimationName_ == "突進_End" && isBounceLock_) {
-                // 硬直が続いている場合は何もしない
-            }
-        }
     } else {
 		// 通常更新
 		animator_->Update();
