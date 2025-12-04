@@ -75,8 +75,9 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	input_->Initialize(hInstance, windowsApp_->GetHwnd());
 
 	// 音声の初期化
-	audioManager_ = std::make_unique<AudioManager>();
-	audioManager_->Initialize();
+	//audioManager_ = std::make_unique<AudioManager>();
+	//audioManager_->Initialize();
+	GameEngine::AudioManager::GetInstance().Initialize();
 
 	// テクスチャの初期化
 	textureManager_ = std::make_shared<TextureManager>();
@@ -131,7 +132,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneContext.inputCommand = inputCommand_.get();
 	sceneContext.textureManager = textureManager_.get();
 	sceneContext.modelManager = modelManager_.get();
-	sceneContext.audioManager = audioManager_.get();
+	//sceneContext.audioManager = audioManager_.get();
 	sceneContext.graphicsDevice = graphicsDevice_.get();
 	sceneContext.animationManager = animationManager_.get();
 	sceneContext.postEffectManager_ = postEffectManager_.get();
@@ -259,6 +260,9 @@ void Engine::Finalize() {
 #ifdef USE_IMGUI
 	editorCore_->Finalize();
 #endif
+
+	// 音声の終了処理
+	GameEngine::AudioManager::GetInstance().Finalize();
 	
 	// テクスチャの解放
 	textureManager_->Finalize();

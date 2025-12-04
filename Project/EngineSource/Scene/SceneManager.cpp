@@ -33,6 +33,9 @@ void SceneManager::Initialize(SceneContext* context) {
 	// アニメーションデータを読み込む
 	LoadAnimationData();
 
+	// 音声データを読み込む
+	LoadAudioData();
+
 	// デバックカメラを生成
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->graphicsDevice->GetDevice());
@@ -174,6 +177,11 @@ void SceneManager::LoadAnimationData() {
 	context_->animationManager->RegisterAnimations("PlayerRush", "PlayerRush.gltf", "Resources/Animations");
 	context_->animationManager->RegisterAnimations("PlayerWalk", "PlayerWalk.gltf", "Resources/Animations");
 	context_->animationManager->RegisterAnimations("PlayerDownAttack", "PlayerRush.gltf", "Resources/Animations");
+}
+
+void SceneManager::LoadAudioData() {
+	//context_->audioManager->LoadAllAudio();
+	GameEngine::AudioManager::GetInstance().LoadAllAudio();
 }
 
 void SceneManager::ChangeScene(SceneState nextSceneState) {

@@ -90,7 +90,7 @@ namespace GameEngine {
 		/// Audio ========================================
 
 		// 音声機能
-		std::unique_ptr<AudioManager> audioManager_;
+		//std::unique_ptr<AudioManager> audioManager_;
 
 		/// Core ========================================
 
