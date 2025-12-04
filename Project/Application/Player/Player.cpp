@@ -166,7 +166,7 @@ void Player::UpdateAnimation() {
     }
 
     // 着地判定: 落下中(false)->着地(true) の遷移で Walk を再生
-    if (!isJump_ && wasJumping_) {
+    if (!isJump_ && prevIsJump_) {
         StartNormalAnim(PlayerAnimationType::Walk, "歩き", true);
     }
 
@@ -185,7 +185,7 @@ void Player::UpdateAnimation() {
     prevIsBounceLock_ = isBounceLock_;
     prevIsAttackDown_ = isAttackDown_;
     prevIsCharging_ = isCharging_;
-    wasJumping_ = isJump_;
+    prevIsJump_ = isJump_;
 }
 
 void Player::UpdateCameraBasis(const Camera* camera) {
