@@ -125,50 +125,50 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 }
 
 void Player::UpdateAnimation() {
-    // 突進溜め開始時
-    if (isCharging_ && !prevIsCharging_) {
-        StartCustomAnim(PlayerAnimationType::Rush, "突進_Prepare",
-			kRushChargeMaxTime_ * kRushChargeLevel3Ratio_);
-    }
+	// 壁衝突でのバウンス硬直開始
+	if (isBounceLock_ && !prevIsBounceLock_) {
+		// 壁衝突時は End をアニメーション全体時間で再生(★)
+		// 使用する時間は currentBounceLockTime_
+		StartCustomAnim(PlayerAnimationType::Rush, "突進_End", std::max(currentBounceLockTime_, 0.001f));
+	}
 
-    // 予備が終わって突進が始まった瞬間
-    if (isRushing_ && !prevIsRushing_) {
-        // 突進開始: Main を通常再生（ループ）
-        StartNormalAnim(PlayerAnimationType::Rush, "突進_Main", false);
-    }
-
-    // 突進終了時
-    if (!isRushing_ && prevIsRushing_) {
-        // 突進終了: End を通常再生
-        StartNormalAnim(PlayerAnimationType::Rush, "突進_End", false);
-    }
-
-    // 壁衝突でのバウンス硬直開始
-    if (isBounceLock_ && !prevIsBounceLock_) {
-        // 壁衝突時は End をアニメーション全体時間で再生(★)
-        // 使用する時間は currentBounceLockTime_
-        StartCustomAnim(PlayerAnimationType::Rush, "突進_End", std::max(currentBounceLockTime_, 0.001f));
-    }
+    // バウンス硬直終了後
+    if (!isBounceLock_ && prevIsBounceLock_) {
+		StartNormalAnim(PlayerAnimationType::AirMove, "AirMove", true);
+	}
 
     // 空中急降下開始 (isAttackDown_ が true になった瞬間)
     if (isAttackDown_ && !prevIsAttackDown_) {
         StartNormalAnim(PlayerAnimationType::DownAttack, "DownAttack_Prepare", false);
-        // Prepare の終了で Main を開始するのは下で判定
     }
 
-    // Prepare->Main の自動遷移: 判定は animator の時間か既知の duration を使う
-    if (currentAnimationType_ == PlayerAnimationType::DownAttack && currentAnimationName_ == "DownAttack_Prepare") {
-        float cur = animator_->GetTimer();
-        float max = animTargetAnimMaxTime_ > 0.0f ? animTargetAnimMaxTime_ : animator_->GetMaxTime();
-        if (cur >= max) {
-            StartNormalAnim(PlayerAnimationType::DownAttack, "DownAttack_Main", false);
-        }
+    // 空中急降下終了 (isAttackDown_ が false になった瞬間)
+	if (!isAttackDown_ && prevIsAttackDown_) {
+		StartNormalAnim(PlayerAnimationType::AirMove, "AirMove", true);
     }
 
     // 着地判定: 落下中(false)->着地(true) の遷移で Walk を再生
     if (!isJump_ && prevIsJump_) {
         StartNormalAnim(PlayerAnimationType::Walk, "歩き", true);
     }
+
+	// 突進溜め開始時
+	if (isCharging_ && !prevIsCharging_) {
+		StartCustomAnim(PlayerAnimationType::Rush, "突進_Prepare",
+			kRushChargeMaxTime_ * kRushChargeLevel3Ratio_);
+	}
+
+	// 予備が終わって突進が始まった瞬間
+	if (isRushing_ && !prevIsRushing_) {
+		// 突進開始: Main を通常再生
+		StartNormalAnim(PlayerAnimationType::Rush, "突進_Main", false);
+	}
+
+	// 突進終了時
+	if (!isRushing_ && prevIsRushing_) {
+		// 突進終了: End を通常再生
+		StartNormalAnim(PlayerAnimationType::Rush, "突進_End", false);
+	}
 
     // カスタム再生時間が有効なら進めて、終了で次の再生を決める
     if (animCustomActive_) {
