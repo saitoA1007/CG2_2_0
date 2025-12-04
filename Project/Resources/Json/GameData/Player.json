@@ -7,7 +7,7 @@
         "GroundAcceleration": 8.0,
         "JumpMaxHeight": 4.0,
         "JumpMaxTime": 0.6499999761581421,
-        "MaxFallSpeed": 2.0,
+        "MaxFallSpeed": 4.0,
         "MoveSpeed": 10.0,
         "SceneName": "TDGameScene",
         "WallHitReflectFactor": 0.5
