@@ -74,11 +74,7 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 		isAlive_ = false;
 
 		// 誰が破壊するかによって状態を変える
-		if (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Player)) {
-			wallState_ = WallState::Strengthen;
-		} else if (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss)) {
-			wallState_ = WallState::Normal;
-		}
+		wallState_ = WallState::Normal;
 	}
 }
 
