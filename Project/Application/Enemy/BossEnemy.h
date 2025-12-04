@@ -42,6 +42,12 @@ public:
 	// ワールド座標
 	Vector3 GetWorldPosition() { return worldTransform_.GetWorldPosition(); }
 
+	/// <summary>
+	/// 突進攻撃の演出
+	/// </summary>
+	/// <returns></returns>
+	bool IsRushAttack() const { return bossContext_.isRushAttack_; }
+
 private: // 調整項目
 
 	// 最大体力

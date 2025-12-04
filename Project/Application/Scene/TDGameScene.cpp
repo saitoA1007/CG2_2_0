@@ -441,8 +441,10 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);
 
 	// ボスの突進攻撃の描画
-	for (auto& rushEffect : enemyRushEffect_->GetWorldTransforms()) {
-		ModelRenderer::Draw(enemyRushModel_, rushEffect);
+	if (bossEnemy_->IsRushAttack()) {
+		for (auto& rushEffect : enemyRushEffect_->GetWorldTransforms()) {
+			ModelRenderer::Draw(enemyRushModel_, rushEffect);
+		}
 	}
 
 	// インスタンシング描画前処理
