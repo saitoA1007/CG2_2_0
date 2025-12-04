@@ -234,6 +234,7 @@ private:
 	bool prevIsRushing_ = false;
 	bool prevIsBounceLock_ = false;
 	bool prevIsAttackDown_ = false;
+    bool prevIsCharging_ = false;
 	bool wasJumping_ = false;
 
 	// シーン等から初期再生を要求するフラグ
