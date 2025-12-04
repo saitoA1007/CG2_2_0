@@ -42,6 +42,9 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 #pragma endregion
 
+	// 入力コマンドを設定する
+	InputRegisterCommand();
+
 	// 天球モデルを生成
 	skyDomeModel_ = context_->modelManager->GetNameByModel("SkyDome");
 	skyDomeWorldTransform_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}});
@@ -271,8 +274,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 	bossHpUI_ = std::make_unique<BossHpUI>();
 	bossHpUI_->Initialize(bossEnemy_->GetMaxHp());
 
-	// 入力コマンドを設定する
-	InputRegisterCommand();
+	// 空気を演出するためのパーティクル
+	airParticle_ = std::make_unique<ParticleBehavior>();
+	airParticle_->Initialize("AirParticle", 128);
+	airParticle_->Emit({ 0.0f,0.0f,0.0f });
 }
 
 void TDGameScene::Update() {
@@ -360,9 +365,11 @@ void TDGameScene::Update() {
 		plane.Update();
 	}
 
+	// 空気を演出するためのパーティクル
+	airParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+
 	// 当たり判定の更新処理
 	UpdateCollision();
-
 
 	// ボスのHpUIの更新処理
 	bossHpUI_->SetCurrentHp(bossEnemy_->GetCurrentHP());
@@ -476,6 +483,10 @@ void TDGameScene::Draw(const bool& isDebugView) {
 		ModelRenderer::DrawInstancing(planeModel_, iceFallEffect.particle->GetCurrentNumInstance(), *iceFallEffect.particle->GetWorldTransforms());
 	}
 
+	// 空気を演出するためのパーティクルを描画
+	ModelRenderer::DrawInstancing(planeModel_, airParticle_->GetCurrentNumInstance(), *airParticle_->GetWorldTransforms());
+
+
 #ifdef _DEBUG
 
 	// デバック描画
@@ -558,17 +569,6 @@ void TDGameScene::UpdateCollision() {
 	debugRenderer_->AddSphere(bossEnemy_->GetSphereData(),{1.0f,1.0f,0.0f,1.0f});
 #endif
 
-	// 生存している壁の要素を取得する
-	const std::vector<Wall*> aliveWalls =  stageManager_->GetAliveWalls();
-	for (auto& wall : aliveWalls) {
-		// 当たり判定を追加
-		collisionManager_->AddCollider(wall->GetCollider());
-#ifdef _DEBUG
-		// デバック描画に追加
-		debugRenderer_->AddBox(wall->GetOBBData());
-#endif
-	}
-
 	// 氷柱の当たり判定を登録する
 	const std::list<std::unique_ptr<IceFall>>& iceFalls = enemyAttackManager_->GetIceFalls();
 	for (auto& iceFall : iceFalls) {
@@ -597,6 +597,17 @@ void TDGameScene::UpdateCollision() {
 
     // 床の当たり判定を登録する
     collisionManager_->AddCollider(terrain_->GetCollider());
+
+	// 生存している壁の要素を取得する
+	const std::vector<Wall*> aliveWalls = stageManager_->GetAliveWalls();
+	for (auto& wall : aliveWalls) {
+		// 当たり判定を追加
+		collisionManager_->AddCollider(wall->GetCollider());
+#ifdef _DEBUG
+		// デバック描画に追加
+		debugRenderer_->AddBox(wall->GetOBBData());
+#endif
+	}
 
 	// 衝突判定
 	collisionManager_->CheckAllCollisions();
