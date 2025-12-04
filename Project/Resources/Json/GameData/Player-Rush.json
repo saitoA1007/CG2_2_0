@@ -7,8 +7,8 @@
         "RushChargeMaxTime": 2.0,
         "RushLockMaxTime": 1.2000000476837158,
         "RushSpeed": 30.0,
-        "RushStrengthLevel1": 0.4000000059604645,
-        "RushStrengthLevel2": 0.5,
+        "RushStrengthLevel1": 0.5,
+        "RushStrengthLevel2": 0.699999988079071,
         "RushStrengthLevel3": 1.0,
         "SceneName": "TDGameScene"
     }
