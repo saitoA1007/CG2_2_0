@@ -56,7 +56,7 @@ void SceneManager::Initialize(SceneContext* context) {
 #endif
 	
 	// シーンの初期化。
-	ChangeScene(SceneState::TDGame);
+	ChangeScene(SceneState::Title);
 }
 
 void SceneManager::Update() {
