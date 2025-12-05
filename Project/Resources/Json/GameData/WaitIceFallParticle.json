@@ -35,6 +35,7 @@
         "IsEnableAlphaOverLifeTime": false,
         "IsEnableColorOverLifeTime": false,
         "IsEnableRotateZFromVelocity": false,
+        "IsEnableScaleXYZActive": false,
         "IsEnableSizeOverLifeTime": true,
         "IsEnableVelocityFromPosition": false,
         "IsLoop": true,

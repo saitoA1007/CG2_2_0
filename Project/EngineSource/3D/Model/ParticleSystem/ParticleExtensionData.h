@@ -32,4 +32,9 @@ namespace GameEngine {
 	struct RotateZFromVelocity {
 		bool isEnable = false;
 	};
+
+	struct ScaleXYZActive {
+		bool isEnable = false;
+	};
+
 }

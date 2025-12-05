@@ -32,6 +32,7 @@ namespace GameEngine {
 
 		VelocityFromPosition velocityFromPosition; // 生成位置から速度を求める
 		RotateZFromVelocity rotateZFromVelocity; // 速度方向から回転
+		ScaleXYZActive scaleXYZActive; // スケールのxyzの適応
 	};
 
 	// パーティクルデータ
