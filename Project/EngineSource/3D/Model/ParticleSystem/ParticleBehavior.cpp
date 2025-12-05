@@ -70,8 +70,16 @@ ParticleData ParticleBehavior::MakeNewParticle() {
 
     ParticleData tmpParticleData;
     // srtを設定
-    float scale = RandomGenerator::Get(particleEmitter_.scaleRange.min.x, particleEmitter_.scaleRange.max.x);
-    tmpParticleData.transform.scale = { scale ,scale ,scale };
+    if (particleEmitter_.scaleXYZActive.isEnable) {
+        tmpParticleData.transform.scale = {
+            RandomGenerator::Get(particleEmitter_.scaleRange.min.x, particleEmitter_.scaleRange.max.x),
+            RandomGenerator::Get(particleEmitter_.scaleRange.min.y, particleEmitter_.scaleRange.max.y),
+            RandomGenerator::Get(particleEmitter_.scaleRange.min.z, particleEmitter_.scaleRange.max.z),
+        };
+    } else {
+        float scale = RandomGenerator::Get(particleEmitter_.scaleRange.min.x, particleEmitter_.scaleRange.max.x);
+        tmpParticleData.transform.scale = { scale ,scale ,scale };
+    }
     tmpParticleData.transform.rotate = {
         RandomGenerator::Get(particleEmitter_.rotateRange.min.x, particleEmitter_.rotateRange.max.x),
         RandomGenerator::Get(particleEmitter_.rotateRange.min.y, particleEmitter_.rotateRange.max.y),
@@ -232,6 +240,8 @@ void ParticleBehavior::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(name_, "MaxVelocity", particleEmitter_.velocityFromPosition.maxVelocity, index++);
 
     GameParamEditor::GetInstance()->AddItem(name_, "IsEnableRotateZFromVelocity", particleEmitter_.rotateZFromVelocity.isEnable, index++);
+
+    GameParamEditor::GetInstance()->AddItem(name_, "IsEnableScaleXYZActive", particleEmitter_.scaleXYZActive.isEnable, index++);
 }
 
 void ParticleBehavior::ApplyDebugParam() {
@@ -264,6 +274,8 @@ void ParticleBehavior::ApplyDebugParam() {
     particleEmitter_.velocityFromPosition.minVelocity = std::min(particleEmitter_.velocityFromPosition.minVelocity, particleEmitter_.velocityFromPosition.maxVelocity);
 
     particleEmitter_.rotateZFromVelocity.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableRotateZFromVelocity");
+
+    particleEmitter_.scaleXYZActive.isEnable = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsEnableScaleXYZActive");
 
     // 出現範囲を抑える
     if (maxNumInstance_ <= particleEmitter_.spawnMaxCount) {
