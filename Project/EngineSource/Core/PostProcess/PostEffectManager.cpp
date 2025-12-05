@@ -136,8 +136,9 @@ void PostEffectManager::PostDraw(ID3D12GraphicsCommandList* commandList, const D
     D3D12_GPU_DESCRIPTOR_HANDLE currentInputSRV = drawObjectSRVHandle_;
 
     // アウトラインを描画
-    DrawOutLine(commandList, depthSRV, currentInputSRV);
-    currentInputSRV = outLineData_.srvHandle;
+   // DrawOutLine(commandList, depthSRV, currentInputSRV);
+    //currentInputSRV = outLineData_.srvHandle;
+    depthSRV;
 
     // ブルームを描画
     DrawBloom(commandList, currentInputSRV, viewport, scissorRect);
@@ -275,7 +276,7 @@ void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_
     srvCPUHandle[3] = srvManager_->GetCPUHandle(index[3]);
     bloomSRVHandle_[3] = srvManager_->GetGPUHandle(index[3]);
     device_->CreateShaderResourceView(bloomCompositeResource_.Get(), &srvDesc, srvCPUHandle[3]);
-
+    bloomIndex_ = index[3];
     
     LogManager::GetInstance().Log("End Create BloomRenderTargets\n");
 }
@@ -432,12 +433,12 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
 
     // psoデータを取得する
     vignettingData_.psoData = &psoList_[static_cast<size_t>(PSOType::Vignetting)];
-
+   
     // パラメータリソースを作成
     vignettingResource_.CreateResource(device_);
     vignettingResource_.GetData()->intensity = 16.0f;
     vignettingResource_.GetData()->time = 0.15f;
-    vignettingResource_.GetData()->textureHandle = drawObjectIndex_;
+    vignettingResource_.GetData()->textureHandle = bloomIndex_;
 
     LogManager::GetInstance().Log("End Create VignettingRenderTargets\n");
 
@@ -463,7 +464,7 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
     scanLineResource_.GetData()->speed = -2.0f;
     scanLineResource_.GetData()->time = 0.0f;
     scanLineResource_.GetData()->lineColor = { 0.3f,0.3f,0.3f };
-    scanLineResource_.GetData()->textureHandle = drawObjectIndex_;
+    scanLineResource_.GetData()->textureHandle = vignettingData_.srvIndex;
 
     LogManager::GetInstance().Log("End Create ScanLineRenderTargets\n");
 
@@ -488,7 +489,7 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
     radialBlurResource_.GetData()->centerPos = { 0.5f,0.5f };
     radialBlurResource_.GetData()->numSamles = 2;
     radialBlurResource_.GetData()->blurWidth = 0.01f;
-    radialBlurResource_.GetData()->textureHandle = drawObjectIndex_;
+    radialBlurResource_.GetData()->textureHandle = vignettingData_.srvIndex;
 
     LogManager::GetInstance().Log("End Create RadialBlurRenderTargets");
 
