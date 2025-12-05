@@ -958,12 +958,12 @@ void BossStateBattle::ApplyDebugParam() {
 	maxWaitTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "IceFallTime");
 
 	// 行動の管理
-	rushAttackWeight_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[5], "RushAttackWeight");
-	WindAttackWeight_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[5], "WindAttackWeight");
-	IceFallWeight_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[5], "IceFallWeight");
-	WaitWeight_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[5], "WaitWeight");
-	RotateMoveWeight_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[5], "RotateMoveWeight");
-	CrossMoveWeight_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[5], "CrossMoveWeight");
+	rushAttackWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupNames[5], "RushAttackWeight"));
+	WindAttackWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupNames[5], "WindAttackWeight"));
+	IceFallWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupNames[5], "IceFallWeight"));
+	WaitWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupNames[5], "WaitWeight"));
+	RotateMoveWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupNames[5], "RotateMoveWeight"));
+	CrossMoveWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupNames[5], "CrossMoveWeight"));
 
 	lotteryList_ = {
 			{ ButtleBehavior::RushAttack,    rushAttackWeight_ }, // 突進
