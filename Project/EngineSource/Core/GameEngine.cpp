@@ -141,6 +141,17 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneManager_ = std::make_unique<SceneManager>();
 	sceneManager_->Initialize(&sceneContext);
 
+#ifdef _DEBUG
+	//GameParamEditor::GetInstance()->AddItem("Bloom", "Iteration", bloomPSO_->constBuffer_->bloomIteration);
+	GameParamEditor::GetInstance()->AddItem("Bloom", "Mask", bloomPSO_->constBuffer_->highLumMask);
+	GameParamEditor::GetInstance()->AddItem("Bloom", "Intensity", bloomPSO_->constBuffer_->intensity);
+	GameParamEditor::GetInstance()->AddItem("Bloom", "Sigm", bloomPSO_->constBuffer_->sigma);
+#endif
+	//bloomPSO_->constBuffer_->bloomIteration = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>("Bloom", "Iteration"));
+	bloomPSO_->constBuffer_->highLumMask = GameParamEditor::GetInstance()->GetValue<float>("Bloom", "Mask");
+	bloomPSO_->constBuffer_->intensity = GameParamEditor::GetInstance()->GetValue<float>("Bloom", "Intensity");
+	bloomPSO_->constBuffer_->sigma = GameParamEditor::GetInstance()->GetValue<float>("Bloom", "Sigm");
+
 	// エディターの初期化
 #ifdef USE_IMGUI
 	// シーン切り替えの通知を管理する機能を初期化
@@ -165,6 +176,13 @@ void Engine::Update() {
 
 		// 更新前処理
 		PreUpdate();
+
+#ifdef _DEBUG
+		//bloomPSO_->constBuffer_->bloomIteration = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>("Bloom", "Iteration"));
+		bloomPSO_->constBuffer_->highLumMask = GameParamEditor::GetInstance()->GetValue<float>("Bloom", "Mask");
+		bloomPSO_->constBuffer_->intensity = GameParamEditor::GetInstance()->GetValue<float>("Bloom", "Intensity");
+		bloomPSO_->constBuffer_->sigma = GameParamEditor::GetInstance()->GetValue<float>("Bloom", "Sigm");
+#endif
 
 		// シーンの更新処理
 		if (isActiveUpdate_ && !isPause_) {

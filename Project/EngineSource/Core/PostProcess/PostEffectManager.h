@@ -108,6 +108,7 @@ namespace GameEngine {
 
         // ブルーム用PSO
         static BloomPSO* bloomPSO_;
+        uint32_t bloomIndex_ = 0;
 
         // アウトライン用のPSO
         static OutLinePSO* outLinePSO_;
