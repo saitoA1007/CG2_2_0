@@ -30,7 +30,9 @@ void Wall::Initialilze(const Transform& transform, float respawnTime, int32_t ma
 	// 当たり判定を作成
 	collider_ = std::make_unique<OBBCollider>();
 	collider_->SetWorldPosition(worldTransform_.transform_.translate);
-	collider_->SetSize(worldTransform_.transform_.scale * 0.5f);
+	worldTransform_.transform_.scale *= 0.5f;
+    worldTransform_.transform_.scale.y = 1024.0f;
+	collider_->SetSize(worldTransform_.transform_.scale);
 	collider_->UpdateOrientationsFromRotate(worldTransform_.transform_.rotate);
 	collider_->SetCollisionAttribute(kCollisionAttributeTerrain);
 	collider_->SetCollisionMask(~kCollisionAttributeTerrain);
@@ -40,7 +42,7 @@ void Wall::Initialilze(const Transform& transform, float respawnTime, int32_t ma
     collider_->SetUserData(userData);
 
 	// コールバック関数に登録する
-	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
+	collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 	});
 }

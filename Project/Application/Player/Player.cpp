@@ -428,7 +428,8 @@ void Player::OnCollision(const CollisionResult &result) {
 	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall))
 		&& dynamic_cast<Wall *>(result.userData.object)->GetIsAlive();
 	bool isIceFall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::IceFall));
-	bool isBoundary = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::BoundaryWall));
+	bool isBoundary = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::BoundaryWall))
+        || (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall) && !dynamic_cast<Wall *>(result.userData.object)->GetIsAlive());
 	bool isGround = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Ground));
 
 	// 壁との衝突処理
@@ -442,7 +443,7 @@ void Player::OnCollision(const CollisionResult &result) {
 		return;
 	}
 
-	if (isWall && !isRushing_) {
+    if (isWall && !isRushing_ && !isJump_) {
 		Vector3 n = result.contactNormal;
 		Vector3 nXZ = { n.x, 0.0f, n.z };
 		if (nXZ.x != 0.0f || nXZ.z != 0.0f) { nXZ = Normalize(nXZ); }
@@ -498,7 +499,7 @@ void Player::OnCollision(const CollisionResult &result) {
 	}
 
 	// BoundaryWall の処理: 通常の壁が存在する場合は無視する
-	if (isBoundary) {
+    if (isBoundary || (isWall && isJump_)) {
 		Vector3 n = result.contactNormal;
 		if (n.x != 0.0f || n.y != 0.0f || n.z != 0.0f) { n = Normalize(n); }
 		float depth = std::max(result.penetrationDepth, 0.0f);
