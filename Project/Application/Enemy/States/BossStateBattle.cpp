@@ -88,15 +88,28 @@ void BossStateBattle::Exit() {
 
 void BossStateBattle::ResetNormal() {
 
+	// 氷柱がステージに存在してる場合は処理をおこなわない
+	std::vector<BehaviorWeight> list;
+	list.resize(lotteryList_.size());
+	if (bossContext_.iceFallCount != 0) {
+		for (size_t i = 0; i < lotteryList_.size(); ++i) {
+			if (lotteryList_[i].behavior != ButtleBehavior::IceFallAttack) {
+				list.push_back(lotteryList_[i]);
+			}
+		}
+	} else {
+		list = lotteryList_;
+	}
+
 	// 全体の重みを計算する
 	int32_t totalWeight = 0;
-	for (const auto& item : lotteryList_) {
+	for (const auto& item : list) {
 		totalWeight += item.weight;
 	}
 
 	int32_t randomValue = RandomGenerator::Get<int32_t>(0, totalWeight - 1);
 
-	for (const auto& item : lotteryList_) {
+	for (const auto& item : list) {
 		if (randomValue < item.weight) {
 			selectButtleBehavior_ = item.behavior;
 			break;
@@ -512,9 +525,9 @@ void BossStateBattle::WindAttackUpdate() {
 		bossContext_.animationTimer = windTimer_;
 
 		// 回転
-		Vector3 dir = Slerp(startDir_, startPos_, windTimer_);
+		Vector3 dir = Slerp(startDir_, endPos_, windTimer_);
 		// Y軸周りの角度
-		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.z, dir.x);
+		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
 
 		// ブレスを吐く方向を向く
 		if (windTimer_ >= 1.0f) {
@@ -569,9 +582,9 @@ void BossStateBattle::WindAttackUpdate() {
 		bossContext_.animationTimer = windTimer_;
 
 		// 回転
-		Vector3 dir = Slerp(endPos_, startDir_, windTimer_);
+		Vector3 dir = Slerp(startPos_, startDir_, windTimer_);
 		// Y軸周りの角度
-		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.z, dir.x);
+		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
 
 		// ブレスを吐く方向を向く
 		if (windTimer_ >= 1.0f) {
