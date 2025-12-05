@@ -36,21 +36,22 @@ BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius,
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::CrossMove)] = [this]() {ResetCrossMove(); };
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::InMove)] = [this]() {ResetInMove(); };
 
-	lotteryList_ = {
-			{ ButtleBehavior::RushAttack,    30 }, // 突進
-			{ ButtleBehavior::WindAttack,    30 }, // 風
-			{ ButtleBehavior::IceFallAttack, 30 }, // 氷柱
-			{ ButtleBehavior::Wait,          5  }, // 待機
-			{ ButtleBehavior::RotateMove,    5 },  // 回転移動
-			{ ButtleBehavior::CrossMove,     5 }   // 横断移動
-	};
-
 #ifdef _DEBUG
 	// 値を登録する
 	RegisterBebugParam();
 #endif
 	// 値を適応させる
 	ApplyDebugParam();
+
+	// 行動のリスト
+	lotteryList_ = {
+			{ ButtleBehavior::RushAttack,    rushAttackWeight_ }, // 突進
+			{ ButtleBehavior::WindAttack,    WindAttackWeight_ }, // 風
+			{ ButtleBehavior::IceFallAttack, IceFallWeight_ }, // 氷柱
+			{ ButtleBehavior::Wait,          WaitWeight_  }, // 待機
+			{ ButtleBehavior::RotateMove,    RotateMoveWeight_ },  // 回転移動
+			{ ButtleBehavior::CrossMove,     CrossMoveWeight_}   // 横断移動
+	};
 }
 
 void BossStateBattle::Enter() {
@@ -104,7 +105,7 @@ void BossStateBattle::ResetNormal() {
 		randomValue -= item.weight;
 	}
 
-	Log("randValue : " + std::to_string(randomValue));
+	//Log("randValue : " + std::to_string(randomValue));
 
 	// 突進が選ばれた場合に距離が短過ぎる場合は移動させる
 	//if (selectButtleBehavior_ == ButtleBehavior::RushAttack) {
@@ -931,6 +932,14 @@ void BossStateBattle::RegisterBebugParam() {
 
 	// 氷柱攻撃
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "IceFallTime", maxWaitTime_);
+
+	// 行動遷移の管理
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[5], "RushAttackWeight", rushAttackWeight_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[5], "WindAttackWeight", WindAttackWeight_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[5], "IceFallWeight", IceFallWeight_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[5], "WaitWeight", WaitWeight_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[5], "RotateMoveWeight", RotateMoveWeight_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[5], "CrossMoveWeight", CrossMoveWeight_);
 }
 
 void BossStateBattle::ApplyDebugParam() {
@@ -940,6 +949,23 @@ void BossStateBattle::ApplyDebugParam() {
 
 	// 氷柱攻撃
 	maxWaitTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "IceFallTime");
+
+	// 行動の管理
+	rushAttackWeight_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[5], "RushAttackWeight");
+	WindAttackWeight_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[5], "WindAttackWeight");
+	IceFallWeight_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[5], "IceFallWeight");
+	WaitWeight_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[5], "WaitWeight");
+	RotateMoveWeight_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[5], "RotateMoveWeight");
+	CrossMoveWeight_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[5], "CrossMoveWeight");
+
+	lotteryList_ = {
+			{ ButtleBehavior::RushAttack,    rushAttackWeight_ }, // 突進
+			{ ButtleBehavior::WindAttack,    WindAttackWeight_ }, // 風
+			{ ButtleBehavior::IceFallAttack, IceFallWeight_ }, // 氷柱
+			{ ButtleBehavior::Wait,          WaitWeight_  }, // 待機
+			{ ButtleBehavior::RotateMove,    RotateMoveWeight_ },  // 回転移動
+			{ ButtleBehavior::CrossMove,     CrossMoveWeight_}   // 横断移動
+	};
 }
 
 void BossStateBattle::Setup(uint32_t sampleCount) {
