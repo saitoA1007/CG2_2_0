@@ -108,6 +108,10 @@ private:
 
 	// 氷柱を落とすまでの時間
 	float maxIceFallEmitTime_ = 1.0f;
+	// 氷柱の調整項目
+	float minDistance = 5.0f; // 離れる距離
+	int targetCount = 3; // 出す数
+	int maxIter = 100; // 回数
 
 	// 咆哮したかのフラグ
 	bool isRoat_ = false;
@@ -142,6 +146,16 @@ private:
 
 	// 風攻撃の更新処理
 	void WindUpdate();
+
+	/// <summary>
+	/// 値を登録する
+	/// </summary>
+	void RegisterBebugParam();
+
+	/// <summary>
+	/// 値を適応する
+	/// </summary>
+	void ApplyDebugParam();
 };
 
 // ヘルプ関数

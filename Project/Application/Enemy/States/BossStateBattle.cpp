@@ -147,7 +147,7 @@ void BossStateBattle::ResetRush() {
 	endRushPos_ = {std::cosf(tmpAngle)* (stageRadius_ + offsetEndRush_),0.0f,std::sinf(tmpAngle)* (stageRadius_ + offsetEndRush_) };
 	
 	// 突進の終わりの戻る位置
-	rushOutEndPos_ = { std::cosf(tmpAngle) * (stageRadius_ - (stageRadius_ / 6.0f)),defalutPosY_,std::sinf(tmpAngle) * (stageRadius_ - (stageRadius_ / 6.0f)) };
+	rushOutEndPos_ = { std::cosf(tmpAngle) * (stageRadius_ * rushEndRatio_),defalutPosY_,std::sinf(tmpAngle) * (stageRadius_ * rushEndRatio_) };
 
 	// 移動する角度
 	float startAngle = 0.0f;
@@ -544,38 +544,12 @@ void BossStateBattle::ResetIceFall() {
 	bossContext_.isActiveIceFall = false;
 	isActiveIceFall_ = false;
 
-	// 円の中心から自分へのベクトルを求める
-	//Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
-	//startDir_ = myDir;
-	//endDir_ = myDir * -1.0f;
-
-	// リセットする
-	//rotateTimer_ = 0.0f;
-
-	// アニメーション
-	//bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
-	//bossContext_.animationTimer = 0.0f;
-
 	//　アニメーション
 	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Scream)]["Scream"]);
 	bossContext_.animationTimer = 0.0f;
 }
 
 void BossStateBattle::IceFallAttackUpdate() {
-
-	//if (rotateTimer_ <= 1.0f) {
-
-	//	rotateTimer_ += FpsCounter::deltaTime / maxRotateTime_;
-	//	bossContext_.animationTimer = rotateTimer_;
-
-	//	// 回転
-	//	Vector3 dir = Slerp(startDir_, endDir_, rotateTimer_);
-	//	// Y軸周りの角度
-	//	bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
-
-	//} else {
-	//	
-	//}
 
 	if (!isActiveIceFall_) {
 		bossContext_.isActiveIceFall = true;
@@ -587,7 +561,7 @@ void BossStateBattle::IceFallAttackUpdate() {
 		}
 	}
 
-	waitTimer_ += FpsCounter::deltaTime / maxWaitTime_;
+	waitTimer_ += FpsCounter::deltaTime / iceFallMaxTime_;
 	bossContext_.animationTimer = waitTimer_;
 
 	// 待機の終了
@@ -929,11 +903,14 @@ void BossStateBattle::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem("Boss", "DefaultsPosY", defalutPosY_);
 
 	// 突進攻撃
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "RushTime", rushMainTime_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "OffestEndRush", offsetEndRush_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "RotateSpeed", rotSpeed_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "RushMainTime", rushMainTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "RushOutTime", rushOutTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "RushEndRatio", rushEndRatio_);
 
 	// 氷柱攻撃
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "IceFallTime", maxWaitTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "IceFallTime", iceFallMaxTime_);
 
 	// 回転移動
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "RotateTimeRatio", rotateTimeRatio_);
@@ -959,11 +936,14 @@ void BossStateBattle::ApplyDebugParam() {
 	defalutPosY_ = GameParamEditor::GetInstance()->GetValue<float>("Boss", "DefaultsPosY");
 
 	// 突進攻撃
-	rushMainTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "RushTime");
 	offsetEndRush_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "OffestEndRush");
+	rotSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "RotateSpeed");
+	rushMainTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "RushMainTime");
+	rushOutTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "RushOutTime");
+	rushEndRatio_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "RushEndRatio");
 
 	// 氷柱攻撃
-	maxWaitTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "IceFallTime");
+	iceFallMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "IceFallTime");
 
 	// 回転行動
 	rotateTimeRatio_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "RotateTimeRatio");
