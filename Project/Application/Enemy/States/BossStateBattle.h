@@ -100,7 +100,10 @@ private:
 	const std::vector<std::string> kGroupNames = {
 		"Boss-Rush",
 		"Boss-IceFall",
-		"Boss-Wind"
+		"Boss-Wind",
+		"Boss-RotateMove",
+		"Boss-CrossMove",
+		"Boss-Controller"
 	};
 
 	// 回転の方向を保存する
@@ -110,6 +113,14 @@ private:
 	// アニメーションで使用するフラグ
 	bool isMidAnimation_ = false;
 	bool isEndANimation_ = false;
+
+	// 行動の重み
+	int32_t rushAttackWeight_ = 30;
+	int32_t WindAttackWeight_ = 30;
+	int32_t IceFallWeight_ = 30;
+	int32_t WaitWeight_ = 5;
+	int32_t RotateMoveWeight_ = 5;
+	int32_t CrossMoveWeight_ = 5;
 
 	// Behavior : Normal
 	// 行動をおこなうための繋ぎの行動に使用する変数============
