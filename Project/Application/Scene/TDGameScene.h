@@ -157,6 +157,9 @@ private: // シーン機能
 	// ボスの風攻撃演出
 	std::unique_ptr<EnemyWindAttackParticle> enemyWindAttackParticle_;
 
+	// ボスの纏っているパーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> bossWearParticle_;
+
 	// 氷柱のモデル
 	GameEngine::Model* iceFallModel_;
 	// 敵の突進攻撃演出のモデル

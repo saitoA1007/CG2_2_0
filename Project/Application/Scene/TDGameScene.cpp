@@ -220,6 +220,11 @@ void TDGameScene::Initialize(SceneContext* context) {
 	enemyRushModel_ = context_->modelManager->GetNameByModel("RushWave");
 	// 風攻撃演出モデル
 	windModel_ = context_->modelManager->GetNameByModel("Wind");
+
+	// ボスが常に纏っているパーティクル
+	bossWearParticle_ = std::make_unique<ParticleBehavior>();
+	bossWearParticle_->Initialize("BossWearParticle", 16);
+	bossWearParticle_->Emit({ 0.0f,5.0f,0.0f });
 #pragma endregion
 
 	// 平面モデルを取得
@@ -369,6 +374,10 @@ void TDGameScene::Update() {
 	// 空気を演出するためのパーティクル
 	airParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
+	// ボスが常に纏っているパーティクル
+	bossWearParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition());
+	bossWearParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+
 	// 当たり判定の更新処理
 	UpdateCollision();
 
@@ -476,6 +485,12 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::DrawInstancing(windModel_, enemyWindAttackParticle_->GetCurrentNumInstance(), *enemyWindAttackParticle_->GetWorldTransforms());
 	
 	// 複数モデルの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::Instancing);
+
+	// ボスの纏っているパーティクルを描画
+	ModelRenderer::DrawInstancing(planeModel_, bossWearParticle_->GetCurrentNumInstance(), *bossWearParticle_->GetWorldTransforms());
+
+	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
 
 	// 氷柱を落とすまでの演出を描画
@@ -483,6 +498,9 @@ void TDGameScene::Draw(const bool& isDebugView) {
 		if (!iceFallEffect.isActive) { continue; }
 		ModelRenderer::DrawInstancing(planeModel_, iceFallEffect.particle->GetCurrentNumInstance(), *iceFallEffect.particle->GetWorldTransforms());
 	}
+
+	// ボスの纏っているパーティクルを描画
+	//ModelRenderer::DrawInstancing(planeModel_, bossWearParticle_->GetCurrentNumInstance(), *bossWearParticle_->GetWorldTransforms());
 
 	// 空気を演出するためのパーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, airParticle_->GetCurrentNumInstance(), *airParticle_->GetWorldTransforms());
