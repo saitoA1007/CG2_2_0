@@ -161,7 +161,7 @@ private: // シーン機能
 	GameEngine::Model* iceFallModel_;
 	// 敵の突進攻撃演出のモデル
 	GameEngine::Model* enemyRushModel_;
-
+	
 	// 平面モデル
 	GameEngine::Model* planeModel_;
 	// 風の演出用モデル

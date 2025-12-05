@@ -172,7 +172,7 @@ void Player::UpdateAnimation() {
 
     // カスタム再生時間が有効なら進めて、終了で次の再生を決める
     if (animCustomActive_) {
-        animator_->Update(animCustomTotal_ > 0.0f ? (animCustomTimer_ / animCustomTotal_) : 1.0f);
+        animator_->NormalizeUpdate(animCustomTotal_ > 0.0f ? (animCustomTimer_ / animCustomTotal_) : 1.0f);
         animCustomTimer_ += FpsCounter::deltaTime;
     } else {
 		// 通常更新
