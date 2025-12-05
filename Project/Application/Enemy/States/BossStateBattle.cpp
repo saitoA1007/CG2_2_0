@@ -831,7 +831,7 @@ void BossStateBattle::ResetCrossMove() {
 	Vector3 dir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
 
 	// 始点と終点の角度を求める
-	float angle = std::numbers::pi_v<float> / 4.0f;
+	float angle = RandomGenerator::Get(-std::numbers::pi_v<float> / 4.0f, std::numbers::pi_v<float> / 4.0f);
 	float cos = std::cosf(angle);
 	float sin = std::sinf(angle);
 	Vector3 startDir = { dir.x * cos - dir.z * sin,0.0f,dir.x * sin + dir.z * cos };
@@ -839,7 +839,7 @@ void BossStateBattle::ResetCrossMove() {
 	startDir *= -1.0f;
 
 	// 終盤の位置を取得
-	endRushPos_ = startDir * stageRadius_;
+	endRushPos_ = startDir * (stageRadius_ * crossEndRatio_);
 
 	/// 自分自体の回転要素
 
@@ -856,9 +856,6 @@ void BossStateBattle::ResetCrossMove() {
 	//Log("startDir : x:" + std::to_string(endRotStartDir_.x) + ", y:" + std::to_string(endRotStartDir_.y) + ", z:" + std::to_string(endRotStartDir_.z));
 	//Log("endDir : x:" + std::to_string(endDir_.x) + ", y:" + std::to_string(endDir_.y) + ", z:" + std::to_string(endDir_.z));
 
-	// 上下する回数
-	cycleCount_ = 3;
-
 	// アニメーション
 	bossContext_.animationTimer = 0.0f;
 	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
@@ -874,14 +871,14 @@ void BossStateBattle::CrossMoveUpdate() {
 #pragma region Move
 	// 縦移動
 	float posY = 0.0f;
-	float totalCycle = moveTimer_ * cycleCount_;
+	float totalCycle = moveTimer_ * upDownCount_;
 	float localTimer = std::fmodf(totalCycle, 1.0f);
 	if (localTimer <= 0.5f) {
 		float t = localTimer / 0.5f;
-		posY = Lerp(0.0f, 2.0f, EaseInOut(t));
+		posY = Lerp(0.0f, maxMoveHeight_, EaseInOut(t));
 	} else {
 		float t = (localTimer - 0.5f) / 0.5f;
-		posY = Lerp(2.0f, 0.0f, EaseInOut(t));
+		posY = Lerp(maxMoveHeight_, 0.0f, EaseInOut(t));
 	}
 
 	// 移動
@@ -937,6 +934,12 @@ void BossStateBattle::RegisterBebugParam() {
 	// 氷柱攻撃
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "IceFallTime", maxWaitTime_);
 
+	// 横断行動
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "CrossMoveTime", crossMoveTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "CrossEndRatio", crossEndRatio_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "UpDownCount", upDownCount_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "MaxMoveHeight", maxMoveHeight_);
+
 	// 行動遷移の管理
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[5], "RushAttackWeight", rushAttackWeight_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[5], "WindAttackWeight", WindAttackWeight_);
@@ -956,6 +959,12 @@ void BossStateBattle::ApplyDebugParam() {
 
 	// 氷柱攻撃
 	maxWaitTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "IceFallTime");
+
+	// 横断行動
+	crossMoveTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "CrossMoveTime");
+	crossEndRatio_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "CrossEndRatio");
+	upDownCount_ = GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupNames[4], "UpDownCount");
+	maxMoveHeight_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "MaxMoveHeight");
 
 	// 行動の管理
 	rushAttackWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupNames[5], "RushAttackWeight"));
