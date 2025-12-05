@@ -476,7 +476,7 @@ void BossStateBattle::RushAttackUpdate() {
 		// 突進の終了
 		if (rushTimer_ >= 1.0f) {
 			// 振る舞いの切り替えをリクエスト
-			behaviorRequest_ = ButtleBehavior::Normal;
+			behaviorRequest_ = ButtleBehavior::Wait;
 		}
 #pragma endregion
 		break;
