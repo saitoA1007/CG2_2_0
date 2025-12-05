@@ -1,0 +1,100 @@
+{
+    "BossWearParticle": {
+        "ColorRange": {
+            "Max": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "EndAlpha": 0.0,
+        "EndColor": [
+            0.4264705777168274,
+            1.0,
+            1.0,
+            1.0
+        ],
+        "EndSize": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "FieldAcceleration": [
+            0.0,
+            1.0,
+            0.0
+        ],
+        "IsBillBoard": true,
+        "IsEnableAlphaOverLifeTime": true,
+        "IsEnableColorOverLifeTime": true,
+        "IsEnableRotateZFromVelocity": false,
+        "IsEnableScaleXYZActive": false,
+        "IsEnableSizeOverLifeTime": false,
+        "IsEnableVelocityFromPosition": true,
+        "IsLoop": true,
+        "LifeTime": 3.0,
+        "MaxVelocity": 0.5,
+        "MinVelocity": 0.20000000298023224,
+        "RotateRange": {
+            "Max": [
+                0.0,
+                0.0,
+                3.200000047683716
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "ScaleRange": {
+            "Max": [
+                2.0,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "SceneName": "TDGameScene",
+        "SpawnCoolTime": 0.20000000298023224,
+        "SpawnMaxCount": 2,
+        "SpawnRange": {
+            "Max": [
+                3.0,
+                5.0,
+                3.0
+            ],
+            "Min": [
+                -3.0,
+                0.10000000149011612,
+                -3.0
+            ]
+        },
+        "Textures": {
+            "smoke2.png": 22
+        },
+        "VelocityRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    }
+}
