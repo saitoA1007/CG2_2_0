@@ -125,6 +125,17 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 }
 
 void Player::UpdateAnimation() {
+    // 突進のアニメーション終了検出
+    if (currentAnimationType_ == PlayerAnimationType::Rush &&
+        currentAnimationName_ == "突進_End" &&
+        !isJump_) {
+		float animTime = animator_->GetTimer();
+		float animMaxTime = animator_->GetMaxTime();
+		if (animTime >= animMaxTime) {
+			isRushAnimEndTriggered_ = true;
+		}
+    }
+
 	// 壁衝突でのバウンス硬直開始
 	if (isBounceLock_ && !prevIsBounceLock_) {
 		// 壁衝突時は End をアニメーション全体時間で再生(★)
@@ -148,7 +159,9 @@ void Player::UpdateAnimation() {
     }
 
     // 着地判定: 落下中(false)->着地(true) の遷移で Walk を再生
-    if (!isJump_ && prevIsJump_) {
+    // or 突進アニメ終了後の復帰
+    if ((!isJump_ && prevIsJump_) ||
+        (isRushAnimEndTriggered_ && !isRushing_)) {
         StartNormalAnim(PlayerAnimationType::Walk, "歩き", true);
     }
 
@@ -186,6 +199,7 @@ void Player::UpdateAnimation() {
     prevIsAttackDown_ = isAttackDown_;
     prevIsCharging_ = isCharging_;
     prevIsJump_ = isJump_;
+    isRushAnimEndTriggered_ = false;
 }
 
 void Player::UpdateCameraBasis(const Camera* camera) {
