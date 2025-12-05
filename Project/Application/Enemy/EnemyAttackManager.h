@@ -57,7 +57,7 @@ public:
 	/// <summary>
 	/// 風ブレスを開始する
 	/// </summary>
-	void StartWindAttack(const Vector3& pos);
+	void StartWindAttack(const Vector3& pos,const float& maxTime);
 
 	/// <summary>
 	/// 氷柱のリスト
