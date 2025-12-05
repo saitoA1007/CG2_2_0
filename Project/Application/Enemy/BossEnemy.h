@@ -11,7 +11,7 @@
 
 #include"EnemyAttackManager.h"
 
-class BossEnemy {
+class BossEnemy : public GameEngine::GameObject {
 public:
 
 	/// <summary>
@@ -47,6 +47,9 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	bool IsRushAttack() const { return bossContext_.isRushAttack_; }
+
+	// 突進攻撃の当たり判定の有効フラグ
+	bool IsRushCollisionActive() const { return bossContext_.isRushCollisionActive_; }
 
 	// 現在のhpを取得
 	uint32_t GetCurrentHP() const { return bossContext_.hp; }

@@ -106,8 +106,11 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 			default: currentHp_ -= 1; break;
 		}
     } else if (boss != nullptr) {
-        // ボスの場合、固定ダメージ
-        currentHp_ -= 2;
+        // ボスが突進状態であれば
+		if (boss->IsRushCollisionActive()) {
+			// ボスの場合、固定ダメージ
+			currentHp_ -= 2;
+		}
     }
 
 	if (currentHp_ <= 0) {

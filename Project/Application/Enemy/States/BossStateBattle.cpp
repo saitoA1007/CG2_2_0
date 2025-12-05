@@ -110,19 +110,30 @@ void BossStateBattle::ResetNormal() {
 	//Log("randValue : " + std::to_string(randomValue));
 
 	// 突進が選ばれた場合に距離が短過ぎる場合は移動させる
-	//if (selectButtleBehavior_ == ButtleBehavior::RushAttack) {
-	//	// 円の中心からプレイヤーへのベクトルを求める
-	//	Vector3 tmpTarget = Normalize(Vector3(bossContext_.targetPos.x, 0.0f, bossContext_.targetPos.z));
-	//	Vector3 targetDir = tmpTarget;
+	if (selectButtleBehavior_ == ButtleBehavior::RushAttack) {
+		// 円の中心からプレイヤーへのベクトルを求める
+		Vector3 tmpTarget = Normalize(Vector3(bossContext_.targetPos.x, 0.0f, bossContext_.targetPos.z));
+		Vector3 targetDir = tmpTarget;
 
-	//	// 反転する
-	//	targetDir = targetDir * -1.0f;
-	//	// 反対側の角度を求める
-	//	float endAngle = std::atan2f(targetDir.z, targetDir.x);
+		// 反転する
+		targetDir = targetDir * -1.0f;
+		// 反対側の角度を求める
+		float endAngle = std::atan2f(targetDir.z, targetDir.x);
 
-	//	// プレイヤーの一番後ろの位置
-	//	Vector3 pos = { std::cosf(endAngle) * (stageRadius_), 0.0f,std::sinf(endAngle) * (stageRadius_) };
-	//}
+		// プレイヤーの一番後ろの位置
+		Vector3 targetPos = { std::cosf(endAngle) * (stageRadius_), 0.0f,std::sinf(endAngle) * (stageRadius_) };
+
+		float length = Length(targetPos - bossContext_.worldTransform->transform_.translate);
+
+		// 距離が近い場合は離れる行動をとる用にする
+		if (length <= stageRadius_ * 0.2f) {
+			if (RandomGenerator::Get(0, 1) == 0) {
+				selectButtleBehavior_ = ButtleBehavior::CrossMove;
+			} else {
+				selectButtleBehavior_ = ButtleBehavior::RotateMove;
+			}
+		}
+	}
 
 	// 選択した遷移
 	//selectButtleBehavior_ = ButtleBehavior::RotateMove;
@@ -243,6 +254,8 @@ void BossStateBattle::ResetRush() {
 
 	isMidAnimation_ = false;
 	isEndANimation_ = false;
+
+	bossContext_.isRushCollisionActive_ = false;
 
 	bossContext_.isRushAttack_ = false;
 }
@@ -398,9 +411,15 @@ void BossStateBattle::RushAttackUpdate() {
 			}
 		}
 
+		// 壁に対する当たり判定を有効にする
+		if (rushTimer_ >= 0.5f) {
+			bossContext_.isRushCollisionActive_ = true;
+		}
+
 		// 突進終了
 		if (rushTimer_ >= 1.0f) {
 			bossContext_.isRushAttack_ = false;
+			bossContext_.isRushCollisionActive_ = false;
 			// 突進のアウトに移行
 			rushPhase_ = RushPhase::Out;
 			rushTimer_ = 0.0f;
