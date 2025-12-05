@@ -30,6 +30,8 @@ struct BossContext {
 
 	// 氷柱の発射を管理
 	bool isActiveIceFall = false;
+	// 現在の氷柱の数
+	uint32_t iceFallCount = 0;
 
 	// 突進攻撃の演出を管理
 	bool isRushAttack_ = false;
@@ -40,7 +42,6 @@ struct BossContext {
 	// アニメーションデータ
 	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)>* animationData_;
 	GameEngine::Animator* animator_ = nullptr;
-
 	float animationTimer = 0.0f;
 	float animationMaxTime = 0.0f;
 };

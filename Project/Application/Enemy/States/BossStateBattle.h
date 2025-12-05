@@ -14,11 +14,15 @@ public:
 
 	// ボスの戦い中の振る舞い
 	enum class ButtleBehavior {
-		Normal, // 通常状態
+		Normal, // 状態の切り替えを管理
+
 		RushAttack, // 突進攻撃
-		WindAttack, // 弾の発射
+		WindAttack, // 風の発射
 		IceFallAttack, // 氷柱を落とす攻撃
+
 		Wait, // その場で留まる。攻撃と攻撃の小休憩
+		RotateMove, // 回転して回る動き
+		CrossMove, // 横断する動き
 
 		InMove, // 最初の時に取る行動
 
@@ -29,6 +33,12 @@ public:
 	struct SamplePoint {
 		float distance; // 始点からの累積距離
 		float rawT;     // その地点での元のt (0.0 - 1.0)
+	};
+
+	// 行動に重みを付ける
+	struct BehaviorWeight {
+		ButtleBehavior behavior;
+		int32_t weight; // この数値が高いほど選ばれやすくなる
 	};
 
 public:
@@ -66,14 +76,16 @@ private:
 	// ボスが指定した状態を行うためのリセット処理
 	std::array<std::function<void()>, static_cast<size_t>(ButtleBehavior::MaxCount)> resetBehaviorParamTable_;
 	
-	// 現在の状態が有効化管理
-	bool isCurrentBehaviorActive_ = false;
+	ButtleBehavior selectButtleBehavior_ = ButtleBehavior::Wait;
 
 	// ステージの半径
 	float stageRadius_ = 0.0f;
 
 	// 大きさ
 	Vector3 size_ = { 1.0f,1.0f,1.0f };
+
+	// 遷移するために使用するリスト
+	std::vector<BehaviorWeight> lotteryList_;
 
 private:
 
@@ -175,6 +187,13 @@ private:
 	float moveWaitTimer_ = 0.0f; 
 	float maxMoveWaitTime_ = 2.0f;
 
+	// 間を埋める動作に使用する時間
+	float moveTimer_ = 0.0f;
+
+	
+	float rotateMoveTime_ = 0.0f;
+	float crossMoveTime_ = 3.0f;
+
 	// 風の攻撃 ================================
 
 	float windTimer_ = 0.0f;
@@ -186,11 +205,6 @@ private:
 	bool isActiveWind_ = false;
 
 private: // 各振る舞いの処理
-
-	/// <summary>
-	/// 振る舞いを管理
-	/// </summary>
-	void ControllBehavior();
 
 	// 通常行動のリセット処理
 	void ResetNormal();
@@ -220,6 +234,14 @@ private: // 各振る舞いの処理
 	// 最初の入りにとる行動
 	void ResetInMove();
 	void InMoveUpdate();
+
+	// 円周を回る動き
+	void ResetRotateMove();
+	void RotateMoveUpdate();
+
+	// 横断する動き
+	void ResetCrossMove();
+	void CrossMoveUpdate();
 
 private:
 
@@ -255,6 +277,9 @@ namespace {
 
 	// 距離に応じた時間を求める
 	float GetMoveTimeDistance(float startAngle, float endAngle, float radius, float speed);
+
+	// 0-360度の範囲に抑える
+	float WrapAngle(float angle);
 
 	float EaseOutQuart(float t);
 

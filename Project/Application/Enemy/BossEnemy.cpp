@@ -96,6 +96,9 @@ void BossEnemy::Update(const Vector3& targetPos) {
         //enemyAttackManager_->SetIsRoat(true);
     }
 
+    // 現在の氷柱の数を取得する
+    bossContext_.iceFallCount = enemyAttackManager_->GetCurrentIceFall();
+
     // 風を発射する
     if (bossContext_.isWindAttack_) {
         enemyAttackManager_->StartWindAttack(worldTransform_.transform_.translate);

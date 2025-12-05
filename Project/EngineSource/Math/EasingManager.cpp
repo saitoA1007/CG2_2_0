@@ -99,16 +99,15 @@ Vector3 Slerp(const Vector3& start, const Vector3& end, const float& t) {
 		// 線形補間して正規化
 		interpVec = Normalize(Lerp(startNorm, endNorm, t));
 	} else if(dot < -0.9995f) {
-		//// 少し軸をずらす
-		Vector3 ortho = Cross(startNorm, Vector3(1.0f, 0.0f, 0.0f));
-
+		Vector3 ortho = Cross(startNorm, Vector3(0.0f, 1.0f, 0.0f));
 		if (Length(ortho) < 0.01f) {
-			ortho = Cross(startNorm, Vector3(0.0f, 1.0f, 0.0f));
+			ortho = Cross(startNorm, Vector3(1.0f, 0.0f, 0.0f));
 		}
 		// 回転の基準となる垂直ベクトルを正規化
 		ortho = Normalize(ortho);
 		float theta = PI * t;
 		interpVec = startNorm * std::cosf(theta) + ortho * std::sinf(theta);
+
 	}else {
 		// Slerpの計算
 		float theta = std::acosf(dot);
@@ -123,7 +122,6 @@ Vector3 Slerp(const Vector3& start, const Vector3& end, const float& t) {
 	// 長さの線形補間
 	float magnitudeLerp = Lerp(startMag, endMag, t);
 	return interpVec * magnitudeLerp;
-
 }
 
 Vector3 Bezier(const Vector3& p0, const Vector3& p1, const Vector3& p2, const float& t) {
