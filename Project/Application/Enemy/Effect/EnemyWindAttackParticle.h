@@ -10,6 +10,7 @@ public:
 		Vector4 color;       // 色
 		float lifeTime;      // 生存時間
 		float currentTime;   // 現在の時間
+		float rotateSpeed;   // 回転速度
 		uint32_t textureHandle = 0; // 使用するテクスチャ
 	};
 
