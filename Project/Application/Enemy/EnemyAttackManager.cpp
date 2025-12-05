@@ -5,6 +5,7 @@
 #include"MyMath.h"
 #include<numbers>
 #include"CollisionConfig.h"
+#include"GameParamEditor.h"
 using namespace GameEngine;
 
 GameEngine::PostEffectManager* EnemyAttackManager::postEffectManager_ = nullptr;
@@ -44,10 +45,21 @@ void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectMan
         iceFallEffectData.particle->Initialize("WaitIceFallParticle", 32);
         iceFallEffectDatas_.push_back(std::move(iceFallEffectData));
     }
+
+#ifdef _DEBUG
+    // 値を登録する
+    RegisterBebugParam();
+#endif
+    // 値を適応させる
+    ApplyDebugParam();
 }
 
 void EnemyAttackManager::Update(const Matrix4x4& cameraWorldMatrix, const Matrix4x4& viewMatrix) {
-
+#ifdef _DEBUG
+    // 値を適応させる
+    ApplyDebugParam();
+#endif
+  
     // 演出の更新処理
     EffectUpdate(cameraWorldMatrix, viewMatrix);
 
@@ -77,11 +89,6 @@ void EnemyAttackManager::AddIceFall(const Vector3& pos) {
 void EnemyAttackManager::CreateIceFallPositions() {
 
     if (IceFallsList_.size() != 0) { return; }
-
-	//// 離れる距離
-	const float minDistance = 5.0f;
-	const int targetCount = 3;
-	const int maxIter = 100;
 
     std::vector<Vector2> points;
     int attempts = 0;
@@ -247,6 +254,19 @@ void EnemyAttackManager::WindUpdate() {
     if (windTimer_ >= 1.0f) {
         isWind_ = false;
     }
+}
+
+void EnemyAttackManager::RegisterBebugParam() {
+
+    // 氷柱攻撃
+    GameParamEditor::GetInstance()->AddItem("Boss-IceFall", "minDistance", minDistance);
+    //GameParamEditor::GetInstance()->AddItem("Boss-IceFall", "IceFallCount", targetCount);
+}
+
+void EnemyAttackManager::ApplyDebugParam() {
+    // 氷柱攻撃
+    minDistance = GameParamEditor::GetInstance()->GetValue<float>("Boss-IceFall", "minDistance");
+    //targetCount = GameParamEditor::GetInstance()->GetValue<float>("Boss-IceFall", "IceFallCount");
 }
 
 namespace {

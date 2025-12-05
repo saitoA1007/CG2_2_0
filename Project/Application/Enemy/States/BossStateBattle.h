@@ -160,6 +160,9 @@ private:
 	float rushMainTime_ = 2.0f;
 	float rushOutTime_ = 2.0f;
 
+	// 最終位置の割合
+	float rushEndRatio_ = 0.8f;
+
 	// 突進する位置
 	Vector3 startRushPos_ = {};
 	Vector3 endRushPos_ = {};
@@ -185,7 +188,8 @@ private:
 
 	// 氷柱を出すまでの時間
 	float waitTimer_ = 0.0f;
-	float maxWaitTime_ = 2.0f;
+	float iceFallMaxTime_ = 2.0f;
+
 
 	float rotateTimer_ = 0.0f;
 	float maxRotateTime_ = 1.0f;
