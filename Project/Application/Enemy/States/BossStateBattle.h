@@ -96,6 +96,12 @@ private:
 		Out,  // 元の位置に戻る
 	};
 
+	enum class WindPhase {
+		In,   // ブレスを吐く方向を向く
+		Main, // ブレスを吐く
+		Out,  // 元の向きに戻る
+	};
+
 	// 保存するグループ名
 	const std::vector<std::string> kGroupNames = {
 		"Boss-Rush",
@@ -227,7 +233,13 @@ private:
 	Vector3 startPos_;
 	Vector3 endPos_;
 
-	bool isActiveWind_ = false;
+	// 風の時間
+	float windInTime_ = 1.0f;
+	float windMainTime_ = 5.0f;
+	float windOutTime_ = 1.0f;
+
+	// ブレスのフェーズ
+	WindPhase windPhase_ = WindPhase::In;
 
 private: // 各振る舞いの処理
 

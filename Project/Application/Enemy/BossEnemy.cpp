@@ -101,7 +101,7 @@ void BossEnemy::Update(const Vector3& targetPos) {
 
     // 風を発射する
     if (bossContext_.isWindAttack_) {
-        enemyAttackManager_->StartWindAttack(worldTransform_.transform_.translate);
+        enemyAttackManager_->StartWindAttack(worldTransform_.transform_.translate, bossContext_.windMaxTime_);
     }
 
     // 行列を更新する

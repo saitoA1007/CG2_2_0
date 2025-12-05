@@ -105,6 +105,8 @@ void BossStateBattle::ResetNormal() {
 		randomValue -= item.weight;
 	}
 
+	//selectButtleBehavior_ = ButtleBehavior::WindAttack;
+
 	//Log("randValue : " + std::to_string(randomValue));
 
 	// 突進が選ばれた場合に距離が短過ぎる場合は移動させる
@@ -454,13 +456,8 @@ void BossStateBattle::ResetWind() {
 	// 時間をリセット
 	windTimer_ = 0.0f;
 	bossContext_.isWindAttack_ = false;
-	isActiveWind_ = false;
-
-	// 円の中心から自分へのベクトルを求める
-	//Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
-	//startDir_ = myDir;
-	//endDir_ = myDir * -1.0f;
-
+	bossContext_.windMaxTime_ = windMainTime_;
+	
 	// 角度を求める
 	Vector3 dir = Normalize(Vector3(-bossContext_.worldTransform->transform_.translate.x, 0.0f, -bossContext_.worldTransform->transform_.translate.z));
 	float angle = std::numbers::pi_v<float> / 4.0f;
@@ -469,61 +466,61 @@ void BossStateBattle::ResetWind() {
 	startPos_ = { dir.x * cos - dir.z * sin,0.0f,dir.x * sin + dir.z * cos };
 	endPos_ = { dir.x * cos - dir.z * -sin,0.0f,dir.x * -sin + dir.z * cos };
 
+	// InPhaseの最初の方向
+	startDir_ = dir;
+	// outPhaseの最後の方向
+	//endDir_ = dir;
+
 	// アニメーション
 	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_Prepare"]);
 	bossContext_.animationTimer = 0.0f;
 
-	isMidAnimation_ = false;
-	isEndANimation_ = false;
+	/*isMidAnimation_ = false;
+	isEndANimation_ = false;*/
+
+	windPhase_ = WindPhase::In;
 }
 
 void BossStateBattle::WindAttackUpdate() {
 
-	// 予備動作のアニメーション
-#pragma region BreathAnimation
+	// 風攻撃
+	switch (windPhase_)
+	{
+	case BossStateBattle::WindPhase::In: {
+#pragma region WindIn
 
-	if (isMidAnimation_) {
+		windTimer_ += FpsCounter::deltaTime / windInTime_;
+		bossContext_.animationTimer = windTimer_;
 
-		if (!isEndANimation_) {
-			// 中間
-			bossContext_.animationTimer += FpsCounter::deltaTime / 0.5f;
+		// 回転
+		Vector3 dir = Slerp(startDir_, startPos_, windTimer_);
+		// Y軸周りの角度
+		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.z, dir.x);
 
-			// 突進行動に移行
-			if (bossContext_.animationTimer >= 1.0f) {
-				isEndANimation_ = true;
-				bossContext_.animationTimer = 0.0f;
-				AnimationData animation = (*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_End"];
-				bossContext_.animationMaxTime = animation.duration;
-				bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_End"]);
-			}
-		}
-	} else {
+		// ブレスを吐く方向を向く
+		if (windTimer_ >= 1.0f) {
+			windTimer_ = 0.0f;
 
-		// 回転するまでの動き
-		bossContext_.animationTimer += FpsCounter::deltaTime / 2.0f;
-
-		// 中間動作に移行
-		if (bossContext_.animationTimer >= 1.0f) {
-			isMidAnimation_ = true;
-			bossContext_.animationTimer = 0.0f;
+			// アニメーション
 			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_Main"]);
-		}
-	}
-#pragma endregion
-
-	if (isMidAnimation_ && isEndANimation_) {
-
-		if (!isActiveWind_) {
+			bossContext_.animationTimer = 0.0f;
 			bossContext_.isWindAttack_ = true;
-			isActiveWind_ = true;
-		} else {
-			// 一度発射したらfalseにする
-			if (bossContext_.isWindAttack_) {
-				bossContext_.isWindAttack_ = false;
-			}
+
+			// フェーズを切り替え
+			windPhase_ = WindPhase::Main;
+		}
+#pragma endregion
+		break;
+	}
+
+	case BossStateBattle::WindPhase::Main: {
+#pragma region WindMain
+
+		if (bossContext_.isWindAttack_) {
+			bossContext_.isWindAttack_ = false;
 		}
 
-		windTimer_ += FpsCounter::deltaTime / maxWindTime_;
+		windTimer_ += FpsCounter::deltaTime / windMainTime_;
 		bossContext_.animationTimer = windTimer_;
 
 		// 回転
@@ -531,11 +528,42 @@ void BossStateBattle::WindAttackUpdate() {
 		// Y軸周りの角度
 		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
 
-		// 待機の終了
+		// ブレスを吐く方向を向く
 		if (windTimer_ >= 1.0f) {
+			windTimer_ = 0.0f;
+
+			// アニメーション
+			//bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_End"]);
+			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
+			bossContext_.animationTimer = 0.0f;
+
+			// フェーズを切り替え
+			windPhase_ = WindPhase::Out;
+		}
+#pragma endregion
+		break;
+	}
+
+	case BossStateBattle::WindPhase::Out: {
+#pragma region WindOut
+		windTimer_ += FpsCounter::deltaTime / windOutTime_;
+		bossContext_.animationTimer = windTimer_;
+
+		// 回転
+		Vector3 dir = Slerp(endPos_, startDir_, windTimer_);
+		// Y軸周りの角度
+		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.z, dir.x);
+
+		// ブレスを吐く方向を向く
+		if (windTimer_ >= 1.0f) {
+			windTimer_ = 0.0f;
+
 			// 振る舞いの切り替えをリクエスト
 			behaviorRequest_ = ButtleBehavior::Normal;
 		}
+#pragma endregion
+		break;
+	}
 	}
 }
 
@@ -912,6 +940,11 @@ void BossStateBattle::RegisterBebugParam() {
 	// 氷柱攻撃
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "IceFallTime", iceFallMaxTime_);
 
+	// 風攻撃
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WindInTime", windInTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WindMainTime", windMainTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WindOutTime", windOutTime_);
+
 	// 回転移動
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "RotateTimeRatio", rotateTimeRatio_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "RotateMoveRadiusRatio", RotateMoveRadiusRatio_);
@@ -944,6 +977,11 @@ void BossStateBattle::ApplyDebugParam() {
 
 	// 氷柱攻撃
 	iceFallMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "IceFallTime");
+
+	// 風攻撃
+	windInTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WindInTime");
+	windMainTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WindMainTime");
+	windOutTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WindOutTime");
 
 	// 回転行動
 	rotateTimeRatio_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "RotateTimeRatio");

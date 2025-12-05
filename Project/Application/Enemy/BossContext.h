@@ -38,6 +38,7 @@ struct BossContext {
 
 	// 風攻撃の演出を管理
 	bool isWindAttack_ = false;
+	float windMaxTime_ = 0.0f;
 
 	// アニメーションデータ
 	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)>* animationData_;

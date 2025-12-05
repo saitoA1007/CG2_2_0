@@ -182,8 +182,9 @@ void EnemyAttackManager::RoatUpdate() {
     }
 }
 
-void EnemyAttackManager::StartWindAttack(const Vector3& pos) {
+void EnemyAttackManager::StartWindAttack(const Vector3& pos, const float& maxTime) {
     if (isWind_) { return; }
+    maxWindTime_ = maxTime;
     centerPos_ = pos;
     // 円の中心へのベクトルを求める
     Vector3 dir = Normalize(Vector3(-pos.x, 0.0f, -pos.z));
