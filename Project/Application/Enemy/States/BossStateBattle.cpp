@@ -926,6 +926,10 @@ void BossStateBattle::CrossMoveUpdate() {
 }
 
 void BossStateBattle::RegisterBebugParam() {
+
+	// ボスの基礎要素
+	GameParamEditor::GetInstance()->AddItem("Boss", "DefaultsPosY", defalutPosY_);
+
 	// 突進攻撃
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "RushTime", rushMainTime_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "OffestEndRush", offsetEndRush_);
@@ -943,6 +947,9 @@ void BossStateBattle::RegisterBebugParam() {
 }
 
 void BossStateBattle::ApplyDebugParam() {
+	// ボスの基礎要素
+	defalutPosY_ = GameParamEditor::GetInstance()->GetValue<float>("Boss", "DefaultsPosY");
+
 	// 突進攻撃
 	rushMainTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "RushTime");
 	offsetEndRush_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "OffestEndRush");
