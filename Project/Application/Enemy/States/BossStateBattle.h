@@ -192,6 +192,8 @@ private:
 
 	bool isActiveIceFall_ = false;
 
+	float ratio_ = 0.0f;
+
 	// 待機行動 ================================
 
 	// 待機時間
@@ -204,7 +206,8 @@ private:
 	// タイマーは円の長さによって可変
 	float rotateMoveTime_ = 0.0f;
 	// 回転移動の調整項目
-
+	float rotateTimeRatio_ = 1.0f;
+	float RotateMoveRadiusRatio_ = 1.0f;
 
 	// 横断行動の調整項目
 	float crossMoveTime_ = 3.0f; // 移動する時間
