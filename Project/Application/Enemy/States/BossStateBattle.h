@@ -201,9 +201,16 @@ private:
 	// 間を埋める動作に使用する時間
 	float moveTimer_ = 0.0f;
 
-	
+	// タイマーは円の長さによって可変
 	float rotateMoveTime_ = 0.0f;
-	float crossMoveTime_ = 3.0f;
+	// 回転移動の調整項目
+
+
+	// 横断行動の調整項目
+	float crossMoveTime_ = 3.0f; // 移動する時間
+	float crossEndRatio_ = 0.8f; // 最後の位置の割合
+	uint32_t upDownCount_ = 3; // 上下移動する回数
+	float maxMoveHeight_ = 2.0f; // 最大で動く回数
 
 	// 風の攻撃 ================================
 
