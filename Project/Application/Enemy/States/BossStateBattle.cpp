@@ -705,6 +705,7 @@ void BossStateBattle::ResetRotateMove() {
 		rotateMoveTime_ = 1.0f;
 	} else {
 		rotateMoveTime_ = GetMoveTimeDistance(startAngle, endAngle, stageRadius_, rotSpeed_);
+		rotateMoveTime_ *= rotateTimeRatio_;
 	}
 
 	// 軌跡を登録
@@ -719,7 +720,7 @@ void BossStateBattle::ResetRotateMove() {
 		float angle = LerpShortAngle(startAngle, endAngle, t);
 
 		// 位置を求める
-		Vector3 pos = { std::cosf(angle) * (stageRadius_), bossContext_.worldTransform->transform_.translate.y,std::sinf(angle) * (stageRadius_) };
+		Vector3 pos = { std::cosf(angle) * (stageRadius_ * RotateMoveRadiusRatio_),defalutPosY_,std::sinf(angle) * (stageRadius_ * RotateMoveRadiusRatio_) };
 
 		controlPoints_.push_back(pos);
 	}
@@ -934,6 +935,10 @@ void BossStateBattle::RegisterBebugParam() {
 	// 氷柱攻撃
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "IceFallTime", maxWaitTime_);
 
+	// 回転移動
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "RotateTimeRatio", rotateTimeRatio_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "RotateMoveRadiusRatio", RotateMoveRadiusRatio_);
+
 	// 横断行動
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "CrossMoveTime", crossMoveTime_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "CrossEndRatio", crossEndRatio_);
@@ -959,6 +964,10 @@ void BossStateBattle::ApplyDebugParam() {
 
 	// 氷柱攻撃
 	maxWaitTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "IceFallTime");
+
+	// 回転行動
+	rotateTimeRatio_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "RotateTimeRatio");
+	RotateMoveRadiusRatio_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "RotateMoveRadiusRatio");
 
 	// 横断行動
 	crossMoveTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "CrossMoveTime");
