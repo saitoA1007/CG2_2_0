@@ -48,6 +48,12 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
     bodyCollider_->SetWorldPosition(worldTransform_.transform_.translate);
     bodyCollider_->SetCollisionAttribute(kCollisionAttributeEnemy);
     bodyCollider_->SetCollisionMask(~kCollisionAttributeEnemy);
+
+    // データ設定（IDのみ暫定）
+    UserData userData;
+    userData.typeID = static_cast<uint32_t>(CollisionTypeID::Boss);
+    userData.object = this;
+    bodyCollider_->SetUserData(userData);
     // 当たり判定の関数を登録する
     bodyCollider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
         this->OnCollisionEnter(result);
