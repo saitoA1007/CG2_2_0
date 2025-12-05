@@ -89,6 +89,9 @@ public:
 	// 風の速度を取得
 	Vector3 GetWindVelocity() const { return windVelocity_; }
 
+	// 現在の氷柱の数
+	uint32_t GetCurrentIceFall() { return static_cast<uint32_t>(IceFallsList_.size()); }
+
 private:
 
 	// ポストエフェクトの管理
