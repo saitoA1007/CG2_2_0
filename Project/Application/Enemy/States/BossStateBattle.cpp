@@ -381,6 +381,40 @@ void BossStateBattle::RushAttackUpdate() {
 			// アニメーション
 			bossContext_.animationTimer = 0.0f;
 			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"]);
+
+			// 突進する位置を求める
+#pragma region SetRushPos
+			// ボスの位置から突進の最後の位置へベクトル
+			Vector3 myDir = Normalize(endRushPos_ - Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
+
+			 // 始点と終点の角度を求める
+			float angle = std::numbers::pi_v<float> / 6.0f;
+			float cos = std::cosf(angle);
+			float sin = std::sinf(angle);
+			Vector3 startDir = { myDir.x * cos - myDir.z * sin,0.0f,myDir.x * sin + myDir.z * cos };
+			Vector3 endDir = { myDir.x * cos - myDir.z * -sin,0.0f,myDir.x * -sin + myDir.z * cos };
+
+			// ボスの位置からターゲットの位置へのベクトル
+			Vector3 targetDir = Normalize(Vector3(bossContext_.targetPos.x, 0.0f, bossContext_.targetPos.z) -
+				Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
+
+			// 内積を求める
+			float clampDot = Dot(myDir,endDir);
+			float targetDot = Dot(myDir,targetDir);
+
+			// 30度範囲におさまっている場合
+			if (1.0f >= targetDot && targetDot >= clampDot) {
+				// 突進の最後の位置を設定
+				targetDir = Normalize(Vector3(bossContext_.targetPos.x, 0.0f, bossContext_.targetPos.z));
+				float tmpAngle = std::atan2f(targetDir.z, targetDir.x);
+				endRushPos_ = { std::cosf(tmpAngle) * (stageRadius_ + offsetEndRush_),0.0f,std::sinf(tmpAngle) * (stageRadius_ + offsetEndRush_) };
+
+				// 向きを設定する
+				Vector3 rotDir = endRushPos_ - startRushPos_;
+				rotDir = Normalize(Vector3(rotDir.x, 0.0f, rotDir.z));
+				bossContext_.worldTransform->transform_.rotate.y = std::atan2f(rotDir.x, rotDir.z);
+			}
+#pragma endregion
 		}
 #pragma endregion
 		break;
@@ -406,7 +440,7 @@ void BossStateBattle::RushAttackUpdate() {
 		// 速度を求める
 		Vector3 next = Lerp(startRushPos_, endRushPos_, EaseIn(rushTimer_ + FpsCounter::deltaTime / rushMainTime_));
 		bossContext_.rushVelocity = next - tmpPos;
-
+		
 		// アニメーション
 		if (rushTimer_ <= 0.2f) {
 			float localT = rushTimer_ / 0.2f;
