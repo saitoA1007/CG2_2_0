@@ -52,14 +52,14 @@ public:
 	bool IsRushCollisionActive() const { return bossContext_.isRushCollisionActive_; }
 
 	// 現在のhpを取得
-	uint32_t GetCurrentHP() const { return bossContext_.hp; }
+	int32_t GetCurrentHP() const { return bossContext_.hp; }
 	// 最大hp
-	uint32_t GetMaxHp() const { return kMaxHp_; }
+	int32_t GetMaxHp() const { return kMaxHp_; }
 
 private: // 調整項目
 
 	// 最大体力
-	uint32_t kMaxHp_ = 2;
+	int32_t kMaxHp_ = 2;
 
 	float scale_ = 1.0f;
 

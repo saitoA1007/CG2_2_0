@@ -3,7 +3,7 @@
 #include"FPSCounter.h"
 using namespace GameEngine;
 
-void BossHpUI::Initialize(const uint32_t& maxHp) {
+void BossHpUI::Initialize(const int32_t& maxHp) {
 
 	maxHp_ = maxHp;
 	currentHp_ = maxHp_;

@@ -17,7 +17,7 @@ public:
 	/// 初期化処理
 	/// </summary>
 	/// <param name="maxHp"></param>
-	void Initialize(const uint32_t& maxHp);
+	void Initialize(const int32_t& maxHp);
 
 	/// <summary>
 	/// 更新処理
@@ -26,7 +26,7 @@ public:
 
 public:
 
-	void SetCurrentHp(const uint32_t& hp) { currentHp_ = hp; }
+	void SetCurrentHp(const int32_t& hp) { currentHp_ = hp; }
 
 	/// <summary>
 	/// 画像データを取得
@@ -47,10 +47,10 @@ private:
 	float preScaleX_ = 1.0f;
 
 	// 最大hp
-	uint32_t maxHp_ = 0;
+	int32_t maxHp_ = 0;
 
 	// 現在のhp
-	uint32_t currentHp_ = 0;
+	int32_t currentHp_ = 0;
 
 	// 演出用のhpゲージが移動する位置
 	std::list<Point> points_;
