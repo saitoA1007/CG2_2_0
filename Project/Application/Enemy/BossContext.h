@@ -32,6 +32,7 @@ struct BossContext {
 	bool isActiveIceFall = false;
 	// 現在の氷柱の数
 	uint32_t iceFallCount = 0;
+	float waitIceFallMaxTime = 1.0f;
 
 	// 突進攻撃の演出を管理
 	bool isRushAttack_ = false;
