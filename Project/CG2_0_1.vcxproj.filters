@@ -296,6 +296,9 @@
     <ClCompile Include="Application\Graphics\BgRock.cpp" />
     <ClCompile Include="Application\UI\BossHpUI.cpp" />
     <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.cpp" />
+    <ClCompile Include="Application\Player\Effect\PlayerChargeEffect.cpp" />
+    <ClCompile Include="Application\Player\Effect\PlayerRushEffect.cpp" />
+    <ClCompile Include="Application\Player\Effect\PlayerAttackDownEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -596,6 +599,9 @@
     <ClInclude Include="Application\Graphics\BgRock.h" />
     <ClInclude Include="Application\UI\BossHpUI.h" />
     <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.h" />
+    <ClInclude Include="Application\Player\Effect\PlayerChargeEffect.h" />
+    <ClInclude Include="Application\Player\Effect\PlayerRushEffect.h" />
+    <ClInclude Include="Application\Player\Effect\PlayerAttackDownEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

@@ -72,6 +72,12 @@ void CameraController::Initialize() {
 	desiredTargetRotate_ = targetRotate_;
 	desiredTargetFov_ = targetFov_;
 	prevTargetPos_ = targetPos_;
+	// view offset initialize
+	viewOffsetEnabled_ = false;
+	viewOffsetDesiredEye_ = {0.0f,0.0f,0.0f};
+	viewOffsetDesiredLook_ = {0.0f,0.0f,0.0f};
+	viewOffsetCurrentEye_ = {0.0f,0.0f,0.0f};
+	viewOffsetCurrentLook_ = {0.0f,0.0f,0.0f};
 }
 
 void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine::Input* rawInput) {
@@ -136,6 +142,22 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine
 
 	if (!isAnimationPlaying_) {
 		ApplyAutoRotate(eye, center);
+	}
+
+	// 視点オフセットの適用（現在値へ補間）
+	if (viewOffsetEnabled_) {
+		float bs = std::clamp(viewOffsetBlendSpeed_, 0.0f, 1.0f);
+		viewOffsetCurrentEye_ = Lerp(viewOffsetCurrentEye_, viewOffsetDesiredEye_, bs);
+		viewOffsetCurrentLook_ = Lerp(viewOffsetCurrentLook_, viewOffsetDesiredLook_, bs);
+		eye = { eye.x + viewOffsetCurrentEye_.x, eye.y + viewOffsetCurrentEye_.y, eye.z + viewOffsetCurrentEye_.z };
+		center = { center.x + viewOffsetCurrentLook_.x, center.y + viewOffsetCurrentLook_.y, center.z + viewOffsetCurrentLook_.z };
+	} else {
+		// disable時はスムーズにゼロへ戻す
+		float bs = std::clamp(viewOffsetBlendSpeed_, 0.0f, 1.0f);
+		viewOffsetCurrentEye_ = Lerp(viewOffsetCurrentEye_, Vector3{0.0f,0.0f,0.0f}, bs);
+		viewOffsetCurrentLook_ = Lerp(viewOffsetCurrentLook_, Vector3{0.0f,0.0f,0.0f}, bs);
+		eye = { eye.x + viewOffsetCurrentEye_.x, eye.y + viewOffsetCurrentEye_.y, eye.z + viewOffsetCurrentEye_.z };
+		center = { center.x + viewOffsetCurrentLook_.x, center.y + viewOffsetCurrentLook_.y, center.z + viewOffsetCurrentLook_.z };
 	}
 
 	// シェイク: 現在のオフセットを更新する（実際の適用はworldMatrix構築後に行う）
@@ -355,7 +377,7 @@ void CameraController::UpdateAnimation() {
 		size_t &idx = fovAnimationState_.currentIndex;
 		while (idx + 1 < fovAnimationState_.keyframes.size() &&
 			animationTime_ >= fovAnimationState_.keyframes[idx + 1].time) {
-			idx++;
+		 idx++;
 		}
 	}
 

@@ -159,6 +159,19 @@ void TDGameScene::Initialize(SceneContext* context) {
     playerAnimator_->Initialize(playerModel_, &playerAnimationData_[static_cast<size_t>(PlayerAnimationType::Walk)]["歩き"]);
 	player_->Initialize(playerAnimator_.get(), playerAnimationData_);
 	
+    // プレイヤーのエフェクト初期化
+    playerChargeEffect_ = std::make_unique<PlayerChargeEffect>();
+    playerChargeEffect_->Initialize();
+    playerChargeEffect_->SetParent(&player_->GetWorldTransform());
+
+    playerRushEffect_ = std::make_unique<PlayerRushEffect>();
+    playerRushEffect_->Initialize();
+    playerRushEffect_->SetParent(&player_->GetWorldTransform());
+
+    playerAttackDownEffect_ = std::make_unique<PlayerAttackDownEffect>();
+    playerAttackDownEffect_->Initialize();
+    playerAttackDownEffect_->SetParent(&player_->GetWorldTransform());
+
     // カメラコントローラークラスを初期化
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
@@ -218,6 +231,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 	iceFallModel_->SetDefaultIsEnableLight(true);
 	// 突進攻撃演出モデル
 	enemyRushModel_ = context_->modelManager->GetNameByModel("RushWave");
+	// プレイヤー用エフェクトのモデルも同じものを使用
+	playerChargeEffectModel_ = enemyRushModel_;
+	playerRushEffectModel_ = enemyRushModel_;
+	playerAttackDownEffectModel_ = enemyRushModel_;
 	// 風攻撃演出モデル
 	windModel_ = context_->modelManager->GetNameByModel("Wind");
 
@@ -310,6 +327,11 @@ void TDGameScene::Update() {
 	// プレイヤーの影の更新処理
 	playerShadow_->Update();
 
+    // プレイヤーのエフェクト更新処理
+    playerChargeEffect_->Update();
+    playerRushEffect_->Update();
+    playerAttackDownEffect_->Update();
+
 	// ロックオン: 入力が有効ならプレイヤーとボスの位置をターゲットに設定
 	if (context_->inputCommand->IsCommandActive("LockOnBoss")) {
 		isBossLockOn_ = !isBossLockOn_;
@@ -337,6 +359,17 @@ void TDGameScene::Update() {
         desiredFov = 0.4f + static_cast<float>(3 - rushLevel) * 0.1f;
 	}
 	cameraController_->SetDesiredFov(desiredFov);
+
+	// ジャンプ中は見下ろし視点オフセットを適用
+	if (player_->IsJump()) {
+		// 斜め上から俯瞰するように、カメラ位置を上方向に、注視点を少し下へ
+		Vector3 eyeOffset{ 0.0f, 16.0f, 0.0f };
+		Vector3 lookOffset{ 0.0f, -4.0f, 0.0f };
+		cameraController_->SetViewOffset(eyeOffset, lookOffset, 0.2f);
+		cameraController_->EnableViewOffset(true);
+	} else {
+		cameraController_->EnableViewOffset(false);
+	}
 
 	cameraController_->Update(context_->inputCommand, context_->input);
 	mainCamera_->SetCamera(cameraController_->GetCamera());
@@ -482,6 +515,23 @@ void TDGameScene::Draw(const bool& isDebugView) {
 
 	// 3Dモデルの両面描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);
+
+    // プレイヤーのエフェクト描画
+	if (player_->IsCharging()) {
+		for (auto &chargeEffect : playerChargeEffect_->GetWorldTransforms()) {
+			ModelRenderer::Draw(playerChargeEffectModel_, chargeEffect);
+		}
+    }
+    if (player_->IsRushing()) {
+		for (auto &rushEffect : playerRushEffect_->GetWorldTransforms()) {
+			ModelRenderer::Draw(playerRushEffectModel_, rushEffect);
+		}
+    }
+    if (player_->IsAttackDown()) {
+        for (auto &attackDownEffect : playerAttackDownEffect_->GetWorldTransforms()) {
+			ModelRenderer::Draw(playerAttackDownEffectModel_, attackDownEffect);
+        }
+    }
 
 	// ボスの突進攻撃の描画
 	if (bossEnemy_->IsRushAttack()) {

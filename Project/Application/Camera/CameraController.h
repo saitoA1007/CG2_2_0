@@ -16,7 +16,7 @@ struct AnimationKeyframe {
 template<typename T>
 struct AnimationState {
 	std::vector<AnimationKeyframe<T>> keyframes; // キーフレーム配列
-    size_t currentIndex = 0;	// 現在のキーフレームインデックス
+    size_t currentIndex = 0; 	// 現在のキーフレームインデックス
 };
 
 class CameraController {
@@ -133,6 +133,22 @@ public:
 		isAnimationPlaying_ = true;
     }
 
+	/// <summary>
+	/// 一時的な視点オフセットを設定 (カメラ位置/注視点に加算)。シーン側でトグル可能。
+	/// </summary>
+	/// <param name="eyeOffset">ワールド座標系のカメラ位置オフセット</param>
+	/// <param name="lookAtOffset">ワールド座標系の注視点オフセット</param>
+	/// <param name="blendSpeed">現在値へ補間する速度係数</param>
+	void SetViewOffset(const Vector3& eyeOffset, const Vector3& lookAtOffset, float blendSpeed = 0.12f) {
+		viewOffsetDesiredEye_ = eyeOffset;
+		viewOffsetDesiredLook_ = lookAtOffset;
+		viewOffsetBlendSpeed_ = blendSpeed;
+	}
+	/// <summary>
+	/// 視点オフセットの有効/無効
+	/// </summary>
+	void EnableViewOffset(bool enable) { viewOffsetEnabled_ = enable; }
+
 private:
 
 	// カメラ
@@ -222,6 +238,14 @@ private:
 	float animationPlaySpeed_ = 1.0f;
 	// 再生中フラグ
 	bool isAnimationPlaying_ = false;
+
+	//--------- 一時ビューオフセット ---------//
+	bool viewOffsetEnabled_ = false;
+	Vector3 viewOffsetDesiredEye_ = {0.0f,0.0f,0.0f};
+	Vector3 viewOffsetDesiredLook_ = {0.0f,0.0f,0.0f};
+	Vector3 viewOffsetCurrentEye_ = {0.0f,0.0f,0.0f};
+	Vector3 viewOffsetCurrentLook_ = {0.0f,0.0f,0.0f};
+	float viewOffsetBlendSpeed_ = 0.12f;
 
 private:
 	void UpdateTargetVector3(const Vector3& v);
