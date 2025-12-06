@@ -107,12 +107,27 @@ PixelShaderOutput main(VertexShaderOutput input)
     // diffuse+specular+rim
     tmpColor += diffuseDirectionalLight + specularDirectionalLight + rimLight;
     
+    // cameraDirection
+    float32_t3 halfVector2 = normalize(-gDirectionalLight.direction + toEye);
+    //float NDotH2 = dot(normalize(input.normal), halfVector2);
+    //float specularPow2 = pow(saturate(NDotH2), 30.0f); // 反射強度
+    // // 鏡面反射
+    //float32_t3 specularDirectionalLight2 = gDirectionalLight.color.rgb * 1.0f * specularPow2 * float32_t3(0.8f,0.8f,0.8f);
+    
+    //float3 tangentRef = normalize(float3(1.0f, 1.0f, 0.0f));
+    //float3 tangent2 = normalize(cross(input.normal, tangentRef));
+    //float TDotH = dot(tangent2, halfVector2);
+    //float anisoFactor = sqrt(max(0.0f, 1.0f - TDotH * TDotH));
+    //float specularPow2 = pow(saturate(anisoFactor), 250.0f);
+    //float32_t3 specularDirectionalLight2 = gDirectionalLight.color.rgb * 1.0f * specularPow2 * float32_t3(0.8f, 0.8f, 0.8f);
+    
     // 最終的な色を適応  
     float32_t4 resultColor = { 0.0f, 0.0f, 0.0f,0.0f };
     resultColor.rgb = tmpColor;
     resultColor.a = gMaterial.color.a;
     
     output.color = (baseTextureColor * gMaterial.baseColor) + (resultColor * gMaterial.time);
+    //output.color.rgb += specularDirectionalLight2 * 0.1f;
     
     if (output.color.a == 0.0)
     {

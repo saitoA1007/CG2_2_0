@@ -1,15 +1,15 @@
-#include"EnemyWindAttackParticle.h"
+#include"WingsParticle.h"
 #include"FPSCounter.h"
 #include"RandomGenerator.h"
 #include"GameParamEditor.h"
 using namespace GameEngine;
 
-void EnemyWindAttackParticle::Initialize(const uint32_t& texture) {
+void WingsParticleParticle::Initialize(const uint32_t& texture) {
 	// 画像を取得
 	particleGH_ = texture;
 
 	// パーティクルが発生する位置を設定
-	emitterPos_ = {0.0f,-10.0f,0.0f};
+	emitterPos_ = { 0.0f,-10.0f,0.0f };
 
 	// ワールド行列の初期化
 	worldTransforms_ = std::make_unique<WorldTransforms>();
@@ -29,7 +29,7 @@ void EnemyWindAttackParticle::Initialize(const uint32_t& texture) {
 	ApplyDebugParam();
 }
 
-void EnemyWindAttackParticle::Update() {
+void WingsParticleParticle::Update() {
 #ifdef _DEBUG
 	ApplyDebugParam();
 #endif
@@ -46,7 +46,7 @@ void EnemyWindAttackParticle::Update() {
 	worldTransforms_->UpdateTransformMatrix(numInstance_);
 }
 
-EnemyWindAttackParticle::ParticleData EnemyWindAttackParticle::MakeNewParticle() {
+WingsParticleParticle::ParticleData WingsParticleParticle::MakeNewParticle() {
 	ParticleData particleData;
 	// SRTを設定
 	float scale = RandomGenerator::Get(1.0f, 2.0f);
@@ -57,7 +57,7 @@ EnemyWindAttackParticle::ParticleData EnemyWindAttackParticle::MakeNewParticle()
 	// 速度
 	particleData.velocity = baseVelocity_;
 	// 色
-	particleData.color = {1.0f,1.0f,1.0f,1.0f};
+	particleData.color = { 1.0f,1.0f,1.0f,1.0f };
 	// 時間の設定
 	particleData.lifeTime = lifeTime_;
 	particleData.currentTime = 0.0f;
@@ -68,13 +68,13 @@ EnemyWindAttackParticle::ParticleData EnemyWindAttackParticle::MakeNewParticle()
 	return particleData;
 }
 
-void EnemyWindAttackParticle::Create() {
+void WingsParticleParticle::Create() {
 	// 経過時間を加算
 	timer_ += FpsCounter::deltaTime;
 
 	// 0.1秒経過したら生成処理
 	if (timer_ >= coolTime_) {
-		int spawnCount = 2; // まとめて出す数
+		int spawnCount = 1; // まとめて出す数
 		for (uint32_t i = 0; i < kNumMaxInstance && spawnCount > 0; ++i) {
 			if (particleDatas_[i].lifeTime < particleDatas_[i].currentTime) {
 				particleDatas_[i] = MakeNewParticle();
@@ -87,7 +87,7 @@ void EnemyWindAttackParticle::Create() {
 	}
 }
 
-void EnemyWindAttackParticle::Move() {
+void WingsParticleParticle::Move() {
 	// 移動処理
 	numInstance_ = 0;
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
@@ -129,13 +129,13 @@ void EnemyWindAttackParticle::Move() {
 	}
 }
 
-void EnemyWindAttackParticle::RegisterBebugParam() {
+void WingsParticleParticle::RegisterBebugParam() {
 	int index = 0;
 	GameParamEditor::GetInstance()->AddItem(name_, "SpawnCoolTime", coolTime_, index++);
 	GameParamEditor::GetInstance()->AddItem(name_, "LifeTime", lifeTime_, index++);
 }
 
-void EnemyWindAttackParticle::ApplyDebugParam() {
+void WingsParticleParticle::ApplyDebugParam() {
 	coolTime_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "SpawnCoolTime");
 	lifeTime_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "LifeTime");
 }

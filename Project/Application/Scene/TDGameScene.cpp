@@ -219,7 +219,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// ボスの突進攻撃の初期化
 	enemyRushEffect_ = std::make_unique<EnemyRushEffect>();
-	enemyRushEffect_->Initialize();
+	enemyRushEffect_->Initialize(context_->textureManager->GetHandleByName("circle.png"));
 	enemyRushEffect_->SetParent(&bossEnemy_->GetWorldTransform());
 
 	// ボスの風攻撃の初期化
@@ -384,8 +384,14 @@ void TDGameScene::Update() {
 	// 敵の影の更新処理
 	bossEnemyShadow_->Update();
 	// 突進攻撃演出の更新処理
-	enemyRushEffect_->Update();
+	if (bossEnemy_->IsRushAttack()) {
+		enemyRushEffect_->SetActiveParticle(true, bossEnemy_->GetWorldPosition(), bossEnemy_->GetRushVelocity());
+	} else {
+		enemyRushEffect_->SetActiveParticle(false, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,1.0f });
+	}
+	enemyRushEffect_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
+	// 風攻撃演出の更新処理
 	if (enemyAttackManager_->IsWind()) {
 		enemyWindAttackParticle_->SetIsLoop(true);
 		enemyWindAttackParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition());
@@ -393,9 +399,12 @@ void TDGameScene::Update() {
 	} else {
 		enemyWindAttackParticle_->SetIsLoop(false);
 	}
-	
-	// 風攻撃演出の更新処理
 	enemyWindAttackParticle_->Update();
+
+	// ボスがヒットした時の演出
+	if (bossEnemy_->IsHit()) {
+		bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,bossEnemy_->GetAlpha() });
+	}
 
 	// ステージの更新処理
 	stageManager_->Update();
@@ -414,7 +423,6 @@ void TDGameScene::Update() {
 	// ボスが常に纏っているパーティクル
 	bossWearParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition());
 	bossWearParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
-
 	bossWearAdditionParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition());
 	bossWearAdditionParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
@@ -471,15 +479,6 @@ void TDGameScene::Draw(const bool& isDebugView) {
 
 	// ステージを描画する
 	stageManager_->Draw(wallModel_);
-
-	// StageWallPlaneの描画 (IceMaterial via CustomRenderer)
-	// Set CustomRenderer camera and draw
-
-	//// プレイヤーを描画
-	//ModelRenderer::DrawLight(sceneLightingController_->GetResource());
-	//ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
-	//// プレイヤーの影描画
-	//ModelRenderer::Draw(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
 
 	// 氷柱のモデルを描画
 	const std::list<std::unique_ptr<IceFall>>& iceFalls = enemyAttackManager_->GetIceFalls();
@@ -545,11 +544,6 @@ void TDGameScene::Draw(const bool& isDebugView) {
 
 	// ボスの風攻撃を描画
 	ModelRenderer::DrawInstancing(windModel_, enemyWindAttackParticle_->GetCurrentNumInstance(), *enemyWindAttackParticle_->GetWorldTransforms());
-	
-	//// 複数モデルの描画前処理
-	//ModelRenderer::PreDraw(RenderMode3D::Instancing);
-	//// ボスの纏っているパーティクルを描画
-	////ModelRenderer::DrawInstancing(planeModel_, bossWearParticle_->GetCurrentNumInstance(), *bossWearParticle_->GetWorldTransforms());
 
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
@@ -559,6 +553,9 @@ void TDGameScene::Draw(const bool& isDebugView) {
 		if (!iceFallEffect.isActive) { continue; }
 		ModelRenderer::DrawInstancing(planeModel_, iceFallEffect.particle->GetCurrentNumInstance(), *iceFallEffect.particle->GetWorldTransforms());
 	}
+	
+	// 突進する時の風パーティクル
+	ModelRenderer::DrawInstancing(planeModel_, enemyRushEffect_->enemyRushParticle_->GetCurrentNumInstance(), *enemyRushEffect_->enemyRushParticle_->GetWorldTransforms());
 	
 	// ボスの纏っているパーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, bossWearAdditionParticle_->GetCurrentNumInstance(), *bossWearAdditionParticle_->GetWorldTransforms());

@@ -1,0 +1,14 @@
+{
+    "EnemyRushParticle": {
+        "LifeTime": 2.0,
+        "ScaleYMax": 5.0,
+        "ScaleYMin": 2.0,
+        "SceneName": "TDGameScene",
+        "SpawnCoolTime": 0.10000000149011612,
+        "SpawnCount": 2,
+        "SpawnPosMax": 5.0,
+        "SpawnPosMin": -5.0,
+        "SpeedMax": 50.0,
+        "SpeedMin": 30.0
+    }
+}

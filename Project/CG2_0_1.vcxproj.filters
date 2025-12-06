@@ -299,6 +299,8 @@
     <ClCompile Include="Application\Player\Effect\PlayerChargeEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerRushEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerAttackDownEffect.cpp" />
+    <ClCompile Include="Application\Enemy\Effect\EnemyRushParticle.cpp" />
+    <ClCompile Include="Application\Enemy\Effect\WingsParticle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -602,6 +604,8 @@
     <ClInclude Include="Application\Player\Effect\PlayerChargeEffect.h" />
     <ClInclude Include="Application\Player\Effect\PlayerRushEffect.h" />
     <ClInclude Include="Application\Player\Effect\PlayerAttackDownEffect.h" />
+    <ClInclude Include="Application\Enemy\Effect\EnemyRushParticle.h" />
+    <ClInclude Include="Application\Enemy\Effect\WingsParticle.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

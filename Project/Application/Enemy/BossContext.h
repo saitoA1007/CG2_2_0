@@ -38,6 +38,8 @@ struct BossContext {
 	bool isRushAttack_ = false;
 	// 突進攻撃が壁に有効にするか
 	bool isRushCollisionActive_ = false;
+	// 突進する速度
+	Vector3 rushVelocity = {};
 
 	// 風攻撃の演出を管理
 	bool isWindAttack_ = false;
