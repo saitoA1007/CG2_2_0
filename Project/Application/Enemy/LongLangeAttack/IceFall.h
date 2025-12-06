@@ -65,18 +65,18 @@ private:
     // 死亡通知フラグ
     bool isDeadNotified_ = false;
 
-	// 速度
-	Vector3 velocity_ = {0.0f,0.0f,0.0f};
+	float timer_ = 0.0f;
+	float startPosY = 0.0f;
+	float endPosY = 0.0f;
 
 private: // 調整項目
-
-	// 落下加速度
-	float fallAcceleration_ = 0.2f;
 
 	float colliderSize_ = 2.0f;
 	float scale_ = 1.0f;
 
 	std::string kGroupName_ = "IceFall";
+
+	float maxTime_ = 2.0f;
 
 private:
 
