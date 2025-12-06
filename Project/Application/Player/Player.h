@@ -63,6 +63,7 @@ public:
 	bool IsCharging() const { return isCharging_; }
     bool IsPreRushing() const { return isPreRushing_; }
 	bool IsRushing() const { return isRushing_; }
+    bool IsJump() const { return isJump_; }
 	bool IsAttackDown() const { return isAttackDown_; }
 
     // 溜め時間の比率取得
@@ -148,6 +149,14 @@ private:
 	float kWallBounceStrengthLevel1_ = 0.5f;
 	float kWallBounceStrengthLevel2_ = 0.75f;
 	float kWallBounceStrengthLevel3_ = 1.0f;
+
+    // 速さに応じた跳ね返りの倍率の最低値
+    float kWallBounceMinSpeedFactor_ = 0.5f;
+	// 速さに応じた跳ね返りの倍率の最大値
+    float kWallBounceMaxSpeedFactor_ = 1.5f;
+
+	// 以前の跳ね返り処理有効化フラグ
+	bool isLegacyWallBounce_ = false;
 
 	//--------- Attack（空中急降下）の設定 ---------//
 
@@ -248,11 +257,6 @@ private:
 	// シーン等から初期再生を要求するフラグ
 	bool requestPlayWalk_ = true;
 
-	// アニメーション制御関数
-	void UpdateAnimation();
-	void StartNormalAnim(PlayerAnimationType type, const std::string& name, bool loop);
-	void StartCustomAnim(PlayerAnimationType type, const std::string& name, float totalDuration);
-
 	// 壁衝突イベント
 	std::function<void()> onWallHit_;
 	// 着地衝突イベント
@@ -260,9 +264,6 @@ private:
 
 	// 後処理用に保管する当たり判定のリスト
 	std::vector<GameEngine::CollisionResult> pendingCollisions_;
-
-private:
-	void ProcessPendingCollisions();
 
 private:
 	void ProcessMoveInput(GameEngine::InputCommand* inputCommand);
@@ -276,6 +277,11 @@ private:
 	void SetAnimator(GameEngine::Animator* animator) { animator_ = animator; }
 	void SetAnimationData(const std::array<std::map<std::string, AnimationData>, kPlayerAnimationCount>& data) { animationData_ = data; }
 	void PlayAnimation(PlayerAnimationType type, const std::string& name);
+
+	// アニメーション制御関数
+	void UpdateAnimation();
+	void StartNormalAnim(PlayerAnimationType type, const std::string &name, bool loop);
+	void StartCustomAnim(PlayerAnimationType type, const std::string &name, float totalDuration);
 
  	void RegisterBebugParam();
  	void ApplyDebugParam();

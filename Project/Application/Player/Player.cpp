@@ -117,9 +117,6 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
         sphereData_.center = worldTransform_.transform_.translate;
 	}
 
-	// 保留中の当たり判定を処理
-	ProcessPendingCollisions();
-
 	// アニメーションの状態更新
 	UpdateAnimation();
 }
@@ -431,23 +428,45 @@ void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength, bool i
 	if (isPreRushing_ || !isRushing_) { return; }
 	isPreRushing_ = false; isJump_ = true;
 	isBounceLock_ = true; bounceLockTimer_ = 0.0f; bounceAwayDir_ = { -bounceDirection.x, 0.0f, -bounceDirection.z }; bounceAwayDir_ = Normalize(bounceAwayDir_);
-	// IceFall の場合は溜めレベルに依存せず一定の強さで跳ね返す
-	if (isIceFall) {
+
+	if (isLegacyWallBounce_) {
+		// IceFall の場合は溜めレベルに依存せず一定の強さで跳ね返す
+		if (isIceFall) {
+			velocity_ = bounceAwayDir_ * (kWallBounceAwaySpeed_ * bounceStrength);
+			velocity_.y = kWallBounceUpSpeed_ * bounceStrength;
+			currentBounceLockTime_ = kWallBounceLockTime_;
+			return;
+		}
+		// 既存の bounceStrength に加えて溜めレベルに応じた倍率を適用
+		float levelMultiplier = 1.0f;
+		switch (rushChargeLevel_) {
+			case 1: levelMultiplier = kWallBounceStrengthLevel1_; break;
+			case 2: levelMultiplier = kWallBounceStrengthLevel2_; break;
+			case 3: levelMultiplier = kWallBounceStrengthLevel3_; break;
+			default: levelMultiplier = kWallBounceStrengthLevel1_; break;
+		}
+		velocity_ = bounceAwayDir_ * (kWallBounceAwaySpeed_ * bounceStrength * levelMultiplier);
+		velocity_.y = kWallBounceUpSpeed_ * bounceStrength * levelMultiplier; currentBounceLockTime_ = kWallBounceLockTime_;
+	
+	} else {
+		// 変更: 跳ね返る高さを直前の水平速度に応じて変化させる
+		// 現在の水平速度を取得
+		Vector3 prevHoriz = { velocity_.x, 0.0f, velocity_.z };
+		float prevSpeed = Length(prevHoriz);
+		// 速度比 (0..1) を計算（kRushMaxSpeed_ が 0 の場合は 0 にする）
+		float speedRatio = 0.0f;
+		if (kRushMaxSpeed_ > 0.00001f) {
+			speedRatio = std::clamp(prevSpeed / kRushMaxSpeed_, 0.0f, 1.0f);
+		}
+		// 高さ倍率を決定
+		float heightMultiplier = Lerp(kWallBounceMinSpeedFactor_, kWallBounceMaxSpeedFactor_, speedRatio);
+
+		// 水平方向の反発速度は従来通り（強さでスケール）
 		velocity_ = bounceAwayDir_ * (kWallBounceAwaySpeed_ * bounceStrength);
-		velocity_.y = kWallBounceUpSpeed_ * bounceStrength;
+		// 上方向速度は強さと速度倍率に応じて変化
+		velocity_.y = kWallBounceUpSpeed_ * bounceStrength * heightMultiplier;
 		currentBounceLockTime_ = kWallBounceLockTime_;
-		return;
 	}
-	// 既存の bounceStrength に加えて溜めレベルに応じた倍率を適用
-	float levelMultiplier = 1.0f;
-	switch (rushChargeLevel_) {
-		case 1: levelMultiplier = kWallBounceStrengthLevel1_; break;
-		case 2: levelMultiplier = kWallBounceStrengthLevel2_; break;
-		case 3: levelMultiplier = kWallBounceStrengthLevel3_; break;
-		default: levelMultiplier = kWallBounceStrengthLevel1_; break;
-	}
-	velocity_ = bounceAwayDir_ * (kWallBounceAwaySpeed_ * bounceStrength * levelMultiplier);
-	velocity_.y = kWallBounceUpSpeed_ * bounceStrength * levelMultiplier; currentBounceLockTime_ = kWallBounceLockTime_;
 }
 
 void Player::OnCollision(const CollisionResult &result) {
@@ -629,15 +648,17 @@ void Player::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushStrengthLevel1", kRushStrengthLevel1_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushStrengthLevel2", kRushStrengthLevel2_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushStrengthLevel3", kRushStrengthLevel3_);
-
+    
 	// 通常壁跳ね返り設定
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceUpSpeed", kWallBounceUpSpeed_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceAwaySpeed", kWallBounceAwaySpeed_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceLockTime", kWallBounceLockTime_);
-	// レベル毎の壁跳ね返り強さ
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceStrengthLevel1", kWallBounceStrengthLevel1_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceStrengthLevel2", kWallBounceStrengthLevel2_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceStrengthLevel3", kWallBounceStrengthLevel3_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceMinSpeedFactor", kWallBounceMinSpeedFactor_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceMaxSpeedFactor", kWallBounceMaxSpeedFactor_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "IsLegacyWallBounce", isLegacyWallBounce_);
 
 	// Attack（空中急降下）設定
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackPreDownTime", kAttackPreDownTime_);
@@ -678,33 +699,14 @@ void Player::ApplyDebugParam() {
 	kWallBounceUpSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceUpSpeed");
 	kWallBounceAwaySpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceAwaySpeed");
 	kWallBounceLockTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceLockTime");
-	// レベル毎の壁跳ね返り強さ
 	kWallBounceStrengthLevel1_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceStrengthLevel1");
 	kWallBounceStrengthLevel2_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceStrengthLevel2");
 	kWallBounceStrengthLevel3_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceStrengthLevel3");
+    kWallBounceMinSpeedFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceMinSpeedFactor");
+    kWallBounceMaxSpeedFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceMaxSpeedFactor");
+    isLegacyWallBounce_ = GameParamEditor::GetInstance()->GetValue<bool>(kGroupNames[2], "IsLegacyWallBounce");
 
 	// Attack（空中急降下）設定
 	kAttackPreDownTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackPreDownTime");
 	kAttackDownSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackDownSpeed");
-}
-
-void Player::ProcessPendingCollisions() {
-	//if (pendingCollisions_.empty()) return;
-
-	//// 先に通常の壁との衝突があるかを確認し、あれば BoundaryWall を無視する
-	//bool hasWallCollision = false;
-	//for (const auto &r : pendingCollisions_) {
-	//	if (r.isHit && r.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall)) {
-	//		hasWallCollision = true;
-	//		break;
-	//	}
-	//}
-
-	//// 各当たり判定を順に処理する
-	//for (const auto &result : pendingCollisions_) {
-	//	
-	//}
-
-	//// 全て処理したらクリア
-	//pendingCollisions_.clear();
 }
