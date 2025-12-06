@@ -225,6 +225,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 	bossWearParticle_ = std::make_unique<ParticleBehavior>();
 	bossWearParticle_->Initialize("BossWearParticle", 16);
 	bossWearParticle_->Emit({ 0.0f,5.0f,0.0f });
+	// 加算
+	bossWearAdditionParticle_ = std::make_unique<ParticleBehavior>();
+	bossWearAdditionParticle_->Initialize("BossWearAdditionParticle", 16);
+	bossWearAdditionParticle_->Emit({ 0.0f,5.0f,0.0f });
 #pragma endregion
 
 	// 平面モデルを取得
@@ -378,6 +382,9 @@ void TDGameScene::Update() {
 	bossWearParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition());
 	bossWearParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
+	bossWearAdditionParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition());
+	bossWearAdditionParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+
 	// 当たり判定の更新処理
 	UpdateCollision();
 
@@ -484,11 +491,10 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// ボスの風攻撃を描画
 	ModelRenderer::DrawInstancing(windModel_, enemyWindAttackParticle_->GetCurrentNumInstance(), *enemyWindAttackParticle_->GetWorldTransforms());
 	
-	// 複数モデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::Instancing);
-
-	// ボスの纏っているパーティクルを描画
-	ModelRenderer::DrawInstancing(planeModel_, bossWearParticle_->GetCurrentNumInstance(), *bossWearParticle_->GetWorldTransforms());
+	//// 複数モデルの描画前処理
+	//ModelRenderer::PreDraw(RenderMode3D::Instancing);
+	//// ボスの纏っているパーティクルを描画
+	////ModelRenderer::DrawInstancing(planeModel_, bossWearParticle_->GetCurrentNumInstance(), *bossWearParticle_->GetWorldTransforms());
 
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
@@ -498,9 +504,10 @@ void TDGameScene::Draw(const bool& isDebugView) {
 		if (!iceFallEffect.isActive) { continue; }
 		ModelRenderer::DrawInstancing(planeModel_, iceFallEffect.particle->GetCurrentNumInstance(), *iceFallEffect.particle->GetWorldTransforms());
 	}
-
+	
 	// ボスの纏っているパーティクルを描画
-	//ModelRenderer::DrawInstancing(planeModel_, bossWearParticle_->GetCurrentNumInstance(), *bossWearParticle_->GetWorldTransforms());
+	ModelRenderer::DrawInstancing(planeModel_, bossWearAdditionParticle_->GetCurrentNumInstance(), *bossWearAdditionParticle_->GetWorldTransforms());
+	ModelRenderer::DrawInstancing(planeModel_, bossWearParticle_->GetCurrentNumInstance(), *bossWearParticle_->GetWorldTransforms());
 
 	// 空気を演出するためのパーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, airParticle_->GetCurrentNumInstance(), *airParticle_->GetWorldTransforms());

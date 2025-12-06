@@ -152,7 +152,7 @@ void BossEnemy::RegisterBebugParam() {
 }
 
 void BossEnemy::ApplyDebugParam() {
-    kMaxHp_ = GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupName_, "MaxHp");
+    kMaxHp_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupName_, "MaxHp"));
     bodyColliderSize_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "BodyColliderSize");
     scale_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "Scale");
 

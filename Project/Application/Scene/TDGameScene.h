@@ -159,6 +159,7 @@ private: // シーン機能
 
 	// ボスの纏っているパーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> bossWearParticle_;
+	std::unique_ptr<GameEngine::ParticleBehavior> bossWearAdditionParticle_;
 
 	// 氷柱のモデル
 	GameEngine::Model* iceFallModel_;
