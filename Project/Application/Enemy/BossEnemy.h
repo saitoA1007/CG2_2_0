@@ -47,6 +47,8 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	bool IsRushAttack() const { return bossContext_.isRushAttack_; }
+	// 突進の時の速度
+	Vector3 GetRushVelocity() const { return bossContext_.rushVelocity; }
 
 	// 突進攻撃の当たり判定の有効フラグ
 	bool IsRushCollisionActive() const { return bossContext_.isRushCollisionActive_; }
@@ -56,12 +58,22 @@ public:
 	// 最大hp
 	int32_t GetMaxHp() const { return kMaxHp_; }
 
+	// 透明度
+	float GetAlpha() const {return alpha_;}
+
+	// 当たり判定フラグ
+	bool IsHit() const { return isHit_; }
+
 private: // 調整項目
 
 	// 最大体力
 	int32_t kMaxHp_ = 2;
 
+	// サイズ
 	float scale_ = 1.0f;
+
+	// ヒットクールタイム
+	float hitCoolTime_ = 2.0f;
 
 private: // メンバ変数
 
@@ -87,6 +99,15 @@ private: // メンバ変数
 
 	// デバック用のグループ名
 	std::string kGroupName_ = "Boss";
+
+	// 当たり判定
+	bool isHit_ = true;
+
+	// 時間
+	float timer_ = 1.0f;
+
+	// 当たり判定に使用する透明度
+	float alpha_ = 1.0f;
 
 private:
 

@@ -149,7 +149,8 @@ void BossStateBattle::ResetNormal() {
 	}
 
 	// 選択した遷移
-	//selectButtleBehavior_ = ButtleBehavior::Wait;
+	//selectButtleBehavior_ = ButtleBehavior::RushAttack;
+	//selectButtleBehavior_ = ButtleBehavior::WindAttack;
 }
 
 void BossStateBattle::NormalUpdate() {
@@ -401,6 +402,10 @@ void BossStateBattle::RushAttackUpdate() {
 
 		// 移動処理
 		bossContext_.worldTransform->transform_.translate = { tmpPos.x,tmpPosY,tmpPos.z };
+
+		// 速度を求める
+		Vector3 next = Lerp(startRushPos_, endRushPos_, EaseIn(rushTimer_ + FpsCounter::deltaTime / rushMainTime_));
+		bossContext_.rushVelocity = next - tmpPos;
 
 		// アニメーション
 		if (rushTimer_ <= 0.2f) {

@@ -7,6 +7,7 @@
 
 #include<string>
 #include "LogManager.h"
+#include"FPSCounter.h"
 #include"GameParamEditor.h"
 #include"CollisionConfig.h"
 #include"Application/CollisionTypeID.h"
@@ -118,10 +119,35 @@ void BossEnemy::Update(const Vector3& targetPos) {
 
     // アニメーションの更新処理
     bossContext_.animator_->NormalizeUpdate(bossContext_.animationTimer);
+
+    // ヒットタイマー
+    if (isHit_) {
+
+        timer_ += FpsCounter::deltaTime / hitCoolTime_;
+
+        // ヒット時に点滅させる
+        if (static_cast<int>(timer_ * 20.0f) % 2 == 0) {
+            alpha_ = 1.0f;
+        } else {
+            alpha_ = 0.5f;
+        }
+
+        // 9割を超えた時点で1.0fに固定する
+        if (timer_ >= 0.9f) {
+            alpha_ = 1.0f;
+        }
+
+        // 終了
+        if (timer_ >= 1.0f) {
+            isHit_ = false;
+            timer_ = 0.0f;
+        }
+    }
 }
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
-    
+    if (isHit_) { return; }
+
     // ヒットした相手がプレイヤーの時
     if (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Player)) {
 
@@ -131,7 +157,12 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
         if (player == nullptr) { return; }
 
         // 突進、または上からの攻撃の時のみダメージ
-        if (player->IsRushing() || player->IsAttackDown()) {
+        //player->IsRushing();
+        if (player->IsAttackDown()) {
+
+            // フラグ
+            isHit_ = true;
+
             if (bossContext_.hp > 0) {
                 bossContext_.hp -= 1;
 
