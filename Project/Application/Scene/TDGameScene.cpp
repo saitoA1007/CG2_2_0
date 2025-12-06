@@ -338,6 +338,17 @@ void TDGameScene::Update() {
 	}
 	cameraController_->SetDesiredFov(desiredFov);
 
+	// ジャンプ中は見下ろし視点オフセットを適用
+	if (player_->IsJump()) {
+		// 斜め上から俯瞰するように、カメラ位置を上方向に、注視点を少し下へ
+		Vector3 eyeOffset{ 0.0f, 16.0f, 0.0f };
+		Vector3 lookOffset{ 0.0f, -4.0f, 0.0f };
+		cameraController_->SetViewOffset(eyeOffset, lookOffset, 0.2f);
+		cameraController_->EnableViewOffset(true);
+	} else {
+		cameraController_->EnableViewOffset(false);
+	}
+
 	cameraController_->Update(context_->inputCommand, context_->input);
 	mainCamera_->SetCamera(cameraController_->GetCamera());
 
