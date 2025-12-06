@@ -29,6 +29,9 @@
 #include"Application/Graphics/BgRock.h"
 #include"Application/Scene/Transition/Fade.h"
 #include"Application/UI/BossHpUI.h"
+#include"Application/Player/Effect/PlayerChargeEffect.h"
+#include"Application/Player/Effect/PlayerRushEffect.h"
+#include"Application/Player/Effect/PlayerAttackDownEffect.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -170,6 +173,16 @@ private: // シーン機能
 	GameEngine::Model* planeModel_;
 	// 風の演出用モデル
 	GameEngine::Model* windModel_;
+
+	// プレイヤー用エフェクトのモデル（EnemyRushEffectと同じモデルを使用）
+	GameEngine::Model* playerChargeEffectModel_ = nullptr;
+	GameEngine::Model* playerRushEffectModel_ = nullptr;
+	GameEngine::Model* playerAttackDownEffectModel_ = nullptr;
+
+	// プレイヤーのエフェクトインスタンス
+	std::unique_ptr<PlayerChargeEffect> playerChargeEffect_;
+	std::unique_ptr<PlayerRushEffect> playerRushEffect_;
+	std::unique_ptr<PlayerAttackDownEffect> playerAttackDownEffect_;
 
 	// ボスロックオンフラグ
     bool isBossLockOn_ = false;
