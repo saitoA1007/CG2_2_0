@@ -13,7 +13,7 @@ void IceFall::Initialize(const Vector3& pos) {
 
     // ワールド行列を初期化
     float rotY = RandomGenerator::Get(0.0f, 6.4f);
-    worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,rotY,0.0f},pos});
+    worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,rotY,0.0f},{pos.x,-10.0f,pos.z} });
 
     // 当たり判定を設定する
     collider_ = std::make_unique<SphereCollider>();
