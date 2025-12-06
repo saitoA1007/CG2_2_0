@@ -127,6 +127,8 @@ private:
     float kRushChargeLevel2Ratio_ = 0.5f;
 	// 突進の強さLv3になるまでの時間の割合
     float kRushChargeLevel3Ratio_ = 1.0f;
+    // 突進時クールタイム（秒。硬直終了後に次の突進が可能になるまでの時間）
+    float kRushCooldownTime_ = 0.5f;
 
 	// 突撃の強さLv（溜めレベルごとの強さ倍率）
 	float kRushStrengthLevel1_ = 0.5f;
@@ -191,8 +193,11 @@ private:
     bool isCharging_ = false;
 	bool isPreRushing_ = false;
 	bool isRushing_ = false;
-    bool isRushLock_ = false;
-    // 突進タイマー
+	bool isRushLock_ = false;
+    bool isRushCooldown_ = false;
+	// 突進クールダウンタイマー
+	float rushLockTimer_ = 0.0f;
+	// 突進タイマー
 	float rushTimer_ = 0.0f;
 	float rushActiveTimer_ = 0.0f;
 	Vector3 rushDirection_ = { 0.0f,0.0f,1.0f };
@@ -200,7 +205,7 @@ private:
 	float chargeTimer_ = 0.0f;      // 溜め時間
 	float chargeRatio_ = 0.0f;      // 0.0-1.0
 	float preRushDuration_ = 0.0f;  // 予備動作の実時間
-    int rushChargeLevel_ = 0;		// 溜めレベル（0-3）
+    int rushChargeLevel_ = 0;       // 溜めレベル（0-3）
 
 	// 壁跳ね返り（硬直）関連
 	bool isBounceLock_ = false;

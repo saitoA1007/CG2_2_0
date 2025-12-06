@@ -317,7 +317,8 @@ void Player::ProcessAttackDownInput(GameEngine::InputCommand *inputCommand) {
 }
 
 void Player::HandleRushCharge(GameEngine::InputCommand* inputCommand) {
-    if (isCharging_ || isJump_ || isRushing_ || isPreRushing_ || isBounceLock_ || isRushLock_) {
+    if (isCharging_ || isJump_ || isRushing_ || isPreRushing_ ||
+		isBounceLock_ || isRushLock_ || isRushCooldown_) {
 		return;
 	}
 	// 溜め開始/継続
@@ -359,6 +360,14 @@ void Player::HandleRushStart(GameEngine::InputCommand* inputCommand) {
 }
 
 void Player::RushUpdate() {
+	if (isRushCooldown_) {
+		rushLockTimer_ -= FpsCounter::deltaTime;
+		if (rushLockTimer_ <= 0.0f) {
+			isRushCooldown_ = false;
+			rushLockTimer_ = 0.0f;
+		}
+	}
+
 	// 溜め進行
 	if (isCharging_) {
 		chargeTimer_ += FpsCounter::deltaTime;
@@ -400,6 +409,11 @@ void Player::RushUpdate() {
 		// 突進時間が終了したら突進終了
 		if (rushActiveTimer_ <= 0.0f) {
 			isRushing_ = false;
+			// 壁に当たらず通常終了した場合はクールダウンを開始
+			if (!isBounceLock_) {
+                isRushCooldown_ = true;
+				rushLockTimer_ = kRushCooldownTime_;
+			}
 		}
 	}
 }
@@ -606,14 +620,12 @@ void Player::RegisterBebugParam() {
 	// 突撃設定
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "PreRushTime", kPreRushMaxTime_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushSpeed", kRushMaxSpeed_);
-    // レベルまでの突進溜め比率
     GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushChargeLevel1Ratio", kRushChargeLevel1Ratio_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushChargeLevel2Ratio", kRushChargeLevel2Ratio_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushChargeLevel3Ratio", kRushChargeLevel3Ratio_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushLockMaxTime", kRushLockMaxTime_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushChargeMaxTime", kRushChargeMaxTime_);
-
-	// レベル毎の突進強さ
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushCooldownTime", kRushCooldownTime_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushStrengthLevel1", kRushStrengthLevel1_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushStrengthLevel2", kRushStrengthLevel2_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "RushStrengthLevel3", kRushStrengthLevel3_);
@@ -652,13 +664,12 @@ void Player::ApplyDebugParam() {
 	// 突撃設定
 	kPreRushMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "PreRushTime");
 	kRushMaxSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushSpeed");
-    // レベルまでの突進溜め比率
     kRushChargeLevel1Ratio_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushChargeLevel1Ratio");
     kRushChargeLevel2Ratio_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushChargeLevel2Ratio");
     kRushChargeLevel3Ratio_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushChargeLevel3Ratio");
 	kRushLockMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushLockMaxTime");
 	kRushChargeMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushChargeMaxTime");
-	// レベル毎の突進強さ
+    kRushCooldownTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushCooldownTime");
 	kRushStrengthLevel1_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushStrengthLevel1");
 	kRushStrengthLevel2_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushStrengthLevel2");
 	kRushStrengthLevel3_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "RushStrengthLevel3");
