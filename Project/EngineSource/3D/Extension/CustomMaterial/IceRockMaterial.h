@@ -7,28 +7,26 @@
 #include"Matrix4x4.h"
 #include<cstdint>
 
-class IceMaterial : public ICustomMaterial {
+class IceRockMaterial : public ICustomMaterial {
 public:
 
 	struct alignas(16) MaterialData {
-		Vector4 baseColor;
 		Vector4 color;
+		int32_t enableLighting;
+		float padding[3];
 		Matrix4x4 uvTransform;
 		Vector3 specularColor;
 		float shininess;
 		uint32_t textureHandle;
-		uint32_t normalTextureHandle;
-		uint32_t baseTextureHandle;
-		float time;
 		Vector3 rimColor;
-		float rimIntensity;
 		float rimPower;
-		float padding[3];
+		float rimIntensity;
+		float padding2[2];
 	};
 
 public:
-	IceMaterial() = default;
-	~IceMaterial();
+	IceRockMaterial() = default;
+	~IceRockMaterial();
 
 	static void StaticInitialize(ID3D12Device* device);
 

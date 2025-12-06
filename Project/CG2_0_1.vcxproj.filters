@@ -295,6 +295,7 @@
     <ClCompile Include="Application\Enemy\Effect\EnemyWindAttackParticle.cpp" />
     <ClCompile Include="Application\Graphics\BgRock.cpp" />
     <ClCompile Include="Application\UI\BossHpUI.cpp" />
+    <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerChargeEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerRushEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerAttackDownEffect.cpp" />
@@ -597,6 +598,7 @@
     <ClInclude Include="Application\Enemy\Effect\EnemyWindAttackParticle.h" />
     <ClInclude Include="Application\Graphics\BgRock.h" />
     <ClInclude Include="Application\UI\BossHpUI.h" />
+    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.h" />
     <ClInclude Include="Application\Player\Effect\PlayerChargeEffect.h" />
     <ClInclude Include="Application\Player\Effect\PlayerRushEffect.h" />
     <ClInclude Include="Application\Player\Effect\PlayerAttackDownEffect.h" />
@@ -730,5 +732,6 @@
     <FxCompile Include="Resources\Shaders\SkinningObject3d.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\IceMaterial.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\IceMaterial.VS.hlsl" />
+    <FxCompile Include="Resources\Shaders\BgIceRock.PS.hlsl" />
   </ItemGroup>
 </Project>

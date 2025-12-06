@@ -382,6 +382,16 @@ void PSOManager::DefaultLoadPSO() {
     iceInputLayoutBuilder.SetSemanticName();
     iceInputLayoutBuilder.CreateInputLayoutDesc();
     RegisterPSO("IceMaterial", ice3D, &rootSigBuilder, &iceInputLayoutBuilder);
+
+    // 背景の岩オブジェクト用PSO
+    CreatePSOData rock3D;
+    default3D.rootSigName = "IceRockVS";
+    default3D.vsPath = L"Resources/Shaders/Object3d.VS.hlsl";
+    default3D.psPath = L"Resources/Shaders/BgIceRock.PS.hlsl";
+    default3D.drawMode = DrawModel::FillFront;
+    default3D.blendMode = BlendMode::kBlendModeNormal;
+    default3D.isDepthEnable = true;
+    RegisterPSO("IceRock", default3D, &rootSigBuilder, &inputLayoutBuilder);
 }
 
 void PSOManager::DeaultLoadPostEffectPSO() {

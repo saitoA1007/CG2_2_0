@@ -64,7 +64,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	bgRockModel_->SetDefaultIsEnableLight(true);
 	// 背景の岩オブジェクトの初期化
 	bgRock_ = std::make_unique<BgRock>();
-	bgRock_->Initialize();
+	bgRock_->Initialize(bgIceRockModel_->GetDefaultTexture());
 
 	// ライトの生成
 	sceneLightingController_ = std::make_unique<SceneLightingController>();
@@ -428,6 +428,7 @@ void TDGameScene::Update() {
 #ifdef _DEBUG
 	// 地面マテリアルの更新処理
 	terrain_->Update();
+	bgRock_->Update();
 #endif
 }
 
@@ -460,9 +461,13 @@ void TDGameScene::Draw(const bool& isDebugView) {
 
 	// 背景のオブジェクトを描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
-	ModelRenderer::Draw(bgIceRockModel_, bgRock_->GetWorldTransform());
-	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(bgRockModel_, bgRock_->GetWorldTransform());
+
+	// 岩を描画
+	CustomRenderer::PreDraw(CustomRenderMode::Rock);
+	CustomRenderer::DrawRock(bgIceRockModel_, bgRock_->GetWorldTransform(), sceneLightingController_->GetResource(), bgRock_->GetMaterial());
+
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
 	// ステージを描画する
 	stageManager_->Draw(wallModel_);

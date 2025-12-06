@@ -153,6 +153,8 @@ namespace GameEngine {
 		/// <param name="materialName"></param>
 		void SetDefaultTextureHandle(const uint32_t& handle, const std::string& materialName = "default");
 
+		uint32_t GetDefaultTexture();
+
 		/// <summary>
 		/// モデルの名前を取得
 		/// </summary>

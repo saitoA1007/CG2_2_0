@@ -367,6 +367,14 @@ void Model::SetDefaultTextureHandle(const uint32_t& handle, const std::string& m
 	material->SetTextureHandle(handle);
 }
 
+uint32_t Model::GetDefaultTexture() {
+	auto it = materials_.begin();
+
+	assert(it != materials_.end() && "Material not found");
+	Material* material = it->second.get();
+	return material->GetTextureHandle();
+}
+
 [[nodiscard]]
 Node Model::ReadNode(aiNode* node) {
 	Node result;

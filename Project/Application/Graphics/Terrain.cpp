@@ -61,6 +61,7 @@ void Terrain::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "RimIntensity", iceMaterial_->materialData_->rimIntensity);
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "Time", iceMaterial_->materialData_->time);
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "Scale", scale_);
+	GameParamEditor::GetInstance()->AddItem("IceTerrain", "RimPower", iceMaterial_->materialData_->rimPower);
 }
 
 void Terrain::ApplyDebugParam() {
@@ -72,6 +73,7 @@ void Terrain::ApplyDebugParam() {
 	iceMaterial_->materialData_->rimIntensity = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "RimIntensity");
 	iceMaterial_->materialData_->time = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "Time");
 	scale_ = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "Scale");
+	iceMaterial_->materialData_->rimPower = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "RimPower");
 
 	iceMaterial_->materialData_->rimColor.x = rimColor.x;
 	iceMaterial_->materialData_->rimColor.y = rimColor.y;
