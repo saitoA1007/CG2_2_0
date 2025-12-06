@@ -1,6 +1,8 @@
 {
     "Boss-IceFall": {
         "IceFallTime": 2.0,
-        "SceneName": "TDGameScene"
+        "RadiusRatio": 0.800000011920929,
+        "SceneName": "TDGameScene",
+        "minDistance": 7.0
     }
 }

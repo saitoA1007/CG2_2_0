@@ -112,6 +112,7 @@ private:
 	float minDistance = 5.0f; // 離れる距離
 	int targetCount = 3; // 出す数
 	int maxIter = 100; // 回数
+	float radiusRatio_ = 0.8f; // ステージの半径に対する使用する割合
 
 	// 咆哮したかのフラグ
 	bool isRoat_ = false;

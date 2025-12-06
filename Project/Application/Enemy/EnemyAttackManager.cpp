@@ -97,7 +97,7 @@ void EnemyAttackManager::CreateIceFallPositions() {
         attempts++;
 
         // 大きな円の中にランダムな点を生成
-        float r = stageRadius_ * std::sqrt(RandomGenerator::Get(0.0f, 1.0f));
+        float r = stageRadius_ * std::sqrt(RandomGenerator::Get(0.0f, radiusRatio_));
         float theta = RandomGenerator::Get(0.0f, std::numbers::pi_v<float> *2.0f);
 
         Vector2 candidate;
@@ -261,12 +261,14 @@ void EnemyAttackManager::RegisterBebugParam() {
 
     // 氷柱攻撃
     GameParamEditor::GetInstance()->AddItem("Boss-IceFall", "minDistance", minDistance);
+    GameParamEditor::GetInstance()->AddItem("Boss-IceFall", "RadiusRatio", radiusRatio_);
     //GameParamEditor::GetInstance()->AddItem("Boss-IceFall", "IceFallCount", targetCount);
 }
 
 void EnemyAttackManager::ApplyDebugParam() {
     // 氷柱攻撃
     minDistance = GameParamEditor::GetInstance()->GetValue<float>("Boss-IceFall", "minDistance");
+    radiusRatio_ = GameParamEditor::GetInstance()->GetValue<float>("Boss-IceFall", "RadiusRatio");
     //targetCount = GameParamEditor::GetInstance()->GetValue<float>("Boss-IceFall", "IceFallCount");
 }
 
