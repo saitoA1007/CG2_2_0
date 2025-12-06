@@ -71,9 +71,19 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 	RushUpdate();
 
 	// 重力（常時適応）
-	velocity_.y += kFallAcceleration_ * FpsCounter::deltaTime;
+    velocity_.y += kFallAcceleration_ * FpsCounter::deltaTime * (isAttackDown_ ? 5.0f : 1.0f);
 	// 縦方向の上限（落下最大速度）
 	velocity_.y = std::max(velocity_.y, (isAttackDown_ ? -kAttackDownSpeed_ : -kMaxFallSpeed_));
+
+	// 落下攻撃中は現在の落下速度から攻撃力を算出
+	if (isAttackDown_) {
+		float fallSpeed = -velocity_.y; // 正の値
+		float ratio = 0.0f;
+		if (kAttackDownSpeed_ > 0.00001f) {
+			ratio = std::clamp(fallSpeed / kAttackDownSpeed_, 0.0f, 1.0f);
+		}
+		attackDownPower_ = Lerp(kAttackDownMinPower_, kAttackDownMaxPower_, ratio);
+	}
 
 	// 速度を適応
 	worldTransform_.transform_.translate.x += velocity_.x * FpsCounter::deltaTime;
@@ -302,13 +312,9 @@ void Player::ProcessAttackDownInput(GameEngine::InputCommand *inputCommand) {
 	}
 	// 攻撃下降開始
 	if (inputCommand->IsCommandActive("AttackDown")) {
-		if (isAttackDown_) {
-			velocity_.y = -kMaxFallSpeed_;
-		} else {
-			velocity_.y = -kAttackDownSpeed_;
-            velocity_.x = 0.0f;
-            velocity_.z = 0.0f;
-		}
+		velocity_.x = 0.0f;
+		velocity_.z = 0.0f;
+		attackDownPower_ = 0.0f;
         isAttackDown_ = !isAttackDown_;
     }
 }
@@ -567,8 +573,13 @@ void Player::OnCollision(const CollisionResult &result) {
 		worldTransform_.transform_.translate.x -= correction.x;
 		worldTransform_.transform_.translate.y -= correction.y;
 		worldTransform_.transform_.translate.z -= correction.z;
-		// 下向き速度をリセット
-		if (velocity_.y < 0.0f) velocity_.y = 0.0f;
+		if (velocity_.y < 0.0f) {
+			velocity_.y = 0.0f;
+			attackDownPower_ = 0.0f;
+			if (isAttackDown_ && onLandHit_) {
+				onLandHit_();
+			}
+		}
 		if (!isRushing_ && !isBounceLock_) {
 			isJump_ = false;
 			isAttackDown_ = false;
@@ -663,6 +674,8 @@ void Player::RegisterBebugParam() {
 	// Attack（空中急降下）設定
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackPreDownTime", kAttackPreDownTime_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownSpeed", kAttackDownSpeed_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownMinPower", kAttackDownMinPower_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownMaxPower", kAttackDownMaxPower_);
 }
 
 void Player::ApplyDebugParam() {

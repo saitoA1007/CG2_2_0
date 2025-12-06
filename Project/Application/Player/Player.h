@@ -70,6 +70,8 @@ public:
     float GetChargeRatio() const { return std::min<float>(chargeTimer_ / kRushChargeMaxTime_, 1.0f); }
     // 突進レベル取得
     int GetRushChargeLevel() const { return rushChargeLevel_; }
+    // 急降下時の攻撃力取得
+    int32_t GetAttackDownPower() const { return static_cast<int32_t>(attackDownPower_); }
 
 	// 壁ヒット時コールバック設定
 	void SetOnWallHit(std::function<void()> cb) { onWallHit_ = std::move(cb); }
@@ -164,6 +166,10 @@ private:
     float kAttackPreDownTime_ = 0.3f;
     // 落下攻撃の落下速度
     float kAttackDownSpeed_ = 10.0f;
+	// 落下攻撃の最低攻撃力
+    float kAttackDownMinPower_ = 1.0f;
+    // 落下攻撃の最大攻撃力
+    float kAttackDownMaxPower_ = 10.0f;
 
     // 回転補間速度（ラジアン / 秒）
     float kRotationLerpSpeed_ = 10.0f;
@@ -226,6 +232,8 @@ private:
 
 	// 急降下攻撃フラグ
     bool isAttackDown_ = false;
+	// 急降下時の攻撃力
+    float attackDownPower_ = 0.0f;
 
 	// プレイヤー用コライダー（球）
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
