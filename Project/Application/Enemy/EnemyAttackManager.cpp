@@ -86,8 +86,8 @@ void EnemyAttackManager::AddIceFall(const Vector3& pos) {
 	IceFallsList_.push_back(std::move(tmpIceFall));
 }
 
-void EnemyAttackManager::CreateIceFallPositions() {
-
+void EnemyAttackManager::CreateIceFallPositions(const float& waitIceFallTime) {
+    maxIceFallEmitTime_ = waitIceFallTime;
     if (IceFallsList_.size() != 0) { return; }
 
     std::vector<Vector2> points;
@@ -127,7 +127,7 @@ void EnemyAttackManager::CreateIceFallPositions() {
 
         // 氷柱を落とす位置に演出を発生させる
         if (!iceFallEffectDatas_[i].isActive) {
-            iceFallEffectDatas_[i].particle->SetEmitterPos(Vector3(points[i].x, 10.0f, points[i].y));
+            iceFallEffectDatas_[i].particle->SetEmitterPos(Vector3(points[i].x, 0.0f, points[i].y));
             iceFallEffectDatas_[i].isActive = true;
             iceFallEffectDatas_[i].timer = 0.0f;
         }
@@ -148,6 +148,8 @@ void EnemyAttackManager::EffectUpdate(const Matrix4x4& cameraWorldMatrix, const 
             
             // 氷柱を落とす
             AddIceFall(iceFallEffectData.particle->GetEmitterPos());
+            // 叫ぶ演出
+            //SetIsRoat(true);
         }
 
         // 更新処理

@@ -28,7 +28,7 @@
         ],
         "FieldAcceleration": [
             0.0,
-            1.7100000381469727,
+            5.0,
             0.0
         ],
         "IsBillBoard": true,
@@ -37,11 +37,11 @@
         "IsEnableRotateZFromVelocity": false,
         "IsEnableScaleXYZActive": false,
         "IsEnableSizeOverLifeTime": true,
-        "IsEnableVelocityFromPosition": false,
+        "IsEnableVelocityFromPosition": true,
         "IsLoop": true,
         "LifeTime": 2.0,
-        "MaxVelocity": 0.0,
-        "MinVelocity": 0.0,
+        "MaxVelocity": -1.0,
+        "MinVelocity": -2.0,
         "RotateRange": {
             "Max": [
                 0.0,
@@ -67,18 +67,18 @@
             ]
         },
         "SceneName": "TDGameScene",
-        "SpawnCoolTime": 0.20000000298023224,
+        "SpawnCoolTime": 0.05000000074505806,
         "SpawnMaxCount": 2,
         "SpawnRange": {
             "Max": [
+                3.0,
                 1.0,
-                1.0,
-                0.5
+                3.0
             ],
             "Min": [
-                -1.0,
+                -3.0,
                 0.0,
-                -0.5
+                -3.0
             ]
         },
         "Textures": {

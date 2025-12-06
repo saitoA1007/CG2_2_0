@@ -149,7 +149,7 @@ void BossStateBattle::ResetNormal() {
 	}
 
 	// 選択した遷移
-	selectButtleBehavior_ = ButtleBehavior::IceFallAttack;
+	//selectButtleBehavior_ = ButtleBehavior::Wait;
 }
 
 void BossStateBattle::NormalUpdate() {
@@ -600,35 +600,44 @@ void BossStateBattle::WindAttackUpdate() {
 }
 
 void BossStateBattle::ResetIceFall() {
-	waitTimer_ = 0.0f;
+	iceFallTimer_ = 0.0f;
 	bossContext_.isActiveIceFall = false;
-	isActiveIceFall_ = false;
 
 	//　アニメーション
-	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Scream)]["Scream"]);
+	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
 	bossContext_.animationTimer = 0.0f;
+
+	isWaitIceFall_ = true;
 }
 
 void BossStateBattle::IceFallAttackUpdate() {
 
-	if (!isActiveIceFall_) {
-		bossContext_.isActiveIceFall = true;
-		isActiveIceFall_ = true;
+	if (isWaitIceFall_) {
+		iceFallTimer_ += FpsCounter::deltaTime / waitIceFallMaxTime_;
+		bossContext_.animationTimer = iceFallTimer_;
+
+		if (iceFallTimer_ >= 1.0f) {
+			iceFallTimer_ = 0.0f;
+			isWaitIceFall_ = false;
+			// アニメーション
+			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Scream)]["Scream"]);
+			bossContext_.animationTimer = 0.0f;
+			bossContext_.isActiveIceFall = true;
+		}
 	} else {
-		// 一度発射したらfalseにする
 		if (bossContext_.isActiveIceFall) {
 			bossContext_.isActiveIceFall = false;
 		}
-	}
 
-	waitTimer_ += FpsCounter::deltaTime / iceFallMaxTime_;
-	bossContext_.animationTimer = waitTimer_;
+		iceFallTimer_ += FpsCounter::deltaTime / iceFallMaxTime_;
+		bossContext_.animationTimer = iceFallTimer_;
 
-	// 待機の終了
-	if (waitTimer_ >= 1.0f) {
-		// 振る舞いの切り替えをリクエスト
-		behaviorRequest_ = ButtleBehavior::Wait;
-		bossContext_.animationTimer = 1.0f;
+		// 待機の終了
+		if (iceFallTimer_ >= 1.0f) {
+			// 振る舞いの切り替えをリクエスト
+			behaviorRequest_ = ButtleBehavior::Wait;
+			bossContext_.animationTimer = 1.0f;
+		}
 	}
 }
 
@@ -971,6 +980,7 @@ void BossStateBattle::RegisterBebugParam() {
 
 	// 氷柱攻撃
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "IceFallTime", iceFallMaxTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "WaitIceFallTime", waitIceFallMaxTime_);
 
 	// 風攻撃
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WindInTime", windInTime_);
@@ -1009,6 +1019,8 @@ void BossStateBattle::ApplyDebugParam() {
 
 	// 氷柱攻撃
 	iceFallMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "IceFallTime");
+	waitIceFallMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "WaitIceFallTime");
+	bossContext_.waitIceFallMaxTime = waitIceFallMaxTime_;
 
 	// 風攻撃
 	windInTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WindInTime");

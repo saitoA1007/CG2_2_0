@@ -52,7 +52,7 @@ public:
 	/// <summary>
 	/// 氷柱を生成する
 	/// </summary>
-	void CreateIceFallPositions();
+	void CreateIceFallPositions(const float& waitIceFallTime);
 
 	/// <summary>
 	/// 風ブレスを開始する

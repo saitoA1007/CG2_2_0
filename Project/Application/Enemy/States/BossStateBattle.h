@@ -193,16 +193,11 @@ private:
 	uint32_t tmpIndex = 0;
 
 	// 氷柱を出すまでの時間
-	float waitTimer_ = 0.0f;
+	float iceFallTimer_ = 0.0f;
 	float iceFallMaxTime_ = 2.0f;
+	float waitIceFallMaxTime_ = 1.0f;
 
-
-	float rotateTimer_ = 0.0f;
-	float maxRotateTime_ = 1.0f;
-
-	bool isActiveIceFall_ = false;
-
-	float ratio_ = 0.0f;
+	bool isWaitIceFall_ = true;
 
 	// 待機行動 ================================
 
