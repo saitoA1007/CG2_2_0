@@ -303,9 +303,13 @@ void TDGameScene::Initialize(SceneContext* context) {
 	bossHpUI_ = std::make_unique<BossHpUI>();
 	bossHpUI_->Initialize(bossEnemy_->GetMaxHp());
 
-    // プレイヤーのhpUIを初期化 (仮の最大HP: 3)
-    playerHpUI_ = std::make_unique<PlayerHpUI>();
-    playerHpUI_->Initialize(3);
+	// プレイヤーのhpUIを初期化 (仮の最大HP: 3)
+	playerHpUI_ = std::make_unique<PlayerHpUI>();
+	playerHpUI_->Initialize(3);
+
+	// ゲームオーバーUIの初期化
+	gameOverUI_ = std::make_unique<GameOverUI>();
+	gameOverUI_->Initialize(context_->input, context_->inputCommand, context_->textureManager);
 
 	// 空気を演出するためのパーティクル
 	airParticle_ = std::make_unique<ParticleBehavior>();
@@ -440,8 +444,11 @@ void TDGameScene::Update() {
 	bossHpUI_->Update();
 
 	// プレイヤーのHpUIの更新処理
-    playerHpUI_->SetCurrentHp(player_->GetCurrentHP());
+	playerHpUI_->SetCurrentHp(player_->GetCurrentHP());
 	playerHpUI_->Update();
+
+	// GameOverUIの更新処理
+	gameOverUI_->Update();
 
 #ifdef _DEBUG
 	// 地面マテリアルの更新処理
@@ -450,7 +457,7 @@ void TDGameScene::Update() {
 #endif
 }
 
-void TDGameScene::Draw(const bool& isDebugView) {
+void TDGameScene::Draw(const bool &isDebugView) {
 
 	// 描画に使用するカメラを設定
 	if (isDebugView) {
@@ -493,10 +500,10 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// アニメーションの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 
-    // プレイヤーのアニメーションを描画
-    ModelRenderer::DrawAnimationWithLight(playerModel_, player_->GetWorldTransform(), sceneLightingController_->GetResource());
-    // プレイヤーの影を描画する
-    ModelRenderer::DrawAnimation(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
+	// プレイヤーのアニメーションを描画
+	ModelRenderer::DrawAnimationWithLight(playerModel_, player_->GetWorldTransform(), sceneLightingController_->GetResource());
+	// プレイヤーの影を描画する
+	ModelRenderer::DrawAnimation(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
 
 	// 敵を描画
 	ModelRenderer::DrawAnimationWithLight(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource());
@@ -514,11 +521,11 @@ void TDGameScene::Draw(const bool& isDebugView) {
 
 	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
 	// 氷柱のモデルを描画
-	const std::list<std::unique_ptr<IceFall>>& iceFalls = enemyAttackManager_->GetIceFalls();
-	for (auto& iceFall : iceFalls) {
+	const std::list<std::unique_ptr<IceFall>> &iceFalls = enemyAttackManager_->GetIceFalls();
+	for (auto &iceFall : iceFalls) {
 		if (iceFall->IsAlive()) {
 			//ModelRenderer::DrawLight(sceneLightingController_->GetResource());
-			CustomRenderer::DrawRock(iceFallModel_, iceFall->GetWorldTransform(), sceneLightingController_->GetResource(),iceFall->GetMaterial());
+			CustomRenderer::DrawRock(iceFallModel_, iceFall->GetWorldTransform(), sceneLightingController_->GetResource(), iceFall->GetMaterial());
 			//ModelRenderer::Draw(iceFallModel_, iceFall->GetShadowWorldTransform(), &iceFall->GetShadowMaterial());
 		}
 	}
@@ -526,26 +533,26 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// 3Dモデルの両面描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);
 
-    // プレイヤーのエフェクト描画
+	// プレイヤーのエフェクト描画
 	if (player_->IsCharging()) {
 		for (auto &chargeEffect : playerChargeEffect_->GetWorldTransforms()) {
 			ModelRenderer::Draw(playerChargeEffectModel_, chargeEffect);
 		}
-    }
-    if (player_->IsRushing()) {
+	}
+	if (player_->IsRushing()) {
 		for (auto &rushEffect : playerRushEffect_->GetWorldTransforms()) {
 			ModelRenderer::Draw(playerRushEffectModel_, rushEffect);
 		}
-    }
-    if (player_->IsAttackDown()) {
-        for (auto &attackDownEffect : playerAttackDownEffect_->GetWorldTransforms()) {
+	}
+	if (player_->IsAttackDown()) {
+		for (auto &attackDownEffect : playerAttackDownEffect_->GetWorldTransforms()) {
 			ModelRenderer::Draw(playerAttackDownEffectModel_, attackDownEffect);
-        }
-    }
+		}
+	}
 
 	// ボスの突進攻撃の描画
 	if (bossEnemy_->IsRushAttack()) {
-		for (auto& rushEffect : enemyRushEffect_->GetWorldTransforms()) {
+		for (auto &rushEffect : enemyRushEffect_->GetWorldTransforms()) {
 			ModelRenderer::Draw(enemyRushModel_, rushEffect);
 		}
 	}
@@ -560,14 +567,14 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
 
 	// 氷柱を落とすまでの演出を描画
-	for (auto& iceFallEffect : enemyAttackManager_->GetIceFallEffectDatas()) {
+	for (auto &iceFallEffect : enemyAttackManager_->GetIceFallEffectDatas()) {
 		if (!iceFallEffect.isActive) { continue; }
 		ModelRenderer::DrawInstancing(planeModel_, iceFallEffect.particle->GetCurrentNumInstance(), *iceFallEffect.particle->GetWorldTransforms());
 	}
-	
+
 	// 突進する時の風パーティクル
 	ModelRenderer::DrawInstancing(planeModel_, enemyRushEffect_->enemyRushParticle_->GetCurrentNumInstance(), *enemyRushEffect_->enemyRushParticle_->GetWorldTransforms());
-	
+
 	// ボスの纏っているパーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, bossWearAdditionParticle_->GetCurrentNumInstance(), *bossWearAdditionParticle_->GetWorldTransforms());
 	ModelRenderer::DrawInstancing(planeModel_, bossWearParticle_->GetCurrentNumInstance(), *bossWearParticle_->GetWorldTransforms());
@@ -595,11 +602,19 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// ボスのHPUIを表示
 	//SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
 	//SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
- 
- 	// プレイヤーのHPUIを表示
- 	//SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
- 	//SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
- }
+
+	// プレイヤーのHPUIを表示
+	//SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
+	//SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
+
+	// GameOverUI描画
+	if (gameOverUI_->IsActive()) {
+		SpriteRenderer::Draw(gameOverUI_->GetBgSprite(), gameOverUI_->GetBgGH());
+		SpriteRenderer::Draw(gameOverUI_->GetLogoSprite(), gameOverUI_->GetLogoGH());
+		SpriteRenderer::Draw(gameOverUI_->GetRetrySprite(), gameOverUI_->GetRetryGH());
+		SpriteRenderer::Draw(gameOverUI_->GetTitleSprite(), gameOverUI_->GetTitleGH());
+	}
+}
  
  void TDGameScene::InputRegisterCommand() {
 	// 移動の入力コマンドを登録する
