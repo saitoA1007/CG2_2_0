@@ -61,6 +61,15 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 	// カメラ基準ベクトル更新
 	UpdateCameraBasis(&camera);
 
+    // ダメージ無敵タイマー更新
+	if (isInvincible_) {
+        damageInvincibleTimer_ -= FpsCounter::deltaTime;
+		if (damageInvincibleTimer_ <= 0.0f) {
+			isInvincible_ = false;
+			damageInvincibleTimer_ = 0.0f;
+        }
+    }
+
 	bounceAwayDir_ = bounceAwayDir_;
 	desiredVelXZ_ = { 0.0f, 0.0f, 0.0f };
 	BounceUpdate();
@@ -484,6 +493,39 @@ void Player::OnCollision(const CollisionResult &result) {
 	bool isBoundary = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::BoundaryWall))
         || (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall) && !dynamic_cast<Wall *>(result.userData.object)->GetIsAlive());
 	bool isGround = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Ground));
+    bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss));
+
+    // ボスとの衝突処理（突進中の場合）
+    if (isBoss && isRushing_) {
+        Log("is hit Boss with Rushing");
+        Vector3 normal = result.contactNormal;
+        Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
+        if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
+        if (onWallHit_) { onWallHit_(); }
+        Bounce(bounceDir, 1.0f);
+		return;
+    }
+
+    // ボスとの衝突処理（空中急降下中の場合）
+	if (isBoss && isAttackDown_) {
+		Log("is hit Boss with Attack Down");
+        //if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
+        return;
+    }
+
+    // ボスとの衝突処理（通常時）
+	if (isBoss && !isRushing_ && !isAttackDown_ && !isInvincible_) {
+		Log("is hit Boss normally");
+		// HP減少処理（仮で1ダメージ）
+		currentHP_ -= 1;
+		if (currentHP_ < 0) { currentHP_ = 0; }
+		// ダメージ無敵時間開始
+		damageInvincibleTimer_ = kDamageInvincibleTime_;
+		isInvincible_ = true;
+
+		if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
+		return;
+	}
 
 	// 壁との衝突処理
     if (isWall && isRushing_) {
@@ -646,6 +688,8 @@ void Player::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "WallHitReflectFactor", kWallHitReflectFactor_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "GroundDeceleration", kGroundDeceleration_);
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "RotationLerpSpeed", kRotationLerpSpeed_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "MaxHP", kMaxHP_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[0], "DamageInvincibleTime", kDamageInvincibleTime_);
 
 	// 突撃設定
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[1], "PreRushTime", kPreRushMaxTime_);
@@ -694,6 +738,8 @@ void Player::ApplyDebugParam() {
 	kWallHitReflectFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "WallHitReflectFactor");
 	kGroundDeceleration_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "GroundDeceleration");
 	kRotationLerpSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "RotationLerpSpeed");
+    kMaxHP_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[0], "MaxHP");
+    kDamageInvincibleTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "DamageInvincibleTime");
 
 	// 突撃設定
 	kPreRushMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[1], "PreRushTime");

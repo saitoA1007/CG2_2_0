@@ -72,6 +72,8 @@ public:
     int GetRushChargeLevel() const { return rushChargeLevel_; }
     // 急降下時の攻撃力取得
     int32_t GetAttackDownPower() const { return static_cast<int32_t>(attackDownPower_); }
+    // 現在のHP取得
+    int32_t GetCurrentHP() const { return currentHP_; }
 
 	// 壁ヒット時コールバック設定
 	void SetOnWallHit(std::function<void()> cb) { onWallHit_ = std::move(cb); }
@@ -113,6 +115,11 @@ private:
     float kFallAcceleration_ = -9.6f;
     // 壁接触時の移動方向反射倍率
     float kWallHitReflectFactor_ = 0.5f;
+
+	// 最大HP
+	int32_t kMaxHP_ = 3;
+    // ダメージ無敵時間
+    float kDamageInvincibleTime_ = 1.0f;
 
 	//--------- 突撃の設定 ---------//
 
@@ -178,6 +185,13 @@ private:
 	//==================================================
     // メンバ変数
     //==================================================
+	
+    // 現在のHP
+    int32_t currentHP_ = kMaxHP_;
+	// ダメージ無敵タイマー
+    float damageInvincibleTimer_ = 0.0f;
+	// 無敵状態フラグ
+    bool isInvincible_ = false;
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;

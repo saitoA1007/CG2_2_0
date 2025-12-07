@@ -29,6 +29,8 @@
 #include"Application/Graphics/BgRock.h"
 #include"Application/Scene/Transition/Fade.h"
 #include"Application/UI/BossHpUI.h"
+#include"Application/UI/PlayerHpUI.h"
+#include"Application/UI/GameOverUI.h"
 #include"Application/Player/Effect/PlayerChargeEffect.h"
 #include"Application/Player/Effect/PlayerRushEffect.h"
 #include"Application/Player/Effect/PlayerAttackDownEffect.h"
@@ -84,13 +86,18 @@ private: // エンジンの低レイヤー機能を取得
 	// 当たり判定の管理
 	std::unique_ptr<GameEngine::CollisionManager> collisionManager_;
 
-private: // シーン機能
+private:
+	//==================================================
+	// シーン機能
+	//==================================================
 
 	// 終了フラグ
 	bool isFinished_ = false;
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
+	// カメラコントローラークラス
+	std::unique_ptr<CameraController> cameraController_;
 
 	// 天球
 	GameEngine::Model* skyDomeModel_;
@@ -110,6 +117,10 @@ private: // シーン機能
 	// ライト
 	std::unique_ptr<SceneLightingController> sceneLightingController_;
 
+	//==================================================
+	// プレイヤー
+	//==================================================
+
 	// 自キャラのモデル
 	GameEngine::Model* playerModel_;
 	// プレイヤー
@@ -121,8 +132,14 @@ private: // シーン機能
     // プレイヤーのアニメーションデータ
     std::array<std::map<std::string, AnimationData>, static_cast<size_t>(kPlayerAnimationCount)> playerAnimationData_;
 
-	// カメラコントローラークラス
-	std::unique_ptr<CameraController> cameraController_;
+	// プレイヤーのエフェクトインスタンス
+	std::unique_ptr<PlayerChargeEffect> playerChargeEffect_;
+	std::unique_ptr<PlayerRushEffect> playerRushEffect_;
+	std::unique_ptr<PlayerAttackDownEffect> playerAttackDownEffect_;
+
+	//==================================================
+	// ステージ
+	//==================================================
 
 	// ステージを生成する
 	GameEngine::Model* wallModel_;
@@ -139,6 +156,10 @@ private: // シーン機能
 	// プレイヤーの移動範囲を制限するためのコライダー群
 	static inline const float kBoundaryHalfHeight = 10000.0f; // 縦方向には到達不可能なほど高く設定
 	std::array<std::unique_ptr<GameEngine::OBBCollider>, kNumStageWalls> boundaryColliders_;
+
+	//==================================================
+	// ボス
+	//==================================================
 
 	// ボス敵モデル
 	GameEngine::Model* bossEnemyModel_;
@@ -164,6 +185,10 @@ private: // シーン機能
 	std::unique_ptr<GameEngine::ParticleBehavior> bossWearParticle_;
 	std::unique_ptr<GameEngine::ParticleBehavior> bossWearAdditionParticle_;
 
+	//==================================================
+	// モデル
+	//==================================================
+
 	// 氷柱のモデル
 	GameEngine::Model* iceFallModel_;
 	// 破壊した氷柱モデル
@@ -181,11 +206,6 @@ private: // シーン機能
 	GameEngine::Model* playerRushEffectModel_ = nullptr;
 	GameEngine::Model* playerAttackDownEffectModel_ = nullptr;
 
-	// プレイヤーのエフェクトインスタンス
-	std::unique_ptr<PlayerChargeEffect> playerChargeEffect_;
-	std::unique_ptr<PlayerRushEffect> playerRushEffect_;
-	std::unique_ptr<PlayerAttackDownEffect> playerAttackDownEffect_;
-
 	// ボスロックオンフラグ
     bool isBossLockOn_ = false;
 
@@ -198,6 +218,11 @@ private: // シーン機能
 
 	// ボスのHpを表示
 	std::unique_ptr<BossHpUI> bossHpUI_;
+	// プレイヤーのHpを表示
+	std::unique_ptr<PlayerHpUI> playerHpUI_;
+
+	// ゲームオーバーUI
+	std::unique_ptr<GameOverUI> gameOverUI_;
 
 private:
 
