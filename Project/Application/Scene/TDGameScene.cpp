@@ -47,6 +47,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// 天球モデルを生成
 	skyDomeModel_ = context_->modelManager->GetNameByModel("SkyDome");
+	skyDomeModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	skyDomeWorldTransform_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}});
 
 	// 地面を生成
