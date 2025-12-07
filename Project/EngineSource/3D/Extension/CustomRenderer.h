@@ -18,6 +18,7 @@ using namespace GameEngine;
 enum class CustomRenderMode {
 	Ice, // 氷
 	Rock, // 背景の岩
+	RockBoth, // 両面描画
 
 	MaxCount
 };

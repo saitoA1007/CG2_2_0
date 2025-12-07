@@ -34,7 +34,7 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Initialize(GameEngine::PostEffectManager* postEffectManager);
+	void Initialize(GameEngine::PostEffectManager* postEffectManager, const uint32_t& texture);
 
 	/// <summary>
 	/// 更新処理
@@ -131,6 +131,8 @@ private:
 	// 風の速度
 	Vector3 windVelocity_ = {};
 	float windSpeed_ = 50.0f;
+
+	uint32_t iceFallTexture_ = 0;
 
 	// 当たり判定
 	std::vector<std::unique_ptr<GameEngine::SphereCollider>> windColliders_;
