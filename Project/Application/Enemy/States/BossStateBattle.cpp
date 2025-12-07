@@ -280,6 +280,9 @@ void BossStateBattle::RushAttackUpdate() {
 	// 移動する位置を表示
 #ifdef _DEBUG
 	CreateCatmullRom();
+	// 突進する距離を描画する
+	debugRenderer_->AddLine(endRushPos_, bossContext_.worldTransform->transform_.translate, { 1.0f,0.0f,0.0f,1.0f });
+	debugRenderer_->AddSphere(Sphere(endRushPos_, 1.0f), { 1.0f,0.0f,0.0f,1.0f });
 #endif
 
 	switch (rushPhase_)
@@ -406,9 +409,12 @@ void BossStateBattle::RushAttackUpdate() {
 			// 30度範囲におさまっている場合
 			if (1.0f >= targetDot && targetDot >= clampDot) {
 				// 突進の最後の位置を設定
-				targetDir = Normalize(Vector3(bossContext_.targetPos.x, 0.0f, bossContext_.targetPos.z));
-				float tmpAngle = std::atan2f(targetDir.z, targetDir.x);
-				endRushPos_ = { std::cosf(tmpAngle) * (stageRadius_ + offsetEndRush_),0.0f,std::sinf(tmpAngle) * (stageRadius_ + offsetEndRush_) };
+				//targetDir = Normalize(Vector3(bossContext_.targetPos.x, 0.0f, bossContext_.targetPos.z));
+				//float tmpAngle = std::atan2f(targetDir.z, targetDir.x);
+				//endRushPos_ = { std::cosf(tmpAngle) * (stageRadius_ + offsetEndRush_),0.0f,std::sinf(tmpAngle) * (stageRadius_ + offsetEndRush_) };
+
+				float length = Length(endRushPos_ - Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
+				endRushPos_ = targetDir * (length + offsetEndRush_);
 
 				// 向きを設定する
 				Vector3 rotDir = endRushPos_ - startRushPos_;
