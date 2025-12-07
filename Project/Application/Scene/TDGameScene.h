@@ -226,6 +226,13 @@ private:
 
 private:
 
+	// ボスヒット時にほとんどの更新を停止するための制御
+	bool isBossHitFreezeActive_ = false;
+	float bossHitFreezeTimer_ = 0.0f;
+	static inline const float kBossHitFreezeDuration = 0.25f; // 秒
+	// ボスのヒット状態の前フレーム保存（ヒット瞬間の検出用）
+	bool prevBossHit_ = false;
+
 	/// <summary>
 	/// 入力のコマンドを設定する
 	/// </summary>

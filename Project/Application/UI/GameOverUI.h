@@ -34,8 +34,9 @@ public:
 	uint32_t GetRetryGH() const { return retryGH_; }
 	uint32_t GetTitleGH() const { return titleGH_; }
 
-    // アクティブ状態取得・設定
-    bool IsActive() const { return isActive_; }
+	// 有効/無効
+	bool IsActive() const { return isActive_; }
+	void SetActive(bool active) { isActive_ = active; }
 
 private:
 	// 入力関連

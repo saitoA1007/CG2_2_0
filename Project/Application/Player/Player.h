@@ -80,6 +80,12 @@ public:
     // 着地時コールバック設定
     void SetOnLandHit(std::function<void()> cb) { onLandHit_ = std::move(cb); }
 
+	// リスタート処理
+    void Restart();
+
+	// 生存状態の取得
+	bool IsAlive() const { return isAlive_; }
+
 private:
 	//==================================================
     // 定数・設定値
@@ -192,6 +198,8 @@ private:
     float damageInvincibleTimer_ = 0.0f;
 	// 無敵状態フラグ
     bool isInvincible_ = false;
+	// 生存フラグ
+    bool isAlive_ = true;
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;

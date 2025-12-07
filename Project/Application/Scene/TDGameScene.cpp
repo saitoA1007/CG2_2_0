@@ -11,6 +11,7 @@
 
 #include"Application/CollisionTypeID.h"
 #include"Extension/CustomRenderer.h"
+#include"FPSCounter.h"
 
 using namespace GameEngine;
 
@@ -325,6 +326,40 @@ void TDGameScene::Update() {
 		isFinished_ = true;
 	}
 
+    // Detect boss hit (transition from not hit to hit)
+    bool currentBossHit = bossEnemy_->IsHit();
+    if (currentBossHit && !prevBossHit_) {
+        // Trigger freeze (stop updating everything except camera & camera controller)
+        isBossHitFreezeActive_ = true;
+        bossHitFreezeTimer_ = kBossHitFreezeDuration;
+        // start camera shake via cameraController
+        if (cameraController_) {
+            cameraController_->SetDesiredFov(1.0f);
+            cameraController_->StartCameraShake(32.0f, kBossHitFreezeDuration, 64.0f,
+                [](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutCubic(a, b, t); },
+                CameraController::ShakeOrigin::TargetAndCameraPosition,
+                true, true, true, false);
+        }
+    }
+    prevBossHit_ = currentBossHit;
+
+	// If boss-hit freeze active, only update cameraController and camera; skip other updates
+	if (isBossHitFreezeActive_) {
+        // decrease timer
+        bossHitFreezeTimer_ -= GameEngine::FpsCounter::deltaTime;
+        // Still update camera controller and camera so shake is visible
+        cameraController_->Update(context_->inputCommand, context_->input);
+        mainCamera_->SetCamera(cameraController_->GetCamera());
+
+        if (bossHitFreezeTimer_ <= 0.0f) {
+            isBossHitFreezeActive_ = false;
+            bossHitFreezeTimer_ = 0.0f;
+        }
+
+        // Skip rest of update when frozen
+        return;
+    }
+
 	// デバックリストを削除
 	debugRenderer_->Clear();
 
@@ -448,6 +483,13 @@ void TDGameScene::Update() {
 	// プレイヤーのHpUIの更新処理
 	playerHpUI_->SetCurrentHp(player_->GetCurrentHP());
 	playerHpUI_->Update();
+
+	// GameOver判定: プレイヤーが生存していなければGameOverUIを有効化
+	if (player_ && !player_->IsAlive()) {
+		if (gameOverUI_) {
+			gameOverUI_->SetActive(true);
+		}
+	}
 
 	// GameOverUIの更新処理
 	gameOverUI_->Update();
