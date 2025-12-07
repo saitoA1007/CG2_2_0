@@ -190,9 +190,14 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// 敵の処理に関する初期化処理
 #pragma region EnemySystem 
+
+	// 氷柱のモデルを取得
+	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
+	iceFallModel_->SetDefaultIsEnableLight(true);
+
 	// 敵の攻撃管理クラス
 	enemyAttackManager_ = std::make_unique<EnemyAttackManager>();
-	enemyAttackManager_->Initialize(context_->postEffectManager_);
+	enemyAttackManager_->Initialize(context_->postEffectManager_, iceFallModel_->GetDefaultTexture());
 	// ボス敵モデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Boss");
 	//bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
@@ -226,9 +231,6 @@ void TDGameScene::Initialize(SceneContext* context) {
 	enemyWindAttackParticle_ = std::make_unique<EnemyWindAttackParticle>();
 	enemyWindAttackParticle_->Initialize(context_->textureManager->GetHandleByName("noise.png"));
 
-	// 氷柱のモデルを取得
-	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
-	iceFallModel_->SetDefaultIsEnableLight(true);
 	// 突進攻撃演出モデル
 	enemyRushModel_ = context_->modelManager->GetNameByModel("RushWave");
 	// プレイヤー用エフェクトのモデルも同じものを使用
@@ -480,16 +482,6 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// ステージを描画する
 	stageManager_->Draw(wallModel_);
 
-	// 氷柱のモデルを描画
-	const std::list<std::unique_ptr<IceFall>>& iceFalls = enemyAttackManager_->GetIceFalls();
-	for (auto& iceFall : iceFalls) {
-		if (iceFall->IsAlive()) {
-			ModelRenderer::DrawLight(sceneLightingController_->GetResource());
-			ModelRenderer::Draw(iceFallModel_, iceFall->GetWorldTransform());
-			ModelRenderer::Draw(iceFallModel_, iceFall->GetShadowWorldTransform(),&iceFall->GetShadowMaterial());
-		}
-	}
-
 	// アニメーションの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 
@@ -511,6 +503,17 @@ void TDGameScene::Draw(const bool& isDebugView) {
 			CustomRenderer::DrawIce(icePlaneModel_, plane.GetWorldTransform(), sceneLightingController_->GetResource(), stageWallPlaneMaterial_.get());
 		}
 	}*/
+
+	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
+	// 氷柱のモデルを描画
+	const std::list<std::unique_ptr<IceFall>>& iceFalls = enemyAttackManager_->GetIceFalls();
+	for (auto& iceFall : iceFalls) {
+		if (iceFall->IsAlive()) {
+			//ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+			CustomRenderer::DrawRock(iceFallModel_, iceFall->GetWorldTransform(), sceneLightingController_->GetResource(),iceFall->GetMaterial());
+			//ModelRenderer::Draw(iceFallModel_, iceFall->GetShadowWorldTransform(), &iceFall->GetShadowMaterial());
+		}
+	}
 
 	// 3Dモデルの両面描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);

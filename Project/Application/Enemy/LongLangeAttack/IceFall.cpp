@@ -9,7 +9,7 @@
 
 using namespace GameEngine;
 
-void IceFall::Initialize(const Vector3& pos) {
+void IceFall::Initialize(const Vector3& pos, const uint32_t& texture) {
 
     // ワールド行列を初期化
     float rotY = RandomGenerator::Get(0.0f, 6.4f);
@@ -33,6 +33,10 @@ void IceFall::Initialize(const Vector3& pos) {
     collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
         this->OnCollision(result);
     });
+
+    iceMaterial_ = std::make_unique<IceRockMaterial>();
+    iceMaterial_->Initialize();
+    iceMaterial_->materialData_->textureHandle = texture;
 
 #ifdef _DEBUG
     // 値を登録する
@@ -85,11 +89,20 @@ void IceFall::OnCollision([[maybe_unused]] const GameEngine::CollisionResult& re
 }
 
 void IceFall::RegisterBebugParam() {
-    GameParamEditor::GetInstance()->AddItem(kGroupName_, "ColliderSize", colliderSize_);
-    GameParamEditor::GetInstance()->AddItem(kGroupName_, "Scale", scale_);
-    GameParamEditor::GetInstance()->AddItem(kGroupName_, "MaxTime", maxTime_);
-    GameParamEditor::GetInstance()->AddItem(kGroupName_, "StartPosY", startPosY);
-    GameParamEditor::GetInstance()->AddItem(kGroupName_, "EndPosY", endPosY);
+    int index = 0;
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "ColliderSize", colliderSize_, index++);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "Scale", scale_, index++);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "MaxTime", maxTime_, index++);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "StartPosY", startPosY, index++);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "EndPosY", endPosY, index++);
+
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "IceColor", iceMaterial_->materialData_->color);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "SpecularColor", specularColor);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "RimColor", rimColor);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "Shininess", iceMaterial_->materialData_->shininess);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "RimIntensity", iceMaterial_->materialData_->rimIntensity);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "RimPower", iceMaterial_->materialData_->rimPower);
+
 }
 
 void IceFall::ApplyDebugParam() {
@@ -103,4 +116,17 @@ void IceFall::ApplyDebugParam() {
     collider_->SetRadius(colliderSize_);
     // スケールを設定
     worldTransform_.transform_.scale = { scale_ ,scale_ ,scale_ };
+
+    iceMaterial_->materialData_->color = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "IceColor");
+    specularColor = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "SpecularColor");
+    rimColor = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "RimColor");
+    iceMaterial_->materialData_->shininess = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "Shininess");
+    iceMaterial_->materialData_->rimIntensity = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "RimIntensity");
+    iceMaterial_->materialData_->rimPower = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "RimPower");
+    iceMaterial_->materialData_->rimColor.x = rimColor.x;
+    iceMaterial_->materialData_->rimColor.y = rimColor.y;
+    iceMaterial_->materialData_->rimColor.z = rimColor.z;
+    iceMaterial_->materialData_->specularColor.x = specularColor.x;
+    iceMaterial_->materialData_->specularColor.y = specularColor.y;
+    iceMaterial_->materialData_->specularColor.z = specularColor.z;
 }

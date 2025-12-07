@@ -2,6 +2,7 @@
 #include"Collider.h"
 #include"WorldTransform.h"
 #include"Application/Graphics/PlaneProjectionShadow.h"
+#include"Extension/CustomMaterial/IceRockMaterial.h"
 
 class IceFall {
 public:
@@ -10,7 +11,7 @@ public:
 	/// 初期化処理
 	/// </summary>
 	/// <param name="pos"></param>
-	void Initialize(const Vector3& pos);
+	void Initialize(const Vector3& pos,const uint32_t& texture);
 
 	/// <summary>
 	/// 更新処理
@@ -46,6 +47,12 @@ public:
 	/// <returns></returns>
 	GameEngine::Material& GetShadowMaterial() { return shadow_->GetMaterial(); }
 
+	/// <summary>
+	/// マテリアルを取得
+	/// </summary>
+	/// <returns></returns>
+	IceRockMaterial* GetMaterial() { return iceMaterial_.get(); }
+
 	// 当たり判定の球データ
 	Sphere GetSphereData() { return Sphere(collider_->GetWorldPosition(), collider_->GetRadius()); }
 
@@ -60,6 +67,9 @@ private:
 	// 当たり判定
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
 
+	// マテリアル
+	std::unique_ptr<IceRockMaterial> iceMaterial_;
+
 	// 生存フラグ
 	bool isAlive_ = true;
     // 死亡通知フラグ
@@ -68,6 +78,10 @@ private:
 	float timer_ = 0.0f;
 	float startPosY = 0.0f;
 	float endPosY = 0.0f;
+
+	// デバック用
+	Vector4 rimColor;
+	Vector4 specularColor;
 
 private: // 調整項目
 

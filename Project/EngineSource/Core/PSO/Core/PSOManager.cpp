@@ -385,13 +385,17 @@ void PSOManager::DefaultLoadPSO() {
 
     // 背景の岩オブジェクト用PSO
     CreatePSOData rock3D;
-    default3D.rootSigName = "IceRockVS";
-    default3D.vsPath = L"Resources/Shaders/Object3d.VS.hlsl";
-    default3D.psPath = L"Resources/Shaders/BgIceRock.PS.hlsl";
-    default3D.drawMode = DrawModel::FillFront;
-    default3D.blendMode = BlendMode::kBlendModeNormal;
-    default3D.isDepthEnable = true;
-    RegisterPSO("IceRock", default3D, &rootSigBuilder, &inputLayoutBuilder);
+    rock3D.rootSigName = "IceRockVS";
+    rock3D.vsPath = L"Resources/Shaders/Object3d.VS.hlsl";
+    rock3D.psPath = L"Resources/Shaders/BgIceRock.PS.hlsl";
+    rock3D.drawMode = DrawModel::FillFront;
+    rock3D.blendMode = BlendMode::kBlendModeNormal;
+    rock3D.isDepthEnable = true;
+    RegisterPSO("IceRock", rock3D, &rootSigBuilder, &inputLayoutBuilder);
+
+    // 両面描画
+    rock3D.drawMode = DrawModel::None;
+    RegisterPSO("IceRockBoth", rock3D, &rootSigBuilder, &inputLayoutBuilder);
 }
 
 void PSOManager::DeaultLoadPostEffectPSO() {

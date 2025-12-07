@@ -2,9 +2,30 @@
     "IceFall": {
         "ColliderSize": 2.0,
         "EndPosY": 0.0,
+        "IceColor": [
+            1.0,
+            1.0,
+            1.0,
+            0.7450980544090271
+        ],
         "MaxTime": 1.0,
+        "RimColor": [
+            0.0,
+            0.6176471710205078,
+            1.0,
+            1.0
+        ],
+        "RimIntensity": 1.8300000429153442,
+        "RimPower": 3.319999933242798,
         "Scale": 3.0,
         "SceneName": "TDGameScene",
+        "Shininess": 10.0,
+        "SpecularColor": [
+            0.2643214166164398,
+            0.9803921580314636,
+            0.43280860781669617,
+            1.0
+        ],
         "StartPosY": -10.0
     }
 }

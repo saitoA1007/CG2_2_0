@@ -14,7 +14,7 @@ EnemyAttackManager::~EnemyAttackManager() {
 	IceFallsList_.clear();
 }
 
-void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectManager) {
+void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectManager,const uint32_t& texture) {
 
     // ポストエフェクトの管理クラスを受け取る
     postEffectManager_ = postEffectManager;
@@ -45,6 +45,9 @@ void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectMan
         iceFallEffectData.particle->Initialize("WaitIceFallParticle", 32);
         iceFallEffectDatas_.push_back(std::move(iceFallEffectData));
     }
+
+    // テクスチャを取得
+    iceFallTexture_ = texture;
 
 #ifdef _DEBUG
     // 値を登録する
@@ -82,7 +85,7 @@ void EnemyAttackManager::Update(const Matrix4x4& cameraWorldMatrix, const Matrix
 
 void EnemyAttackManager::AddIceFall(const Vector3& pos) {
 	std::unique_ptr<IceFall> tmpIceFall = std::make_unique<IceFall>();
-	tmpIceFall->Initialize(pos);
+	tmpIceFall->Initialize(pos, iceFallTexture_);
 	IceFallsList_.push_back(std::move(tmpIceFall));
 }
 
