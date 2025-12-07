@@ -1,0 +1,14 @@
+{
+    "WallBreakParticle": {
+        "Elasticity": 0.5,
+        "FieldAcceleration": -15.0,
+        "LifeTime": 3.0,
+        "ScaleMax": 1.5,
+        "ScaleMin": 0.5,
+        "SceneName": "TDGameScene",
+        "SpawnPosMax": 4.0,
+        "SpawnPosMin": -4.0,
+        "SpeedMax": 15.0,
+        "SpeedMin": 2.0
+    }
+}

@@ -1,7 +1,8 @@
 #pragma once
+#include<list>
 #include"Model.h"
 #include"Wall.h"
-
+#include"Effect/BreakWallParticle.h"
 
 class StageManager {
 public:
@@ -47,6 +48,12 @@ public:
 	/// <returns></returns>
 	const float& GetRadius() const { return radius_; }
 
+	/// <summary>
+	/// 壊れた演出のリスト
+	/// </summary>
+	/// <returns></returns>
+	std::list<std::unique_ptr<BreakWallParticle>>& GetBreakWallParticles() { return breakWallParticles_; }
+
 private:
 
 	// 生成位置
@@ -82,12 +89,17 @@ private:
 	// 生存状態の壁のデータ
 	std::vector<Wall*> aliveWalls_;
 
+	// 壊れた演出
+	std::list<std::unique_ptr<BreakWallParticle>> breakWallParticles_;
+
 private:
 
 	/// <summary>
 	/// ステージを生成する処理
 	/// </summary>
 	void GenerateWalls();
+
+	void AddBreakWallParticle(const Vector3& pos);
 
 	/// <summary>
 	/// 値を登録する

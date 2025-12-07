@@ -40,6 +40,12 @@ void StageManager::Update() {
 
 	// 更新処理
 	for (auto& wall : walls_) {
+
+		// 壁が壊れた演出を追加
+		if (wall->IsBreakParticleActive()) {
+			AddBreakWallParticle(wall->GetWorldPosition());
+		}
+
 		// 壁の更新処理
 		wall->Update();
 
@@ -48,16 +54,22 @@ void StageManager::Update() {
 			aliveWalls_.push_back(wall.get());
 		}*/
 	}
+
+	// 壁を壊す演出
+	breakWallParticles_.remove_if([](const std::unique_ptr<BreakWallParticle>& breakWallParticle) {
+		return breakWallParticle->IsFinished();
+	});
+	// 破壊演出の更新処理
+	for (auto& breakWallParticle : breakWallParticles_) {
+		breakWallParticle->Update();
+	}
 }
 
 void StageManager::Draw(GameEngine::Model* wallModel) {
 
 	// 生存している壁を描画
 	for (auto& wall : aliveWalls_) {
-		if (wall->GetIsAlive()) {
-			ModelRenderer::Draw(wallModel, wall->GetWorldTransform(), &wall->GetMaterial());
-		}
-		
+		ModelRenderer::Draw(wallModel, wall->GetWorldTransform(), &wall->GetMaterial());	
 	}
 }
 
@@ -98,6 +110,13 @@ void StageManager::GenerateWalls() {
 		// 登録する
 		walls_.push_back(std::move(tmpWall));
 	}
+}
+
+void StageManager::AddBreakWallParticle(const Vector3& pos) {
+	std::unique_ptr<BreakWallParticle> tmp = std::make_unique<BreakWallParticle>();
+	tmp->Initialize(0, pos);
+	tmp->SetEmitterPos(pos);
+	breakWallParticles_.push_back(std::move(tmp));
 }
 
 void StageManager::RegisterBebugParam() {
