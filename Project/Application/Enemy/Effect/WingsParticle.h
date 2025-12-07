@@ -1,7 +1,7 @@
 #pragma once
 #include"WorldTransforms.h"
 
-class WingsParticleParticle {
+class WingsParticle {
 public:
 
 	struct ParticleData {
@@ -12,6 +12,10 @@ public:
 		float currentTime;   // 現在の時間
 		float rotateSpeed;   // 回転速度
 		uint32_t textureHandle = 0; // 使用するテクスチャ
+
+		float swayPhase = 0.0f;
+		float swaySpeed = 0.0f;
+		float swayWidth = 0.0f;
 	};
 
 public:
@@ -50,13 +54,10 @@ public:
 	/// <returns></returns>
 	uint32_t GetCurrentNumInstance() const { return numInstance_; }
 
-	// 速度を設定する
-	void SetVelocity(const Vector3& velocity) { baseVelocity_ = velocity; }
-
 private:
 
 	// 最大描画数
-	static inline const uint32_t kNumMaxInstance = 64;
+	static inline const uint32_t kNumMaxInstance = 32;
 
 	// 画像を取得
 	uint32_t particleGH_ = 0u;
@@ -81,11 +82,21 @@ private:
 	// ループの判定
 	bool isLoop_ = true;
 
-	// 速度
-	Vector3 baseVelocity_ = {};
-
 	float lifeTime_ = 2.0f;
-	std::string name_ = "WingsParticle";
+	std::string name_ = "EnemyWingsParticle";
+
+	// 発生する数
+	uint32_t spawnCount_ = 1;
+
+	// サイズ
+	float scaleMin_ = 1.0f;
+	float scaleMax_ = 1.0f;
+	// 速度
+	float speedMin_ = 10.0f;
+	float speedMax_ = 10.0f;
+	// 範囲
+	float spawnPosMin_ = 1.0f;
+	float spawnPosMax_ = 1.0f;
 
 private:
 

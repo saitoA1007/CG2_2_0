@@ -4,7 +4,7 @@
 #include"GameParamEditor.h"
 using namespace GameEngine;
 
-void WingsParticleParticle::Initialize(const uint32_t& texture) {
+void WingsParticle::Initialize(const uint32_t& texture) {
 	// 画像を取得
 	particleGH_ = texture;
 
@@ -18,7 +18,9 @@ void WingsParticleParticle::Initialize(const uint32_t& texture) {
 	// ワールド行列の初期化
 	particleDatas_.reserve(kNumMaxInstance);
 	for (uint32_t i = 0; i < kNumMaxInstance; ++i) {
-		particleDatas_.push_back(MakeNewParticle());
+		particleDatas_.push_back(ParticleData());
+		particleDatas_[i].currentTime = 2.0f;
+		particleDatas_[i].lifeTime = 1.0f;
 	}
 
 #ifdef _DEBUG
@@ -29,7 +31,7 @@ void WingsParticleParticle::Initialize(const uint32_t& texture) {
 	ApplyDebugParam();
 }
 
-void WingsParticleParticle::Update() {
+void WingsParticle::Update() {
 #ifdef _DEBUG
 	ApplyDebugParam();
 #endif
@@ -46,35 +48,40 @@ void WingsParticleParticle::Update() {
 	worldTransforms_->UpdateTransformMatrix(numInstance_);
 }
 
-WingsParticleParticle::ParticleData WingsParticleParticle::MakeNewParticle() {
+WingsParticle::ParticleData WingsParticle::MakeNewParticle() {
 	ParticleData particleData;
 	// SRTを設定
-	float scale = RandomGenerator::Get(1.0f, 2.0f);
+	float scale = RandomGenerator::Get(scaleMin_, scaleMax_);
 	particleData.transform.scale = { scale,scale,scale };
-	particleData.transform.rotate = { 0.0f,0.0f,0.0f };
-	particleData.transform.rotate.z = RandomGenerator::Get(0.0f, 3.2f);
-	particleData.transform.translate = RandomGenerator::GetVector3(-0.4f, 0.4f) + emitterPos_;
+	particleData.transform.rotate = RandomGenerator::GetVector3(0.0f, 6.4f);
+	particleData.transform.translate = RandomGenerator::GetVector3(spawnPosMin_, spawnPosMax_) + emitterPos_;
+	particleData.transform.translate.y = emitterPos_.y + RandomGenerator::Get(-3.0f, -0.5f);
 	// 速度
-	particleData.velocity = baseVelocity_;
+	particleData.velocity = Normalize(particleData.transform.translate - emitterPos_) * RandomGenerator::Get(speedMin_, speedMax_);
+	particleData.velocity.y = RandomGenerator::Get(-5.0f, -3.0f);
 	// 色
 	particleData.color = { 1.0f,1.0f,1.0f,1.0f };
 	// 時間の設定
 	particleData.lifeTime = lifeTime_;
 	particleData.currentTime = 0.0f;
 	// 回転速度
-	particleData.rotateSpeed = RandomGenerator::Get(6.0f, 10.0f);
+	//particleData.rotateSpeed = RandomGenerator::Get(6.0f, 10.0f);
 	// テクスチャ
 	particleData.textureHandle = particleGH_;
+	// 振れ幅
+	particleData.swayPhase = RandomGenerator::Get(0.0f, 6.28f);
+	particleData.swaySpeed = RandomGenerator::Get(2.0f, 4.0f);
+	particleData.swayWidth = RandomGenerator::Get(0.1f, 0.3f);
 	return particleData;
 }
 
-void WingsParticleParticle::Create() {
+void WingsParticle::Create() {
 	// 経過時間を加算
 	timer_ += FpsCounter::deltaTime;
 
 	// 0.1秒経過したら生成処理
 	if (timer_ >= coolTime_) {
-		int spawnCount = 1; // まとめて出す数
+		int spawnCount = spawnCount_; // まとめて出す数
 		for (uint32_t i = 0; i < kNumMaxInstance && spawnCount > 0; ++i) {
 			if (particleDatas_[i].lifeTime < particleDatas_[i].currentTime) {
 				particleDatas_[i] = MakeNewParticle();
@@ -87,7 +94,7 @@ void WingsParticleParticle::Create() {
 	}
 }
 
-void WingsParticleParticle::Move() {
+void WingsParticle::Move() {
 	// 移動処理
 	numInstance_ = 0;
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
@@ -100,28 +107,37 @@ void WingsParticleParticle::Move() {
 		// 経過時間を加算
 		particle.currentTime += FpsCounter::deltaTime;
 
+		Vector3 forwardDir = Normalize(particle.velocity);
+		Vector3 up = { 0.0f, 1.0f, 0.0f };
+		Vector3 rightDir = Cross(forwardDir, up);
+
+		// 揺れの計算
+		float timeValue = particle.currentTime * particle.swaySpeed + particle.swayPhase;
+		float swayPower = std::sinf(timeValue) * 10.0f;
+
+		Vector3 currentVelocity = particle.velocity + (rightDir * swayPower);
+
 		// 移動
-		particle.transform.translate += particle.velocity * FpsCounter::deltaTime;
+		particle.transform.translate += currentVelocity * FpsCounter::deltaTime;
 
-		// 速度方向に向きを設定する
-		Vector3 dir = particle.velocity;
-		particle.transform.rotate.y = std::atan2f(dir.x, dir.z);
-		// 横軸方向の長さを求める
-		float vectorX = Length({ dir.x,0.0f,dir.z });
-		// X軸周り角度
-		particle.transform.rotate.x = std::atan2f(-dir.y, vectorX);
+		// 移動
+		//particle.transform.translate += particle.velocity * FpsCounter::deltaTime;
 
-		// 回転
-		particle.transform.rotate.z += particle.rotateSpeed * FpsCounter::deltaTime;
+		float swayValue = std::sinf(particle.currentTime * particle.swaySpeed + particle.swayPhase);
 
-		// 拡縮
-		particle.transform.scale = particle.transform.scale + 1.0f * FpsCounter::deltaTime;
+		Vector3 velocityDir = Normalize(particle.velocity);
+		//Vector3 up = { 0.0f, 1.0f, 0.0f };
+		Vector3 right = Normalize(Cross(up, velocityDir));
+		Vector3 drawPos = particle.transform.translate + (right * swayValue * particle.swayWidth);
+		float maxTiltAngle = 0.5f;
+		particle.transform.rotate.z = swayValue * maxTiltAngle;
 
 		// トラスフォームの適応
 		worldTransforms_->transformDatas_[numInstance_].transform = particle.transform;
+		worldTransforms_->transformDatas_[numInstance_].transform.translate = drawPos;
 
 		// 色を適応
-		particle.color.w = 1.0f - (particle.currentTime / particle.lifeTime);
+		//particle.color.w = 1.0f - (particle.currentTime / particle.lifeTime);
 		worldTransforms_->transformDatas_[numInstance_].color = particle.color;
 		worldTransforms_->transformDatas_[numInstance_].textureHandle = particle.textureHandle;
 		//worldTransforms_->transformDatas_[numInstance_].textureHandle = 0;
@@ -129,13 +145,34 @@ void WingsParticleParticle::Move() {
 	}
 }
 
-void WingsParticleParticle::RegisterBebugParam() {
+void WingsParticle::RegisterBebugParam() {
 	int index = 0;
+	GameParamEditor::GetInstance()->AddItem(name_, "SpawnCount", spawnCount_, index++);
 	GameParamEditor::GetInstance()->AddItem(name_, "SpawnCoolTime", coolTime_, index++);
 	GameParamEditor::GetInstance()->AddItem(name_, "LifeTime", lifeTime_, index++);
+
+
+	GameParamEditor::GetInstance()->AddItem(name_, "ScaleYMin", scaleMin_, index++);
+	GameParamEditor::GetInstance()->AddItem(name_, "ScaleYMax", scaleMax_, index++);
+	GameParamEditor::GetInstance()->AddItem(name_, "SpeedMin", speedMin_, index++);
+	GameParamEditor::GetInstance()->AddItem(name_, "SpeedMax", speedMax_, index++);
+	GameParamEditor::GetInstance()->AddItem(name_, "SpawnPosMin", spawnPosMin_, index++);
+	GameParamEditor::GetInstance()->AddItem(name_, "SpawnPosMax", spawnPosMax_, index++);
 }
 
-void WingsParticleParticle::ApplyDebugParam() {
+void WingsParticle::ApplyDebugParam() {
+	// 発生数
+	spawnCount_ = GameParamEditor::GetInstance()->GetValue<uint32_t>(name_, "SpawnCount");
 	coolTime_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "SpawnCoolTime");
 	lifeTime_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "LifeTime");
+
+	// サイズ
+	scaleMin_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "ScaleYMin");
+	scaleMax_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "ScaleYMax");
+	// 速度
+	speedMin_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "SpeedMin");
+	speedMax_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "SpeedMax");
+	// 生成位置
+	spawnPosMin_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "SpawnPosMin");
+	spawnPosMax_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "SpawnPosMax");
 }

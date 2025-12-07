@@ -204,7 +204,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	enemyAttackManager_->Initialize(context_->postEffectManager_, iceFallModel_->GetDefaultTexture());
 	// ボス敵モデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Boss");
-	//bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
+	bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	bossEnemyModel_->SetDefaultIsEnableLight(true);
 
 	// 敵のアニメーションデータを取得する
@@ -243,6 +243,14 @@ void TDGameScene::Initialize(SceneContext* context) {
 	playerAttackDownEffectModel_ = enemyRushModel_;
 	// 風攻撃演出モデル
 	windModel_ = context_->modelManager->GetNameByModel("Wind");
+
+	// 翼のモデルを取得する
+	wingModel_ = context_->modelManager->GetNameByModel("Wing");
+
+	// 翼の演出
+	enemyWingsParticleParticle_ = std::make_unique<WingsParticle>();
+	enemyWingsParticleParticle_->Initialize(wingModel_->GetDefaultTexture());
+	//enemyWingsParticleParticle_->SetEmitterPos({ 0.0f,10.0f,0.0f });
 
 	// ボスが常に纏っているパーティクル
 	bossWearParticle_ = std::make_unique<ParticleBehavior>();
@@ -449,6 +457,11 @@ void TDGameScene::Update() {
 	}
 	enemyWindAttackParticle_->Update();
 
+	// ボスの翼の演出
+	enemyWingsParticleParticle_->SetEmitterPos(
+		Vector3(bossEnemy_->GetWorldPosition().x, bossEnemy_->GetWorldPosition().y + 3.0f, bossEnemy_->GetWorldPosition().z));
+	enemyWingsParticleParticle_->Update();
+
 	// ボスがヒットした時の演出
 	if (bossEnemy_->IsHit()) {
 		bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,bossEnemy_->GetAlpha() });
@@ -625,6 +638,9 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	for (auto& particle : stageManager_->GetBreakWallParticles()) {
 		ModelRenderer::DrawInstancing(wallModel_, particle->GetCurrentNumInstance(), *particle->GetWorldTransforms());
 	}
+
+	// ボスの翼の演出を描画
+	ModelRenderer::DrawInstancing(wingModel_, enemyWingsParticleParticle_->GetCurrentNumInstance(), *enemyWingsParticleParticle_->GetWorldTransforms());
 
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
