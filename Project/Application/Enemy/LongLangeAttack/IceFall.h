@@ -56,6 +56,8 @@ public:
 	// 当たり判定の球データ
 	Sphere GetSphereData() { return Sphere(collider_->GetWorldPosition(), collider_->GetRadius()); }
 
+	Vector3 GetWorldPosition() { return worldTransform_.GetWorldPosition(); }
+
 private:
 
 	// ワールド行列

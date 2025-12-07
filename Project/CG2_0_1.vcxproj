@@ -170,6 +170,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="Application\Camera\CameraController.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
+    <ClCompile Include="Application\Enemy\Effect\BreakIceFallParticle.cpp" />
     <ClCompile Include="Application\Enemy\Effect\EnemyRushEffect.cpp" />
     <ClCompile Include="Application\Enemy\Effect\EnemyRushParticle.cpp" />
     <ClCompile Include="Application\Enemy\Effect\EnemyWindAttackParticle.cpp" />
@@ -351,6 +352,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy\BossContext.h" />
     <ClInclude Include="Application\Enemy\BossEnemy.h" />
     <ClInclude Include="Application\Enemy\BossState.h" />
+    <ClInclude Include="Application\Enemy\Effect\BreakIceFallParticle.h" />
     <ClInclude Include="Application\Enemy\Effect\EnemyRushEffect.h" />
     <ClInclude Include="Application\Enemy\Effect\EnemyRushParticle.h" />
     <ClInclude Include="Application\Enemy\Effect\EnemyWindAttackParticle.h" />

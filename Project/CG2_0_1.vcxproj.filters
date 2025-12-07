@@ -301,6 +301,7 @@
     <ClCompile Include="Application\Player\Effect\PlayerAttackDownEffect.cpp" />
     <ClCompile Include="Application\Enemy\Effect\EnemyRushParticle.cpp" />
     <ClCompile Include="Application\Enemy\Effect\WingsParticle.cpp" />
+    <ClCompile Include="Application\Enemy\Effect\BreakIceFallParticle.cpp" />
     <ClCompile Include="Application\UI\PlayerHpUI.cpp" />
     <ClCompile Include="Application\UI\GameOverUI.cpp" />
   </ItemGroup>
@@ -608,6 +609,7 @@
     <ClInclude Include="Application\Player\Effect\PlayerAttackDownEffect.h" />
     <ClInclude Include="Application\Enemy\Effect\EnemyRushParticle.h" />
     <ClInclude Include="Application\Enemy\Effect\WingsParticle.h" />
+    <ClInclude Include="Application\Enemy\Effect\BreakIceFallParticle.h" />
     <ClInclude Include="Application\UI\PlayerHpUI.h" />
     <ClInclude Include="Application\UI\GameOverUI.h" />
   </ItemGroup>

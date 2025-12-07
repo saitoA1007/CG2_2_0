@@ -194,7 +194,9 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// 氷柱のモデルを取得
 	iceFallModel_ = context_->modelManager->GetNameByModel("IceFall");
 	iceFallModel_->SetDefaultIsEnableLight(true);
-
+	// 破壊演出用の氷柱モデル
+	breakIceFallModel_ = context_->modelManager->GetNameByModel("IceFallEffect");
+	
 	// 敵の攻撃管理クラス
 	enemyAttackManager_ = std::make_unique<EnemyAttackManager>();
 	enemyAttackManager_->Initialize(context_->postEffectManager_, iceFallModel_->GetDefaultTexture());
@@ -527,6 +529,15 @@ void TDGameScene::Draw(const bool &isDebugView) {
 			//ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 			CustomRenderer::DrawRock(iceFallModel_, iceFall->GetWorldTransform(), sceneLightingController_->GetResource(), iceFall->GetMaterial());
 			//ModelRenderer::Draw(iceFallModel_, iceFall->GetShadowWorldTransform(), &iceFall->GetShadowMaterial());
+		}
+	}
+
+	// 氷柱の破壊演出を描画
+	for (const std::unique_ptr<BreakIceFallParticle>& iceFall : enemyAttackManager_->GetBreakIceFallParticles()) {
+		if (!iceFall->IsFinished()) {
+			for (auto& particle : iceFall->GetParticleDatas()) {
+				CustomRenderer::DrawRock(breakIceFallModel_, particle.worldTransform, sceneLightingController_->GetResource(), particle.material.get());
+			}
 		}
 	}
 
