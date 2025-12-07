@@ -1,0 +1,9 @@
+{
+    "Boss-CrossMove": {
+        "CrossEndRatio": 0.800000011920929,
+        "CrossMoveTime": 3.0,
+        "MaxMoveHeight": 2.0,
+        "SceneName": "TDGameScene",
+        "UpDownCount": 3
+    }
+}

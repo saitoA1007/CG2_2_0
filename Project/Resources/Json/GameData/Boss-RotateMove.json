@@ -1,0 +1,7 @@
+{
+    "Boss-RotateMove": {
+        "RotateMoveRadiusRatio": 1.0,
+        "RotateTimeRatio": 1.0,
+        "SceneName": "TDGameScene"
+    }
+}

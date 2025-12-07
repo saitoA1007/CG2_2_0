@@ -1,0 +1,8 @@
+{
+    "Boss-Wind": {
+        "SceneName": "TDGameScene",
+        "WindInTime": 1.0,
+        "WindMainTime": 5.0,
+        "WindOutTime": 1.0
+    }
+}
