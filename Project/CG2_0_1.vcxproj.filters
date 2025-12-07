@@ -304,6 +304,7 @@
     <ClCompile Include="Application\Enemy\Effect\BreakIceFallParticle.cpp" />
     <ClCompile Include="Application\UI\PlayerHpUI.cpp" />
     <ClCompile Include="Application\UI\GameOverUI.cpp" />
+    <ClCompile Include="Application\Stage\Effect\BreakWallParticle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -612,6 +613,7 @@
     <ClInclude Include="Application\Enemy\Effect\BreakIceFallParticle.h" />
     <ClInclude Include="Application\UI\PlayerHpUI.h" />
     <ClInclude Include="Application\UI\GameOverUI.h" />
+    <ClInclude Include="Application\Stage\Effect\BreakWallParticle.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

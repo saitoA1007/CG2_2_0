@@ -64,6 +64,11 @@ public:
 	/// <returns></returns>
 	bool GetIsAlive() const { return isAlive_; }
 
+	// 壁が壊れるパーティクのフラグ
+	bool IsBreakParticleActive() { return isBreakParticleActive_; }
+
+	Vector3 GetWorldPosition() { return worldTransform_.GetWorldPosition(); }
+
 private: // 固定値
 
 	// 復活までの時間
@@ -89,6 +94,8 @@ private:
 
 	// 生存フラグ
 	bool isAlive_ = true;
+
+	bool isBreakParticleActive_ = false;
 
 	// obbの当たり判定
 	std::unique_ptr<GameEngine::OBBCollider> collider_;

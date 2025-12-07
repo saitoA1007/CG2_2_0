@@ -537,11 +537,6 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	CustomRenderer::PreDraw(CustomRenderMode::Rock);
 	CustomRenderer::DrawRock(bgIceRockModel_, bgRock_->GetWorldTransform(), sceneLightingController_->GetResource(), bgRock_->GetMaterial());
 
-	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
-
-	// ステージを描画する
-	stageManager_->Draw(wallModel_);
-
 	// アニメーションの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 
@@ -563,6 +558,12 @@ void TDGameScene::Draw(const bool &isDebugView) {
 			CustomRenderer::DrawIce(icePlaneModel_, plane.GetWorldTransform(), sceneLightingController_->GetResource(), stageWallPlaneMaterial_.get());
 		}
 	}*/
+
+	// 通常モデルの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
+
+	// ステージを描画する
+	stageManager_->Draw(wallModel_);
 
 	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
 	// 氷柱のモデルを描画
@@ -616,6 +617,14 @@ void TDGameScene::Draw(const bool &isDebugView) {
 
 	// ボスの風攻撃を描画
 	ModelRenderer::DrawInstancing(windModel_, enemyWindAttackParticle_->GetCurrentNumInstance(), *enemyWindAttackParticle_->GetWorldTransforms());
+
+	// インスタンシング描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::Instancing);
+
+	// 壁破壊のパーティクルを描画
+	for (auto& particle : stageManager_->GetBreakWallParticles()) {
+		ModelRenderer::DrawInstancing(wallModel_, particle->GetCurrentNumInstance(), *particle->GetWorldTransforms());
+	}
 
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
