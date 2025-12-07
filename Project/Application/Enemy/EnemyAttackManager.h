@@ -9,6 +9,7 @@
 
 // アプリ機能
 #include"LongLangeAttack/IceFall.h"
+#include"Application/Enemy/Effect/BreakIceFallParticle.h"
 
 // ボスの遠距離攻撃を管理する
 class EnemyAttackManager {
@@ -66,6 +67,12 @@ public:
 	std::list<std::unique_ptr<IceFall>>& GetIceFalls() { return IceFallsList_; }
 
 	/// <summary>
+	/// 氷柱の破壊リスト
+	/// </summary>
+	/// <returns></returns>
+	std::list<std::unique_ptr<BreakIceFallParticle>>& GetBreakIceFallParticles() { return breakIceFallParticles_; }
+
+	/// <summary>
 	/// ステージの半径を設定
 	/// </summary>
 	/// <param name="radius"></param>
@@ -99,6 +106,8 @@ private:
 
 	// 氷柱攻撃
 	std::list<std::unique_ptr<IceFall>> IceFallsList_;
+	// 氷柱の破壊演出
+	std::list<std::unique_ptr<BreakIceFallParticle>> breakIceFallParticles_;
 
 	// 氷の演出データ
 	std::vector<IceFallEffectData> iceFallEffectDatas_;
@@ -149,6 +158,11 @@ private:
 
 	// 風攻撃の更新処理
 	void WindUpdate();
+
+	/// <summary>
+	/// 氷柱の破壊演出を追加
+	/// </summary>
+	void AddBreakIceParticle(const Vector3& pos);
 
 	/// <summary>
 	/// 値を登録する

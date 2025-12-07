@@ -166,6 +166,8 @@ private: // シーン機能
 
 	// 氷柱のモデル
 	GameEngine::Model* iceFallModel_;
+	// 破壊した氷柱モデル
+	GameEngine::Model* breakIceFallModel_;
 	// 敵の突進攻撃演出のモデル
 	GameEngine::Model* enemyRushModel_;
 	

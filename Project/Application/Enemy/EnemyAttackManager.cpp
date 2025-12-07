@@ -67,6 +67,11 @@ void EnemyAttackManager::Update(const Matrix4x4& cameraWorldMatrix, const Matrix
     EffectUpdate(cameraWorldMatrix, viewMatrix);
 
 	// 氷柱がデスフラグがたったら削除
+    for (std::unique_ptr<IceFall>& iceFall : IceFallsList_) {
+        if (!iceFall->IsAlive()) {
+            AddBreakIceParticle(iceFall->GetWorldPosition());
+        }
+    }
 	IceFallsList_.remove_if([](const std::unique_ptr<IceFall>& iceFall) {
 		return iceFall->IsAlive() ? false : true;
 	});
@@ -75,6 +80,15 @@ void EnemyAttackManager::Update(const Matrix4x4& cameraWorldMatrix, const Matrix
 	for (std::unique_ptr<IceFall>& iceFall : IceFallsList_) {
 		iceFall->Update();
 	}
+
+    breakIceFallParticles_.remove_if([](const std::unique_ptr<BreakIceFallParticle>& breakIceFallParticle) {
+        return breakIceFallParticle->IsFinished();
+    });
+    
+    // 氷柱の破壊演出の更新処理
+    for (auto& breakIceFallParticle : breakIceFallParticles_) {
+        breakIceFallParticle->Update();
+    }
 
     // 咆哮演出の更新処理
     RoatUpdate();
@@ -87,6 +101,12 @@ void EnemyAttackManager::AddIceFall(const Vector3& pos) {
 	std::unique_ptr<IceFall> tmpIceFall = std::make_unique<IceFall>();
 	tmpIceFall->Initialize(pos, iceFallTexture_);
 	IceFallsList_.push_back(std::move(tmpIceFall));
+}
+
+void EnemyAttackManager::AddBreakIceParticle(const Vector3& pos) {
+    std::unique_ptr<BreakIceFallParticle> tmpIceFall = std::make_unique<BreakIceFallParticle>();
+    tmpIceFall->Initialize(iceFallTexture_, pos);
+    breakIceFallParticles_.push_back(std::move(tmpIceFall));
 }
 
 void EnemyAttackManager::CreateIceFallPositions(const float& waitIceFallTime) {
