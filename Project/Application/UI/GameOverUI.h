@@ -3,6 +3,7 @@
 #include "Input.h"
 #include "InputCommand.h"
 #include "TextureManager.h"
+#include <functional>
 
 class GameOverUI {
 public:
@@ -38,6 +39,13 @@ public:
 	bool IsActive() const { return isActive_; }
 	void SetActive(bool active) { isActive_ = active; }
 
+	// 入力処理（Updateから呼ぶ）
+	void HandleInput();
+
+	// クリック時のコールバック
+	void SetOnRetryClicked(std::function<void()> cb) { onRetryClicked_ = std::move(cb); }
+	void SetOnTitleClicked(std::function<void()> cb) { onTitleClicked_ = std::move(cb); }
+
 private:
 	// 入力関連
 	GameEngine::Input* input_ = nullptr;
@@ -61,4 +69,17 @@ private:
 
 	// 内部状態
 	bool isActive_ = false;
+
+	Vector2 retryPos_ = {640.0f, 360.0f};
+	Vector2 retrySize_ = {400.0f, 48.0f};
+	Vector2 titlePos_ = {640.0f, 440.0f};
+	Vector2 titleSize_ = {400.0f, 48.0f};
+
+	// ホバー判定フラグ
+	bool isHoverRetry_ = false;
+	bool isHoverTitle_ = false;
+
+	// クリックコールバック
+	std::function<void()> onRetryClicked_ = nullptr;
+	std::function<void()> onTitleClicked_ = nullptr;
 };
