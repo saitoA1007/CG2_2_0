@@ -303,6 +303,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 	bossHpUI_ = std::make_unique<BossHpUI>();
 	bossHpUI_->Initialize(bossEnemy_->GetMaxHp());
 
+    // プレイヤーのhpUIを初期化 (仮の最大HP: 3)
+    playerHpUI_ = std::make_unique<PlayerHpUI>();
+    playerHpUI_->Initialize(3);
+
 	// 空気を演出するためのパーティクル
 	airParticle_ = std::make_unique<ParticleBehavior>();
 	airParticle_->Initialize("AirParticle", 128);
@@ -434,6 +438,10 @@ void TDGameScene::Update() {
 	// ボスのHpUIの更新処理
 	bossHpUI_->SetCurrentHp(bossEnemy_->GetCurrentHP());
 	bossHpUI_->Update();
+
+	// プレイヤーのHpUIの更新処理
+    playerHpUI_->SetCurrentHp(player_->GetCurrentHP());
+	playerHpUI_->Update();
 
 #ifdef _DEBUG
 	// 地面マテリアルの更新処理
@@ -587,9 +595,13 @@ void TDGameScene::Draw(const bool& isDebugView) {
 	// ボスのHPUIを表示
 	//SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
 	//SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
-}
-
-void TDGameScene::InputRegisterCommand() {
+ 
+ 	// プレイヤーのHPUIを表示
+ 	//SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
+ 	//SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
+ }
+ 
+ void TDGameScene::InputRegisterCommand() {
 	// 移動の入力コマンドを登録する
 	context_->inputCommand->RegisterCommand("MoveUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
 	context_->inputCommand->RegisterCommand("MoveDown", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });
