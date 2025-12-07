@@ -191,6 +191,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Scene\ResultScene.cpp" />
     <ClCompile Include="Application\Scene\TDGameScene.cpp" />
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
+    <ClCompile Include="Application\Stage\Effect\BreakWallParticle.cpp" />
     <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="Application\Stage\StageWallPlane.cpp" />
     <ClCompile Include="Application\Stage\Wall.cpp" />
@@ -374,6 +375,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Scene\ResultScene.h" />
     <ClInclude Include="Application\Scene\TDGameScene.h" />
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
+    <ClInclude Include="Application\Stage\Effect\BreakWallParticle.h" />
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\Stage\StageWallPlane.h" />
     <ClInclude Include="Application\Stage\Wall.h" />

@@ -140,6 +140,45 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 	UpdateAnimation();
 }
 
+void Player::Restart() {
+	// 位置リセット
+	worldTransform_.transform_.translate = { -2.0f, 1.0f, 0.0f };
+	worldTransform_.UpdateTransformMatrix();
+	// 速度リセット
+	velocity_ = { 0.0f, 0.0f, 0.0f };
+	// 状態リセット
+	isJump_ = false;
+	jumpTimer_ = 0.0f;
+	isCharging_ = false;
+	chargeTimer_ = 0.0f;
+	chargeRatio_ = 0.0f;
+	rushChargeLevel_ = 0;
+	isPreRushing_ = false;
+	isRushing_ = false;
+	isRushLock_ = false;
+	rushLockTimer_ = 0.0f;
+	rushTimer_ = 0.0f;
+	rushActiveTimer_ = 0.0f;
+	isBounceLock_ = false;
+	bounceLockTimer_ = 0.0f;
+	currentBounceUpSpeed_ = 0.0f;
+	currentBounceAwaySpeed_ = 0.0f;
+	currentBounceLockTime_ = 0.0f;
+	bounceAwayDir_ = { 0.0f, 0.0f, 0.0f };
+	isAttackDown_ = false;
+	attackDownPower_ = 0.0f;
+	// HPリセット
+	currentHP_ = kMaxHP_;
+	isAlive_ = true;
+	// 無敵解除
+	isInvincible_ = false;
+	damageInvincibleTimer_ = 0.0f;
+	// アニメーションリセット
+    StartNormalAnim(PlayerAnimationType::Walk, "歩き", true);
+    // 値の適応
+    ApplyDebugParam();
+}
+
 void Player::UpdateAnimation() {
     // 突進のアニメーション終了検出
     if (currentAnimationType_ == PlayerAnimationType::Rush &&
@@ -518,7 +557,10 @@ void Player::OnCollision(const CollisionResult &result) {
 		Log("is hit Boss normally");
 		// HP減少処理（仮で1ダメージ）
 		currentHP_ -= 1;
-		if (currentHP_ < 0) { currentHP_ = 0; }
+		if (currentHP_ < 0) {
+			currentHP_ = 0;
+            isAlive_ = false;
+		}
 		// ダメージ無敵時間開始
 		damageInvincibleTimer_ = kDamageInvincibleTime_;
 		isInvincible_ = true;

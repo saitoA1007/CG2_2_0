@@ -101,7 +101,7 @@ private: // メンバ変数
 	std::string kGroupName_ = "Boss";
 
 	// 当たり判定
-	bool isHit_ = true;
+	bool isHit_ = false;
 
 	// 時間
 	float timer_ = 1.0f;

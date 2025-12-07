@@ -1,7 +1,7 @@
 #pragma once
 #include"WorldTransforms.h"
 
-class WingsParticle {
+class BreakWallParticle {
 public:
 
 	struct ParticleData {
@@ -10,12 +10,8 @@ public:
 		Vector4 color;       // 色
 		float lifeTime;      // 生存時間
 		float currentTime;   // 現在の時間
-		float rotateSpeed;   // 回転速度
 		uint32_t textureHandle = 0; // 使用するテクスチャ
-
-		float swayPhase = 0.0f;
-		float swaySpeed = 0.0f;
-		float swayWidth = 0.0f;
+		Vector3 startScale;
 	};
 
 public:
@@ -24,7 +20,7 @@ public:
 	/// 初期化処理
 	/// </summary>
 	/// <param name="texture"></param>
-	void Initialize(const uint32_t& texture);
+	void Initialize(const uint32_t& texture,const Vector3& emitPos);
 
 	/// <summary>
 	/// 更新処理
@@ -37,7 +33,10 @@ public:
 	/// 発生位置を設定
 	/// </summary>
 	/// <param name="pos"></param>
-	void SetEmitterPos(const Vector3& pos) { emitterPos_ = pos; }
+	void SetEmitterPos(const Vector3& pos) {
+		emitterPos_ = pos;
+		Create();
+	}
 
 	// ループの設定
 	void SetIsLoop(const bool& isLoop) { isLoop_ = isLoop; }
@@ -53,6 +52,8 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	uint32_t GetCurrentNumInstance() const { return numInstance_; }
+
+	bool IsFinished() const { return isFinished_; }
 
 private:
 
@@ -77,16 +78,13 @@ private:
 	// 時間
 	float timer_ = 0.0f;
 
-	float coolTime_ = 0.2f;
+	float coolTime_ = 0.0f;
 
 	// ループの判定
-	bool isLoop_ = true;
+	bool isLoop_ = false;
 
 	float lifeTime_ = 2.0f;
-	std::string name_ = "EnemyWingsParticle";
-
-	// 発生する数
-	uint32_t spawnCount_ = 1;
+	std::string name_ = "WallBreakParticle";
 
 	// サイズ
 	float scaleMin_ = 1.0f;
@@ -97,6 +95,15 @@ private:
 	// 範囲
 	float spawnPosMin_ = 1.0f;
 	float spawnPosMax_ = 1.0f;
+
+	// 発生する数
+	//uint32_t spawnCount_ = 1;
+
+	bool isFinished_ = false;
+
+	float fieldAcceleration_ = 0.1f;
+
+	float elasticity_ = 0.8f;
 
 private:
 
@@ -126,3 +133,4 @@ private:
 	/// </summary>
 	void ApplyDebugParam();
 };
+

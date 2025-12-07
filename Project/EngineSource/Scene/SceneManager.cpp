@@ -164,7 +164,7 @@ void SceneManager::LoadSpriteData() {
 
 void SceneManager::LoadAnimationData() {
 	// 歩くアニメーションデータを登録する
-	context_->animationManager->RegisterAnimation("Walk", "walk.gltf");
+	//context_->animationManager->RegisterAnimation("Walk", "walk.gltf");
 
 	// ボスのアニメーションを読み込む
 	context_->animationManager->RegisterAnimations("BossBird.IceBreath", "BossBird.IceBreath.gltf", "Resources/Animations");

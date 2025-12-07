@@ -4,6 +4,7 @@
 #include"Application/CollisionTypeID.h"
 #include"Application/Player/Player.h"
 #include"Application/Enemy/BossEnemy.h"
+#include"EasingManager.h"
 #include "LogManager.h"
 using namespace GameEngine;
 
@@ -50,18 +51,26 @@ void Wall::Initialilze(const Transform& transform, float respawnTime, int32_t ma
 void Wall::Update() {
 	if (currentHp_ <= 0) {
 		isAlive_ = false;
+		isBreakParticleActive_ = false;
     }
 
 	// 生存フラグがtrueなら早期リターン
 	if (isAlive_) {return;}
 
-	respawnTimer_ += FpsCounter::deltaTime;
+	respawnTimer_ += FpsCounter::deltaTime / respawnTime_;
+
+	if (respawnTimer_ >= 0.5f) {
+		float localT = (respawnTimer_ - 0.5f) / 0.5f;
+		float alpha = Lerp(0.0f, 1.0f, EaseIn(localT));
+		material_.SetColor({ 0.8f,0.8f,0.8f,alpha });
+	}
 
 	// リスポーン時間を超えたら、復活する
-	if (respawnTimer_ >= respawnTime_) {
+	if (respawnTimer_ >= 1.0f) {
 		isAlive_ = true;
 		respawnTimer_ = 0.0f;
 		currentHp_ = maxHp_;
+		material_.SetColor({ 0.8f,0.8f,0.8f,1.0f });
 		// 壁の状態に応じてステータスを変更する
 		ChangeWallState();
 	}
@@ -115,6 +124,8 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 
 	if (currentHp_ <= 0) {
 		currentHp_ = 0;
+		material_.SetColor({ 0.8f,0.8f,0.8f,0.0f });
+		isBreakParticleActive_ = true;
 		// 誰が破壊するかによって状態を変える
 		wallState_ = WallState::Normal;
 	}

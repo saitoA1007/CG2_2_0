@@ -11,6 +11,7 @@
 
 #include"Application/CollisionTypeID.h"
 #include"Extension/CustomRenderer.h"
+#include"FPSCounter.h"
 
 using namespace GameEngine;
 
@@ -47,6 +48,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// 天球モデルを生成
 	skyDomeModel_ = context_->modelManager->GetNameByModel("SkyDome");
+	skyDomeModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	skyDomeWorldTransform_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}});
 
 	// 地面を生成
@@ -202,7 +204,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	enemyAttackManager_->Initialize(context_->postEffectManager_, iceFallModel_->GetDefaultTexture());
 	// ボス敵モデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Boss");
-	//bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
+	bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	bossEnemyModel_->SetDefaultIsEnableLight(true);
 
 	// 敵のアニメーションデータを取得する
@@ -241,6 +243,14 @@ void TDGameScene::Initialize(SceneContext* context) {
 	playerAttackDownEffectModel_ = enemyRushModel_;
 	// 風攻撃演出モデル
 	windModel_ = context_->modelManager->GetNameByModel("Wind");
+
+	// 翼のモデルを取得する
+	wingModel_ = context_->modelManager->GetNameByModel("Wing");
+
+	// 翼の演出
+	enemyWingsParticleParticle_ = std::make_unique<WingsParticle>();
+	enemyWingsParticleParticle_->Initialize(wingModel_->GetDefaultTexture());
+	//enemyWingsParticleParticle_->SetEmitterPos({ 0.0f,10.0f,0.0f });
 
 	// ボスが常に纏っているパーティクル
 	bossWearParticle_ = std::make_unique<ParticleBehavior>();
@@ -324,6 +334,40 @@ void TDGameScene::Update() {
 	if (context_->input->TriggerKey(DIK_U) || (bossEnemy_->GetCurrentHP() == 0)) {
 		isFinished_ = true;
 	}
+
+    // Detect boss hit (transition from not hit to hit)
+    bool currentBossHit = bossEnemy_->IsHit();
+    if (currentBossHit && !prevBossHit_) {
+        // Trigger freeze (stop updating everything except camera & camera controller)
+        isBossHitFreezeActive_ = true;
+        bossHitFreezeTimer_ = kBossHitFreezeDuration;
+        // start camera shake via cameraController
+        if (cameraController_) {
+            cameraController_->SetDesiredFov(1.0f);
+            cameraController_->StartCameraShake(32.0f, kBossHitFreezeDuration, 64.0f,
+                [](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutCubic(a, b, t); },
+                CameraController::ShakeOrigin::TargetAndCameraPosition,
+                true, true, true, false);
+        }
+    }
+    prevBossHit_ = currentBossHit;
+
+	// If boss-hit freeze active, only update cameraController and camera; skip other updates
+	if (isBossHitFreezeActive_) {
+        // decrease timer
+        bossHitFreezeTimer_ -= GameEngine::FpsCounter::deltaTime;
+        // Still update camera controller and camera so shake is visible
+        cameraController_->Update(context_->inputCommand, context_->input);
+        mainCamera_->SetCamera(cameraController_->GetCamera());
+
+        if (bossHitFreezeTimer_ <= 0.0f) {
+            isBossHitFreezeActive_ = false;
+            bossHitFreezeTimer_ = 0.0f;
+        }
+
+        // Skip rest of update when frozen
+        return;
+    }
 
 	// デバックリストを削除
 	debugRenderer_->Clear();
@@ -413,6 +457,11 @@ void TDGameScene::Update() {
 	}
 	enemyWindAttackParticle_->Update();
 
+	// ボスの翼の演出
+	enemyWingsParticleParticle_->SetEmitterPos(
+		Vector3(bossEnemy_->GetWorldPosition().x, bossEnemy_->GetWorldPosition().y + 3.0f, bossEnemy_->GetWorldPosition().z));
+	enemyWingsParticleParticle_->Update();
+
 	// ボスがヒットした時の演出
 	if (bossEnemy_->IsHit()) {
 		bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,bossEnemy_->GetAlpha() });
@@ -448,6 +497,13 @@ void TDGameScene::Update() {
 	// プレイヤーのHpUIの更新処理
 	playerHpUI_->SetCurrentHp(player_->GetCurrentHP());
 	playerHpUI_->Update();
+
+	// GameOver判定: プレイヤーが生存していなければGameOverUIを有効化
+	if (player_ && !player_->IsAlive()) {
+		if (gameOverUI_) {
+			gameOverUI_->SetActive(true);
+		}
+	}
 
 	// GameOverUIの更新処理
 	gameOverUI_->Update();
@@ -494,11 +550,6 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	CustomRenderer::PreDraw(CustomRenderMode::Rock);
 	CustomRenderer::DrawRock(bgIceRockModel_, bgRock_->GetWorldTransform(), sceneLightingController_->GetResource(), bgRock_->GetMaterial());
 
-	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
-
-	// ステージを描画する
-	stageManager_->Draw(wallModel_);
-
 	// アニメーションの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 
@@ -520,6 +571,12 @@ void TDGameScene::Draw(const bool &isDebugView) {
 			CustomRenderer::DrawIce(icePlaneModel_, plane.GetWorldTransform(), sceneLightingController_->GetResource(), stageWallPlaneMaterial_.get());
 		}
 	}*/
+
+	// 通常モデルの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
+
+	// ステージを描画する
+	stageManager_->Draw(wallModel_);
 
 	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
 	// 氷柱のモデルを描画
@@ -573,6 +630,17 @@ void TDGameScene::Draw(const bool &isDebugView) {
 
 	// ボスの風攻撃を描画
 	ModelRenderer::DrawInstancing(windModel_, enemyWindAttackParticle_->GetCurrentNumInstance(), *enemyWindAttackParticle_->GetWorldTransforms());
+
+	// インスタンシング描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::Instancing);
+
+	// 壁破壊のパーティクルを描画
+	for (auto& particle : stageManager_->GetBreakWallParticles()) {
+		ModelRenderer::DrawInstancing(wallModel_, particle->GetCurrentNumInstance(), *particle->GetWorldTransforms());
+	}
+
+	// ボスの翼の演出を描画
+	ModelRenderer::DrawInstancing(wingModel_, enemyWingsParticleParticle_->GetCurrentNumInstance(), *enemyWingsParticleParticle_->GetWorldTransforms());
 
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
