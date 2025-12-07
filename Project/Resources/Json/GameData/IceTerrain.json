@@ -12,6 +12,13 @@
             0.8235294222831726,
             1.0
         ],
+        "PlaneSpecularColor": [
+            1.0,
+            1.0,
+            1.0,
+            0.0
+        ],
+        "PlaneSpecularPower": 250.0,
         "RimColor": [
             0.3148788511753082,
             0.569560706615448,
@@ -19,6 +26,7 @@
             1.0
         ],
         "RimIntensity": 1.5,
+        "RimPower": 3.0,
         "Scale": 50.0,
         "SceneName": "TDGameScene",
         "Shininess": 8.0,

@@ -62,6 +62,9 @@ void Terrain::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "Time", iceMaterial_->materialData_->time);
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "Scale", scale_);
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "RimPower", iceMaterial_->materialData_->rimPower);
+
+	GameParamEditor::GetInstance()->AddItem("IceTerrain", "PlaneSpecularColor", iceMaterial_->materialData_->planeSpecularColor);
+	GameParamEditor::GetInstance()->AddItem("IceTerrain", "PlaneSpecularPower", iceMaterial_->materialData_->planeSpecularPower);
 }
 
 void Terrain::ApplyDebugParam() {
@@ -74,6 +77,9 @@ void Terrain::ApplyDebugParam() {
 	iceMaterial_->materialData_->time = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "Time");
 	scale_ = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "Scale");
 	iceMaterial_->materialData_->rimPower = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "RimPower");
+
+	iceMaterial_->materialData_->planeSpecularColor = GameParamEditor::GetInstance()->GetValue<Vector4>("IceTerrain", "PlaneSpecularColor");
+	iceMaterial_->materialData_->planeSpecularPower = GameParamEditor::GetInstance()->GetValue<float>("IceTerrain", "PlaneSpecularPower");
 
 	iceMaterial_->materialData_->rimColor.x = rimColor.x;
 	iceMaterial_->materialData_->rimColor.y = rimColor.y;

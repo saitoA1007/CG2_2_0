@@ -40,4 +40,7 @@ void IceMaterial::Initialize() {
 	materialData_->rimColor = { 0.0f,0.296f,0.672f };
 	materialData_->rimIntensity = 0.3f;
 	materialData_->rimPower = 3.0f;
+	// 平面
+	materialData_->planeSpecularColor = { 1.0f,1.0f,1.0f,0.0f };
+	materialData_->planeSpecularPower = 250.0f;
 }

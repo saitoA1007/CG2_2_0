@@ -151,7 +151,7 @@ void BossStateBattle::ResetNormal() {
 	// 選択した遷移
 	//selectButtleBehavior_ = ButtleBehavior::RushAttack;
 	//selectButtleBehavior_ = ButtleBehavior::WindAttack;
-	//selectButtleBehavior_ = ButtleBehavior::IceFallAttack;
+	selectButtleBehavior_ = ButtleBehavior::IceFallAttack;
 }
 
 void BossStateBattle::NormalUpdate() {

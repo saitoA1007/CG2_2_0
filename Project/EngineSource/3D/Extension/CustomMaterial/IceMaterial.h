@@ -22,8 +22,10 @@ public:
 		float time;
 		Vector3 rimColor;
 		float rimIntensity;
+		Vector4 planeSpecularColor;
 		float rimPower;
-		float padding[3];
+		float planeSpecularPower;
+		float padding[2];
 	};
 
 public:
