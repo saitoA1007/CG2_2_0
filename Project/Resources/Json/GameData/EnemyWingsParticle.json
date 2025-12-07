@@ -1,0 +1,14 @@
+{
+    "EnemyWingsParticle": {
+        "LifeTime": 2.0,
+        "ScaleYMax": 2.0,
+        "ScaleYMin": 1.0,
+        "SceneName": "TDGameScene",
+        "SpawnCoolTime": 2.5,
+        "SpawnCount": 8,
+        "SpawnPosMax": 2.0,
+        "SpawnPosMin": -2.0,
+        "SpeedMax": 8.0,
+        "SpeedMin": 5.0
+    }
+}

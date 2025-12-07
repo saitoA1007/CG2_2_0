@@ -24,6 +24,7 @@
 #include"Application/Enemy/EnemyAttackManager.h"
 #include"Application/Enemy/Effect/EnemyRushEffect.h"
 #include"Application/Enemy/Effect/EnemyWindAttackParticle.h"
+#include"Application/Enemy/Effect/WingsParticle.h"
 #include"Application/Graphics/Terrain.h"
 #include"Application/Graphics/PlaneProjectionShadow.h"
 #include"Application/Graphics/BgRock.h"
@@ -180,6 +181,8 @@ private:
 	std::unique_ptr<EnemyRushEffect> enemyRushEffect_;
 	// ボスの風攻撃演出
 	std::unique_ptr<EnemyWindAttackParticle> enemyWindAttackParticle_;
+	// 翼の演出
+	std::unique_ptr<WingsParticle> enemyWingsParticleParticle_;
 
 	// ボスの纏っているパーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> bossWearParticle_;
@@ -195,6 +198,8 @@ private:
 	GameEngine::Model* breakIceFallModel_;
 	// 敵の突進攻撃演出のモデル
 	GameEngine::Model* enemyRushModel_;
+	// 翼のモデル
+	GameEngine::Model* wingModel_;
 	
 	// 平面モデル
 	GameEngine::Model* planeModel_;
