@@ -10,6 +10,7 @@
 #include"Application/CollisionTypeID.h"
 #include"Application/Stage/Wall.h"
 #include "LogManager.h"
+#include "AudioManager.h"
 using namespace GameEngine;
 
 void Player::Initialize(GameEngine::Animator *animator, const std::array<std::map<std::string, AnimationData>, kPlayerAnimationCount>& animationData) {
@@ -31,6 +32,15 @@ void Player::Initialize(GameEngine::Animator *animator, const std::array<std::ma
 	collider_->SetUserData(userData);
 	// コールバック登録
 	collider_->SetOnCollisionCallback([this](const CollisionResult &result) { this->OnCollision(result); });
+
+	// オーディオハンドル取得
+	audioHandle_PlayerDamaged_ = AudioManager::GetInstance().GetHandleByName("PlayerDamaged.mp3");
+	audioHandle_RushCharge_ = AudioManager::GetInstance().GetHandleByName("RushCharge.mp3");
+	audioHandle_RushLv1_ = AudioManager::GetInstance().GetHandleByName("Rush_lv1.mp3");
+	audioHandle_RushLv2_ = AudioManager::GetInstance().GetHandleByName("Rush_lv2.mp3");
+	audioHandle_RushLv3_ = AudioManager::GetInstance().GetHandleByName("Rush_lv3.mp3");
+	audioHandle_AirMotion_ = AudioManager::GetInstance().GetHandleByName("airMotion.mp3");
+	audioHandle_Reflect_ = AudioManager::GetInstance().GetHandleByName("Reflect.mp3");
 
 	// 初期アニメーションをセット
 	if (animator_) {
@@ -206,11 +216,15 @@ void Player::UpdateAnimation() {
     // 空中急降下開始 (isAttackDown_ が true になった瞬間)
     if (isAttackDown_ && !prevIsAttackDown_) {
         StartNormalAnim(PlayerAnimationType::DownAttack, "DownAttack_Prepare", false);
+        // 空中移動音を停止
+        if (audioHandle_AirMotion_ != 0) { AudioManager::GetInstance().Stop(audioHandle_AirMotion_); }
     }
 
     // 空中急降下終了 (isAttackDown_ が false になった瞬間)
 	if (!isAttackDown_ && prevIsAttackDown_) {
 		StartNormalAnim(PlayerAnimationType::AirMove, "AirMove", true);
+        // 空中移動音を再生
+        if (audioHandle_AirMotion_ != 0 && !AudioManager::GetInstance().IsPlay(audioHandle_AirMotion_)) { AudioManager::GetInstance().Play(audioHandle_AirMotion_, 1.0f, true); }
     }
 
     // 着地判定: 落下中(false)->着地(true) の遷移で Walk を再生
@@ -218,18 +232,36 @@ void Player::UpdateAnimation() {
     if ((!isJump_ && prevIsJump_) ||
         (isRushAnimEndTriggered_ && !isRushing_)) {
         StartNormalAnim(PlayerAnimationType::Walk, "歩き", true);
+        // 着地したら空中移動音を停止
+        if (audioHandle_AirMotion_ != 0) { AudioManager::GetInstance().Stop(audioHandle_AirMotion_); }
     }
 
 	// 突進溜め開始時
 	if (isCharging_ && !prevIsCharging_) {
 		StartCustomAnim(PlayerAnimationType::Rush, "突進_Prepare",
 			kRushChargeMaxTime_ * kRushChargeLevel3Ratio_);
+		// 再生: RushCharge ループ
+		{
+			auto handle = audioHandle_RushCharge_;
+			if (handle != 0) { AudioManager::GetInstance().Play(handle, 1.0f, true); }
+		}
 	}
+    // 突進溜め終了時にループを停止
+    if (!isCharging_ && prevIsCharging_) {
+        auto handle = audioHandle_RushCharge_;
+        if (handle != 0) { AudioManager::GetInstance().Stop(handle); }
+    }
 
 	// 予備が終わって突進が始まった瞬間
 	if (isRushing_ && !prevIsRushing_) {
 		// 突進開始: Main を通常再生
 		StartNormalAnim(PlayerAnimationType::Rush, "突進_Main", false);
+		// 突進開始時のレベル別SE
+		{
+			int lvl = rushChargeLevel_;
+			auto h = (lvl == 3) ? audioHandle_RushLv3_ : (lvl == 2 ? audioHandle_RushLv2_ : audioHandle_RushLv1_);
+			if (h != 0) { AudioManager::GetInstance().Play(h, 1.0f, false); }
+		}
 	}
 
 	// 突進終了時
@@ -238,13 +270,25 @@ void Player::UpdateAnimation() {
 		StartNormalAnim(PlayerAnimationType::Rush, "突進_End", false);
 	}
 
-    // カスタム再生時間が有効なら進めて、終了で次の再生を決める
-    if (animCustomActive_) {
-        animator_->NormalizeUpdate(animCustomTotal_ > 0.0f ? (animCustomTimer_ / animCustomTotal_) : 1.0f);
-        animCustomTimer_ += FpsCounter::deltaTime;
+	// カスタム再生時間が有効なら進めて、終了で次の再生を決める
+	if (animCustomActive_) {
+		animator_->NormalizeUpdate(animCustomTotal_ > 0.0f ? (animCustomTimer_ / animCustomTotal_) : 1.0f);
+		animCustomTimer_ += FpsCounter::deltaTime;
     } else {
 		// 通常更新
 		animator_->Update();
+    }
+
+    // 空中移動中の音再生管理: 空中でかつ急降下でない場合はループ音を再生
+    {
+        auto h = audioHandle_AirMotion_;
+        if (h != 0) {
+            if (isJump_ && !isAttackDown_) {
+                if (!AudioManager::GetInstance().IsPlay(h)) { AudioManager::GetInstance().Play(h, 1.0f, true); }
+            } else {
+                if (AudioManager::GetInstance().IsPlay(h)) { AudioManager::GetInstance().Stop(h); }
+            }
+        }
     }
 
     // prev 状態更新
@@ -483,7 +527,13 @@ void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength, bool i
 	isPreRushing_ = false; isJump_ = true;
 	isBounceLock_ = true; bounceLockTimer_ = 0.0f; bounceAwayDir_ = { -bounceDirection.x, 0.0f, -bounceDirection.z }; bounceAwayDir_ = Normalize(bounceAwayDir_);
 
-	if (isLegacyWallBounce_) {
+    // 壁跳ね返り音
+    {
+        auto h = audioHandle_Reflect_;
+        if (h != 0) { AudioManager::GetInstance().Play(h, 1.0f, false); }
+    }
+
+    if (isLegacyWallBounce_) {
 		// IceFall の場合は溜めレベルに依存せず一定の強さで跳ね返す
 		if (isIceFall) {
 			velocity_ = bounceAwayDir_ * (kWallBounceAwaySpeed_ * bounceStrength);
@@ -564,6 +614,15 @@ void Player::OnCollision(const CollisionResult &result) {
 		// ダメージ無敵時間開始
 		damageInvincibleTimer_ = kDamageInvincibleTime_;
 		isInvincible_ = true;
+
+		// 通知コールバック
+		if (onDamaged_) { onDamaged_(); }
+
+		// ダメージ時のSE再生
+    {
+        auto h = audioHandle_PlayerDamaged_;
+        if (h != 0) { AudioManager::GetInstance().Play(h, 1.0f, false); }
+    }
 
 		if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
 		return;

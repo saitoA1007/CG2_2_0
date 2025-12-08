@@ -4,7 +4,7 @@
 #include"GameParamEditor.h"
 #include"SpriteRenderer.h"
 
-// Added includes for stage/player
+#include "TDGameScene.h"
 #include"Application/Stage/StageManager.h"
 #include"Application/Stage/StageWallPlane.h"
 #include"Application/Player/Player.h"
@@ -16,7 +16,6 @@
 #include"Application/Graphics/BgRock.h"
 #include"Extension/CustomRenderer.h"
 
-// Player effect headers
 #include "Application/Player/Effect/PlayerChargeEffect.h"
 #include "Application/Player/Effect/PlayerRushEffect.h"
 #include "Application/Player/Effect/PlayerAttackDownEffect.h"
@@ -196,6 +195,7 @@ void TitleScene::Initialize(SceneContext* context) {
 void TitleScene::Update() {
     if (context_->inputCommand->IsCommandActive("Start")) {
         isFinished_ = true;
+        TDGameScene::SetIsFirstGameStart(true);
     }
 
     if (debugRenderer_) debugRenderer_->Clear();
@@ -247,6 +247,11 @@ void TitleScene::Update() {
     }
 
     UpdateCollision();
+
+    if (isFirstUpdate_) {
+        cameraController_->SetDesiredAsCurrent();
+        isFirstUpdate_ = false;
+    }
 }
 
 void TitleScene::Draw(const bool& isDebugView) {

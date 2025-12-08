@@ -77,10 +77,14 @@ public:
 	/// 次のシーン遷移する場面の値を取得
 	/// </summary>
 	/// <returns></returns>
-	SceneState NextSceneState() override { return SceneState::Result; }
+	SceneState NextSceneState() override { return nextSceneState_; }
 
 	// 遷移するクラス
 	std::unique_ptr<ITransitionEffect> GetTransitionEffect() override { return std::make_unique<Fade>(); }
+
+    // 初のゲーム開始かどうかの設定
+	static void SetIsFirstGameStart(bool isFirst) { sIsFirstGameStart_ = isFirst; }
+    static bool IsFirstGameStart() { return sIsFirstGameStart_; }
 
 private: // エンジンの低レイヤー機能を取得
 
@@ -122,6 +126,9 @@ private:
 
 	// ライト
 	std::unique_ptr<SceneLightingController> sceneLightingController_;
+
+    // 次に遷移するシーン
+    SceneState nextSceneState_ = SceneState::TDGame;
 
 	//==================================================
 	// プレイヤー
@@ -234,6 +241,12 @@ private:
 	// ゲームオーバーUI
 	std::unique_ptr<GameOverUI> gameOverUI_;
 
+    // 初のゲーム開始かどうかのフラグ
+    static inline bool sIsFirstGameStart_ = true;
+
+    // 開始時アニメーション再生中フラグ
+    bool isStartAnimationPlaying_ = true;
+
 private:
 
 	// ボスヒット時にほとんどの更新を停止するための制御
@@ -252,4 +265,9 @@ private:
 	/// 当たり判定の更新処理
 	/// </summary>
 	void UpdateCollision();
+
+    /// <summary>
+    /// 開始アニメーションの更新処理
+    /// </summary>
+    void UpdateStartAnimation();
 };

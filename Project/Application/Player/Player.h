@@ -27,6 +27,7 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
+	/// <param name="input"></param>
 	void Initialize(GameEngine::Animator *animator,
 		const std::array<std::map<std::string, AnimationData>, kPlayerAnimationCount>& animationData);
 
@@ -79,6 +80,8 @@ public:
 	void SetOnWallHit(std::function<void()> cb) { onWallHit_ = std::move(cb); }
     // 着地時コールバック設定
     void SetOnLandHit(std::function<void()> cb) { onLandHit_ = std::move(cb); }
+    // ダメージ時コールバック設定
+    void SetOnDamaged(std::function<void()> cb) { onDamaged_ = std::move(cb); }
 
 	// リスタート処理
     void Restart();
@@ -291,9 +294,20 @@ private:
 	std::function<void()> onWallHit_;
 	// 着地衝突イベント
     std::function<void()> onLandHit_;
+	// ダメージイベント
+	std::function<void()> onDamaged_;
 
 	// 後処理用に保管する当たり判定のリスト
 	std::vector<GameEngine::CollisionResult> pendingCollisions_;
+
+	// オーディオハンドル
+	uint32_t audioHandle_PlayerDamaged_ = 0;
+	uint32_t audioHandle_RushCharge_ = 0;
+	uint32_t audioHandle_RushLv1_ = 0;
+	uint32_t audioHandle_RushLv2_ = 0;
+	uint32_t audioHandle_RushLv3_ = 0;
+	uint32_t audioHandle_AirMotion_ = 0;
+	uint32_t audioHandle_Reflect_ = 0;
 
 private:
 	void ProcessMoveInput(GameEngine::InputCommand* inputCommand);

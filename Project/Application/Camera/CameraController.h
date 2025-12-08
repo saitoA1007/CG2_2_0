@@ -149,6 +149,25 @@ public:
 	/// </summary>
 	void EnableViewOffset(bool enable) { viewOffsetEnabled_ = enable; }
 
+    /// <summary>
+    /// 現在位置を目標位置として設定
+	/// </summary>
+	void SetCurrentAsDesired() {
+		desiredTargetPos_ = targetPos_;
+		desiredTargetLookAt_ = targetLookAt_;
+		desiredTargetRotate_ = targetRotate_;
+		desiredTargetFov_ = targetFov_;
+    }
+    /// <summary>
+    /// 目標位置を現在位置として設定
+    /// </summary>
+	void SetDesiredAsCurrent() {
+		targetPos_ = desiredTargetPos_;
+		targetLookAt_ = desiredTargetLookAt_;
+		targetRotate_ = desiredTargetRotate_;
+		targetFov_ = desiredTargetFov_;
+    }
+
 private:
 
 	// カメラ
