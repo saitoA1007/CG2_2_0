@@ -14,7 +14,7 @@ EnemyAttackManager::~EnemyAttackManager() {
 	IceFallsList_.clear();
 }
 
-void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectManager,const uint32_t& texture) {
+void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectManager,const uint32_t& texture, const uint32_t& breakTexture) {
 
     // ポストエフェクトの管理クラスを受け取る
     postEffectManager_ = postEffectManager;
@@ -48,6 +48,7 @@ void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectMan
 
     // テクスチャを取得
     iceFallTexture_ = texture;
+    breakTexture_ = breakTexture;
 
 #ifdef _DEBUG
     // 値を登録する
@@ -90,6 +91,14 @@ void EnemyAttackManager::Update(const Matrix4x4& cameraWorldMatrix, const Matrix
         breakIceFallParticle->Update();
     }
 
+    // 撃破演出
+    enemyDestroyEffects_.remove_if([](const std::unique_ptr<EnemyDestroyEffect>& effect) {
+        return effect->IsFinished();
+    });
+    for (auto& effect : enemyDestroyEffects_) {
+        effect->Update(cameraWorldMatrix, viewMatrix);
+    }
+
     // 咆哮演出の更新処理
     RoatUpdate();
 
@@ -106,7 +115,13 @@ void EnemyAttackManager::AddIceFall(const Vector3& pos) {
 void EnemyAttackManager::AddBreakIceParticle(const Vector3& pos) {
     std::unique_ptr<BreakIceFallParticle> tmpIceFall = std::make_unique<BreakIceFallParticle>();
     tmpIceFall->Initialize(iceFallTexture_, pos);
-    breakIceFallParticles_.push_back(std::move(tmpIceFall));
+    breakIceFallParticles_.push_back(std::move(tmpIceFall)); 
+}
+
+void EnemyAttackManager::AddEnemyDestroyEffect(const Vector3& pos) {
+    std::unique_ptr<EnemyDestroyEffect> tmp = std::make_unique<EnemyDestroyEffect>();
+    tmp->Initialize(iceFallTexture_,breakTexture_,pos);
+    enemyDestroyEffects_.push_back(std::move(tmp));
 }
 
 void EnemyAttackManager::CreateIceFallPositions(const float& waitIceFallTime) {

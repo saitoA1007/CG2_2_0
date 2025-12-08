@@ -10,6 +10,7 @@
 // アプリ機能
 #include"LongLangeAttack/IceFall.h"
 #include"Application/Enemy/Effect/BreakIceFallParticle.h"
+#include"Application/Enemy/Effect/EnemyDestroyEffect.h"
 
 // ボスの遠距離攻撃を管理する
 class EnemyAttackManager {
@@ -35,7 +36,7 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Initialize(GameEngine::PostEffectManager* postEffectManager, const uint32_t& texture);
+	void Initialize(GameEngine::PostEffectManager* postEffectManager, const uint32_t& texture,const uint32_t& breakTexture);
 
 	/// <summary>
 	/// 更新処理
@@ -99,6 +100,11 @@ public:
 	// 現在の氷柱の数
 	uint32_t GetCurrentIceFall() { return static_cast<uint32_t>(IceFallsList_.size()); }
 
+	// 撃破演出を追加
+	void AddEnemyDestroyEffect(const Vector3& pos);
+	// 撃破演出を取得
+	std::list<std::unique_ptr<EnemyDestroyEffect>>& GetEnemyDestroyEffect() { return enemyDestroyEffects_; }
+
 private:
 
 	// ポストエフェクトの管理
@@ -142,9 +148,13 @@ private:
 	float windSpeed_ = 50.0f;
 
 	uint32_t iceFallTexture_ = 0;
+	uint32_t breakTexture_ = 0;
 
 	// 当たり判定
 	std::vector<std::unique_ptr<GameEngine::SphereCollider>> windColliders_;
+
+	// 敵の撃破演出
+	std::list<std::unique_ptr<EnemyDestroyEffect>> enemyDestroyEffects_;
 
 private:
 
