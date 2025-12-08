@@ -118,6 +118,9 @@ private: // メンバ変数
 	// 現在の状態
 	BossState bossState_ = BossState::In;
 
+	// 音声ハンドル
+	uint32_t bossDamagedSH_ = 0; // ダメージ音声
+
 private:
 
 	/// <summary>

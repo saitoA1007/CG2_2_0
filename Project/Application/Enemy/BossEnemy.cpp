@@ -9,6 +9,7 @@
 #include "LogManager.h"
 #include"FPSCounter.h"
 #include"GameParamEditor.h"
+#include"AudioManager.h"
 #include"CollisionConfig.h"
 #include"Application/CollisionTypeID.h"
 
@@ -60,6 +61,9 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
     bodyCollider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
         this->OnCollisionEnter(result);
     });
+
+    // ダメージ音声を取得する
+    bossDamagedSH_ = AudioManager::GetInstance().GetHandleByName("BossDamaged.mp3");
 
 #ifdef _DEBUG
     // 値を登録する
@@ -138,7 +142,7 @@ void BossEnemy::Update(const Vector3& targetPos) {
         if (static_cast<int>(timer_ * 20.0f) % 2 == 0) {
             alpha_ = 1.0f;
         } else {
-            alpha_ = 0.5f;
+            alpha_ = 0.2f;
         }
 
         // 9割を超えた時点で1.0fに固定する
@@ -174,6 +178,8 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 
             if (bossContext_.hp > 0) {
                 bossContext_.hp -= 1;
+
+                AudioManager::GetInstance().Play(bossDamagedSH_, 0.5f, false);
 
                 Log("CurrentHp : " + std::to_string(bossContext_.hp), "Enemy");
             }

@@ -6,6 +6,7 @@
 #include"EasingManager.h"
 #include"RandomGenerator.h"
 #include"GameParamEditor.h"
+#include"AudioManager.h"
 #include"LogManager.h"
 using namespace GameEngine;
 
@@ -35,6 +36,12 @@ BossStateBattle::BossStateBattle(BossContext& context, const float& stageRadius,
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::RotateMove)] = [this]() {ResetRotateMove(); };
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::CrossMove)] = [this]() {ResetCrossMove(); };
 	resetBehaviorParamTable_[static_cast<size_t>(ButtleBehavior::InMove)] = [this]() {ResetInMove(); };
+
+	// 音声を取得
+	screamSH_ = AudioManager::GetInstance().GetHandleByName("Scream.mp3");
+	rushSH_ = AudioManager::GetInstance().GetHandleByName("Rush.mp3");
+	iceBreath_ = AudioManager::GetInstance().GetHandleByName("IceBreath.mp3");
+	BossMove_ = AudioManager::GetInstance().GetHandleByName("BossMove.mp3");
 
 #ifdef _DEBUG
 	// 値を登録する
@@ -82,6 +89,17 @@ void BossStateBattle::Update() {
 
 	// 指定した状態による更新処理をおこなう
 	behaviorsTable_[static_cast<size_t>(currentBehavior_)]();
+
+	// 通常の音声
+	if (AudioManager::GetInstance().IsPlay(screamSH_) || AudioManager::GetInstance().IsPlay(rushSH_) || AudioManager::GetInstance().IsPlay(iceBreath_)) {
+		if (AudioManager::GetInstance().IsPlay(BossMove_)) {
+			AudioManager::GetInstance().Stop(BossMove_);
+		}
+	} else {
+		if (!AudioManager::GetInstance().IsPlay(BossMove_)) {
+			AudioManager::GetInstance().Play(BossMove_, 0.2f, true);
+		}
+	}
 }
 
 void BossStateBattle::Exit() {
@@ -389,6 +407,9 @@ void BossStateBattle::RushAttackUpdate() {
 			bossContext_.animationTimer = 0.0f;
 			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Rush)]["Rush_Main"]);
 
+			// 音声を再生
+			AudioManager::GetInstance().Play(rushSH_, 0.8f, false);
+
 			// 突進する位置を求める
 #pragma region SetRushPos
 			// ボスの位置から突進の最後の位置へベクトル
@@ -586,7 +607,8 @@ void BossStateBattle::WindAttackUpdate() {
 			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_Main"]);
 			bossContext_.animationTimer = 0.0f;
 			bossContext_.isWindAttack_ = true;
-
+			// 音声
+			AudioManager::GetInstance().Play(iceBreath_, 0.8f, false);
 			// フェーズを切り替え
 			windPhase_ = WindPhase::Main;
 		}
@@ -672,6 +694,7 @@ void BossStateBattle::IceFallAttackUpdate() {
 			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Scream)]["Scream"]);
 			bossContext_.animationTimer = 0.0f;
 			bossContext_.isActiveIceFall = true;
+			AudioManager::GetInstance().Play(screamSH_, 0.8f, false);
 		}
 	} else {
 		if (bossContext_.isActiveIceFall) {
