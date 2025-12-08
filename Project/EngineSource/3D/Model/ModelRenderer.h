@@ -22,6 +22,7 @@ namespace GameEngine {
 		Instancing,   // インスタンシング描画用
 		InstancingAdd,
 		InstancingBoth,
+		InstancingBothNone,
 		Grid,  // グリッド描画用
 		AnimationModel, // アニメーション描画用
 	};

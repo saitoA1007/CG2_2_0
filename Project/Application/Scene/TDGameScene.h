@@ -194,6 +194,7 @@ private:
 	std::unique_ptr<EnemyRushEffect> enemyRushEffect_;
 	// ボスの風攻撃演出
 	std::unique_ptr<EnemyWindAttackParticle> enemyWindAttackParticle_;
+	std::unique_ptr<EnemyWindAttackParticle> enemyWindShadowAttackParticle_;
 	// 翼の演出
 	std::unique_ptr<WingsParticle> enemyWingsParticleParticle_;
 

@@ -20,7 +20,7 @@ public:
 	/// 初期化処理
 	/// </summary>
 	/// <param name="texture"></param>
-	void Initialize(const uint32_t& texture);
+	void Initialize(const uint32_t& texture, const bool& isHeight);
 
 	/// <summary>
 	/// 更新処理
@@ -80,6 +80,8 @@ private:
 
 	// ループの判定
 	bool isLoop_ = true;
+
+	bool isHeiLight_ = true;
 
 	// 速度
 	Vector3 baseVelocity_ = {};

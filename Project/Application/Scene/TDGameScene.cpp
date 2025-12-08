@@ -242,7 +242,9 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// ボスの風攻撃の初期化
 	enemyWindAttackParticle_ = std::make_unique<EnemyWindAttackParticle>();
-	enemyWindAttackParticle_->Initialize(context_->textureManager->GetHandleByName("noise.png"));
+	enemyWindAttackParticle_->Initialize(context_->textureManager->GetHandleByName("noise.png"),true);
+	enemyWindShadowAttackParticle_ = std::make_unique<EnemyWindAttackParticle>();
+	enemyWindShadowAttackParticle_->Initialize(context_->textureManager->GetHandleByName("noise.png"), false);
 
 	// 突進攻撃演出モデル
 	enemyRushModel_ = context_->modelManager->GetNameByModel("RushWave");
@@ -475,12 +477,17 @@ void TDGameScene::Update() {
 	// 風攻撃演出の更新処理
 	if (enemyAttackManager_->IsWind()) {
 		enemyWindAttackParticle_->SetIsLoop(true);
-		enemyWindAttackParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition());
+		enemyWindAttackParticle_->SetEmitterPos(Vector3(bossEnemy_->GetWorldPosition().x, bossEnemy_->GetWorldPosition().y + 2.0f, bossEnemy_->GetWorldPosition().z));
 		enemyWindAttackParticle_->SetVelocity(enemyAttackManager_->GetWindVelocity());
+		enemyWindShadowAttackParticle_->SetIsLoop(true);
+		enemyWindShadowAttackParticle_->SetEmitterPos(Vector3(bossEnemy_->GetWorldPosition().x, bossEnemy_->GetWorldPosition().y + 2.0f, bossEnemy_->GetWorldPosition().z));
+		enemyWindShadowAttackParticle_->SetVelocity(enemyAttackManager_->GetWindVelocity());
 	} else {
 		enemyWindAttackParticle_->SetIsLoop(false);
+		enemyWindShadowAttackParticle_->SetIsLoop(false);
 	}
 	enemyWindAttackParticle_->Update();
+	enemyWindShadowAttackParticle_->Update();
 
 	// ボスの翼の演出
 	enemyWingsParticleParticle_->SetIsLoop(bossEnemy_->IsWingsEffect());
@@ -677,8 +684,12 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	}
 
 	// インスタンシング描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::InstancingBoth);
+	ModelRenderer::PreDraw(RenderMode3D::InstancingBothNone);
+	// ボスの風攻撃を描画
+	ModelRenderer::DrawInstancing(windModel_, enemyWindShadowAttackParticle_->GetCurrentNumInstance(), *enemyWindShadowAttackParticle_->GetWorldTransforms());
 
+	// インスタンシング描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::InstancingBoth);
 	// ボスの風攻撃を描画
 	ModelRenderer::DrawInstancing(windModel_, enemyWindAttackParticle_->GetCurrentNumInstance(), *enemyWindAttackParticle_->GetWorldTransforms());
 

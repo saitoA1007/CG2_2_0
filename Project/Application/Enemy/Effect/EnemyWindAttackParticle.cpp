@@ -4,9 +4,10 @@
 #include"GameParamEditor.h"
 using namespace GameEngine;
 
-void EnemyWindAttackParticle::Initialize(const uint32_t& texture) {
+void EnemyWindAttackParticle::Initialize(const uint32_t& texture,const bool& isHeight) {
 	// 画像を取得
 	particleGH_ = texture;
+	isHeiLight_ = isHeight;
 
 	// パーティクルが発生する位置を設定
 	emitterPos_ = {0.0f,-10.0f,0.0f};
@@ -49,15 +50,28 @@ void EnemyWindAttackParticle::Update() {
 EnemyWindAttackParticle::ParticleData EnemyWindAttackParticle::MakeNewParticle() {
 	ParticleData particleData;
 	// SRTを設定
-	float scale = RandomGenerator::Get(1.0f, 2.0f);
-	particleData.transform.scale = { scale,scale,scale };
+	float scaleZ = 0.0f;
+	float scaleXY = 0.0f;
+	if (isHeiLight_) {
+		scaleZ = RandomGenerator::Get(2.0f, 5.0f);
+		scaleXY = RandomGenerator::Get(1.0f, 3.0f);
+	} else {
+		scaleZ = RandomGenerator::Get(2.0f, 4.0f);
+		scaleXY = RandomGenerator::Get(0.2f, 1.0f);
+	}
+	particleData.transform.scale = { scaleXY,scaleXY,scaleZ };
 	particleData.transform.rotate = { 0.0f,0.0f,0.0f };
 	particleData.transform.rotate.z = RandomGenerator::Get(0.0f, 3.2f);
 	particleData.transform.translate = RandomGenerator::GetVector3(-0.4f, 0.4f) + emitterPos_;
 	// 速度
 	particleData.velocity = baseVelocity_;
 	// 色
-	particleData.color = {1.0f,1.0f,1.0f,1.0f};
+	if (isHeiLight_) {
+		particleData.color = { 1.0f,1.0f,1.0f,1.0f };
+	} else {
+		particleData.color = { 0.2f,0.2f,0.4f,1.0f };
+
+	}
 	// 時間の設定
 	particleData.lifeTime = lifeTime_;
 	particleData.currentTime = 0.0f;
