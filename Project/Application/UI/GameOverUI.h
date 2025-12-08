@@ -71,9 +71,9 @@ private:
 	bool isActive_ = false;
 
 	Vector2 retryPos_ = {640.0f, 360.0f};
-	Vector2 retrySize_ = {400.0f, 48.0f};
-	Vector2 titlePos_ = {640.0f, 440.0f};
-	Vector2 titleSize_ = {400.0f, 48.0f};
+	Vector2 retrySize_ = {375.0f, 80.0f};
+	Vector2 titlePos_ = {640.0f, 488.0f};
+	Vector2 titleSize_ = {500.0f, 80.0f};
 
 	// ホバー判定フラグ
 	bool isHoverRetry_ = false;

@@ -13,8 +13,8 @@ void GameOverUI::Initialize(Input* input, InputCommand* inputCommand, TextureMan
 		{ 0.0f, 0.0f, 0.0f, 0.75f });
 
 	// ロゴスプライト
-	logoSprite_ = Sprite::Create({ 640.0f, 180.0f }, { 600.0f, 128.0f }, { 0.5f, 0.5f });
-	logoGH_ = textureManager->GetHandleByName("gameOverLogo.png");
+	logoSprite_ = Sprite::Create({ 640.0f, 180.0f }, { 1024.0f, 256.0f }, { 0.5f, 0.5f });
+	logoGH_ = textureManager->GetHandleByName("gameOverText.png");
 
 	// やりなおすスプライト
 	retrySprite_ = Sprite::Create(retryPos_, retrySize_, { 0.5f, 0.5f });

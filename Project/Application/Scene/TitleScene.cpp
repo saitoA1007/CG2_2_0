@@ -3,6 +3,7 @@
 #include"ModelRenderer.h"
 #include"GameParamEditor.h"
 #include"SpriteRenderer.h"
+#include"FPSCounter.h"
 
 #include "TDGameScene.h"
 #include"Application/Stage/StageManager.h"
@@ -123,6 +124,8 @@ void TitleScene::Initialize(SceneContext* context) {
     playerAnimator_->Initialize(playerModel_, &playerAnimationData_[static_cast<size_t>(PlayerAnimationType::Walk)]["歩き"]);
     player_ = std::make_unique<Player>();
     player_->Initialize(playerAnimator_.get(), playerAnimationData_);
+    player_->GetWorldTransform().transform_.rotate.y = 0.0f;
+    player_->GetWorldTransform().UpdateTransformMatrix();
 
     playerShadow_ = std::make_unique<PlaneProjectionShadow>();
     playerShadow_->Initialize(&player_->GetWorldTransform());
@@ -157,6 +160,20 @@ void TitleScene::Initialize(SceneContext* context) {
     cameraController_ = std::make_unique<CameraController>();
     cameraController_->Initialize();
 
+    // タイトル用の初期カメラを CameraController に設定: 注視点 {0,16,0}
+    Vector3 initialCenter = { 0.0f, 16.0f, 0.0f };
+
+    // cameraController のターゲットを初期注視点に設定して内部状態を同期
+    cameraController_->SetTarget(initialCenter);
+
+    // mainCamera を cameraController と同期しておく
+    mainCamera_->SetCamera(cameraController_->GetCamera());
+
+    // Title starts locked: only accept Start input
+    isTitleLocked_ = true;
+    isTransitioning_ = false;
+    transitionTimer_ = 0.0f;
+
     /*{
         std::vector<AnimationKeyframe<Vector3>> positionKeys;
         std::vector<AnimationKeyframe<Vector3>> rotateKeys;
@@ -190,12 +207,38 @@ void TitleScene::Initialize(SceneContext* context) {
             CameraController::ShakeOrigin::TargetPosition,
             false, true, true, true);
     }*/
+    cameraController_->SetCurrentAsDesired();
+    mainCamera_->SetCamera(cameraController_->GetCamera());
 }
 
 void TitleScene::Update() {
-    if (context_->inputCommand->IsCommandActive("Start")) {
-        isFinished_ = true;
-        TDGameScene::SetIsFirstGameStart(true);
+    // ロック中で遷移中でなければ Start のみ検出
+    if (isTitleLocked_ && !isTransitioning_) {
+        if (context_->inputCommand->IsCommandActive("Start")) {
+            // CameraController のアニメーションを使って遷移を開始
+            isTransitioning_ = true;
+            transitionTimer_ = 0.0f;
+
+            std::vector<AnimationKeyframe<Vector3>> positionKeys;
+            std::vector<AnimationKeyframe<Vector3>> rotateKeys;
+            std::vector<AnimationKeyframe<Vector3>> lookAtKeys;
+            std::vector<AnimationKeyframe<float>> fovKeys;
+
+            auto vecEase = [](const Vector3 &a, const Vector3 &b, float t) -> Vector3 { return EaseInOutCubic(a, b, t); };
+
+            // カメラ位置オフセットは一定 (eye = lookAt + offset)
+            positionKeys.push_back(AnimationKeyframe<Vector3>{ 0.0f, Vector3{0.0f, 0.0f, -10.0f}, vecEase });
+            positionKeys.push_back(AnimationKeyframe<Vector3>{ kTransitionDuration_, Vector3{0.0f, 0.0f, -10.0f}, vecEase });
+
+            cameraController_->SetAnimationKeyframes(positionKeys, rotateKeys, lookAtKeys, fovKeys);
+            cameraController_->PlayAnimation();
+        }
+    } else {
+        // ロック解除後は Start でシーン遷移
+        if (!isTitleLocked_ && context_->inputCommand->IsCommandActive("Start")) {
+            isFinished_ = true;
+            TDGameScene::SetIsFirstGameStart(true);
+        }
     }
 
     if (debugRenderer_) debugRenderer_->Clear();
@@ -203,30 +246,34 @@ void TitleScene::Update() {
 
 
     if (cameraController_) {
-        float desiredFov = 0.7f;
-        if (player_ && player_->IsRushing()) {
-            desiredFov = 1.0f;
-        } else if (player_ && (player_->IsCharging() || player_->IsPreRushing())) {
-            int rushLevel = player_->GetRushChargeLevel();
-            desiredFov = 0.4f + static_cast<float>(3 - rushLevel) * 0.1f;
-        }
-        cameraController_->SetDesiredFov(desiredFov);
-
-        if (player_ && player_->IsJump()) {
-            Vector3 eyeOffset{ 0.0f, 16.0f, 0.0f };
-            Vector3 lookOffset{ 0.0f, -4.0f, 0.0f };
-            cameraController_->SetViewOffset(eyeOffset, lookOffset, 0.2f);
-            cameraController_->EnableViewOffset(true);
-        } else if (cameraController_) {
-            cameraController_->EnableViewOffset(false);
-        }
-
-        if (player_) {
+        if (!isTransitioning_) {
+            float desiredFov = 0.7f;
+            if (player_ && player_->IsRushing()) {
+                desiredFov = 1.0f;
+            } else if (player_ && (player_->IsCharging() || player_->IsPreRushing())) {
+                int rushLevel = player_->GetRushChargeLevel();
+                desiredFov = 0.4f + static_cast<float>(3 - rushLevel) * 0.1f;
+            }
+            cameraController_->SetDesiredFov(desiredFov);
             cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
         }
-
         cameraController_->Update(context_->inputCommand, context_->input);
         mainCamera_->SetCamera(cameraController_->GetCamera());
+    }
+
+    // 遷移中はスプライトをフェードさせる
+    if (isTitleLocked_ && isTransitioning_) {
+        transitionTimer_ += FpsCounter::deltaTime;
+        float t = std::clamp(transitionTimer_ / kTransitionDuration_, 0.0f, 1.0f);
+        float eased = EaseInOutCubic(0.0f, 1.0f, t);
+        float alpha = 1.0f - eased;
+        titleSprite_->SetColor(Vector4(0.7f, 0.7f, 0.7f, alpha));
+        spaceSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, alpha));
+
+        if (transitionTimer_ >= kTransitionDuration_) {
+            isTransitioning_ = false;
+            isTitleLocked_ = false;
+        }
     }
 
     // ライトの更新
@@ -235,12 +282,19 @@ void TitleScene::Update() {
     if (terrain_) terrain_->Update();
 
     if (stageManager_) stageManager_->Update();
-    if (player_) player_->Update(context_->inputCommand, *mainCamera_);
-    if (playerShadow_) playerShadow_->Update();
 
-    if (playerChargeEffect_) playerChargeEffect_->Update();
-    if (playerRushEffect_) playerRushEffect_->Update();
-    if (playerAttackDownEffect_) playerAttackDownEffect_->Update();
+    // タイトルロック中はプレイヤーの操作/物理更新を行わない
+    if (!isTitleLocked_) {
+        if (player_) player_->Update(context_->inputCommand, *mainCamera_);
+        if (playerShadow_) playerShadow_->Update();
+
+        if (playerChargeEffect_) playerChargeEffect_->Update();
+        if (playerRushEffect_) playerRushEffect_->Update();
+        if (playerAttackDownEffect_) playerAttackDownEffect_->Update();
+    } else {
+        // ロック中でも影やエフェクトの位置は更新
+        if (playerShadow_) playerShadow_->Update();
+    }
 
     for (auto &plane : stageWallPlanes_) {
         plane.Update();
@@ -250,6 +304,7 @@ void TitleScene::Update() {
 
     if (isFirstUpdate_) {
         cameraController_->SetDesiredAsCurrent();
+        mainCamera_->SetCamera(cameraController_->GetCamera());
         isFirstUpdate_ = false;
     }
 }
@@ -302,19 +357,21 @@ void TitleScene::Draw(const bool& isDebugView) {
     ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);
 
     // プレイヤーのエフェクト描画
-    if (player_->IsCharging()) {
-        for (auto &chargeEffect : playerChargeEffect_->GetWorldTransforms()) {
-            ModelRenderer::Draw(playerChargeEffectModel_, chargeEffect);
+    if (!isTitleLocked_) {
+        if (player_->IsCharging()) {
+            for (auto &chargeEffect : playerChargeEffect_->GetWorldTransforms()) {
+                ModelRenderer::Draw(playerChargeEffectModel_, chargeEffect);
+            }
         }
-    }
-    if (player_->IsRushing()) {
-        for (auto &rushEffect : playerRushEffect_->GetWorldTransforms()) {
-            ModelRenderer::Draw(playerRushEffectModel_, rushEffect);
+        if (player_->IsRushing()) {
+            for (auto &rushEffect : playerRushEffect_->GetWorldTransforms()) {
+                ModelRenderer::Draw(playerRushEffectModel_, rushEffect);
+            }
         }
-    }
-    if (player_->IsAttackDown()) {
-        for (auto &attackDownEffect : playerAttackDownEffect_->GetWorldTransforms()) {
-            ModelRenderer::Draw(playerAttackDownEffectModel_, attackDownEffect);
+        if (player_->IsAttackDown()) {
+            for (auto &attackDownEffect : playerAttackDownEffect_->GetWorldTransforms()) {
+                ModelRenderer::Draw(playerAttackDownEffectModel_, attackDownEffect);
+            }
         }
     }
 
