@@ -87,6 +87,12 @@ private:
 	// 遷移するために使用するリスト
 	std::vector<BehaviorWeight> lotteryList_;
 
+	// 音声ハンドル
+	uint32_t screamSH_ = 0; // 叫ぶ
+	uint32_t rushSH_ = 0; // 突進
+	uint32_t iceBreath_ = 0; // 氷柱
+	uint32_t BossMove_ = 0; // 移動
+
 private:
 
 	// 突進のフェーズ
