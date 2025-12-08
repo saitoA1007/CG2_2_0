@@ -728,6 +728,23 @@ void TDGameScene::DrawUI() {
 	SpriteRenderer::PreDraw(RenderMode2D::Normal);
 	// タイトル描画
 	SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_);
+
+
+	// ボスのHPUIを表示
+	//SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
+	//SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
+
+	// プレイヤーのHPUIを表示
+	//SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
+	//SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
+
+	// GameOverUI描画
+	if (gameOverUI_->IsActive()) {
+		SpriteRenderer::Draw(gameOverUI_->GetBgSprite(), gameOverUI_->GetBgGH());
+		SpriteRenderer::Draw(gameOverUI_->GetLogoSprite(), gameOverUI_->GetLogoGH());
+		SpriteRenderer::Draw(gameOverUI_->GetRetrySprite(), gameOverUI_->GetRetryGH());
+		SpriteRenderer::Draw(gameOverUI_->GetTitleSprite(), gameOverUI_->GetTitleGH());
+	}
 }
  
  void TDGameScene::InputRegisterCommand() {

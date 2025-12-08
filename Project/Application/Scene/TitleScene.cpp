@@ -325,7 +325,9 @@ void TitleScene::Draw(const bool& isDebugView) {
     for (auto &particle : stageManager_->GetBreakWallParticles()) {
         ModelRenderer::DrawInstancing(wallModel_, particle->GetCurrentNumInstance(), *particle->GetWorldTransforms());
     }
+}
 
+void TitleScene::DrawUI() {
     //======================================================
     // 2D描画
     //======================================================
@@ -333,10 +335,6 @@ void TitleScene::Draw(const bool& isDebugView) {
     SpriteRenderer::PreDraw(RenderMode2D::Normal);
     SpriteRenderer::Draw(titleSprite_.get(), titleGH_);
     SpriteRenderer::Draw(spaceSprite_.get(), spaceGH_);
-}
-
-void TitleScene::DrawUI() {
-
 }
 
 void TitleScene::InputRegisterCommand() {
