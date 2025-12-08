@@ -60,6 +60,8 @@ void BossStateBattle::Enter() {
 	resetBehaviorParamTable_[static_cast<size_t>(currentBehavior_)]();
 	// リクエストをリセット
 	behaviorRequest_ = std::nullopt;
+
+	bossContext_.isWingsEffect_ = true;
 }
 
 void BossStateBattle::Update() {

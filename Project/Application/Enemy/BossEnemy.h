@@ -64,6 +64,9 @@ public:
 	// 当たり判定フラグ
 	bool IsHit() const { return isHit_; }
 
+	// 翼のアニメーション
+	bool IsWingsEffect() const { return bossContext_.isWingsEffect_; }
+
 private: // 調整項目
 
 	// 最大体力
