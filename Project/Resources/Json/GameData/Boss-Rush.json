@@ -1,6 +1,6 @@
 {
     "Boss-Rush": {
-        "OffestEndRush": -2.5,
+        "OffestEndRush": 3.0,
         "RotateSpeed": 20.0,
         "RushEndRatio": 0.800000011920929,
         "RushMainTime": 2.0,
