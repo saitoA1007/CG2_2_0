@@ -45,6 +45,9 @@ struct BossContext {
 	bool isWindAttack_ = false;
 	float windMaxTime_ = 0.0f;
 
+	// 翼のアニメーション
+	bool isWingsEffect_ = false;
+
 	// アニメーションデータ
 	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)>* animationData_;
 	GameEngine::Animator* animator_ = nullptr;

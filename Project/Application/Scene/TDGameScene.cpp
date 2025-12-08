@@ -458,6 +458,7 @@ void TDGameScene::Update() {
 	enemyWindAttackParticle_->Update();
 
 	// ボスの翼の演出
+	enemyWingsParticleParticle_->SetIsLoop(bossEnemy_->IsWingsEffect());
 	enemyWingsParticleParticle_->SetEmitterPos(
 		Vector3(bossEnemy_->GetWorldPosition().x, bossEnemy_->GetWorldPosition().y + 3.0f, bossEnemy_->GetWorldPosition().z));
 	enemyWingsParticleParticle_->Update();
