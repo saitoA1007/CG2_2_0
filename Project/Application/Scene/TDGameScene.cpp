@@ -190,6 +190,15 @@ void TDGameScene::Initialize(SceneContext* context) {
 			true, false, true, false);
 	});
 
+	// プレイヤーがダメージを受けたときのカメラシェイク
+	player_->SetOnDamaged([this]() {
+		// 小さめの振動でプレイヤー被弾を表現
+		cameraController_->StartCameraShake(6.0f, 0.5f, 800.0f,
+			[](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutCubic(a, b, t); },
+			CameraController::ShakeOrigin::CameraPosition,
+			true, true, true, false);
+	});
+
 	// 敵の処理に関する初期化処理
 #pragma region EnemySystem 
 
@@ -269,43 +278,48 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// カメラアニメーション設定
 	//==================================================
 
-	{
-		// 指定のキーとイージング関数を設定する
-		std::vector<AnimationKeyframe<Vector3>> positionKeys;
-		std::vector<AnimationKeyframe<Vector3>> rotateKeys;
-		std::vector<AnimationKeyframe<Vector3>> lookAtKeys;
-		std::vector<AnimationKeyframe<float>> fovKeys;
+	if (TDGameScene::IsFirstGameStart()) {
+		{
+			// 指定のキーとイージング関数を設定する
+			std::vector<AnimationKeyframe<Vector3>> positionKeys;
+			std::vector<AnimationKeyframe<Vector3>> rotateKeys;
+			std::vector<AnimationKeyframe<Vector3>> lookAtKeys;
+			std::vector<AnimationKeyframe<float>> fovKeys;
 
-		// イージングラッパー
-		auto vecEase = [](const Vector3 &a, const Vector3 &b, float t) -> Vector3 { return EaseInOutCubic(a, b, t); };
-		auto floatEase = [](const float &a, const float &b, float t) -> float { return EaseInOutCubic(a, b, t); };
+			// イージングラッパー
+			auto vecEase = [](const Vector3 &a, const Vector3 &b, float t) -> Vector3 { return EaseInOutCubic(a, b, t); };
+			auto floatEase = [](const float &a, const float &b, float t) -> float { return EaseInOutCubic(a, b, t); };
 
-		float pitch;
-        float yaw;
-		const float degToRad = static_cast<float>(std::numbers::pi) / 180.0f;
+			float pitch;
+        	float yaw;
+			const float degToRad = static_cast<float>(std::numbers::pi) / 180.0f;
 
-		// t=0.5f のキー
-        pitch = -15.0f * degToRad;
-		positionKeys.push_back(AnimationKeyframe<Vector3>{ 0.5f, Vector3{0.0f, 0.0f, 8.0f}, vecEase });
-		rotateKeys.push_back(AnimationKeyframe<Vector3>{ 0.5f, Vector3{ pitch, 0.0f, 0.0f }, vecEase });
-		lookAtKeys.push_back(AnimationKeyframe<Vector3>{ 0.5f, Vector3{ 0.0f, 0.0f, 0.0f }, vecEase });
-		fovKeys.push_back(AnimationKeyframe<float>{ 0.5f, 0.7f, floatEase });
+			// t=0.5f のキー
+        	pitch = -15.0f * degToRad;
+			positionKeys.push_back(AnimationKeyframe<Vector3>{ 0.5f, Vector3{0.0f, 0.0f, 8.0f}, vecEase });
+			rotateKeys.push_back(AnimationKeyframe<Vector3>{ 0.5f, Vector3{ pitch, 0.0f, 0.0f }, vecEase });
+			lookAtKeys.push_back(AnimationKeyframe<Vector3>{ 0.5f, Vector3{ 0.0f, 0.0f, 0.0f }, vecEase });
+			fovKeys.push_back(AnimationKeyframe<float>{ 0.5f, 0.7f, floatEase });
 
-		// t=2.0f のキー
-        pitch = -45.0f * degToRad;
-		yaw = 360.0f * degToRad;
-		positionKeys.push_back(AnimationKeyframe<Vector3>{ 2.0f, Vector3{0.0f, 0.0f, 32.0f}, vecEase });
-		rotateKeys.push_back(AnimationKeyframe<Vector3>{ 2.0f, Vector3{ pitch, yaw, 0.0f }, vecEase });
-		lookAtKeys.push_back(AnimationKeyframe<Vector3>{ 2.0f, Vector3{ 0.0f, 0.0f, 0.0f }, vecEase });
-		fovKeys.push_back(AnimationKeyframe<float>{ 2.0f, 1.5f, floatEase });
+			// t=2.0f のキー
+        	pitch = -45.0f * degToRad;
+			yaw = 360.0f * degToRad;
+			positionKeys.push_back(AnimationKeyframe<Vector3>{ 2.0f, Vector3{0.0f, 0.0f, 32.0f}, vecEase });
+			rotateKeys.push_back(AnimationKeyframe<Vector3>{ 2.0f, Vector3{ pitch, yaw, 0.0f }, vecEase });
+			lookAtKeys.push_back(AnimationKeyframe<Vector3>{ 2.0f, Vector3{ 0.0f, 0.0f, 0.0f }, vecEase });
+			fovKeys.push_back(AnimationKeyframe<float>{ 2.0f, 1.5f, floatEase });
 
-		cameraController_->SetAnimationKeyframes(positionKeys, rotateKeys, lookAtKeys, fovKeys);
-		cameraController_->PlayAnimation();
-		cameraController_->StartCameraShake(0.5f, 10.0f, 20.0f,
+			cameraController_->SetAnimationKeyframes(positionKeys, rotateKeys, lookAtKeys, fovKeys);
+			cameraController_->PlayAnimation();
+			cameraController_->StartCameraShake(0.5f, 10.0f, 20.0f,
             [](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutSine(a, b, t); },
-			CameraController::ShakeOrigin::TargetPosition,
-			false, true, true, true);
+				CameraController::ShakeOrigin::TargetPosition,
+				false, true, true, true);
+		}
+		// 初回実行フラグを解除
+		TDGameScene::SetIsFirstGameStart(false);
 	}
+	cameraController_->SetCurrentAsDesired();
 
 	// 仮UI
 	playGuideSprite_ = Sprite::Create({ 16.0f,580.0f }, { 300.0f,150.0f }, { 0.0f,0.0f });
@@ -322,6 +336,20 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// ゲームオーバーUIの初期化
 	gameOverUI_ = std::make_unique<GameOverUI>();
 	gameOverUI_->Initialize(context_->input, context_->inputCommand, context_->textureManager);
+	// リトライ・タイトルのコールバックを設定
+	gameOverUI_->SetOnRetryClicked([this]() {
+		// リトライが選択されたら現在のシーンかResultへ遷移
+		if (bossEnemy_ && bossEnemy_->GetCurrentHP() == 0) {
+			nextSceneState_ = SceneState::Result;
+		} else {
+			nextSceneState_ = SceneState::TDGame;
+		}
+		isFinished_ = true;
+	});
+	gameOverUI_->SetOnTitleClicked([this]() {
+		nextSceneState_ = SceneState::Title;
+		isFinished_ = true;
+	});
 
 	// 空気を演出するためのパーティクル
 	airParticle_ = std::make_unique<ParticleBehavior>();
@@ -331,32 +359,30 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 void TDGameScene::Update() {
 
-	if (context_->input->TriggerKey(DIK_U)) {
+	if (context_->input->TriggerKey(DIK_U) || (bossEnemy_->GetCurrentHP() == 0)) {
+		if (bossEnemy_->GetCurrentHP() == 0) {
+			nextSceneState_ = SceneState::Result;
+		}
 		isFinished_ = true;
 	}
 
-    // Detect boss hit (transition from not hit to hit)
+    // ボスへのヒット演出処理
     bool currentBossHit = bossEnemy_->IsHit();
     if (currentBossHit && !prevBossHit_) {
-        // Trigger freeze (stop updating everything except camera & camera controller)
         isBossHitFreezeActive_ = true;
         bossHitFreezeTimer_ = kBossHitFreezeDuration;
-        // start camera shake via cameraController
         if (cameraController_) {
             cameraController_->SetDesiredFov(1.0f);
-            cameraController_->StartCameraShake(32.0f, kBossHitFreezeDuration, 64.0f,
+            cameraController_->StartCameraShake(64.0f, kBossHitFreezeDuration, 256.0f,
                 [](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutCubic(a, b, t); },
                 CameraController::ShakeOrigin::TargetAndCameraPosition,
-                true, true, true, false);
+                true, false, true, false);
         }
     }
     prevBossHit_ = currentBossHit;
 
-	// If boss-hit freeze active, only update cameraController and camera; skip other updates
 	if (isBossHitFreezeActive_) {
-        // decrease timer
         bossHitFreezeTimer_ -= GameEngine::FpsCounter::deltaTime;
-        // Still update camera controller and camera so shake is visible
         cameraController_->Update(context_->inputCommand, context_->input);
         mainCamera_->SetCamera(cameraController_->GetCamera());
 
@@ -365,7 +391,6 @@ void TDGameScene::Update() {
             bossHitFreezeTimer_ = 0.0f;
         }
 
-        // Skip rest of update when frozen
         return;
     }
 
@@ -734,6 +759,23 @@ void TDGameScene::DrawUI() {
 	SpriteRenderer::PreDraw(RenderMode2D::Normal);
 	// タイトル描画
 	SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_);
+
+
+	// ボスのHPUIを表示
+	//SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
+	//SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
+
+	// プレイヤーのHPUIを表示
+	//SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
+	//SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
+
+	// GameOverUI描画
+	if (gameOverUI_->IsActive()) {
+		SpriteRenderer::Draw(gameOverUI_->GetBgSprite(), gameOverUI_->GetBgGH());
+		SpriteRenderer::Draw(gameOverUI_->GetLogoSprite(), gameOverUI_->GetLogoGH());
+		SpriteRenderer::Draw(gameOverUI_->GetRetrySprite(), gameOverUI_->GetRetryGH());
+		SpriteRenderer::Draw(gameOverUI_->GetTitleSprite(), gameOverUI_->GetTitleGH());
+	}
 }
  
  void TDGameScene::InputRegisterCommand() {
@@ -868,4 +910,9 @@ void TDGameScene::DebugUpdate() {
 	debugRenderer_->SetEnabled(isDrawCollision_);
 	ImGui::End();
 #endif
+}
+
+void TDGameScene::UpdateStartAnimation() {
+	cameraController_->Update(context_->inputCommand, context_->input);
+	mainCamera_->SetCamera(cameraController_->GetCamera());
 }

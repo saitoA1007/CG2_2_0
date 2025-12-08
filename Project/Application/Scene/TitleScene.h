@@ -122,6 +122,7 @@ private:
 	std::unique_ptr<GameEngine::DebugRenderer> debugRenderer_;
 
 	std::unique_ptr<CameraController> cameraController_;
+    bool isFirstUpdate_ = true;
 
 	void UpdateCollision();
 };
