@@ -1,5 +1,6 @@
 #include"EditorToolBar.h"
 #include"ImGuiManager.h"
+#include"AudioManager.h"
 
 using namespace GameEngine;
 
@@ -39,6 +40,7 @@ void EditorToolBar::Run() {
 			// 再生中の場合、リセットする
 			if (ImGui::ImageButton("ResetButton", static_cast<ImTextureID>(stopImagesrvHandle_.ptr), imageSize)) {
 				playMode_ = ScenePlayMode::Stop;
+				AudioManager::GetInstance().StopAll();
 				isPause_ = false;
 			}
 		}
@@ -82,6 +84,7 @@ void EditorToolBar::UpdateShortcutsKey() {
 
 		if (playMode_ == ScenePlayMode::Play) {
 			playMode_ = ScenePlayMode::Stop;
+			AudioManager::GetInstance().StopAll();
 		}else if (playMode_ == ScenePlayMode::Stop) {
 			playMode_ = ScenePlayMode::Play;
 		}
