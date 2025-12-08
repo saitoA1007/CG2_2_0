@@ -727,13 +727,13 @@ void BossStateBattle::WaitUpdate() {
 
 void BossStateBattle::ResetInMove() {
 	// 円の中心から自分へのベクトルを求める
-	Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
-	startDir_ = myDir;
-	endDir_ = myDir * -1.0f;
+	//Vector3 myDir = Normalize(Vector3(bossContext_.worldTransform->transform_.translate.x, 0.0f, bossContext_.worldTransform->transform_.translate.z));
+	startDir_ = Vector3(0.0f, 0.0f, -1.0f);
+	endDir_ = Vector3(0.0f, 0.0f, 1.0f);
 
 	// 戻る位置の始点と終点を決める
 	startBackPos_ = bossContext_.worldTransform->transform_.translate;
-	endBackPos_ = myDir * (stageRadius_ - (stageRadius_ / 6.0f));
+	endBackPos_ = Vector3(0.0f,0.0f,1.0f) * (stageRadius_ - (stageRadius_ / 6.0f));
 	endBackPos_.y = defalutPosY_;
 
 	// 時間をリセット
@@ -742,27 +742,59 @@ void BossStateBattle::ResetInMove() {
 	// アニメーション
 	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
 	bossContext_.animationTimer = 0.0f;
+
+	isStartMove_ = true;
+	moveTimer_ = 0.0f;
 }
 
 void BossStateBattle::InMoveUpdate() {
-	// 元の場所に戻る
-	backTimer_ += FpsCounter::deltaTime / backMaxTime_;
-	Vector3 tmpPos = Lerp(startBackPos_, endBackPos_, EaseInBack(backTimer_));
 
-	bossContext_.animationTimer = backTimer_;
+	if (isStartMove_) {
+		// 元の場所に戻る
+		backTimer_ += FpsCounter::deltaTime / backMaxTime_;
+		Vector3 tmpPos = Lerp(startBackPos_, endBackPos_, EaseInBack(backTimer_));
 
-	// 移動処理
-	bossContext_.worldTransform->transform_.translate = tmpPos;
+		// 移動処理
+		bossContext_.worldTransform->transform_.translate = tmpPos;
 
-	// 回転
-	Vector3 dir = Slerp(startDir_, endDir_, backTimer_);
-	// Y軸周りの角度
-	bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+		// 回転
+		Vector3 dir = Slerp(startDir_, endDir_, backTimer_);
+		// Y軸周りの角度
+		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
 
-	// 元の場所に戻る処理を終了
-	if (backTimer_ >= 1.0f) {
-		// 振る舞いの切り替えをリクエスト
-		behaviorRequest_ = ButtleBehavior::Normal;
+		// アニメーション
+		moveTimer_ += FpsCounter::deltaTime;
+		if (moveTimer_ >= 1.0f) {
+			moveTimer_ = 0.0f;
+		}
+		bossContext_.animationTimer = moveTimer_;
+
+		// 元の場所に戻る処理を終了
+		if (backTimer_ >= 1.0f) {
+			backTimer_ = 0.0f;
+			isStartMove_ = false;
+		}
+	} else {
+		// 元の場所に戻る
+		backTimer_ += FpsCounter::deltaTime;
+		Vector3 tmpPos = Lerp(startBackPos_, endBackPos_, EaseInBack(backTimer_));
+
+		// アニメーション
+		moveTimer_ += FpsCounter::deltaTime;
+		if (moveTimer_ >= 1.0f) {
+			moveTimer_ = 0.0f;
+		}
+		bossContext_.animationTimer = moveTimer_;
+
+		// 回転
+		Vector3 dir = Slerp(endDir_, startDir_, backTimer_);
+		// Y軸周りの角度
+		bossContext_.worldTransform->transform_.rotate.y = std::atan2f(dir.x, dir.z);
+
+		if (backTimer_ >= 1.0f) {
+			// 振る舞いの切り替えをリクエスト
+			behaviorRequest_ = ButtleBehavior::Normal;
+		}
 	}
 }
 

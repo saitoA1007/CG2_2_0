@@ -1,0 +1,19 @@
+{
+    "BossInMove": {
+        "CycleCount": 3,
+        "EndPos": [
+            0.0,
+            15.0,
+            0.0
+        ],
+        "InTime": 3.0,
+        "MoveHeight": 3.0,
+        "SceneName": "TDGameScene",
+        "StartPos": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "WaitTime": 2.0
+    }
+}

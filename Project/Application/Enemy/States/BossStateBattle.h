@@ -137,7 +137,7 @@ private:
 
 	// 元の場所に戻る時間
 	float backTimer_ = 0.0f;
-	float backMaxTime_ = 1.0f;
+	float backMaxTime_ = 2.5f;
 
 	// 普段いる高さ
 	float defalutPosY_ = 5.0f;
@@ -219,6 +219,8 @@ private:
 	float crossEndRatio_ = 0.8f; // 最後の位置の割合
 	uint32_t upDownCount_ = 3; // 上下移動する回数
 	float maxMoveHeight_ = 2.0f; // 最大で動く回数
+
+	bool isStartMove_ = true;
 
 	// 風の攻撃 ================================
 
