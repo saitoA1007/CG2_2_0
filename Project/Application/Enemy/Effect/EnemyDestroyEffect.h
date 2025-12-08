@@ -5,6 +5,8 @@
 #include"Extension/CustomMaterial/IceRockMaterial.h"
 #include"ParticleSystem/ParticleBehavior.h"
 
+#include"BreakEffect.h"
+
 class EnemyDestroyEffect {
 public:
 
@@ -33,12 +35,12 @@ public:
 	///　パーティクルデータ
 	/// </summary>
 	/// <returns></returns>
-	std::array<ParticleData, 5>& GetParticleDatas() { return particleData_; }
+	std::array<ParticleData, 8>& GetParticleDatas() { return particleData_; }
 
 	std::unique_ptr<GameEngine::ParticleBehavior>& GetSmallParticle() { return smallParticle_; }
 
 	// 行列を取得
-	GameEngine::WorldTransform& GetBreakWorldTransform() { return breakWorldTransform_; }
+	//GameEngine::WorldTransform& GetBreakWorldTransform() { return breakWorldTransform_; }
 	/// <summary>
 	/// マテリアルを取得
 	/// </summary>
@@ -47,9 +49,11 @@ public:
 
 	bool IsFinished()const { return isFinished_; }
 
+	std::unique_ptr<BreakEffect> breakEffect_;
+
 private:
 
-	std::array<ParticleData, 5> particleData_;
+	std::array<ParticleData, 8> particleData_;
 
 	Vector3 emitPos_;
 
@@ -78,8 +82,7 @@ private:
 	float timer_ = 0.0f;
 	float maxTime_ = 0.2f;
 
-	// 
-	GameEngine::WorldTransform breakWorldTransform_;
+
 	// マテリアル
 	GameEngine::Material material_;
 private:
