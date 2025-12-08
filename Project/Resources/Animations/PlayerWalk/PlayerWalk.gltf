@@ -122,7 +122,7 @@
 		},
 		{
 			"mesh":0,
-			"name":"Spear",
+			"name":"Spear.001",
 			"skin":0
 		},
 		{
@@ -372,7 +372,7 @@
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"\u30de\u30c6\u30ea\u30a2\u30eb.002",
+			"name":"\u30de\u30c6\u30ea\u30a2\u30eb",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":0
@@ -384,7 +384,7 @@
 	],
 	"meshes":[
 		{
-			"name":"\u7403.006",
+			"name":"\u7403.001",
 			"primitives":[
 				{
 					"attributes":{
@@ -433,14 +433,14 @@
 			"componentType":5126,
 			"count":1734,
 			"max":[
-				1.6143946647644043,
-				1.355721354484558,
-				3.5181429386138916
+				1.6143956184387207,
+				1.3557220697402954,
+				3.0911171436309814
 			],
 			"min":[
 				-1.6003186702728271,
 				-0.7179783582687378,
-				-1.8349246978759766
+				-2.261950969696045
 			],
 			"type":"VEC3"
 		},
@@ -471,7 +471,7 @@
 		{
 			"bufferView":5,
 			"componentType":5123,
-			"count":6942,
+			"count":6939,
 			"type":"SCALAR"
 		},
 		{
@@ -485,7 +485,7 @@
 			"componentType":5126,
 			"count":2,
 			"max":[
-				1.2083333333333333
+				1.125
 			],
 			"min":[
 				0
@@ -519,9 +519,9 @@
 		{
 			"bufferView":12,
 			"componentType":5126,
-			"count":30,
+			"count":28,
 			"max":[
-				1.2083333333333333
+				1.125
 			],
 			"min":[
 				0
@@ -531,7 +531,7 @@
 		{
 			"bufferView":13,
 			"componentType":5126,
-			"count":30,
+			"count":28,
 			"type":"VEC4"
 		},
 		{
@@ -567,7 +567,7 @@
 		{
 			"bufferView":19,
 			"componentType":5126,
-			"count":30,
+			"count":28,
 			"type":"VEC4"
 		},
 		{
@@ -585,7 +585,7 @@
 		{
 			"bufferView":22,
 			"componentType":5126,
-			"count":30,
+			"count":28,
 			"type":"VEC4"
 		},
 		{
@@ -603,7 +603,7 @@
 		{
 			"bufferView":25,
 			"componentType":5126,
-			"count":30,
+			"count":28,
 			"type":"VEC4"
 		},
 		{
@@ -646,114 +646,114 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":13884,
+			"byteLength":13878,
 			"byteOffset":90168,
 			"target":34963
 		},
 		{
 			"buffer":0,
 			"byteLength":384,
-			"byteOffset":104052
+			"byteOffset":104048
 		},
 		{
 			"buffer":0,
 			"byteLength":8,
-			"byteOffset":104436
+			"byteOffset":104432
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":104444
+			"byteOffset":104440
 		},
 		{
 			"buffer":0,
 			"byteLength":32,
-			"byteOffset":104468
+			"byteOffset":104464
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":104500
+			"byteOffset":104496
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":104524
+			"byteOffset":104520
 		},
 		{
 			"buffer":0,
-			"byteLength":120,
-			"byteOffset":104548
+			"byteLength":112,
+			"byteOffset":104544
 		},
 		{
 			"buffer":0,
-			"byteLength":480,
-			"byteOffset":104668
-		},
-		{
-			"buffer":0,
-			"byteLength":24,
-			"byteOffset":105148
+			"byteLength":448,
+			"byteOffset":104656
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":105172
+			"byteOffset":105104
+		},
+		{
+			"buffer":0,
+			"byteLength":24,
+			"byteOffset":105128
 		},
 		{
 			"buffer":0,
 			"byteLength":32,
-			"byteOffset":105196
+			"byteOffset":105152
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":105228
+			"byteOffset":105184
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":105252
+			"byteOffset":105208
 		},
 		{
 			"buffer":0,
-			"byteLength":480,
-			"byteOffset":105276
-		},
-		{
-			"buffer":0,
-			"byteLength":24,
-			"byteOffset":105756
+			"byteLength":448,
+			"byteOffset":105232
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":105780
-		},
-		{
-			"buffer":0,
-			"byteLength":480,
-			"byteOffset":105804
+			"byteOffset":105680
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":106284
+			"byteOffset":105704
+		},
+		{
+			"buffer":0,
+			"byteLength":448,
+			"byteOffset":105728
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":106308
-		},
-		{
-			"buffer":0,
-			"byteLength":480,
-			"byteOffset":106332
+			"byteOffset":106176
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":106812
+			"byteOffset":106200
+		},
+		{
+			"buffer":0,
+			"byteLength":448,
+			"byteOffset":106224
+		},
+		{
+			"buffer":0,
+			"byteLength":24,
+			"byteOffset":106672
 		}
 	],
 	"samplers":[
@@ -764,7 +764,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":106836,
+			"byteLength":106696,
 			"uri":"PlayerWalk.bin"
 		}
 	]

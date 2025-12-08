@@ -12,7 +12,7 @@
         "SceneName": "TDGameScene",
         "WallDepth": 1.0,
         "WallHeight": 8.0,
-        "WallMaxHp": 2,
-        "WallRespawnTime": 10.0
+        "WallMaxHp": 3,
+        "WallRespawnTime": 11.0
     }
 }
