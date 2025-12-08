@@ -330,6 +330,10 @@ void TitleScene::Draw(const bool& isDebugView) {
     SpriteRenderer::Draw(spaceSprite_.get(), spaceGH_);
 }
 
+void TitleScene::DrawUI() {
+
+}
+
 void TitleScene::InputRegisterCommand() {
     // 移動の入力コマンドを登録する
     context_->inputCommand->RegisterCommand("MoveUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });

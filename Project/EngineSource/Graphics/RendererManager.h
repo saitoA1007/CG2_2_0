@@ -28,6 +28,9 @@ namespace GameEngine {
         /// </summary>
         void BeginFrame();
 
+        // 中間描画処理
+        void MiddleFrame();
+
         /// <summary>
         /// 描画後処理
         /// </summary>

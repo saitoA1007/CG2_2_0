@@ -6,11 +6,13 @@ using namespace GameEngine;
 
 BloomPSO* PostEffectManager::bloomPSO_ = nullptr;
 OutLinePSO* PostEffectManager::outLinePSO_ = nullptr;
+CopyPSO* PostEffectManager::copyPSO_ = nullptr;
 std::array<DrawPsoData, static_cast<size_t>(PostEffectManager::PSOType::MaxCount)> PostEffectManager::psoList_;
 
-void PostEffectManager::StaticInitialize(BloomPSO* bloomPSO, OutLinePSO* outLinePSO, PSOManager* psoManager) {
+void PostEffectManager::StaticInitialize(BloomPSO* bloomPSO, OutLinePSO* outLinePSO, PSOManager* psoManager, CopyPSO* copyPSO) {
     bloomPSO_ = bloomPSO;
     outLinePSO_ = outLinePSO;
+    copyPSO_ = copyPSO;
 
     psoList_[static_cast<size_t>(PSOType::Vignetting)] = psoManager->GetDrawPsoData("Vignetting");
     psoList_[static_cast<size_t>(PSOType::ScanLine)] = psoManager->GetDrawPsoData("ScanLine");
@@ -170,7 +172,40 @@ void PostEffectManager::PostDraw(ID3D12GraphicsCommandList* commandList, const D
 }
 
 CD3DX12_GPU_DESCRIPTOR_HANDLE& PostEffectManager::GetSRVHandle() { 
-    return resultSRVHandle_;
+    return UIData_.srvHandle;
+}
+
+void PostEffectManager::PreUIDraw(ID3D12GraphicsCommandList* commandList) {
+    D3D12_RESOURCE_BARRIER barrier{};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    // バリアを張る対象のリソース
+    barrier.Transition.pResource = UIData_.resource.Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    commandList->ResourceBarrier(1, &barrier);
+
+    // レンダーターゲット設定
+    commandList->SetGraphicsRootSignature(copyPSO_->GetRootSignature());
+    commandList->SetPipelineState(copyPSO_->GetBrightPipelineState());
+    commandList->OMSetRenderTargets(1, &UIData_.rtvHandle, false, nullptr);
+    //commandList->ClearRenderTargetView(UIData_.rtvHandle, clear, 0, nullptr);
+
+    // 3D空間の物体を描画
+    copyPSO_->Draw(commandList,resultSRVHandle_);
+}
+
+void PostEffectManager::PostUIDraw(ID3D12GraphicsCommandList* commandList) {
+    D3D12_RESOURCE_BARRIER barrier{};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    // バリアを張る対象のリソース
+    barrier.Transition.pResource = UIData_.resource.Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    commandList->ResourceBarrier(1, &barrier);
 }
 
 void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
@@ -492,6 +527,19 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
     radialBlurResource_.GetData()->textureHandle = vignettingData_.srvIndex;
 
     LogManager::GetInstance().Log("End Create RadialBlurRenderTargets");
+
+    // UI描画用のリソース
+    CreatePostEffectResources(
+        postProcessRTVHeap_.Get(), rtvIndex_, descriptorSizeRTV,
+        width, height,
+        UIData_.resource,
+        UIData_.rtvHandle,
+        UIData_.srvHandle,
+        UIData_.srvIndex
+    );
+
+    // psoデータを取得する
+    //radialBlurData_.psoData = &psoList_[static_cast<size_t>(PSOType::RadialBlur)];
 
     // アウトラインの生成
     LogManager::GetInstance().Log("Start Create OutLineRenderTargets");

@@ -26,6 +26,11 @@ void RenderPipeline::BeginFrame() {
     rendererManager_->BeginFrame();
 }
 
+void RenderPipeline::MiddleFrame() {
+    // 中間描画
+    rendererManager_->MiddleFrame();
+}
+
 void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
     // レンダリング終了処理
     rendererManager_->EndFrame(imGuiManager);

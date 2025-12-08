@@ -54,7 +54,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	psoManager_->DeaultLoadPostEffectPSO();
 
 	// ポストエフェクトの初期化
-	PostEffectManager::StaticInitialize(bloomPSO_.get(), outLinePSO_.get(), psoManager_.get());
+	PostEffectManager::StaticInitialize(bloomPSO_.get(), outLinePSO_.get(), psoManager_.get(), copyPSO_.get());
 	// ポストエフェクトマネージャーの初期化
 	postEffectManager_ = std::make_unique<PostEffectManager>();
 	float clearColor_[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
@@ -203,6 +203,12 @@ void Engine::Update() {
 
 		// シーンの描画処理
 		sceneManager_->Draw();
+
+		// 中間描画
+		renderPipeline_->MiddleFrame();
+
+		// シーンのUIを描画
+		sceneManager_->DrawUI();
 
 		// 描画後処理
 		PostDraw();
