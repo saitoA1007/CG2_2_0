@@ -240,10 +240,10 @@ void Player::UpdateAnimation() {
 	if (isCharging_ && !prevIsCharging_) {
 		StartCustomAnim(PlayerAnimationType::Rush, "突進_Prepare",
 			kRushChargeMaxTime_ * kRushChargeLevel3Ratio_);
-		// 再生: RushCharge ループ
+		// 再生: RushCharge
 		{
 			auto handle = audioHandle_RushCharge_;
-			if (handle != 0) { AudioManager::GetInstance().Play(handle, 1.0f, true); }
+			if (handle != 0) { AudioManager::GetInstance().Play(handle, 1.0f, false); }
 		}
 	}
     // 突進溜め終了時にループを停止
