@@ -359,7 +359,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 void TDGameScene::Update() {
 
-	if (context_->input->TriggerKey(DIK_U) || (bossEnemy_->GetCurrentHP() == 0)) {
+	if (context_->input->TriggerKey(DIK_U)) {
 		if (bossEnemy_->GetCurrentHP() == 0) {
 			nextSceneState_ = SceneState::Result;
 		}
@@ -670,7 +670,9 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 	for (const std::unique_ptr<EnemyDestroyEffect>& effect : enemyAttackManager_->GetEnemyDestroyEffect()) {
 		if (!effect->IsFinished()) {
-			ModelRenderer::Draw(planeModel_, effect->GetBreakWorldTransform(), &effect->GetMaterial());
+			for (auto& world : effect->breakEffect_->GetWorldTransforms()) {
+				ModelRenderer::Draw(planeModel_, world, &effect->GetMaterial());
+			}
 		}
 	}
 

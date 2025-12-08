@@ -17,7 +17,7 @@ void EnemyDestroyEffect::Initialize(const uint32_t& texture, const uint32_t& bre
 
 	for (auto& particle : particleData_) {
 		particle.timer = 0.0f;
-		particle.maxTime = RandomGenerator::Get(1.0f, 1.5f);
+		particle.maxTime = RandomGenerator::Get(1.5f, 2.0f);
 		Vector3 rot = RandomGenerator::GetVector3(0.0f, 3.2f);
 		Vector3 pos = emitPos_ + RandomGenerator::GetVector3(spawnPosMin_, spawnPosMax_);
 		particle.worldTransform.Initialize({ { 1.0f, 1.0f, 1.0f},rot,pos });
@@ -38,10 +38,12 @@ void EnemyDestroyEffect::Initialize(const uint32_t& texture, const uint32_t& bre
 	smallParticle_->Initialize("EnemyDestroyParticle", 32);
 	smallParticle_->Emit(emitPos_);
 
+	breakEffect_ = std::make_unique<BreakEffect>();
+	breakEffect_->Initialize(emitPos_);
 
-	breakWorldTransform_.Initialize({ {15.0f,15.0f,15.0f},{0.0f,0.0f,0.0f},emitPos_ });
+
 	// マテリアルを初期化
-	material_.Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 250.0f, false);
+	material_.Initialize({ 1.0f,1.0f,0.0f,1.0f }, { 1.0f,1.0f,1.0f }, 250.0f, false);
 	material_.SetTextureHandle(breakTextuer);
 }
 
@@ -74,8 +76,10 @@ void EnemyDestroyEffect::Update(const Matrix4x4& cameraMatrix, const Matrix4x4& 
 		material_.SetAplha(0.0f);
 	}
 
+	breakEffect_->Update(cameraMatrix, viewMatrix);
+
 	// カメラ位置に合わせる
-	breakWorldTransform_.SetWorldMatrix(MakeBillboardMatrix(breakWorldTransform_.transform_.scale, breakWorldTransform_.transform_.translate, cameraMatrix, breakWorldTransform_.transform_.rotate.z));
+	//breakWorldTransform_.SetWorldMatrix(MakeBillboardMatrix(breakWorldTransform_.transform_.scale, breakWorldTransform_.transform_.translate, cameraMatrix, breakWorldTransform_.transform_.rotate.z));
 
 	smallParticle_->Update(cameraMatrix, viewMatrix);
 }
