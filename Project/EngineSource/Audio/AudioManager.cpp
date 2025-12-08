@@ -281,6 +281,24 @@ void AudioManager::Stop(const uint32_t& soundHandle) {
 	}
 }
 
+void AudioManager::StopAll() {
+	// 管理している全てのボイスを停止・破棄する
+	for (auto& voicePair : activeVoices_) {
+		IXAudio2SourceVoice* pSourceVoice = voicePair.second;
+		if (pSourceVoice) {
+			// 再生停止
+			pSourceVoice->Stop(0);
+			// バッファをフラッシュ（待機中のデータを破棄）
+			pSourceVoice->FlushSourceBuffers();
+			// ボイスを削除
+			pSourceVoice->DestroyVoice();
+		}
+	}
+
+	// マップをクリアして、再生中の情報をリセット
+	activeVoices_.clear();
+}
+
 void AudioManager::SoundPlayMp3(const uint32_t& soundHandle, bool isloop) {
 	HRESULT result;
 

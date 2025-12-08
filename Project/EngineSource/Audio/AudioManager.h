@@ -117,6 +117,11 @@ namespace GameEngine {
 		/// <returns></returns>
 		bool IsPlay(const uint32_t& soundHandle);
 
+		/// <summary>
+		/// 全ての音声を止める
+		/// </summary>
+		void StopAll();
+
 	private:
 		AudioManager() = default;
 		~AudioManager() = default;
