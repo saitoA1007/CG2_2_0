@@ -305,6 +305,7 @@
     <ClCompile Include="Application\UI\PlayerHpUI.cpp" />
     <ClCompile Include="Application\UI\GameOverUI.cpp" />
     <ClCompile Include="Application\Stage\Effect\BreakWallParticle.cpp" />
+    <ClCompile Include="Application\Enemy\Effect\EnemyDestroyEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -614,6 +615,7 @@
     <ClInclude Include="Application\UI\PlayerHpUI.h" />
     <ClInclude Include="Application\UI\GameOverUI.h" />
     <ClInclude Include="Application\Stage\Effect\BreakWallParticle.h" />
+    <ClInclude Include="Application\Enemy\Effect\EnemyDestroyEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

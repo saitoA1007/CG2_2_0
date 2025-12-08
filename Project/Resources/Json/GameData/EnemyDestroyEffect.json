@@ -1,0 +1,11 @@
+{
+    "EnemyDestroyEffect": {
+        "ScaleMax": 0.800000011920929,
+        "ScaleMin": 0.4000000059604645,
+        "SceneName": "TDGameScene",
+        "SpawnPosMax": 2.0,
+        "SpawnPosMin": -2.0,
+        "SpeedMax": 30.0,
+        "SpeedMin": 20.0
+    }
+}

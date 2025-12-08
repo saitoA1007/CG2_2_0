@@ -67,6 +67,9 @@ public:
 	// 翼のアニメーション
 	bool IsWingsEffect() const { return bossContext_.isWingsEffect_; }
 
+	// 破壊演出
+	bool IsDestroyEffect() const { return bossContext_.isDestroyEffect; }
+
 private: // 調整項目
 
 	// 最大体力
@@ -111,6 +114,9 @@ private: // メンバ変数
 
 	// 当たり判定に使用する透明度
 	float alpha_ = 1.0f;
+
+	// 現在の状態
+	BossState bossState_ = BossState::In;
 
 private:
 

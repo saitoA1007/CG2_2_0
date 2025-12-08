@@ -25,6 +25,8 @@ private:
     // ボスの共通データを取得
     BossContext& bossContext_;
 
+	uint32_t cout_ = 0;
+
 private:
 
 	/// <summary>

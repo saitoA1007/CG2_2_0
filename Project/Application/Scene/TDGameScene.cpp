@@ -210,7 +210,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	
 	// 敵の攻撃管理クラス
 	enemyAttackManager_ = std::make_unique<EnemyAttackManager>();
-	enemyAttackManager_->Initialize(context_->postEffectManager_, iceFallModel_->GetDefaultTexture());
+	enemyAttackManager_->Initialize(context_->postEffectManager_, iceFallModel_->GetDefaultTexture(), context_->textureManager->GetHandleByName("break.png"));
 	// ボス敵モデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Boss");
 	bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
@@ -458,7 +458,7 @@ void TDGameScene::Update() {
 	//========================================
 	// 敵の更新処理
 	//========================================
-
+#pragma region EnemyUpdate
 	// 敵の移動処理
 	bossEnemy_->Update(player_->GetPlayerPos());
 	enemyAttackManager_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
@@ -492,6 +492,12 @@ void TDGameScene::Update() {
 	if (bossEnemy_->IsHit()) {
 		bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,bossEnemy_->GetAlpha() });
 	}
+
+	// 撃破演出
+	if (bossEnemy_->IsDestroyEffect()) {
+		enemyAttackManager_->AddEnemyDestroyEffect(bossEnemy_->GetWorldPosition());
+	}
+#pragma endregion
 
 	// ステージの更新処理
 	stageManager_->Update();
@@ -624,6 +630,15 @@ void TDGameScene::Draw(const bool &isDebugView) {
 		}
 	}
 
+	// 撃破演出で使用する氷の塊
+	for (const std::unique_ptr<EnemyDestroyEffect>& effect : enemyAttackManager_->GetEnemyDestroyEffect()) {
+		if (!effect->IsFinished()) {
+			for (auto& particle : effect->GetParticleDatas()) {
+				CustomRenderer::DrawRock(breakIceFallModel_, particle.worldTransform, sceneLightingController_->GetResource(), particle.material.get());
+			}
+		}
+	}
+
 	// 3Dモデルの両面描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);
 
@@ -651,6 +666,14 @@ void TDGameScene::Draw(const bool &isDebugView) {
 		}
 	}
 
+	// ボスの撃破演出
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
+	for (const std::unique_ptr<EnemyDestroyEffect>& effect : enemyAttackManager_->GetEnemyDestroyEffect()) {
+		if (!effect->IsFinished()) {
+			ModelRenderer::Draw(planeModel_, effect->GetBreakWorldTransform(), &effect->GetMaterial());
+		}
+	}
+
 	// インスタンシング描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingBoth);
 
@@ -675,6 +698,14 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	for (auto &iceFallEffect : enemyAttackManager_->GetIceFallEffectDatas()) {
 		if (!iceFallEffect.isActive) { continue; }
 		ModelRenderer::DrawInstancing(planeModel_, iceFallEffect.particle->GetCurrentNumInstance(), *iceFallEffect.particle->GetWorldTransforms());
+	}
+
+	// 敵の撃破時の演出
+	for (const std::unique_ptr<EnemyDestroyEffect>& effect : enemyAttackManager_->GetEnemyDestroyEffect()) {
+		if (!effect->IsFinished()) {
+			auto& particle = effect->GetSmallParticle();
+			ModelRenderer::DrawInstancing(planeModel_, particle->GetCurrentNumInstance(), *particle->GetWorldTransforms());
+		}
 	}
 
 	// 突進する時の風パーティクル

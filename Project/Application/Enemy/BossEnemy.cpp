@@ -39,6 +39,7 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
     statesTable_[static_cast<size_t>(BossState::Out)] = std::make_unique<BossStateOut>(bossContext_);
 
     // 最初の状態を設定する
+    bossState_ = BossState::In;
     currentState_ = statesTable_[static_cast<size_t>(BossState::In)].get();
     currentState_->Enter();
     Log("BossState : In","Enemy");
@@ -66,6 +67,7 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
 #endif
     // 値を適応させる
     ApplyDebugParam();
+    bossContext_.hp = kMaxHp_;
 }
 
 void BossEnemy::Update(const Vector3& targetPos) {
@@ -74,12 +76,19 @@ void BossEnemy::Update(const Vector3& targetPos) {
     ApplyDebugParam();
 #endif
 
+    if (bossContext_.hp <= 0) {
+        if (bossState_ != BossState::Out) {
+            bossContext_.bossStateRequest_ = BossState::Out;
+        }
+    }
+
     // 攻撃する目標の位置を取得する
     bossContext_.targetPos = targetPos;
 
     // 状態変更が有効であれば、切り替える
     if (bossContext_.bossStateRequest_) {
         //currentState_->Exit();
+        bossState_ = bossContext_.bossStateRequest_.value();
         currentState_ = nullptr;
 #ifdef _DEBUG
         // 切り替わった状態のログを出す

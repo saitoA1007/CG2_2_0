@@ -154,6 +154,7 @@ void BossStateBattle::ResetNormal() {
 	//selectButtleBehavior_ = ButtleBehavior::RushAttack;
 	//selectButtleBehavior_ = ButtleBehavior::WindAttack;
 	//selectButtleBehavior_ = ButtleBehavior::IceFallAttack;
+	//selectButtleBehavior_ = ButtleBehavior::Wait;
 }
 
 void BossStateBattle::NormalUpdate() {

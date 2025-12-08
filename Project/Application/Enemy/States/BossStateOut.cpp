@@ -6,16 +6,14 @@ BossStateOut::BossStateOut(BossContext& context) : bossContext_(context) {
 
 #ifdef _DEBUG
 	// 値を登録する
-	RegisterBebugParam();
-	ApplyDebugParam();
-#else
+	RegisterBebugParam();	
+#endif
 	// 値を適応させる
 	ApplyDebugParam();
-#endif
 }
 
 void BossStateOut::Enter() {
-
+	bossContext_.isDestroyEffect = true;
 }
 
 void BossStateOut::Update() {
@@ -24,6 +22,12 @@ void BossStateOut::Update() {
 	ApplyDebugParam();
 #endif
 
+	if (cout_ == 1) {
+		bossContext_.isDestroyEffect = false;
+	}
+	if (cout_ <= 2) {
+		cout_++;
+	}
 }
 
 void BossStateOut::Exit() {
