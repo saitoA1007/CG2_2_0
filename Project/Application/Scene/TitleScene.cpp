@@ -160,55 +160,23 @@ void TitleScene::Initialize(SceneContext* context) {
     cameraController_ = std::make_unique<CameraController>();
     cameraController_->Initialize();
 
-    // タイトル用の初期カメラを CameraController に設定: 注視点 {0,16,0}
-    Vector3 initialCenter = { 0.0f, 16.0f, 0.0f };
+    transitionStartTarget_ = Vector3{ 0.0f,32.0f,0.0f };
+    transitionEndTarget_ = player_ ? player_->GetWorldTransform().GetWorldPosition() : transitionStartTarget_;
 
     // cameraController のターゲットを初期注視点に設定して内部状態を同期
-    cameraController_->SetTarget(initialCenter);
-
-    // mainCamera を cameraController と同期しておく
+    cameraController_->SetTarget(transitionStartTarget_);
+    cameraController_->SetCameraCoordinateType(CameraController::CameraCoodinateType::Spherical);
+    cameraController_->SetDesiredFov(0.7f);
+    cameraController_->SetDesiredAsCurrent();
+    cameraController_->Update(context_->inputCommand, context_->input);
+    cameraController_->SetCurrentAsDesired();
+    cameraController_->Update(context_->inputCommand, context_->input);
     mainCamera_->SetCamera(cameraController_->GetCamera());
+    mainCamera_->Update();
 
-    // Title starts locked: only accept Start input
     isTitleLocked_ = true;
     isTransitioning_ = false;
     transitionTimer_ = 0.0f;
-
-    /*{
-        std::vector<AnimationKeyframe<Vector3>> positionKeys;
-        std::vector<AnimationKeyframe<Vector3>> rotateKeys;
-        std::vector<AnimationKeyframe<Vector3>> lookAtKeys;
-        std::vector<AnimationKeyframe<float>> fovKeys;
-
-        auto vecEase = [](const Vector3 &a, const Vector3 &b, float t) -> Vector3 { return EaseInOutCubic(a, b, t); };
-        auto floatEase = [](const float &a, const float &b, float t) -> float { return EaseInOutCubic(a, b, t); };
-
-        float pitch;
-        float yaw;
-        const float degToRad = static_cast<float>(std::numbers::pi) / 180.0f;
-
-        pitch = -15.0f * degToRad;
-        positionKeys.push_back(AnimationKeyframe<Vector3>{ 0.5f, Vector3{0.0f, 0.0f, 8.0f}, vecEase });
-        rotateKeys.push_back(AnimationKeyframe<Vector3>{ 0.5f, Vector3{ pitch, 0.0f, 0.0f }, vecEase });
-        lookAtKeys.push_back(AnimationKeyframe<Vector3>{ 0.5f, Vector3{ 0.0f, 0.0f, 0.0f }, vecEase });
-        fovKeys.push_back(AnimationKeyframe<float>{ 0.5f, 0.7f, floatEase });
-
-        pitch = -45.0f * degToRad;
-        yaw = 360.0f * degToRad;
-        positionKeys.push_back(AnimationKeyframe<Vector3>{ 2.0f, Vector3{0.0f, 0.0f, 32.0f}, vecEase });
-        rotateKeys.push_back(AnimationKeyframe<Vector3>{ 2.0f, Vector3{ pitch, yaw, 0.0f }, vecEase });
-        lookAtKeys.push_back(AnimationKeyframe<Vector3>{ 2.0f, Vector3{ 0.0f, 0.0f, 0.0f }, vecEase });
-        fovKeys.push_back(AnimationKeyframe<float>{ 2.0f, 1.5f, floatEase });
-
-        cameraController_->SetAnimationKeyframes(positionKeys, rotateKeys, lookAtKeys, fovKeys);
-        cameraController_->PlayAnimation();
-        cameraController_->StartCameraShake(0.5f, 10.0f, 20.0f,
-            [](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutSine(a, b, t); },
-            CameraController::ShakeOrigin::TargetPosition,
-            false, true, true, true);
-    }*/
-    cameraController_->SetCurrentAsDesired();
-    mainCamera_->SetCamera(cameraController_->GetCamera());
 }
 
 void TitleScene::Update() {
@@ -218,20 +186,6 @@ void TitleScene::Update() {
             // CameraController のアニメーションを使って遷移を開始
             isTransitioning_ = true;
             transitionTimer_ = 0.0f;
-
-            std::vector<AnimationKeyframe<Vector3>> positionKeys;
-            std::vector<AnimationKeyframe<Vector3>> rotateKeys;
-            std::vector<AnimationKeyframe<Vector3>> lookAtKeys;
-            std::vector<AnimationKeyframe<float>> fovKeys;
-
-            auto vecEase = [](const Vector3 &a, const Vector3 &b, float t) -> Vector3 { return EaseInOutCubic(a, b, t); };
-
-            // カメラ位置オフセットは一定 (eye = lookAt + offset)
-            positionKeys.push_back(AnimationKeyframe<Vector3>{ 0.0f, Vector3{0.0f, 0.0f, -10.0f}, vecEase });
-            positionKeys.push_back(AnimationKeyframe<Vector3>{ kTransitionDuration_, Vector3{0.0f, 0.0f, -10.0f}, vecEase });
-
-            cameraController_->SetAnimationKeyframes(positionKeys, rotateKeys, lookAtKeys, fovKeys);
-            cameraController_->PlayAnimation();
         }
     } else {
         // ロック解除後は Start でシーン遷移
@@ -244,9 +198,8 @@ void TitleScene::Update() {
     if (debugRenderer_) debugRenderer_->Clear();
     if (collisionManager_) collisionManager_->ClearList();
 
-
     if (cameraController_) {
-        if (!isTransitioning_) {
+        if (!isTitleLocked_) {
             float desiredFov = 0.7f;
             if (player_ && player_->IsRushing()) {
                 desiredFov = 1.0f;
@@ -261,11 +214,16 @@ void TitleScene::Update() {
         mainCamera_->SetCamera(cameraController_->GetCamera());
     }
 
-    // 遷移中はスプライトをフェードさせる
+    // 遷移中は注視点をイージングで変化させる
     if (isTitleLocked_ && isTransitioning_) {
         transitionTimer_ += FpsCounter::deltaTime;
         float t = std::clamp(transitionTimer_ / kTransitionDuration_, 0.0f, 1.0f);
         float eased = EaseInOutCubic(0.0f, 1.0f, t);
+        Vector3 currentTarget = Lerp(transitionStartTarget_, transitionEndTarget_, eased);
+        // カメラコントローラーに注視点を設定
+        cameraController_->SetTarget(currentTarget);
+
+        // スプライトのフェード
         float alpha = 1.0f - eased;
         titleSprite_->SetColor(Vector4(0.7f, 0.7f, 0.7f, alpha));
         spaceSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, alpha));

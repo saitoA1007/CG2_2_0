@@ -131,4 +131,8 @@ private:
     bool isTransitioning_ = false; // true while fade/camera easing
     float transitionTimer_ = 0.0f;
     static inline constexpr float kTransitionDuration_ = 1.0f; // seconds
+
+    // イージングで遷移する注視点
+    Vector3 transitionStartTarget_ = {0.0f, 16.0f, 0.0f};
+    Vector3 transitionEndTarget_ = {0.0f, 16.0f, 0.0f};
 };
