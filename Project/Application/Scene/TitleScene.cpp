@@ -75,6 +75,10 @@ void TitleScene::Draw(const bool& isDebugView) {
 	SpriteRenderer::Draw(spaceSprite_.get(), spaceGH_);
 }
 
+void TitleScene::DrawUI() {
+
+}
+
 void TitleScene::InputRegisterCommand() {
 	// Startゲーム開始（EnterキーまたはAボタン）
 	context_->inputCommand->RegisterCommand("Start", { {InputState::KeyTrigger, DIK_RETURN}, {InputState::PadTrigger, XINPUT_GAMEPAD_A},{InputState::KeyTrigger, DIK_SPACE} });

@@ -41,6 +41,8 @@ public:
 	/// </summary>
 	void Draw();
 
+	void DrawUI();
+
 	/// <summary>
 	/// シーンの切り替え処理
 	/// </summary>

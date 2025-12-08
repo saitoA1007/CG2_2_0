@@ -128,6 +128,12 @@ void SceneManager::Draw() {
 
 	// 現在シーンの描画処理
 	currentScene_->Draw(isDebugView_);
+}
+
+void SceneManager::DrawUI() {
+
+	// UIの描画
+	currentScene_->DrawUI();
 
 	// シーン遷移演出を描画
 	sceneTransition_->Draw();

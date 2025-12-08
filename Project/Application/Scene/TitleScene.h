@@ -37,6 +37,11 @@ public:
 	void Draw(const bool& isDebugView) override;
 
 	/// <summary>
+	/// UIの描画
+	/// </summary>
+	void DrawUI() override;
+
+	/// <summary>
 	/// 終了したことを伝える
 	/// </summary>
 	/// <returns></returns>

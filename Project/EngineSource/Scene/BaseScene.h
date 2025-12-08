@@ -34,6 +34,9 @@ public:
 	/// </summary>
 	virtual void Draw(const bool& isDebugView) = 0;
 
+	// UIの描画
+	virtual void DrawUI() = 0;
+
 	/// <summary>
 	/// 終了したことを伝える
 	/// </summary>

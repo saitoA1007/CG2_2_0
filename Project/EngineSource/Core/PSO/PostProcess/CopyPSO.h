@@ -20,7 +20,7 @@ namespace GameEngine {
 
         ID3D12PipelineState* GetBrightPipelineState() const { return pipelineState_.Get(); }
 
-        ID3D12PipelineState* GetPipelineState() const {}
+        //ID3D12PipelineState* GetPipelineState() const {}
 
     private:
         CopyPSO(const CopyPSO&) = delete;

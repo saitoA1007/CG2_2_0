@@ -676,9 +676,6 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	// 画像の描画前処理
 	SpriteRenderer::PreDraw(RenderMode2D::Normal);
 
-	// タイトル描画
-	SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_);
-
 	// ボスのHPUIを表示
 	//SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
 	//SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
@@ -694,6 +691,18 @@ void TDGameScene::Draw(const bool &isDebugView) {
 		SpriteRenderer::Draw(gameOverUI_->GetRetrySprite(), gameOverUI_->GetRetryGH());
 		SpriteRenderer::Draw(gameOverUI_->GetTitleSprite(), gameOverUI_->GetTitleGH());
 	}
+}
+
+void TDGameScene::DrawUI() {
+
+	//======================================================
+	// 2D描画
+	//======================================================
+
+	// 画像の描画前処理
+	SpriteRenderer::PreDraw(RenderMode2D::Normal);
+	// タイトル描画
+	SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_);
 }
  
  void TDGameScene::InputRegisterCommand() {

@@ -24,13 +24,22 @@ void RendererManager::BeginFrame() {
     postEffectManager_->PreDraw(graphicsDevice_->GetCommandList(),graphicsDevice_->GetViewport(),graphicsDevice_->GetScissorRect(),clearColor_,graphicsDevice_->GetDSVHeap());
 }
 
-void RendererManager::EndFrame(ImGuiManager* imGuiManager) {
+void RendererManager::MiddleFrame() {
     // 深度バッファを深度書き込みからSRVに遷移
     TransitionDepthToRead();
 
     // ポストエフェクトの描画
-    postEffectManager_->PostDraw(graphicsDevice_->GetCommandList(),graphicsDevice_->GetViewport(),graphicsDevice_->GetScissorRect(),graphicsDevice_->GetDepthStencilSRVHandle());
+    postEffectManager_->PostDraw(graphicsDevice_->GetCommandList(), graphicsDevice_->GetViewport(), graphicsDevice_->GetScissorRect(), graphicsDevice_->GetDepthStencilSRVHandle());
 
+    // UIの前処理描画
+    postEffectManager_->PreUIDraw(graphicsDevice_->GetCommandList());
+}
+
+void RendererManager::EndFrame(ImGuiManager* imGuiManager) {
+
+    // UIの描画後処理
+    postEffectManager_->PostUIDraw(graphicsDevice_->GetCommandList());
+    
     // バックバッファをレンダーターゲットに遷移
     TransitionBackBuffer(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 

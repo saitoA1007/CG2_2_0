@@ -10,6 +10,7 @@
 
 #include"PSO/Core/PSOManager.h"
 #include"PSO/Core/DrawPSOData.h"
+#include"PSO/PostProcess/CopyPSO.h"
 
 #include"PostEffectData.h"
 #include"ParameterResource.h"
@@ -54,7 +55,7 @@ namespace GameEngine {
         /// </summary>
         /// <param name="bloomPSO"></param>
         /// <param name="logManager"></param>
-        static void StaticInitialize(BloomPSO* bloomPSO, OutLinePSO* outLinePSO, PSOManager* psoManager);
+        static void StaticInitialize(BloomPSO* bloomPSO, OutLinePSO* outLinePSO, PSOManager* psoManager, CopyPSO* copyPSO);
 
         /// <summary>
         /// 初期化
@@ -86,6 +87,10 @@ namespace GameEngine {
         /// <param name="scissorRect"></param>
         void PostDraw(ID3D12GraphicsCommandList* commandList, const D3D12_VIEWPORT& viewport, const D3D12_RECT& scissorRect, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV);
 
+        void PreUIDraw(ID3D12GraphicsCommandList* commandList);
+
+        void PostUIDraw(ID3D12GraphicsCommandList* commandList);
+
         /// <summary>
         /// SRVを取得
         /// </summary>
@@ -112,6 +117,8 @@ namespace GameEngine {
 
         // アウトライン用のPSO
         static OutLinePSO* outLinePSO_;
+
+        static  CopyPSO* copyPSO_;
 
         // psoデータのリスト
         static std::array<DrawPsoData,static_cast<size_t>(PSOType::MaxCount)> psoList_;
@@ -180,6 +187,11 @@ namespace GameEngine {
         // ラジアルブラーのデータ
         EffectData radialBlurData_;
        
+        // 2DUI描画用
+        EffectData UIData_;
+        //ParameterResource<ScanLineData> UIResource_;
+
+        float clear[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
      
         // アウトラインのデータ
         EffectData outLineData_;
