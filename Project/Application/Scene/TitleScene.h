@@ -7,8 +7,20 @@
 #include"Model.h"
 #include"Sprite.h"
 #include"WorldTransform.h"
+#include"DebugRenderer.h"
+#include"CollisionManager.h"
 
 #include"Application/Scene/Transition/Fade.h"
+
+#include"Application/Stage/StageManager.h"
+#include"Application/Stage/StageWallPlane.h"
+#include"Application/Player/Player.h"
+#include"Animator.h"
+#include"Application/Graphics/PlaneProjectionShadow.h"
+#include"Application/Graphics/Terrain.h"
+#include"Extension/CustomMaterial/IceMaterial.h"
+#include"Application/Light/SceneLightingController.h"
+#include"Application/Camera/CameraController.h"
 
 class TitleScene : public BaseScene {
 public:
@@ -67,9 +79,44 @@ private: // シーン機能
 	uint32_t spaceGH_ = 0;
 
 private:
-
 	/// <summary>
 	/// 入力コマンドを登録する
 	/// </summary>
 	void InputRegisterCommand();
+
+private:
+	std::unique_ptr<StageManager> stageManager_;
+	GameEngine::Model* stageWallPlaneModel_ = nullptr;
+	static inline const size_t kNumStageWalls = 6;
+	std::array<StageWallPlane, kNumStageWalls> stageWallPlanes_;
+	std::unique_ptr<IceMaterial> stageWallPlaneMaterial_;
+
+	GameEngine::Model* playerModel_ = nullptr;
+	std::unique_ptr<Player> player_;
+	std::unique_ptr<GameEngine::Animator> playerAnimator_;
+	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(PlayerAnimationType::MaxCount)> playerAnimationData_;
+	std::unique_ptr<PlaneProjectionShadow> playerShadow_;
+
+	std::unique_ptr<Terrain> terrain_;
+	GameEngine::Model* icePlaneModel_ = nullptr;
+
+	// ライト
+	std::unique_ptr<SceneLightingController> sceneLightingController_;
+
+	GameEngine::Model* wallModel_ = nullptr;
+
+	GameEngine::Model* playerChargeEffectModel_ = nullptr;
+	GameEngine::Model* playerRushEffectModel_ = nullptr;
+	GameEngine::Model* playerAttackDownEffectModel_ = nullptr;
+
+	std::unique_ptr<class PlayerChargeEffect> playerChargeEffect_;
+	std::unique_ptr<class PlayerRushEffect> playerRushEffect_;
+	std::unique_ptr<class PlayerAttackDownEffect> playerAttackDownEffect_;
+
+	std::unique_ptr<GameEngine::CollisionManager> collisionManager_;
+	std::unique_ptr<GameEngine::DebugRenderer> debugRenderer_;
+
+	std::unique_ptr<CameraController> cameraController_;
+
+	void UpdateCollision();
 };
