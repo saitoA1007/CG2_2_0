@@ -23,6 +23,7 @@ void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, Tex
 	psoList_[RenderMode3D::Instancing] = psoManager->GetDrawPsoData("Instancing3D");
 	psoList_[RenderMode3D::InstancingAdd] = psoManager->GetDrawPsoData("AdditiveInstancing3D");
 	psoList_[RenderMode3D::InstancingBoth] = psoManager->GetDrawPsoData("BothSidesInstancing3D");
+	psoList_[RenderMode3D::InstancingBothNone] = psoManager->GetDrawPsoData("NoneBothSidesInstancing3D");
 	// グリッド描画用のデータを取得する
 	psoList_[RenderMode3D::Grid] = psoManager->GetDrawPsoData("Grid");
 	// アニメーション描画用のデータを取得する

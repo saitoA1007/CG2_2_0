@@ -322,6 +322,9 @@ void PSOManager::DefaultLoadPSO() {
     instancing3D.drawMode = DrawModel::None;
     RegisterPSO("BothSidesInstancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
 
+    instancing3D.blendMode = BlendMode::kBlendModeNormal;
+    RegisterPSO("NoneBothSidesInstancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
+
     // グリッド描画用のPSO
     CreatePSOData grid;
     grid.rootSigName = "Grid";
