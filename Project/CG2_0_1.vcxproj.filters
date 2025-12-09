@@ -311,6 +311,7 @@
     <ClCompile Include="Application\UI\Letterbox.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerLandingEffect.cpp" />
     <ClCompile Include="Application\UI\BossDestroyFade.cpp" />
+    <ClCompile Include="Application\UI\ClearUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -626,6 +627,7 @@
     <ClInclude Include="Application\UI\Letterbox.h" />
     <ClInclude Include="Application\Player\Effect\PlayerLandingEffect.h" />
     <ClInclude Include="Application\UI\BossDestroyFade.h" />
+    <ClInclude Include="Application\UI\ClearUI.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

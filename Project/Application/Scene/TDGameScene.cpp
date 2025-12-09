@@ -4,7 +4,6 @@
 #include"SpriteRenderer.h"
 #include"GameParamEditor.h"
 #include"EasingManager.h"
-#include"SpriteRenderer.h"
 #include"LogManager.h"
 #include"CollisionConfig.h"
 #include<numbers>
@@ -421,6 +420,10 @@ void TDGameScene::Initialize(SceneContext* context) {
         letterboxEndHeight_ = 0.0f;
     }
 
+	// クリアUI
+	clearUI_ = std::make_unique<ClearUI>();
+	clearUI_->Initialize(context_->inputCommand, context_->textureManager);
+
 	// ボスの撃破時のフェード
 	bossDestroyFade_ = std::make_unique<BossDestroyFade>();
 	bossDestroyFade_->Initialize();
@@ -725,6 +728,14 @@ void TDGameScene::Update() {
 	}
 	bossDestroyFade_->Update();
 
+	// クリア処理
+	if (bossEnemy_->isFinished()) {
+		if (!clearUI_->IsActive()) {
+			clearUI_->SetIsActice(true);
+		}	
+	}
+	clearUI_->Update();
+
 #ifdef _DEBUG
 	// 地面マテリアルの更新処理
 	terrain_->Update();
@@ -995,6 +1006,13 @@ void TDGameScene::DrawUI() {
 		SpriteRenderer::Draw(gameOverUI_->GetLogoSprite(), gameOverUI_->GetLogoGH());
 		SpriteRenderer::Draw(gameOverUI_->GetRetrySprite(), gameOverUI_->GetRetryGH());
 		SpriteRenderer::Draw(gameOverUI_->GetTitleSprite(), gameOverUI_->GetTitleGH());
+	}
+
+	// クリアUIを描画
+	if (clearUI_->IsActive()) {
+		SpriteRenderer::Draw(clearUI_->GetBgSprite(), 0);
+		SpriteRenderer::Draw(clearUI_->GetClearSprite(), clearUI_->GetClearTexture());
+		SpriteRenderer::Draw(clearUI_->GetGuideSprite(), clearUI_->GetGuidTexture());
 	}
 
 	// ボスの撃破時のフェード処理
