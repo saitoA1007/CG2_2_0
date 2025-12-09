@@ -64,7 +64,7 @@ void IceFall::Update() {
 
         timer_ += FpsCounter::deltaTime / maxTime_;
 
-        worldTransform_.transform_.translate.y = Lerp(startPosY, endPosY, EaseIn(timer_));
+        worldTransform_.transform_.translate.y = Lerp(startPosY, endPosY, timer_ * timer_ * timer_);
 
         // 行列の更新処理
         worldTransform_.UpdateTransformMatrix();
