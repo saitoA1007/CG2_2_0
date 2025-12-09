@@ -39,6 +39,7 @@
 #include"Application/Player/Effect/PlayerAttackEffect.h"
 #include"Application/Player/Effect/PlayerLandingEffect.h"
 #include"Application/UI/Letterbox.h"
+#include"Application/UI/BossDestroyFade.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -206,6 +207,10 @@ private:
 	// ボスの纏っているパーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> bossWearParticle_;
 	std::unique_ptr<GameEngine::ParticleBehavior> bossWearAdditionParticle_;
+
+	// ボスが撃破された時のフェード
+	std::unique_ptr<BossDestroyFade> bossDestroyFade_;
+	bool isBossDestroyFade_ = false;
 
 	//==================================================
 	// モデル

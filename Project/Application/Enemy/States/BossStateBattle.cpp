@@ -103,7 +103,12 @@ void BossStateBattle::Update() {
 }
 
 void BossStateBattle::Exit() {
-
+	// フラグを切る
+	bossContext_.isActiveIceFall = false;
+	bossContext_.isRushAttack_ = false;
+	bossContext_.isRushCollisionActive_ = false;
+	bossContext_.isWindAttack_ = false;
+	bossContext_.isWingsEffect_ = false;
 }
 
 void BossStateBattle::ResetNormal() {
