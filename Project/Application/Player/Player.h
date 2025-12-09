@@ -99,6 +99,7 @@ private:
 		"Player-Rush",
 		"Player-WallBounce",
 		"Player-Attack",
+        "Player-Audio",
 	};
 
 	// ジャンプの高さ
@@ -308,6 +309,15 @@ private:
 	uint32_t audioHandle_RushLv3_ = 0;
 	uint32_t audioHandle_AirMotion_ = 0;
 	uint32_t audioHandle_Reflect_ = 0;
+
+	// 各音声の再生音量（0.0 - 1.0）
+	float audioVolume_PlayerDamaged_ = 1.0f;
+	float audioVolume_RushCharge_ = 1.0f;
+	float audioVolume_RushLv1_ = 1.0f;
+	float audioVolume_RushLv2_ = 1.0f;
+	float audioVolume_RushLv3_ = 1.0f;
+	float audioVolume_AirMotion_ = 1.0f;
+	float audioVolume_Reflect_ = 1.0f;
 
 private:
 	void ProcessMoveInput(GameEngine::InputCommand* inputCommand);

@@ -224,7 +224,7 @@ void Player::UpdateAnimation() {
 	if (!isAttackDown_ && prevIsAttackDown_) {
 		StartNormalAnim(PlayerAnimationType::AirMove, "AirMove", true);
         // 空中移動音を再生
-        if (audioHandle_AirMotion_ != 0 && !AudioManager::GetInstance().IsPlay(audioHandle_AirMotion_)) { AudioManager::GetInstance().Play(audioHandle_AirMotion_, 1.0f, true); }
+        if (audioHandle_AirMotion_ != 0 && !AudioManager::GetInstance().IsPlay(audioHandle_AirMotion_)) { AudioManager::GetInstance().Play(audioHandle_AirMotion_, audioVolume_AirMotion_, true); }
     }
 
     // 着地判定: 落下中(false)->着地(true) の遷移で Walk を再生
@@ -243,7 +243,7 @@ void Player::UpdateAnimation() {
 		// 再生: RushCharge
 		{
 			auto handle = audioHandle_RushCharge_;
-			if (handle != 0) { AudioManager::GetInstance().Play(handle, 1.0f, false); }
+			if (handle != 0) { AudioManager::GetInstance().Play(handle, audioVolume_RushCharge_, false); }
 		}
 	}
     // 突進溜め終了時にループを停止
@@ -260,7 +260,8 @@ void Player::UpdateAnimation() {
 		{
 			int lvl = rushChargeLevel_;
 			auto h = (lvl == 3) ? audioHandle_RushLv3_ : (lvl == 2 ? audioHandle_RushLv2_ : audioHandle_RushLv1_);
-			if (h != 0) { AudioManager::GetInstance().Play(h, 1.0f, false); }
+			float vol = (lvl == 3) ? audioVolume_RushLv3_ : (lvl == 2 ? audioVolume_RushLv2_ : audioVolume_RushLv1_);
+			if (h != 0) { AudioManager::GetInstance().Play(h, vol, false); }
 		}
 	}
 
@@ -284,7 +285,7 @@ void Player::UpdateAnimation() {
         auto h = audioHandle_AirMotion_;
         if (h != 0) {
             if (isJump_ && !isAttackDown_) {
-                if (!AudioManager::GetInstance().IsPlay(h)) { AudioManager::GetInstance().Play(h, 1.0f, true); }
+                if (!AudioManager::GetInstance().IsPlay(h)) { AudioManager::GetInstance().Play(h, audioVolume_AirMotion_, true); }
             } else {
                 if (AudioManager::GetInstance().IsPlay(h)) { AudioManager::GetInstance().Stop(h); }
             }
@@ -530,7 +531,7 @@ void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength, bool i
     // 壁跳ね返り音
     {
         auto h = audioHandle_Reflect_;
-        if (h != 0) { AudioManager::GetInstance().Play(h, 1.0f, false); }
+        if (h != 0) { AudioManager::GetInstance().Play(h, audioVolume_Reflect_, false); }
     }
 
     if (isLegacyWallBounce_) {
@@ -621,7 +622,7 @@ void Player::OnCollision(const CollisionResult &result) {
 		// ダメージ時のSE再生
     {
         auto h = audioHandle_PlayerDamaged_;
-        if (h != 0) { AudioManager::GetInstance().Play(h, 1.0f, false); }
+        if (h != 0) { AudioManager::GetInstance().Play(h, audioVolume_PlayerDamaged_, false); }
     }
 
 		if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
@@ -821,6 +822,15 @@ void Player::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownSpeed", kAttackDownSpeed_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownMinPower", kAttackDownMinPower_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownMaxPower", kAttackDownMaxPower_);
+
+	// Audio 設定 (Player-Audio)
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "PlayerDamagedVolume", audioVolume_PlayerDamaged_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "RushChargeVolume", audioVolume_RushCharge_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "RushLv1Volume", audioVolume_RushLv1_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "RushLv2Volume", audioVolume_RushLv2_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "RushLv3Volume", audioVolume_RushLv3_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "AirMotionVolume", audioVolume_AirMotion_);
+	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "ReflectVolume", audioVolume_Reflect_);
 }
 
 void Player::ApplyDebugParam() {
@@ -869,4 +879,13 @@ void Player::ApplyDebugParam() {
 	// Attack（空中急降下）設定
 	kAttackPreDownTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackPreDownTime");
 	kAttackDownSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackDownSpeed");
+
+	// Audio パラメータ取得
+	audioVolume_PlayerDamaged_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "PlayerDamagedVolume");
+	audioVolume_RushCharge_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "RushChargeVolume");
+	audioVolume_RushLv1_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "RushLv1Volume");
+	audioVolume_RushLv2_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "RushLv2Volume");
+	audioVolume_RushLv3_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "RushLv3Volume");
+	audioVolume_AirMotion_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "AirMotionVolume");
+	audioVolume_Reflect_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "ReflectVolume");
 }

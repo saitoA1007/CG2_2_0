@@ -55,8 +55,7 @@ void TitleScene::Initialize(SceneContext* context) {
     mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
 
     // タイトル画像
-    titleSprite_ = Sprite::Create({ 640.0f,250.0f }, { 1024.0f,256.0f }, { 0.5f,0.5f },
-        { 0.7f, 0.7f, 0.7f, 1.0f });
+    titleSprite_ = Sprite::Create({ 640.0f,250.0f }, { 1024.0f,256.0f }, { 0.5f,0.5f });
     titleGH_ = context_->textureManager->GetHandleByName("titleText.png");
 
     // スペースボタン
@@ -225,7 +224,7 @@ void TitleScene::Update() {
 
         // スプライトのフェード
         float alpha = 1.0f - eased;
-        titleSprite_->SetColor(Vector4(0.7f, 0.7f, 0.7f, alpha));
+        titleSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, alpha));
         spaceSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, alpha));
 
         if (transitionTimer_ >= kTransitionDuration_) {
