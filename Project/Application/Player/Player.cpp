@@ -90,7 +90,7 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 	RushUpdate();
 
 	// 重力（常時適応）
-    velocity_.y += kFallAcceleration_ * FpsCounter::deltaTime * (isAttackDown_ ? 5.0f : 1.0f);
+    velocity_.y += kFallAcceleration_ * FpsCounter::deltaTime * (isAttackDown_ ? 50.0f : 1.0f);
 	// 縦方向の上限（落下最大速度）
 	velocity_.y = std::max(velocity_.y, (isAttackDown_ ? -kAttackDownSpeed_ : -kMaxFallSpeed_));
 
@@ -222,6 +222,13 @@ void Player::UpdateAnimation() {
     // バウンス硬直終了後
     if (!isBounceLock_ && prevIsBounceLock_) {
 		StartNormalAnim(PlayerAnimationType::AirMove, "AirMove", true);
+		// Notify external listener when bounce lock ends
+		if (onBounceLockEnd_) {
+			// Only notify if the bounce was result of a max-level rush
+			if (rushChargeLevel_ == 3) {
+				onBounceLockEnd_();
+			}
+		}
 	}
 
     // 空中急降下開始 (isAttackDown_ が true になった瞬間)
@@ -535,6 +542,11 @@ void Player::BounceUpdate() {
 	bounceLockTimer_ += FpsCounter::deltaTime;
 	if (bounceLockTimer_ >= currentBounceLockTime_) {
 		isBounceLock_ = false; bounceLockTimer_ = 0.0f; currentBounceUpSpeed_ = 0.0f; currentBounceAwaySpeed_ = 0.0f; currentBounceLockTime_ = 0.0f; bounceAwayDir_ = {0.0f,0.0f,0.0f};
+		if (onBounceLockEnd_) {
+			if (rushChargeLevel_ == 3) {
+				onBounceLockEnd_();
+			}
+		}
 	}
 }
 

@@ -83,12 +83,19 @@ public:
     // ダメージ時コールバック設定
     void SetOnDamaged(std::function<void()> cb) { onDamaged_ = std::move(cb); }
 
+    // 突起跳ね返り終了時コールバック設定（タイトル遷移用）
+    void SetOnBounceLockEnd(std::function<void()> cb) { onBounceLockEnd_ = std::move(cb); }
+
+
 	// リスタート処理
-    void Restart();
+	void Restart();
 
 	// 生存状態の取得
 	bool IsAlive() const { return isAlive_; }
 
+    // Bounce lock 状態取得
+    bool IsBounceLock() const { return isBounceLock_; }
+	
 private:
 	//==================================================
     // 定数・設定値
@@ -259,6 +266,9 @@ private:
 	float currentBounceAwaySpeed_ = 0.0f;
 	float currentBounceLockTime_ = 0.0f;
 	Vector3 bounceAwayDir_ = {0.0f, 0.0f, 0.0f};
+
+    // Bounce lock end callback for external use
+    std::function<void()> onBounceLockEnd_;
 
 	// 急降下攻撃フラグ
     bool isAttackDown_ = false;

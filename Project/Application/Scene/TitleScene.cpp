@@ -156,6 +156,13 @@ void TitleScene::Initialize(SceneContext* context) {
         }
     });
 
+    player_->SetOnBounceLockEnd([this]() {
+        if (!isTitleLocked_) {
+            isFinished_ = true;
+            TDGameScene::SetIsFirstGameStart(true);
+        }
+    });
+
     cameraController_ = std::make_unique<CameraController>();
     cameraController_->Initialize();
 
