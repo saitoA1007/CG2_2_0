@@ -76,6 +76,8 @@ void Wall::Update() {
 		float localT = (respawnTimer_ - 0.5f) / 0.5f;
 		float alpha = Lerp(0.0f, 0.6f, EaseIn(localT));
 		iceMaterial_->materialData_->color.w = alpha;
+		worldTransform_.transform_.scale.z = 2.0f;
+		worldTransform_.UpdateTransformMatrix();
 	}
 
 	// リスポーン時間を超えたら、復活する
@@ -134,6 +136,13 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 			currentHp_ -= 2;
 		}
     }
+
+	if (currentHp_ == 1) {
+		worldTransform_.transform_.scale.z = 0.5f;
+	} else if (currentHp_ == 2) {
+		worldTransform_.transform_.scale.z = 1.0f;
+	}
+	worldTransform_.UpdateTransformMatrix();
 
 	if (currentHp_ <= 0) {
 		currentHp_ = 0;
