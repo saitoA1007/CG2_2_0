@@ -18,7 +18,7 @@ void Player::Initialize(GameEngine::Animator *animator, const std::array<std::ma
 	SetAnimator(animator);
 	SetAnimationData(animationData);
 	// ワールド行列を初期化
-	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
+	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,-8.0f} });
 	// コライダー生成・設定
 	collider_ = std::make_unique<SphereCollider>();
 	collider_->SetRadius(sphereData_.radius);
@@ -341,7 +341,7 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 	// 溜め/予備/突進/硬直中は通常移動禁止
 	if (isCharging_ || isPreRushing_ || isRushing_ || isBounceLock_ || isRushLock_) { 
 		// 溜め中は向きのみ変更可能
-		if (isCharging_) {
+        if (inputCommand && isCharging_) {
 			Vector3 dir = { 0.0f, 0.0f, 0.0f };
 			if (inputCommand->IsCommandActive("MoveUp"))    { dir -= cameraForwardXZ_; }
 			if (inputCommand->IsCommandActive("MoveDown"))  { dir += cameraForwardXZ_; }
@@ -357,10 +357,12 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 		}
 	} else {
 		Vector3 dir = { 0.0f, 0.0f, 0.0f };
-		if (inputCommand->IsCommandActive("MoveUp")) { dir -= cameraForwardXZ_; }
-		if (inputCommand->IsCommandActive("MoveDown")) { dir += cameraForwardXZ_; }
-		if (inputCommand->IsCommandActive("MoveLeft")) { dir -= cameraRightXZ_; }
-		if (inputCommand->IsCommandActive("MoveRight")) { dir += cameraRightXZ_; }
+		if (inputCommand) {
+			if (inputCommand->IsCommandActive("MoveUp")) { dir -= cameraForwardXZ_; }
+			if (inputCommand->IsCommandActive("MoveDown")) { dir += cameraForwardXZ_; }
+			if (inputCommand->IsCommandActive("MoveLeft")) { dir -= cameraRightXZ_; }
+			if (inputCommand->IsCommandActive("MoveRight")) { dir += cameraRightXZ_; }
+		}
 		if (dir.x != 0.0f || dir.z != 0.0f) {
 			// Y成分は常に0
 			dir.y = 0.0f;
@@ -422,7 +424,7 @@ void Player::ProcessAttackDownInput(GameEngine::InputCommand *inputCommand) {
         return;
     }
 	// 攻撃下降開始
-	if (inputCommand->IsCommandActive("AttackDown")) {
+	if (inputCommand && inputCommand->IsCommandActive("AttackDown")) {
 		velocity_.x = 0.0f;
 		velocity_.z = 0.0f;
 		attackDownPower_ = 0.0f;
@@ -440,7 +442,7 @@ void Player::HandleRushCharge(GameEngine::InputCommand* inputCommand) {
 		return;
 	}
 	// 溜め開始/継続
-	if (inputCommand->IsCommandActive("RushCharge")) {
+	if (inputCommand && inputCommand->IsCommandActive("RushCharge")) {
 		isCharging_ = true;
 		chargeTimer_ = 0.0f;
 		chargeRatio_ = 0.0f;
@@ -458,7 +460,7 @@ void Player::HandleRushStart(GameEngine::InputCommand* inputCommand) {
 		return;
 	}
 	// 溜め解除でRush開始要求
-	if (inputCommand->IsCommandActive("RushStart")) {
+	if (inputCommand && inputCommand->IsCommandActive("RushStart")) {
 		// 予備動作時間を溜め比率で決定
 		chargeRatio_ = std::clamp(chargeTimer_ / kRushChargeMaxTime_, 0.0f, 1.0f);
 		// 溜め比率に応じてレベル決定（1-3）

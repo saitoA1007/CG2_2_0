@@ -193,12 +193,6 @@ void TitleScene::Update() {
             isTransitioning_ = true;
             transitionTimer_ = 0.0f;
         }
-    } else {
-        // ロック解除後は Start でシーン遷移
-        if (!isTitleLocked_ && context_->inputCommand->IsCommandActive("Start")) {
-            isFinished_ = true;
-            TDGameScene::SetIsFirstGameStart(true);
-        }
     }
 
     if (debugRenderer_) debugRenderer_->Clear();
@@ -214,7 +208,9 @@ void TitleScene::Update() {
                 desiredFov = 0.4f + static_cast<float>(3 - rushLevel) * 0.1f;
             }
             cameraController_->SetDesiredFov(desiredFov);
-            cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
+            Vector3 target = player_ ? player_->GetWorldTransform().GetWorldPosition() : Vector3{ 0.0f,0.0f,0.0f };
+            target.y = 0.0f;
+            cameraController_->SetTarget(target);
         }
         cameraController_->Update(context_->inputCommand, context_->input);
         mainCamera_->SetCamera(cameraController_->GetCamera());
@@ -257,6 +253,7 @@ void TitleScene::Update() {
         if (playerAttackDownEffect_) playerAttackDownEffect_->Update();
     } else {
         // ロック中でも影やエフェクトの位置は更新
+        if (player_) player_->Update(nullptr, *mainCamera_);
         if (playerShadow_) playerShadow_->Update();
     }
 
