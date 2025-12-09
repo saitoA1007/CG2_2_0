@@ -1,6 +1,6 @@
 {
     "PlayerAttackEffect": {
-        "EndRotateZ": 10.0,
+        "EndRotateZ": 4.5,
         "EndScale": 8.0,
         "MaxTime": 1.0,
         "SceneName": "TDGameScene"

@@ -1,6 +1,6 @@
 {
     "EnemyWindAttackParticle": {
-        "LifeTime": 1.5,
+        "LifeTime": 0.800000011920929,
         "SceneName": "TDGameScene",
         "SpawnCoolTime": 0.05000000074505806
     }

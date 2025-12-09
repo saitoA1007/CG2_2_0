@@ -1,6 +1,6 @@
 {
     "Boss": {
-        "BodyColliderSize": 3.0,
+        "BodyColliderSize": 4.0,
         "DefaultsPosY": 7.0,
         "MaxHp": 10,
         "Scale": 3.5,
