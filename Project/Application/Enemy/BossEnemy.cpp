@@ -128,7 +128,7 @@ void BossEnemy::Update(const Vector3& targetPos) {
     worldTransform_.UpdateTransformMatrix();
 
     // 体の当たり判定の位置を設定する
-    bodyCollider_->SetWorldPosition(worldTransform_.transform_.translate);
+    bodyCollider_->SetWorldPosition(worldTransform_.transform_.translate + Vector3(0.0f, worldTransform_.transform_.scale.y * 0.7f,0.0f));
 
     // アニメーションの更新処理
     bossContext_.animator_->NormalizeUpdate(bossContext_.animationTimer);
