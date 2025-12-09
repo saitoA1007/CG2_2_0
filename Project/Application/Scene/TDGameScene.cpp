@@ -76,7 +76,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	wallModel_ = context_->modelManager->GetNameByModel("Wall");
 	// ステージを生成を初期化
 	stageManager_ = std::make_unique<StageManager>();
-	stageManager_->Initialize();
+	stageManager_->Initialize(0);
 	stageManager_->Update();
 
 	// StageWallPlane用モデル
@@ -737,10 +737,7 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	}*/
 
 	// 通常モデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
-
-	// ステージを描画する
-	stageManager_->Draw(wallModel_);
+	//ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
 	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
 	// 氷柱のモデルを描画
@@ -770,6 +767,9 @@ void TDGameScene::Draw(const bool &isDebugView) {
 			}
 		}
 	}
+
+	// ステージ壁を描画する
+	stageManager_->Draw(wallModel_, sceneLightingController_->GetResource());
 
 	// 3Dモデルの両面描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);

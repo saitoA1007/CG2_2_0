@@ -1,6 +1,6 @@
 #pragma once
 #include"WorldTransform.h"
-#include"Material.h"
+#include"Extension/CustomMaterial/IceRockMaterial.h"
 #include"Collider.h"
 
 // 壁の状態
@@ -19,7 +19,7 @@ public:
 	/// <param name="transform"></param>
 	/// <param name="respawnTime"></param>
 	/// <param name="maxHp"></param>
-	void Initialilze(const Transform& transform,float respawnTime, int32_t maxHp);
+	void Initialilze(const Transform& transform,float respawnTime, int32_t maxHp,const uint32_t& wallTexture);
 
 	/// <summary>
 	/// 更新処理
@@ -38,7 +38,7 @@ public:
 	/// マテリアルを取得
 	/// </summary>
 	/// <returns></returns>
-	GameEngine::Material& GetMaterial() { return material_; }
+	IceRockMaterial* GetMaterial() { return iceMaterial_.get(); }
 
 	/// <summary>
 	/// 当たり判定を取得
@@ -81,7 +81,7 @@ private:
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
 	// マテリアル
-	GameEngine::Material material_;
+	std::unique_ptr<IceRockMaterial> iceMaterial_;
 
 	// 壁の状態
 	WallState wallState_ = WallState::Normal;
@@ -100,6 +100,12 @@ private:
 	// obbの当たり判定
 	std::unique_ptr<GameEngine::OBBCollider> collider_;
 
+	std::string kGroupName_ = "Wall";
+
+	// デバック用
+	Vector4 rimColor;
+	Vector4 specularColor;
+
 private:
 
 	/// <summary>
@@ -111,4 +117,14 @@ private:
 	/// 壁の状態に応じてステータスを変える
 	/// </summary>
 	void ChangeWallState();
+
+	/// <summary>
+	/// 値を登録する
+	/// </summary>
+	void RegisterBebugParam();
+
+	/// <summary>
+	/// 値を適応する
+	/// </summary>
+	void ApplyDebugParam();
 };

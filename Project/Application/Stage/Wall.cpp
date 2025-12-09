@@ -4,11 +4,12 @@
 #include"Application/CollisionTypeID.h"
 #include"Application/Player/Player.h"
 #include"Application/Enemy/BossEnemy.h"
+#include"GameParamEditor.h"
 #include"EasingManager.h"
 #include "LogManager.h"
 using namespace GameEngine;
 
-void Wall::Initialilze(const Transform& transform, float respawnTime, int32_t maxHp) {
+void Wall::Initialilze(const Transform& transform, float respawnTime, int32_t maxHp, const uint32_t& wallTexture) {
 
 	// 復活までの時間を取得
 	respawnTime_ = respawnTime;
@@ -20,8 +21,9 @@ void Wall::Initialilze(const Transform& transform, float respawnTime, int32_t ma
 	// ワールド行列を初期化
 	worldTransform_.Initialize(transform);
 
-	// マテリアルを初期化
-	material_.Initialize({ 0.8f,0.8f,0.8f,1.0f }, { 1.0f,1.0f,1.0f }, 250.0f, false);
+	iceMaterial_ = std::make_unique<IceRockMaterial>();
+	iceMaterial_->Initialize();
+	iceMaterial_->materialData_->textureHandle = wallTexture;
 
 	// 壁のデータを入れる
 	/*UserData userData;
@@ -46,9 +48,20 @@ void Wall::Initialilze(const Transform& transform, float respawnTime, int32_t ma
 	collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 	});
+
+	worldTransform_.transform_ = transform;
+
+#ifdef _DEBUG
+	RegisterBebugParam();
+#endif
+	ApplyDebugParam();
 }
 
 void Wall::Update() {
+#ifdef _DEBUG
+	ApplyDebugParam();
+#endif
+
 	if (currentHp_ <= 0) {
 		isAlive_ = false;
 		isBreakParticleActive_ = false;
@@ -60,9 +73,9 @@ void Wall::Update() {
 	respawnTimer_ += FpsCounter::deltaTime / respawnTime_;
 
 	if (respawnTimer_ >= 0.5f) {
-		float localT = (respawnTimer_ - 0.5f) / 0.5f;
-		float alpha = Lerp(0.0f, 1.0f, EaseIn(localT));
-		material_.SetColor({ 0.8f,0.8f,0.8f,alpha });
+		//float localT = (respawnTimer_ - 0.5f) / 0.5f;
+		//float alpha = Lerp(0.0f, 1.0f, EaseIn(localT));
+		//material_.SetColor({ 0.8f,0.8f,0.8f,alpha });
 	}
 
 	// リスポーン時間を超えたら、復活する
@@ -70,7 +83,7 @@ void Wall::Update() {
 		isAlive_ = true;
 		respawnTimer_ = 0.0f;
 		currentHp_ = maxHp_;
-		material_.SetColor({ 0.8f,0.8f,0.8f,1.0f });
+		//material_.SetColor({ 0.8f,0.8f,0.8f,1.0f });
 		// 壁の状態に応じてステータスを変更する
 		ChangeWallState();
 	}
@@ -124,7 +137,7 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 
 	if (currentHp_ <= 0) {
 		currentHp_ = 0;
-		material_.SetColor({ 0.8f,0.8f,0.8f,0.0f });
+		//material_.SetColor({ 0.8f,0.8f,0.8f,0.0f });
 		isBreakParticleActive_ = true;
 		// 誰が破壊するかによって状態を変える
 		wallState_ = WallState::Normal;
@@ -135,11 +148,11 @@ void Wall::ChangeWallState() {
 	switch (wallState_)
 	{
 	case WallState::Normal:
-		material_.SetColor({ 0.8f,0.8f,0.8f,1.0f });
+		//material_.SetColor({ 0.8f,0.8f,0.8f,1.0f });
 		break;
 
 	case WallState::Strengthen:
-		material_.SetColor({ 0.7f,0.7f,0.0f,1.0f });
+		//material_.SetColor({ 0.7f,0.7f,0.0f,1.0f });
 		break;
 
 	case WallState::None:
@@ -158,4 +171,32 @@ OBB Wall::GetOBBData() {
 	}
 	obb.size = collider_->GetSize();
 	return obb;
+}
+
+void Wall::RegisterBebugParam() {
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "IceColor", iceMaterial_->materialData_->color);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "SpecularColor", specularColor);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "RimColor", rimColor);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "Shininess", iceMaterial_->materialData_->shininess);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "RimIntensity", iceMaterial_->materialData_->rimIntensity);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "RimPower", iceMaterial_->materialData_->rimPower);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "Scale", worldTransform_.transform_.scale);
+}
+
+void Wall::ApplyDebugParam() {
+	iceMaterial_->materialData_->color = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "IceColor");
+	specularColor = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "SpecularColor");
+	rimColor = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "RimColor");
+	iceMaterial_->materialData_->shininess = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "Shininess");
+	iceMaterial_->materialData_->rimIntensity = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "RimIntensity");
+	iceMaterial_->materialData_->rimPower = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "RimPower");
+	iceMaterial_->materialData_->rimColor.x = rimColor.x;
+	iceMaterial_->materialData_->rimColor.y = rimColor.y;
+	iceMaterial_->materialData_->rimColor.z = rimColor.z;
+	iceMaterial_->materialData_->specularColor.x = specularColor.x;
+	iceMaterial_->materialData_->specularColor.y = specularColor.y;
+	iceMaterial_->materialData_->specularColor.z = specularColor.z;
+
+	worldTransform_.transform_.scale = GameParamEditor::GetInstance()->GetValue<Vector3>(kGroupName_, "Scale");
+	worldTransform_.UpdateTransformMatrix();
 }
