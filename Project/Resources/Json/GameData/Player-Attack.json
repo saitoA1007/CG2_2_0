@@ -1,9 +1,11 @@
 {
     "Player-Attack": {
+        "AttackDownDistanceToMax": 10.0,
         "AttackDownMaxPower": 10.0,
         "AttackDownMinPower": 1.0,
         "AttackDownSpeed": 50.0,
         "AttackPreDownTime": 0.30000001192092896,
-        "SceneName": "TDGameScene"
+        "SceneName": "TDGameScene",
+        "UseSpeedBasedAttackDown": false
     }
 }
