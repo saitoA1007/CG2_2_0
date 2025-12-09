@@ -272,4 +272,21 @@ private:
     /// 開始アニメーションの更新処理
     /// </summary>
     void UpdateStartAnimation();
+
+	// Title-specific control
+	bool isTitleLocked_ = true; // when true, only Start input accepted
+	bool isTransitioning_ = false; // true while fade/camera easing
+	float transitionTimer_ = 0.0f;
+	static inline constexpr float kTransitionDuration_ = 1.0f; // seconds
+
+	// title sprites
+	std::unique_ptr<GameEngine::Sprite> titleSprite_;
+	uint32_t titleGH_ = 0;
+
+	std::unique_ptr<GameEngine::Sprite> spaceSprite_;
+	uint32_t spaceGH_ = 0;
+
+	// イージングで遷移する注視点
+	Vector3 transitionStartTarget_ = {0.0f, 16.0f, 0.0f};
+	Vector3 transitionEndTarget_ = {0.0f, 16.0f, 0.0f};
 };
