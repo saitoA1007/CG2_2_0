@@ -187,6 +187,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Graphics\Terrain.cpp" />
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerAttackDownEffect.cpp" />
+    <ClCompile Include="Application\Player\Effect\PlayerAttackEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerChargeEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerRushEffect.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
@@ -373,6 +374,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Graphics\Terrain.h" />
     <ClInclude Include="Application\Light\SceneLightingController.h" />
     <ClInclude Include="Application\Player\Effect\PlayerAttackDownEffect.h" />
+    <ClInclude Include="Application\Player\Effect\PlayerAttackEffect.h" />
     <ClInclude Include="Application\Player\Effect\PlayerChargeEffect.h" />
     <ClInclude Include="Application\Player\Effect\PlayerRushEffect.h" />
     <ClInclude Include="Application\Player\Player.h" />

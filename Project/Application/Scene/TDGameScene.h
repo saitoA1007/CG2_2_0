@@ -36,6 +36,7 @@
 #include"Application/Player/Effect/PlayerChargeEffect.h"
 #include"Application/Player/Effect/PlayerRushEffect.h"
 #include"Application/Player/Effect/PlayerAttackDownEffect.h"
+#include"Application/Player/Effect/PlayerAttackEffect.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -150,6 +151,7 @@ private:
 	std::unique_ptr<PlayerChargeEffect> playerChargeEffect_;
 	std::unique_ptr<PlayerRushEffect> playerRushEffect_;
 	std::unique_ptr<PlayerAttackDownEffect> playerAttackDownEffect_;
+	std::unique_ptr<PlayerAttackEffect> playerAttackEffect_;
 
 	//==================================================
 	// ステージ
