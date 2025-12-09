@@ -641,6 +641,7 @@ void Player::OnCollision(const CollisionResult &result) {
         || (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall) && !dynamic_cast<Wall *>(result.userData.object)->GetIsAlive());
 	bool isGround = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Ground));
     bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss));
+    bool isWind = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wind));
 
     // ボスとの衝突処理（突進中の場合）
     if (isBoss && isRushing_) {
@@ -661,7 +662,9 @@ void Player::OnCollision(const CollisionResult &result) {
     }
 
     // ボスとの衝突処理（通常時）
-    if (isBoss && !isRushing_ && !isAttackDown_ && !isInvincible_ && !isBounceLock_) {
+    // or 風攻撃の場合
+    if ((isBoss && !isRushing_ && !isAttackDown_ && !isInvincible_ && !isBounceLock_) ||
+        (isWind && !isInvincible_)) {
 		Log("is hit Boss normally");
 		// HP減少処理（仮で1ダメージ）
 		currentHP_ -= 1;
@@ -677,10 +680,9 @@ void Player::OnCollision(const CollisionResult &result) {
 		if (onDamaged_) { onDamaged_(); }
 
 		// ダメージ時のSE再生
-    {
-        auto h = audioHandle_PlayerDamaged_;
-        if (h != 0) { AudioManager::GetInstance().Play(h, audioVolume_PlayerDamaged_, false); }
-    }
+        if (audioHandle_PlayerDamaged_ != 0) {
+			AudioManager::GetInstance().Play(audioHandle_PlayerDamaged_, audioVolume_PlayerDamaged_, false);
+		}
 
 		if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
 		return;
