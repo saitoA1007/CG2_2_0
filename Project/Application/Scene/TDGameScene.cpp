@@ -416,6 +416,10 @@ void TDGameScene::Initialize(SceneContext* context) {
         letterboxStartHeight_ = 0.0f;
         letterboxEndHeight_ = 0.0f;
     }
+
+	// ボスの撃破時のフェード
+	bossDestroyFade_ = std::make_unique<BossDestroyFade>();
+	bossDestroyFade_->Initialize();
 }
 
 void TDGameScene::Update() {
@@ -687,6 +691,21 @@ void TDGameScene::Update() {
 	// 空気を演出するためのパーティクル
 	airParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
+	// ボス撃破時のフェード処理
+	if (bossEnemy_->GetCurrentHP() <= 0) {
+		if (!isBossDestroyFade_) {
+			bossDestroyFade_->SetActive();
+			isBossDestroyFade_ = true;
+		}
+	}
+	// フェードが有効中の時、中間に来ていればリセットする
+	if (bossDestroyFade_->IsActive()) {
+		if (bossDestroyFade_->IsMiddle()) {
+			bossEnemy_->SetResetPosition();
+		}
+	}
+	bossDestroyFade_->Update();
+
 #ifdef _DEBUG
 	// 地面マテリアルの更新処理
 	terrain_->Update();
@@ -957,6 +976,11 @@ void TDGameScene::DrawUI() {
 		SpriteRenderer::Draw(gameOverUI_->GetLogoSprite(), gameOverUI_->GetLogoGH());
 		SpriteRenderer::Draw(gameOverUI_->GetRetrySprite(), gameOverUI_->GetRetryGH());
 		SpriteRenderer::Draw(gameOverUI_->GetTitleSprite(), gameOverUI_->GetTitleGH());
+	}
+
+	// ボスの撃破時のフェード処理
+	if (bossDestroyFade_->IsActive()) {
+		SpriteRenderer::Draw(bossDestroyFade_->GetSprite(), 0);
 	}
 }
  

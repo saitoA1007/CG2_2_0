@@ -26,7 +26,12 @@ public:
 
 public:
 
-	void SetCurrentHp(const int32_t& hp) { currentHp_ = hp; }
+	void SetCurrentHp(const int32_t& hp) { 
+		currentHp_ = hp;
+		if (currentHp_ <= 0) {
+			currentHp_ = 0;
+		}
+	}
 
 	/// <summary>
 	/// 画像データを取得

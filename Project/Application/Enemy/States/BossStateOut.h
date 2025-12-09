@@ -25,7 +25,13 @@ private:
     // ボスの共通データを取得
     BossContext& bossContext_;
 
-	uint32_t cout_ = 0;
+	uint32_t cout_ = 0; 
+
+	float timer_ = 0.0f;
+	float maxTime_ = 4.0f;
+
+	bool isSet_ = false;
+	bool isActive_ = false;
 
 private:
 

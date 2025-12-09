@@ -91,7 +91,7 @@ void BossEnemy::Update(const Vector3& targetPos) {
 
     // 状態変更が有効であれば、切り替える
     if (bossContext_.bossStateRequest_) {
-        //currentState_->Exit();
+        currentState_->Exit();
         bossState_ = bossContext_.bossStateRequest_.value();
         currentState_ = nullptr;
 #ifdef _DEBUG
@@ -177,7 +177,12 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
             isHit_ = true;
 
             if (bossContext_.hp > 0) {
-                bossContext_.hp -= 1;
+
+                if (static_cast<int32_t>(bossContext_.hp) - player->GetAttackDownPower() <= 0) {
+                    bossContext_.hp = 0;
+                } else {
+                    bossContext_.hp -= player->GetAttackDownPower();
+                }
 
                 AudioManager::GetInstance().Play(bossDamagedSH_, 0.5f, false);
 

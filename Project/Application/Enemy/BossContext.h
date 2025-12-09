@@ -51,6 +51,10 @@ struct BossContext {
 	// 翼のアニメーション
 	bool isWingsEffect_ = false;
 
+	// ボスの処理の終了
+	bool isFinished_ = false;
+	bool isResetPos = false;
+
 	// アニメーションデータ
 	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)>* animationData_;
 	GameEngine::Animator* animator_ = nullptr;

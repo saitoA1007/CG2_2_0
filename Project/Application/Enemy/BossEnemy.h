@@ -70,6 +70,14 @@ public:
 	// 破壊演出
 	bool IsDestroyEffect() const { return bossContext_.isDestroyEffect; }
 
+	// ボスの全ての処理が終了
+	bool isFinished() const { return bossContext_.isFinished_; }
+
+	// 終了フェーズに入った時に位置をリセット出来るタイミングを取得する
+	void SetResetPosition() {
+		bossContext_.isResetPos = true;
+	}
+
 private: // 調整項目
 
 	// 最大体力
