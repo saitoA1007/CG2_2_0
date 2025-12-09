@@ -37,6 +37,10 @@ public:
 	// 演出用の画像データを取得
 	GameEngine::Sprite* GetEffectSprite() { return effectSprite_.get(); }
 
+	GameEngine::Sprite* GetFrameSprite() { return frameSprite_.get(); }
+
+	GameEngine::Sprite* GetNameSprite() { return bossNameSprite_.get(); }
+
 private:
 
 	std::unique_ptr<GameEngine::Sprite> sprite_;
@@ -63,10 +67,29 @@ private:
 
 	float maxTime_ = 0.5f;
 
+	// デバック用
+	Vector2 size_ = { 640.0f,48.0f };
+	Vector2 position_ = { 320.0f,32.0f };
+
+	Vector2 bossNameSize_ = {};
+	Vector2 bossNamePosition_ = {};
+	
+	std::string kGroupName_ = "BossHpUI";
+
 private:
 
 	/// <summary>
 	/// 演出の更新処理
 	/// </summary>
 	void EffectUpdate();
+
+	/// <summary>
+	/// 値を登録する
+	/// </summary>
+	void RegisterBebugParam();
+
+	/// <summary>
+	/// 値を適応する
+	/// </summary>
+	void ApplyDebugParam();
 };
