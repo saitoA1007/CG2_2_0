@@ -283,7 +283,7 @@ void EnemyAttackManager::WindUpdate() {
         point.pos.z += centerPos_.z;
 
         // 当たり判定の更新
-        point.pos.y = Lerp(centerPos_.y, 0.0f, (static_cast<float>(i) / 7));
+        point.pos.y = Lerp(centerPos_.y * 0.8f, 0.0f, (static_cast<float>(i) / 7));
         windColliders_[i]->SetWorldPosition(point.pos);
         i++;
     }
