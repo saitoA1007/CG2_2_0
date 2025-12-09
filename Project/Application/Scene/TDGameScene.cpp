@@ -479,7 +479,11 @@ void TDGameScene::Update() {
 	playerShadow_->Update();
 
     // プレイヤーのエフェクト更新処理
-    playerChargeEffect_->Update();
+    if (player_) {
+        int lvl = player_->GetRushChargeLevel();
+		playerChargeEffect_->SetLevel(lvl);
+    }
+	playerChargeEffect_->Update();
     playerRushEffect_->Update();
     playerAttackDownEffect_->Update();
 	playerAttackEffect_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
@@ -740,16 +744,18 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);
 
 	// プレイヤーのエフェクト描画
-	if (player_->IsCharging()) {
-		for (auto &chargeEffect : playerChargeEffect_->GetWorldTransforms()) {
-			ModelRenderer::Draw(playerChargeEffectModel_, chargeEffect);
+	if (player_->IsCharging() || player_->IsPreRushing()) {
+		int active = playerChargeEffect_->GetActiveCount();
+		auto &wts = playerChargeEffect_->GetWorldTransforms();
+		for (int i = 0; i < active && i < static_cast<int>(wts.size()); ++i) {
+			ModelRenderer::Draw(playerChargeEffectModel_, wts[i]);
 		}
 	}
-	if (player_->IsRushing()) {
+    if (player_->IsRushing()) {
 		for (auto &rushEffect : playerRushEffect_->GetWorldTransforms()) {
-			ModelRenderer::Draw(playerRushEffectModel_, rushEffect);
+			ModelRenderer::Draw(playerChargeEffectModel_, rushEffect);
 		}
-	}
+    }
 	if (player_->IsAttackDown()) {
 		for (auto &attackDownEffect : playerAttackDownEffect_->GetWorldTransforms()) {
 			ModelRenderer::Draw(playerAttackDownEffectModel_, attackDownEffect, playerAttackDownEffect_->GetMaterial());

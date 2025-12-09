@@ -19,7 +19,7 @@ public:
     /// 親を設定
     /// </summary>
     /// <param name="parent"></param>
-    void SetParent(GameEngine::WorldTransform* parent) {
+    void SetParent(GameEngine::WorldTransform *parent) {
         for (size_t i = 0; i < worldTransforms_.size(); ++i) {
             worldTransforms_[i].SetParent(parent);
         }
@@ -29,15 +29,28 @@ public:
     /// ワールド行列を取得
     /// </summary>
     /// <returns></returns>
-    std::array<GameEngine::WorldTransform, 3>& GetWorldTransforms() { return worldTransforms_; }
+    std::array<GameEngine::WorldTransform, 3> &GetWorldTransforms() { return worldTransforms_; }
+
+    /// <summary>
+    /// 現在有効な個数を取得
+    /// </summary>
+    int GetActiveCount() const { return activeCount_; }
+
+    /// <summary>
+    /// レベルに応じて表示/スケールを設定する (1..3)
+    /// </summary>
+    void SetLevel(int level);
 
 private:
     // ワールド行列
-    std::array<GameEngine::WorldTransform,3> worldTransforms_;
+    std::array<GameEngine::WorldTransform, 3> worldTransforms_;
 
     // 回転速度
     float rotateSpeed_ = 50.0f;
 
     // 有効フラグ
     bool isActive_ = false;
+
+    // 現在有効な個数
+    int activeCount_ = 1;
 };
