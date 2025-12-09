@@ -886,12 +886,12 @@ void TDGameScene::DrawUI() {
 	}
 
 	// ボスのHPUIを表示
-	//SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
-	//SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
+	SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
+	SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
 
 	// プレイヤーのHPUIを表示
-	//SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
-	//SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
+	SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
+	SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
 
 	// GameOverUI描画
 	if (gameOverUI_->IsActive()) {

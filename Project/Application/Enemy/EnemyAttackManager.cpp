@@ -6,6 +6,7 @@
 #include<numbers>
 #include"CollisionConfig.h"
 #include"GameParamEditor.h"
+#include"Application/CollisionTypeID.h"
 using namespace GameEngine;
 
 GameEngine::PostEffectManager* EnemyAttackManager::postEffectManager_ = nullptr;
@@ -32,6 +33,11 @@ void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectMan
         collider->SetWorldPosition({0.0f,0.0f,0.0f});
         collider->SetCollisionAttribute(kCollisionAttributeEnemy);
         collider->SetCollisionMask(~kCollisionAttributeEnemy);
+        // データ設定
+        UserData userData;
+        userData.typeID = static_cast<uint32_t>(CollisionTypeID::Wind);
+        userData.object = nullptr;
+        collider->SetUserData(userData);
         windColliders_.push_back(std::move(collider));
     }
 

@@ -11,5 +11,6 @@ enum class CollisionTypeID : uint32_t {
 	Wall,    // 壁
     Ground,  // 地面
 	IceFall, // つらら
+	Wind,    // ボスの風攻撃
 	BoundaryWall, // 移動範囲制限用の壁
 };
