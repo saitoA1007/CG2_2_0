@@ -13,6 +13,14 @@
 #include "AudioManager.h"
 using namespace GameEngine;
 
+float Player::GetDamageFlashAlpha() const {
+    if (!isInvincible_ || kDamageInvincibleTime_ <= 0.0f) { return 1.0f; }
+    // Blink with 0.1s period
+    float period = 0.1f;
+    float t = std::fmod(std::max(damageInvincibleTimer_, 0.0f), period);
+    return (t < period * 0.5f) ? 0.2f : 1.0f;
+}
+
 void Player::Initialize(GameEngine::Animator *animator, const std::array<std::map<std::string, AnimationData>, kPlayerAnimationCount>& animationData) {
 	// アニメーション設定
 	SetAnimator(animator);

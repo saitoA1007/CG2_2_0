@@ -80,6 +80,11 @@ public:
     // 現在のHP取得
     int32_t GetCurrentHP() const { return currentHP_; }
 
+    // ダメージ無敵中フラグ取得
+    bool IsDamagedInvincible() const { return isInvincible_; }
+    // ダメージ点滅時のアルファ取得
+    float GetDamageFlashAlpha() const;
+
 	// 壁ヒット時コールバック設定
 	void SetOnWallHit(std::function<void()> cb) { onWallHit_ = std::move(cb); }
     // 着地時コールバック設定

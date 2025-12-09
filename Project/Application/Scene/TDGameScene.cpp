@@ -647,6 +647,15 @@ void TDGameScene::Update() {
 		bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,bossEnemy_->GetAlpha() });
 	}
 
+	// プレイヤーがダメージ無敵中の点滅演出
+	if (player_ && player_->IsDamagedInvincible()) {
+		float a = player_->GetDamageFlashAlpha();
+		playerModel_->SetDefaultColor({ 1.0f,1.0f,1.0f, a });
+	} else {
+		// 通常は不透明
+		playerModel_->SetDefaultColor({ 1.0f,1.0f,1.0f, 1.0f });
+	}
+
 	// 撃破演出
 	if (bossEnemy_->IsDestroyEffect()) {
 		enemyAttackManager_->AddEnemyDestroyEffect(bossEnemy_->GetWorldPosition());
