@@ -585,6 +585,12 @@ void TDGameScene::Update() {
 		Vector3 lookOffset{ 0.0f, -4.0f, 0.0f };
 		cameraController_->SetViewOffset(eyeOffset, lookOffset, 0.2f);
 		cameraController_->EnableViewOffset(true);
+	} else if (isBossLockOn_) {
+		// ボスロックオン時は通常より低めのカメラアングルにする
+		Vector3 eyeOffset{ 0.0f, -8.0f, 0.0f };
+		Vector3 lookOffset{ 0.0f, 0.0f, 0.0f };
+		cameraController_->SetViewOffset(eyeOffset, lookOffset, 0.2f);
+		cameraController_->EnableViewOffset(true);
 	} else {
 		cameraController_->EnableViewOffset(false);
 	}
