@@ -442,6 +442,8 @@ void TDGameScene::Update() {
 				CameraController::ShakeOrigin::TargetAndCameraPosition,
 				true, false, true, false);
 		}
+		// 攻撃演出のエミッター
+		playerAttackEffect_->Emitter(player_->GetPlayerPos());
 	}
 	prevBossHit_ = currentBossHit;
 
@@ -457,9 +459,6 @@ void TDGameScene::Update() {
 
 		return;
 	}
-
-	// 攻撃演出のエミッター
-	playerAttackEffect_->Emitter(player_->GetPlayerPos());
 
 	// デバックリストを削除
 	debugRenderer_->Clear();
