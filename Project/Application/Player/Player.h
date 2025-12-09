@@ -73,6 +73,10 @@ public:
     int GetRushChargeLevel() const { return rushChargeLevel_; }
     // 急降下時の攻撃力取得
     int32_t GetAttackDownPower() const { return static_cast<int32_t>(attackDownPower_); }
+    // 急降下時の最小攻撃力取得
+    float GetAttackDownMinPower() const { return kAttackDownMinPower_; }
+    // 急降下時の最大攻撃力取得
+    float GetAttackDownMaxPower() const { return kAttackDownMaxPower_; }
     // 現在のHP取得
     int32_t GetCurrentHP() const { return currentHP_; }
 
@@ -162,7 +166,7 @@ private:
 	float kRushStrengthLevel2_ = 0.8f;
 	float kRushStrengthLevel3_ = 1.0f;
 
-	//--------- 通常壁への跳ね返り設定 ---------//
+	//--------- 跳ね返り設定 ---------//
 
 	// 跳ね上がり後の高さ(上方向速度のイメージ)
     float kWallBounceUpSpeed_ = 10.0f;
@@ -180,6 +184,13 @@ private:
     float kWallBounceMinSpeedFactor_ = 0.5f;
 	// 速さに応じた跳ね返りの倍率の最大値
     float kWallBounceMaxSpeedFactor_ = 1.5f;
+
+	// 壁に衝突した際の跳ね返りの倍率
+    float kWallBounceReflectFactor_ = 1.0f;
+	// 氷柱に衝突した際の跳ね返りの倍率
+    float kIceWallBounceReflectFactor_ = 0.8f;
+	// ボスに衝突した際の跳ね返りの倍率
+    float kBossBounceReflectFactor_ = 1.2f;
 
 	// 以前の跳ね返り処理有効化フラグ
 	bool isLegacyWallBounce_ = false;

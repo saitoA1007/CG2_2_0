@@ -1,6 +1,9 @@
 #pragma once
 #include<array>
+#include<memory>
 #include"WorldTransform.h"
+
+namespace GameEngine { class Material; }
 
 class PlayerAttackDownEffect {
 public:
@@ -31,6 +34,12 @@ public:
     /// <returns></returns>
     std::array<GameEngine::WorldTransform, 3>& GetWorldTransforms() { return worldTransforms_; }
 
+    // マテリアルの取得
+    GameEngine::Material* GetMaterial() const { return material_.get(); }
+
+    // 透明度を設定
+    void SetAlpha(float a);
+
 private:
     // ワールド行列
     std::array<GameEngine::WorldTransform,3> worldTransforms_;
@@ -40,4 +49,7 @@ private:
 
     // 有効フラグ
     bool isActive_ = false;
+
+    // マテリアル
+    std::unique_ptr<GameEngine::Material> material_;
 };

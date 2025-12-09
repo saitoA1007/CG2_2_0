@@ -256,6 +256,8 @@ void TDGameScene::Initialize(SceneContext* context) {
 	playerChargeEffectModel_ = enemyRushModel_;
 	playerRushEffectModel_ = enemyRushModel_;
 	playerAttackDownEffectModel_ = enemyRushModel_;
+	Material *material = playerAttackDownEffect_->GetMaterial();
+	material->SetTextureHandle(playerAttackDownEffectModel_->GetDefaultTexture());
 	// 風攻撃演出モデル
 	windModel_ = context_->modelManager->GetNameByModel("Wind");
 
@@ -482,6 +484,19 @@ void TDGameScene::Update() {
     playerRushEffect_->Update();
     playerAttackDownEffect_->Update();
 	playerAttackEffect_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+
+	// プレイヤーの攻撃力に応じてAttackDownエフェクトの透明度を設定
+	if (player_ && playerAttackDownEffect_) {
+		float power = static_cast<float>(player_->GetAttackDownPower());
+		float minP = player_->GetAttackDownMinPower();
+		float maxP = player_->GetAttackDownMaxPower();
+		float alpha = 0.0f;
+		if (maxP - minP > 1e-6f) {
+			alpha = (power - minP) / (maxP - minP);
+			alpha = std::clamp(alpha, 0.0f, 1.0f);
+		}
+		playerAttackDownEffect_->SetAlpha(alpha);
+	}
 
 	// ロックオン: 入力が有効ならプレイヤーとボスの位置をターゲットに設定
 	if (!isTitleLocked_) {
@@ -738,7 +753,7 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	}
 	if (player_->IsAttackDown()) {
 		for (auto &attackDownEffect : playerAttackDownEffect_->GetWorldTransforms()) {
-			ModelRenderer::Draw(playerAttackDownEffectModel_, attackDownEffect);
+			ModelRenderer::Draw(playerAttackDownEffectModel_, attackDownEffect, playerAttackDownEffect_->GetMaterial());
 		}
 	}
 

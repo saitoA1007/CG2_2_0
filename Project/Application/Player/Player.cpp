@@ -620,12 +620,12 @@ void Player::OnCollision(const CollisionResult &result) {
         Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
         if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
         if (onWallHit_) { onWallHit_(); }
-        Bounce(bounceDir, 1.0f);
-		return;
+        Bounce(bounceDir, kBossBounceReflectFactor_);
+        return;
     }
 
     // ボスとの衝突処理（空中急降下中の場合）
-	if (isBoss && isAttackDown_) {
+    if (isBoss && isAttackDown_) {
         Log("is hit Boss with Attack Down" + std::to_string(attackDownPower_));
         //if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
         return;
@@ -664,7 +664,7 @@ void Player::OnCollision(const CollisionResult &result) {
 		Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
 		if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
 		if (onWallHit_) { onWallHit_(); }
-		Bounce(bounceDir, 1.0f);
+		Bounce(bounceDir, kWallBounceReflectFactor_);
 		return;
 	}
 
@@ -701,7 +701,7 @@ void Player::OnCollision(const CollisionResult &result) {
 		Vector3 bounceDir = { -normal.x, 0.0f, -normal.z };
 		if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
 		if (onWallHit_) { onWallHit_(); }
-		Bounce(bounceDir, 0.5f, true);
+		Bounce(bounceDir, kIceWallBounceReflectFactor_, true);
 		return;
 	}
 
@@ -843,7 +843,11 @@ void Player::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceStrengthLevel3", kWallBounceStrengthLevel3_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceMinSpeedFactor", kWallBounceMinSpeedFactor_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceMaxSpeedFactor", kWallBounceMaxSpeedFactor_);
-	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "IsLegacyWallBounce", isLegacyWallBounce_);
+    // New: reflect factor parameters for different collision types
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceReflectFactor", kWallBounceReflectFactor_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "IceWallBounceReflectFactor", kIceWallBounceReflectFactor_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "BossBounceReflectFactor", kBossBounceReflectFactor_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "IsLegacyWallBounce", isLegacyWallBounce_);
 
 	// Attack（空中急降下）設定
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackPreDownTime", kAttackPreDownTime_);
@@ -904,6 +908,10 @@ void Player::ApplyDebugParam() {
 	kWallBounceStrengthLevel3_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceStrengthLevel3");
     kWallBounceMinSpeedFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceMinSpeedFactor");
     kWallBounceMaxSpeedFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceMaxSpeedFactor");
+    // New: reflect factors
+    kWallBounceReflectFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceReflectFactor");
+    kIceWallBounceReflectFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "IceWallBounceReflectFactor");
+    kBossBounceReflectFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "BossBounceReflectFactor");
     isLegacyWallBounce_ = GameParamEditor::GetInstance()->GetValue<bool>(kGroupNames[2], "IsLegacyWallBounce");
 
 	// Attack（空中急降下）設定

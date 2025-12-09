@@ -1,5 +1,6 @@
 #include "PlayerAttackDownEffect.h"
 #include "MyMath.h"
+#include "EngineSource/3D/Model/Material.h"
 
 void PlayerAttackDownEffect::Initialize() {
     isActive_ = true;
@@ -7,6 +8,10 @@ void PlayerAttackDownEffect::Initialize() {
     for (auto &wt : worldTransforms_) {
         wt.Initialize({ {1.5f,1.5f,10.0f}, {kRotate90,0.0f,0.0f}, {0.0f,1.0f,0.0f} });
     }
+
+    // マテリアルの作成
+    material_ = std::make_unique<GameEngine::Material>();
+    material_->Initialize({1.0f,1.0f,1.0f,1.0f}, {1.0f,1.0f,1.0f}, 50.0f, false);
 }
 
 void PlayerAttackDownEffect::Update() {
@@ -14,5 +19,11 @@ void PlayerAttackDownEffect::Update() {
     for (auto &wt : worldTransforms_) {
         wt.transform_.rotate.y += rotateSpeed_;
         wt.UpdateTransformMatrix();
+    }
+}
+
+void PlayerAttackDownEffect::SetAlpha(float a) {
+    if (material_) {
+        material_->SetAplha(a);
     }
 }
