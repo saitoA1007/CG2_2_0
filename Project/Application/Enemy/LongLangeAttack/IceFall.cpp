@@ -3,6 +3,7 @@
 #include"CollisionConfig.h"
 #include"Application/CollisionTypeID.h"
 #include"Application/Player/Player.h"
+#include"Application/Enemy/BossEnemy.h"
 #include"GameParamEditor.h"
 #include"RandomGenerator.h"
 #include"EasingManager.h"
@@ -19,8 +20,8 @@ void IceFall::Initialize(const Vector3& pos, const uint32_t& texture) {
     collider_ = std::make_unique<SphereCollider>();
     collider_->SetRadius(2.0f);
     collider_->SetWorldPosition(worldTransform_.transform_.translate);
-    collider_->SetCollisionAttribute(kCollisionAttributeEnemy);
-    collider_->SetCollisionMask(~kCollisionAttributeEnemy);
+    collider_->SetCollisionAttribute(kCollisionAttributeTerrain);
+    collider_->SetCollisionMask(~kCollisionAttributeTerrain);
     UserData userData;
     userData.typeID = static_cast<uint32_t>(CollisionTypeID::IceFall);
     collider_->SetUserData(userData);
@@ -79,12 +80,21 @@ void IceFall::Update() {
 
 void IceFall::OnCollision([[maybe_unused]] const GameEngine::CollisionResult& result) {
     Player *player = dynamic_cast<Player *>(result.userData.object);
-    if (!player) {
+    BossEnemy* bossEnemy = result.userData.As<BossEnemy>();
+    if (!player && !bossEnemy) {
         return;
     }
     // プレイヤーが突進中なら消滅
-    if (player->IsRushing()) {
-        isDeadNotified_ = true;
+    if (player) {
+        if (player->IsRushing()) {
+            isDeadNotified_ = true;
+        }
+    }
+
+    if (bossEnemy) {
+        if (bossEnemy->IsRushAttack()) {
+            isDeadNotified_ = true;
+        }
     }
 }
 
