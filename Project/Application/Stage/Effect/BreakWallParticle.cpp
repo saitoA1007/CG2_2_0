@@ -61,7 +61,7 @@ BreakWallParticle::ParticleData BreakWallParticle::MakeNewParticle() {
 	// 速度
 	particleData.velocity = Normalize(particleData.transform.translate - emitterPos_) * RandomGenerator::Get(speedMin_, speedMax_);
 	// 色
-	particleData.color = { 1.0f,1.0f,1.0f,1.0f };
+	particleData.color = { 0.07f,0.5f,1.0f,0.7f };
 	// 時間の設定
 	particleData.lifeTime = RandomGenerator::Get(2.0f,3.0f);
 	particleData.currentTime = 0.0f;
