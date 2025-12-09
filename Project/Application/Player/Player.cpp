@@ -65,18 +65,37 @@ void Player::Initialize(GameEngine::Animator *animator, const std::array<std::ma
 
 void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera) {
 #ifdef _DEBUG
-	// 値を適応
-	ApplyDebugParam();
+    // 値を適応
+    ApplyDebugParam();
 #endif
-	// カメラ基準ベクトル更新
-	UpdateCameraBasis(&camera);
+    // カメラ基準ベクトル更新
+    UpdateCameraBasis(&camera);
 
     // ダメージ無敵タイマー更新
-	if (isInvincible_) {
+    if (isInvincible_) {
         damageInvincibleTimer_ -= FpsCounter::deltaTime;
-		if (damageInvincibleTimer_ <= 0.0f) {
-			isInvincible_ = false;
-			damageInvincibleTimer_ = 0.0f;
+        if (damageInvincibleTimer_ <= 0.0f) {
+            isInvincible_ = false;
+            damageInvincibleTimer_ = 0.0f;
+        }
+    }
+
+    // 急降下準備中の処理
+    if (isAttackDownPrepping_) {
+        // 準備時間を進める
+        attackDownPrepareTimer_ += FpsCounter::deltaTime;
+        float half = attackDownPrepareTotal_ * 0.5f;
+        if (attackDownPrepareTimer_ <= half && half > 0.0f) {
+            float t = std::clamp(attackDownPrepareTimer_ / half, 0.0f, 1.0f);
+            float yOffset = EaseOutCubic(0.0f, 2.0f, t);
+            worldTransform_.transform_.translate.y = attackDownPrepareStartY_ + yOffset;
+        }
+        // 準備完了で急降下開始
+        if (attackDownPrepareTimer_ >= attackDownPrepareTotal_) {
+            isAttackDownPrepping_ = false;
+            // 実際の急降下開始
+            isAttackDown_ = true;
+            attackDownStartY_ = worldTransform_.transform_.translate.y;
         }
     }
 
@@ -232,11 +251,11 @@ void Player::UpdateAnimation() {
 	}
 
     // 空中急降下開始 (isAttackDown_ が true になった瞬間)
-    if (isAttackDown_ && !prevIsAttackDown_) {
-        StartNormalAnim(PlayerAnimationType::DownAttack, "DownAttack_Prepare", false);
-        // 空中移動音を停止
-        if (audioHandle_AirMotion_ != 0) { AudioManager::GetInstance().Stop(audioHandle_AirMotion_); }
-    }
+	if (isAttackDown_ && !prevIsAttackDown_) {
+		//StartNormalAnim(PlayerAnimationType::DownAttack, "DownAttack_Prepare", false);
+		// 空中移動音を停止
+		if (audioHandle_AirMotion_ != 0) { AudioManager::GetInstance().Stop(audioHandle_AirMotion_); }
+	}
 
     // 空中急降下終了 (isAttackDown_ が false になった瞬間)
 	if (!isAttackDown_ && prevIsAttackDown_) {
@@ -420,7 +439,7 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 }
 
 void Player::ProcessAttackDownInput(GameEngine::InputCommand *inputCommand) {
-    if (isCharging_ || isPreRushing_ || isRushing_ || isBounceLock_ || isRushLock_ || !isJump_) {
+    if (isCharging_ || isPreRushing_ || isRushing_ || isBounceLock_ || isRushLock_ || !isJump_ || isAttackDownPrepping_) {
         return;
     }
 	// 攻撃下降開始
@@ -428,11 +447,21 @@ void Player::ProcessAttackDownInput(GameEngine::InputCommand *inputCommand) {
 		velocity_.x = 0.0f;
 		velocity_.z = 0.0f;
 		attackDownPower_ = 0.0f;
-        isAttackDown_ = !isAttackDown_;
-        if (isAttackDown_) {
-            // 開始時のYを記録して落下距離で計算する
-            attackDownStartY_ = worldTransform_.transform_.translate.y;
+        // 準備状態に入る（実際の落下は後で開始）
+        isAttackDownPrepping_ = true;
+        attackDownPrepareTimer_ = 0.0f;
+        attackDownPrepareStartY_ = worldTransform_.transform_.translate.y;
+        // アニメーション時間を取得して総待機時間に設定
+        // DownAttack_Prepare のアニメーションデータから duration を拾う
+        auto &mapRef = animationData_[static_cast<size_t>(PlayerAnimationType::DownAttack)];
+        auto it = mapRef.find("DownAttack_Prepare");
+        if (it != mapRef.end()) {
+            attackDownPrepareTotal_ = it->second.duration;
+        } else {
+            attackDownPrepareTotal_ = kAttackPreDownTime_; // フォールバック
         }
+        // アニメーション再生
+        StartNormalAnim(PlayerAnimationType::DownAttack, "DownAttack_Prepare", false);
     }
 }
 

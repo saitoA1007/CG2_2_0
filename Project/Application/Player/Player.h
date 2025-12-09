@@ -287,6 +287,11 @@ private:
     float attackDownPower_ = 0.0f;
 	// 急降下開始時のY座標 (落下距離計算用)
     float attackDownStartY_ = 0.0f;
+    // 急降下準備状態（DownAttack_Prepare 再生中の待機）
+    bool isAttackDownPrepping_ = false;
+    float attackDownPrepareTimer_ = 0.0f;
+    float attackDownPrepareTotal_ = 0.0f;
+    float attackDownPrepareStartY_ = 0.0f;
 
 	// プレイヤー用コライダー（球）
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
