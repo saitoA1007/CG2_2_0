@@ -96,12 +96,23 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 
 	// 落下攻撃中は現在の落下速度から攻撃力を算出
 	if (isAttackDown_) {
-		float fallSpeed = -velocity_.y; // 正の値
-		float ratio = 0.0f;
-		if (kAttackDownSpeed_ > 0.00001f) {
-			ratio = std::clamp(fallSpeed / kAttackDownSpeed_, 0.0f, 1.0f);
+		if (useSpeedBasedAttackDown_) {
+			float fallSpeed = -velocity_.y; // 正の値
+			float ratio = 0.0f;
+			if (kAttackDownSpeed_ > 0.00001f) {
+				ratio = std::clamp(fallSpeed / kAttackDownSpeed_, 0.0f, 1.0f);
+			}
+			attackDownPower_ = Lerp(kAttackDownMinPower_, kAttackDownMaxPower_, ratio);
+		} else {
+			float currentY = worldTransform_.transform_.translate.y;
+			float fallDistance = attackDownStartY_ - currentY;
+			if (fallDistance < 0.0f) fallDistance = 0.0f;
+			float ratio = 0.0f;
+			if (kAttackDownDistanceToMax_ > 0.00001f) {
+				ratio = std::clamp(fallDistance / kAttackDownDistanceToMax_, 0.0f, 1.0f);
+			}
+			attackDownPower_ = Lerp(kAttackDownMinPower_, kAttackDownMaxPower_, ratio);
 		}
-		attackDownPower_ = Lerp(kAttackDownMinPower_, kAttackDownMaxPower_, ratio);
 	}
 
 	// 速度を適応
@@ -401,20 +412,24 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 
 void Player::ProcessAttackDownInput(GameEngine::InputCommand *inputCommand) {
     if (isCharging_ || isPreRushing_ || isRushing_ || isBounceLock_ || isRushLock_ || !isJump_) {
-		return;
-	}
+        return;
+    }
 	// 攻撃下降開始
 	if (inputCommand->IsCommandActive("AttackDown")) {
 		velocity_.x = 0.0f;
 		velocity_.z = 0.0f;
 		attackDownPower_ = 0.0f;
         isAttackDown_ = !isAttackDown_;
+        if (isAttackDown_) {
+            // 開始時のYを記録して落下距離で計算する
+            attackDownStartY_ = worldTransform_.transform_.translate.y;
+        }
     }
 }
 
 void Player::HandleRushCharge(GameEngine::InputCommand* inputCommand) {
     if (isCharging_ || isJump_ || isRushing_ || isPreRushing_ ||
-		isBounceLock_ || isRushLock_ || isRushCooldown_) {
+        isBounceLock_ || isRushLock_ || isRushCooldown_) {
 		return;
 	}
 	// 溜め開始/継続
@@ -529,10 +544,9 @@ void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength, bool i
 	isBounceLock_ = true; bounceLockTimer_ = 0.0f; bounceAwayDir_ = { -bounceDirection.x, 0.0f, -bounceDirection.z }; bounceAwayDir_ = Normalize(bounceAwayDir_);
 
     // 壁跳ね返り音
-    {
-        auto h = audioHandle_Reflect_;
-        if (h != 0) { AudioManager::GetInstance().Play(h, audioVolume_Reflect_, false); }
-    }
+    if (audioHandle_Reflect_ != 0) {
+		AudioManager::GetInstance().Play(audioHandle_Reflect_, audioVolume_Reflect_, false);
+	}
 
     if (isLegacyWallBounce_) {
 		// IceFall の場合は溜めレベルに依存せず一定の強さで跳ね返す
@@ -598,13 +612,13 @@ void Player::OnCollision(const CollisionResult &result) {
 
     // ボスとの衝突処理（空中急降下中の場合）
 	if (isBoss && isAttackDown_) {
-		Log("is hit Boss with Attack Down");
+        Log("is hit Boss with Attack Down" + std::to_string(attackDownPower_));
         //if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
         return;
     }
 
     // ボスとの衝突処理（通常時）
-	if (isBoss && !isRushing_ && !isAttackDown_ && !isInvincible_) {
+    if (isBoss && !isRushing_ && !isAttackDown_ && !isInvincible_ && !isBounceLock_) {
 		Log("is hit Boss normally");
 		// HP減少処理（仮で1ダメージ）
 		currentHP_ -= 1;
@@ -822,6 +836,8 @@ void Player::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownSpeed", kAttackDownSpeed_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownMinPower", kAttackDownMinPower_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownMaxPower", kAttackDownMaxPower_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownDistanceToMax", kAttackDownDistanceToMax_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "UseSpeedBasedAttackDown", useSpeedBasedAttackDown_);
 
 	// Audio 設定 (Player-Audio)
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "PlayerDamagedVolume", audioVolume_PlayerDamaged_);
@@ -879,6 +895,10 @@ void Player::ApplyDebugParam() {
 	// Attack（空中急降下）設定
 	kAttackPreDownTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackPreDownTime");
 	kAttackDownSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackDownSpeed");
+	kAttackDownMinPower_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackDownMinPower");
+	kAttackDownMaxPower_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackDownMaxPower");
+    kAttackDownDistanceToMax_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackDownDistanceToMax");
+    useSpeedBasedAttackDown_ = GameParamEditor::GetInstance()->GetValue<bool>(kGroupNames[3], "UseSpeedBasedAttackDown");
 
 	// Audio パラメータ取得
 	audioVolume_PlayerDamaged_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "PlayerDamagedVolume");

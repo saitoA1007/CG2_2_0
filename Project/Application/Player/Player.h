@@ -187,6 +187,10 @@ private:
     float kAttackDownMinPower_ = 1.0f;
     // 落下攻撃の最大攻撃力
     float kAttackDownMaxPower_ = 10.0f;
+    // 最大攻撃力に達するまでの落下距離
+    float kAttackDownDistanceToMax_ = 5.0f;
+    // 以前の速度ベース計算を使うフラグ
+    bool useSpeedBasedAttackDown_ = false;
 
     // 回転補間速度（ラジアン / 秒）
     float kRotationLerpSpeed_ = 10.0f;
@@ -260,6 +264,8 @@ private:
     bool isAttackDown_ = false;
 	// 急降下時の攻撃力
     float attackDownPower_ = 0.0f;
+	// 急降下開始時のY座標 (落下距離計算用)
+    float attackDownStartY_ = 0.0f;
 
 	// プレイヤー用コライダー（球）
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
