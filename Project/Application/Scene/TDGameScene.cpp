@@ -174,6 +174,10 @@ void TDGameScene::Initialize(SceneContext* context) {
     playerAttackDownEffect_->Initialize();
     playerAttackDownEffect_->SetParent(&player_->GetWorldTransform());
 
+	// プレイヤーの攻撃演出
+	playerAttackEffect_ = std::make_unique<PlayerAttackEffect>();
+	playerAttackEffect_->Initialize(context_->textureManager->GetHandleByName("HitEffect.png"));
+
     // カメラコントローラークラスを初期化
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
@@ -452,6 +456,9 @@ void TDGameScene::Update() {
 		return;
 	}
 
+	// 攻撃演出のエミッター
+	playerAttackEffect_->Emitter(player_->GetPlayerPos());
+
 	// デバックリストを削除
 	debugRenderer_->Clear();
 
@@ -470,10 +477,11 @@ void TDGameScene::Update() {
 	// プレイヤーの影の更新処理
 	playerShadow_->Update();
 
-	// プレイヤーのエフェクト更新処理
-	playerChargeEffect_->Update();
-	playerRushEffect_->Update();
-	playerAttackDownEffect_->Update();
+    // プレイヤーのエフェクト更新処理
+    playerChargeEffect_->Update();
+    playerRushEffect_->Update();
+    playerAttackDownEffect_->Update();
+	playerAttackEffect_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
 	// ロックオン: 入力が有効ならプレイヤーとボスの位置をターゲットに設定
 	if (!isTitleLocked_) {
@@ -751,6 +759,9 @@ void TDGameScene::Draw(const bool &isDebugView) {
 		}
 	}
 
+	// プレイヤーの攻撃演出を描画
+	ModelRenderer::Draw(planeModel_, playerAttackEffect_->GetWorldTransforms(), &playerAttackEffect_->GetMaterial());
+
 	// インスタンシング描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingBothNone);
 	// ボスの風攻撃を描画
@@ -788,6 +799,9 @@ void TDGameScene::Draw(const bool &isDebugView) {
 			ModelRenderer::DrawInstancing(planeModel_, particle->GetCurrentNumInstance(), *particle->GetWorldTransforms());
 		}
 	}
+
+	// プレイヤーの攻撃演出
+	ModelRenderer::DrawInstancing(planeModel_, playerAttackEffect_->smallParticle_->GetCurrentNumInstance(), *playerAttackEffect_->smallParticle_->GetWorldTransforms());
 
 	// 突進する時の風パーティクル
 	ModelRenderer::DrawInstancing(planeModel_, enemyRushEffect_->enemyRushParticle_->GetCurrentNumInstance(), *enemyRushEffect_->enemyRushParticle_->GetWorldTransforms());
