@@ -1,6 +1,7 @@
 #include"BossHpUI.h"
 #include"EasingManager.h"
 #include"FPSCounter.h"
+#include"GameParamEditor.h"
 using namespace GameEngine;
 
 void BossHpUI::Initialize(const int32_t& maxHp) {
@@ -9,18 +10,26 @@ void BossHpUI::Initialize(const int32_t& maxHp) {
 	currentHp_ = maxHp_;
 
 	// 初期化
-	sprite_ = Sprite::Create({ 320.0f,32.0f }, { 640.0f,48.0f }, { 0.0f,0.0f }, { 1.0f,0.0f,0.0f,1.0f });
+	sprite_ = Sprite::Create(position_, size_, { 0.0f,0.0f }, { 1.0f,0.0f,0.0f,1.0f });
 
-	effectSprite_ = Sprite::Create({ 320.0f,32.0f }, { 640.0f,48.0f }, { 0.0f,0.0f }, { 0.5f,0.0f,0.0f,1.0f });
+	effectSprite_ = Sprite::Create(position_, size_, { 0.0f,0.0f }, { 0.5f,0.0f,0.0f,1.0f });
 
 	// 後ろのフレーム
-	frameSprite_ = Sprite::Create({ 320.0f,32.0f }, { 640.0f,48.0f }, { 0.0f,0.0f }, { 0.5f,0.0f,0.0f,1.0f });
+	frameSprite_ = Sprite::Create(position_, size_, { 0.0f,0.0f }, { 0.0f,0.0f,0.0f,1.0f });
 
 	// ボスの名前UI
-	bossNameSprite_ = Sprite::Create({ 320.0f,32.0f }, { 640.0f,48.0f }, { 0.0f,0.0f }, { 0.5f,0.0f,0.0f,1.0f });
+	bossNameSprite_ = Sprite::Create(bossNamePosition_, bossNameSize_, { 0.5f,0.5f }, { 1.0f,1.0f,1.0f,1.0f });
+
+#ifdef _DEBUG
+	RegisterBebugParam();
+#endif
+	ApplyDebugParam();
 }
 
 void BossHpUI::Update() {
+#ifdef _DEBUG
+	ApplyDebugParam();
+#endif
 
 	preScaleX_ = sprite_->scale_.x;
 
@@ -57,4 +66,37 @@ void BossHpUI::EffectUpdate() {
 			points_.pop_front();
 		}
 	}
+}
+
+void BossHpUI::RegisterBebugParam() {
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "HpSize", size_);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "HpPosition", position_);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "BossNameSize", bossNameSize_);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "BossNamePosition", bossNamePosition_);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "HpColor", sprite_->color_);
+	GameParamEditor::GetInstance()->AddItem(kGroupName_, "HpFrameColor", frameSprite_->color_);
+}
+
+void BossHpUI::ApplyDebugParam() {
+	size_ = GameParamEditor::GetInstance()->GetValue<Vector2>(kGroupName_, "HpSize");
+	position_ = GameParamEditor::GetInstance()->GetValue<Vector2>(kGroupName_, "HpPosition");
+	bossNameSize_ = GameParamEditor::GetInstance()->GetValue<Vector2>(kGroupName_, "BossNameSize");
+	bossNamePosition_ = GameParamEditor::GetInstance()->GetValue<Vector2>(kGroupName_, "BossNamePosition");
+	sprite_->color_ = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "HpColor");
+	frameSprite_->color_ = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "HpFrameColor");
+
+	sprite_->position_ = position_;
+	sprite_->size_ = size_;
+	effectSprite_->position_ = position_;
+	effectSprite_->size_ = size_;
+	frameSprite_->position_ = position_;
+	frameSprite_->size_ = size_;
+
+	bossNameSprite_->position_ = bossNamePosition_;
+	bossNameSprite_->size_ = bossNameSize_;
+
+	sprite_->Update();
+	effectSprite_->Update();
+	frameSprite_->Update();
+	bossNameSprite_->Update();
 }

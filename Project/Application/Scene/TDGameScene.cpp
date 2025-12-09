@@ -343,6 +343,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// ボスのhpUIを初期化
 	bossHpUI_ = std::make_unique<BossHpUI>();
 	bossHpUI_->Initialize(bossEnemy_->GetMaxHp());
+	bossNameGH_ = context_->textureManager->GetHandleByName("BossName.png");
 
 	// プレイヤーのhpUIを初期化 (仮の最大HP: 3)
 	playerHpUI_ = std::make_unique<PlayerHpUI>();
@@ -849,10 +850,6 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	// 画像の描画前処理
 	SpriteRenderer::PreDraw(RenderMode2D::Normal);
 
-	// ボスのHPUIを表示
-	//SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
-	//SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
-
 	// プレイヤーのHPUIを表示
 	//SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
 	//SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
@@ -886,12 +883,14 @@ void TDGameScene::DrawUI() {
 	}
 
 	// ボスのHPUIを表示
+	SpriteRenderer::Draw(bossHpUI_->GetFrameSprite(), 0);
 	SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
 	SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
+	SpriteRenderer::Draw(bossHpUI_->GetNameSprite(), bossNameGH_);
 
 	// プレイヤーのHPUIを表示
-	SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
-	SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
+	//SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
+	//SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
 
 	// GameOverUI描画
 	if (gameOverUI_->IsActive()) {

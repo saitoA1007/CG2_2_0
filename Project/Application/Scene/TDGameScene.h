@@ -239,6 +239,7 @@ private:
 
 	// ボスのHpを表示
 	std::unique_ptr<BossHpUI> bossHpUI_;
+	uint32_t bossNameGH_ = 0;
 	// プレイヤーのHpを表示
 	std::unique_ptr<PlayerHpUI> playerHpUI_;
 
