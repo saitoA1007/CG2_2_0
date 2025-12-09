@@ -42,9 +42,9 @@ void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectMan
     }
 
     // 演出用のメモリを確保しておく
-    iceFallEffectDatas_.reserve(3);
+    iceFallEffectDatas_.reserve(5);
     // 演出のパーティクルを生成
-    for (size_t i = 0; i < 3; ++i) {
+    for (size_t i = 0; i < 5; ++i) {
         IceFallEffectData  iceFallEffectData;
         iceFallEffectData.timer = 0.0f;
         iceFallEffectData.particle = std::make_unique<ParticleBehavior>();
@@ -132,12 +132,15 @@ void EnemyAttackManager::AddEnemyDestroyEffect(const Vector3& pos) {
 
 void EnemyAttackManager::CreateIceFallPositions(const float& waitIceFallTime) {
     maxIceFallEmitTime_ = waitIceFallTime;
-    if (IceFallsList_.size() != 0) { return; }
+    if (IceFallsList_.size() > 5) { return; }
 
     std::vector<Vector2> points;
     int attempts = 0;
 
-    while (points.size() < targetCount && attempts < maxIter) {
+    // 生成してた数
+    int count = 0;
+
+    while (count < targetCount && attempts < maxIter) {
         attempts++;
 
         // 大きな円の中にランダムな点を生成
@@ -161,6 +164,7 @@ void EnemyAttackManager::CreateIceFallPositions(const float& waitIceFallTime) {
 
         // 条件を満たせば採用
         if (isValid) {
+            count++;
             points.push_back(candidate);
         }
     }

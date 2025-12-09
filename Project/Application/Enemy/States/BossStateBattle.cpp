@@ -111,7 +111,7 @@ void BossStateBattle::ResetNormal() {
 	// 氷柱がステージに存在してる場合は処理をおこなわない
 	std::vector<BehaviorWeight> list;
 	list.resize(lotteryList_.size());
-	if (bossContext_.iceFallCount != 0) {
+	if (bossContext_.iceFallCount + 3 > 5) {
 		for (size_t i = 0; i < lotteryList_.size(); ++i) {
 			if (lotteryList_[i].behavior != ButtleBehavior::IceFallAttack) {
 				list.push_back(lotteryList_[i]);
