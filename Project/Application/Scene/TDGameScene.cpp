@@ -747,7 +747,7 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	if (player_->IsCharging() || player_->IsPreRushing()) {
 		int active = playerChargeEffect_->GetActiveCount();
 		auto &wts = playerChargeEffect_->GetWorldTransforms();
-		for (int i = 0; i < active && i < static_cast<int>(wts.size()); ++i) {
+		for (int i = active - 1; i >= 0; --i) {
 			ModelRenderer::Draw(playerChargeEffectModel_, wts[i]);
 		}
 	}
