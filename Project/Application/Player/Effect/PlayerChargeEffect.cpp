@@ -21,6 +21,10 @@ void PlayerChargeEffect::Initialize() {
         worldTransforms_[i].Initialize(t);
     }
     activeCount_ = 1;
+
+    // マテリアルの初期化（白）
+    material_ = std::make_unique<GameEngine::Material>();
+    material_->Initialize(Vector4{1.0f, 1.0f, 1.0f, 1.0f}, Vector3{1.0f, 1.0f, 1.0f}, 16.0f, false);
 }
 
 void PlayerChargeEffect::Update() {
@@ -36,4 +40,19 @@ void PlayerChargeEffect::SetLevel(int level) {
     if (level < 1) level = 1;
     if (level > 3) level = 3;
     activeCount_ = level;
+
+    // レベルに応じて色を変更: 1 白, 2 黄色, 3 オレンジ
+    if (material_) {
+        switch (activeCount_) {
+        case 1:
+            material_->SetColor(Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+            break;
+        case 2:
+            material_->SetColor(Vector4{1.0f, 1.0f, 0.0f, 1.0f});
+            break;
+        case 3:
+            material_->SetColor(Vector4{1.0f, 0.5f, 0.0f, 1.0f});
+            break;
+        }
+    }
 }

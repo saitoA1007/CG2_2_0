@@ -1,6 +1,7 @@
 #pragma once
 #include<array>
 #include"WorldTransform.h"
+#include"EngineSource/3D/Model/Material.h"
 
 class PlayerChargeEffect {
 public:
@@ -41,6 +42,11 @@ public:
     /// </summary>
     void SetLevel(int level);
 
+    /// <summary>
+    /// マテリアルを取得
+    /// </summary>
+    GameEngine::Material* GetMaterial() const { return material_.get(); }
+
 private:
     // ワールド行列
     std::array<GameEngine::WorldTransform, 3> worldTransforms_;
@@ -53,4 +59,7 @@ private:
 
     // 現在有効な個数
     int activeCount_ = 1;
+
+    // 描画用マテリアル
+    std::unique_ptr<GameEngine::Material> material_;
 };

@@ -273,6 +273,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 	for (auto &m : playerLandingEffect_->GetMaterials()) {
 		m->SetTextureHandle(playerLandingEffectModel_->GetDefaultTexture());
     }
+    // PlayerChargeEffect のマテリアルにもテクスチャを設定
+    if (playerChargeEffect_ && playerChargeEffect_->GetMaterial()) {
+        playerChargeEffect_->GetMaterial()->SetTextureHandle(playerChargeEffectModel_->GetDefaultTexture());
+    }
 	// 風攻撃演出モデル
 	windModel_ = context_->modelManager->GetNameByModel("Wind");
 
@@ -810,7 +814,7 @@ void TDGameScene::Draw(const bool &isDebugView) {
 		int active = playerChargeEffect_->GetActiveCount();
 		auto &wts = playerChargeEffect_->GetWorldTransforms();
 		for (int i = active - 1; i >= 0; --i) {
-			ModelRenderer::Draw(playerChargeEffectModel_, wts[i]);
+			ModelRenderer::Draw(playerChargeEffectModel_, wts[i], playerChargeEffect_->GetMaterial());
 		}
 	}
     if (player_->IsRushing()) {
