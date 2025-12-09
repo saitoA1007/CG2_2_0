@@ -37,6 +37,7 @@
 #include"Application/Player/Effect/PlayerRushEffect.h"
 #include"Application/Player/Effect/PlayerAttackDownEffect.h"
 #include"Application/Player/Effect/PlayerAttackEffect.h"
+#include"Application/Player/Effect/PlayerLandingEffect.h"
 #include"Application/UI/Letterbox.h"
 
 class TDGameScene : public BaseScene {
@@ -153,6 +154,7 @@ private:
 	std::unique_ptr<PlayerRushEffect> playerRushEffect_;
 	std::unique_ptr<PlayerAttackDownEffect> playerAttackDownEffect_;
 	std::unique_ptr<PlayerAttackEffect> playerAttackEffect_;
+	std::unique_ptr<PlayerLandingEffect> playerLandingEffect_;
 
 	//==================================================
 	// ステージ
@@ -227,6 +229,7 @@ private:
 	GameEngine::Model* playerChargeEffectModel_ = nullptr;
 	GameEngine::Model* playerRushEffectModel_ = nullptr;
 	GameEngine::Model* playerAttackDownEffectModel_ = nullptr;
+	GameEngine::Model* playerLandingEffectModel_ = nullptr;
 
 	// ボスロックオンフラグ
     bool isBossLockOn_ = false;

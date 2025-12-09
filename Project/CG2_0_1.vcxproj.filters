@@ -309,6 +309,7 @@
     <ClCompile Include="Application\Enemy\Effect\BreakEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerAttackEffect.cpp" />
     <ClCompile Include="Application\UI\Letterbox.cpp" />
+    <ClCompile Include="Application\Player\Effect\PlayerLandingEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -622,6 +623,7 @@
     <ClInclude Include="Application\Enemy\Effect\BreakEffect.h" />
     <ClInclude Include="Application\Player\Effect\PlayerAttackEffect.h" />
     <ClInclude Include="Application\UI\Letterbox.h" />
+    <ClInclude Include="Application\Player\Effect\PlayerLandingEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

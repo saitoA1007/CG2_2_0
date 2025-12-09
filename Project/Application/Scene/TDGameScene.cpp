@@ -178,7 +178,18 @@ void TDGameScene::Initialize(SceneContext* context) {
 	playerAttackEffect_ = std::make_unique<PlayerAttackEffect>();
 	playerAttackEffect_->Initialize(context_->textureManager->GetHandleByName("HitEffect.png"));
 
-    // カメラコントローラークラスを初期化
+    // 着地演出
+    playerLandingEffect_ = std::make_unique<PlayerLandingEffect>();
+    playerLandingEffect_->Initialize();
+
+    // 着地時にエフェクトを起動
+    player_->SetOnLandHit([this]() {
+        if (playerLandingEffect_) {
+            playerLandingEffect_->Emitter(player_->GetWorldTransform().GetWorldPosition());
+        }
+    });
+
+	// カメラコントローラークラスを初期化
 	cameraController_ = std::make_unique<CameraController>();
 	cameraController_->Initialize();
 
@@ -256,8 +267,12 @@ void TDGameScene::Initialize(SceneContext* context) {
 	playerChargeEffectModel_ = enemyRushModel_;
 	playerRushEffectModel_ = enemyRushModel_;
 	playerAttackDownEffectModel_ = enemyRushModel_;
+	playerLandingEffectModel_ = enemyRushModel_;
 	Material *material = playerAttackDownEffect_->GetMaterial();
 	material->SetTextureHandle(playerAttackDownEffectModel_->GetDefaultTexture());
+	for (auto &m : playerLandingEffect_->GetMaterials()) {
+		m->SetTextureHandle(playerLandingEffectModel_->GetDefaultTexture());
+    }
 	// 風攻撃演出モデル
 	windModel_ = context_->modelManager->GetNameByModel("Wind");
 
@@ -440,7 +455,7 @@ void TDGameScene::Update() {
 		if (bossEnemy_->GetCurrentHP() == 0) {
 			nextSceneState_ = SceneState::Result;
 		}
-		isFinished_ = true;
+	 isFinished_ = true;
 	}
 
 	// ボスへのヒット演出処理
@@ -500,6 +515,7 @@ void TDGameScene::Update() {
     playerRushEffect_->Update();
     playerAttackDownEffect_->Update();
 	playerAttackEffect_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+	playerLandingEffect_->Update();
 
 	// プレイヤーの攻撃力に応じてAttackDownエフェクトの透明度を設定
 	if (player_ && playerAttackDownEffect_) {
@@ -790,6 +806,13 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	if (player_->IsAttackDown()) {
 		for (auto &attackDownEffect : playerAttackDownEffect_->GetWorldTransforms()) {
 			ModelRenderer::Draw(playerAttackDownEffectModel_, attackDownEffect, playerAttackDownEffect_->GetMaterial());
+		}
+	}
+	if (playerLandingEffect_ && playerLandingEffect_->IsActive()) {
+		auto &wts = playerLandingEffect_->GetWorldTransforms();
+		auto &mats = playerLandingEffect_->GetMaterials();
+		for (size_t i = 0; i < wts.size(); ++i) {
+			ModelRenderer::Draw(playerLandingEffectModel_, wts[i], mats[i].get());
 		}
 	}
 
