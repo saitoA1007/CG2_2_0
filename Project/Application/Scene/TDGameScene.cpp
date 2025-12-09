@@ -774,7 +774,9 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	}
 
 	// プレイヤーの攻撃演出を描画
-	ModelRenderer::Draw(planeModel_, playerAttackEffect_->GetWorldTransforms(), &playerAttackEffect_->GetMaterial());
+	if (playerAttackEffect_->IsActive()) {
+		ModelRenderer::Draw(planeModel_, playerAttackEffect_->GetWorldTransforms(), &playerAttackEffect_->GetMaterial());
+	}
 
 	// インスタンシング描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingBothNone);
