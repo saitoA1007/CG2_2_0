@@ -71,7 +71,7 @@ void TitleScene::Initialize(SceneContext* context) {
     terrain_->Initialize(context_->textureManager->GetHandleByName("gras.png"), context_->textureManager->GetHandleByName("ice.png"), context_->textureManager->GetHandleByName("iceNormal.png"));
 
     stageManager_ = std::make_unique<StageManager>();
-    stageManager_->Initialize();
+    stageManager_->Initialize(0);
 
     stageWallPlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
     stageWallPlaneMaterial_ = std::make_unique<IceMaterial>();
@@ -308,11 +308,11 @@ void TitleScene::Draw(const bool& isDebugView) {
         }
     }
 
-    // 通常モデルの描画前処理
-    ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
+    // 岩の描画前処理
+    CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
 
     // ステージを描画する
-    stageManager_->Draw(wallModel_);
+    stageManager_->Draw(wallModel_, sceneLightingController_->GetResource());
 
     // 3Dモデルの両面描画前処理
     ModelRenderer::PreDraw(RenderMode3D::DefaultModelBoth);

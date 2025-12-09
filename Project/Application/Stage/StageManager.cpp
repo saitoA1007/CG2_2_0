@@ -3,10 +3,12 @@
 #include<numbers>
 #include<cmath>
 
-#include"ModelRenderer.h"
+#include"Extension/CustomRenderer.h"
 using namespace GameEngine;
 
-void StageManager::Initialize() {
+void StageManager::Initialize(const uint32_t& wallTexture) {
+
+	wallTextureHandle_ = wallTexture;
 
 #ifdef _DEBUG
 	// 値を登録する
@@ -65,11 +67,11 @@ void StageManager::Update() {
 	}
 }
 
-void StageManager::Draw(GameEngine::Model* wallModel) {
+void StageManager::Draw(GameEngine::Model* wallModel, ID3D12Resource* lightGroupResource) {
 
 	// 生存している壁を描画
 	for (auto& wall : aliveWalls_) {
-		ModelRenderer::Draw(wallModel, wall->GetWorldTransform(), &wall->GetMaterial());	
+		CustomRenderer::DrawRock(wallModel, wall->GetWorldTransform(),lightGroupResource,wall->GetMaterial());
 	}
 }
 
@@ -105,7 +107,7 @@ void StageManager::GenerateWalls() {
 
 		// 壁を生成する
 		std::unique_ptr<Wall> tmpWall = std::make_unique<Wall>();
-		tmpWall->Initialilze({ {wallWidth,wallHeight_,wallDepth_},{0.0f,rotateY,0.0f},{tmpPos} }, respawnTime_, maxHp_);
+		tmpWall->Initialilze({ {wallWidth,wallHeight_,wallDepth_},{0.0f,rotateY,0.0f},{tmpPos} }, respawnTime_, maxHp_, wallTextureHandle_);
 
 		// 登録する
 		walls_.push_back(std::move(tmpWall));

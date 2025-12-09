@@ -10,7 +10,7 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Initialize();
+	void Initialize(const uint32_t& wallTexture);
 
 	/// <summary>
 	/// 更新処理
@@ -21,7 +21,7 @@ public:
 	/// 描画処理
 	/// </summary>
 	/// <param name="wallModel"></param>
-	void Draw(GameEngine::Model* wallModel);
+	void Draw(GameEngine::Model* wallModel, ID3D12Resource* lightGroupResource);
 
 	/// <summary>
 	/// デバック用の更新処理
@@ -91,6 +91,8 @@ private:
 
 	// 壊れた演出
 	std::list<std::unique_ptr<BreakWallParticle>> breakWallParticles_;
+
+	uint32_t wallTextureHandle_ = 0;
 
 private:
 
