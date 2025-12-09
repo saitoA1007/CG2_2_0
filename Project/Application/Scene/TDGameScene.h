@@ -39,6 +39,7 @@
 #include"Application/Player/Effect/PlayerAttackEffect.h"
 #include"Application/Player/Effect/PlayerLandingEffect.h"
 #include"Application/UI/Letterbox.h"
+#include"Application/UI/ClearUI.h"
 #include"Application/UI/BossDestroyFade.h"
 
 class TDGameScene : public BaseScene {
@@ -267,6 +268,9 @@ private:
     float letterboxAnimDuration_ = 0.25f; // seconds
     float letterboxStartHeight_ = 0.0f;
     float letterboxEndHeight_ = 0.0f;
+
+	// クリアUI
+	std::unique_ptr<ClearUI> clearUI_;
 
 private:
 
