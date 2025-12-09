@@ -44,6 +44,12 @@ private:
 	// hpの演出用
 	std::unique_ptr<GameEngine::Sprite> effectSprite_;
 
+	// フレーム
+	std::unique_ptr<GameEngine::Sprite> frameSprite_;
+
+	// ボスの名前
+	std::unique_ptr<GameEngine::Sprite> bossNameSprite_;
+
 	float preScaleX_ = 1.0f;
 
 	// 最大hp
