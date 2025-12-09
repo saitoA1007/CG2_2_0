@@ -37,6 +37,7 @@
 #include"Application/Player/Effect/PlayerRushEffect.h"
 #include"Application/Player/Effect/PlayerAttackDownEffect.h"
 #include"Application/Player/Effect/PlayerAttackEffect.h"
+#include"Application/UI/Letterbox.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -252,6 +253,13 @@ private:
     // 開始時アニメーション再生中フラグ
     bool isStartAnimationPlaying_ = true;
 
+    // レターボックス
+    std::unique_ptr<Letterbox> letterbox_;
+    float letterboxAnimTimer_ = 0.0f;
+    float letterboxAnimDuration_ = 0.25f; // seconds
+    float letterboxStartHeight_ = 0.0f;
+    float letterboxEndHeight_ = 0.0f;
+
 private:
 
 	// ボスヒット時にほとんどの更新を停止するための制御
@@ -276,13 +284,11 @@ private:
     /// </summary>
     void UpdateStartAnimation();
 
-	// Title-specific control
-	bool isTitleLocked_ = true; // when true, only Start input accepted
-	bool isTransitioning_ = false; // true while fade/camera easing
+	bool isTitleLocked_ = true;
+	bool isTransitioning_ = false;
 	float transitionTimer_ = 0.0f;
-	static inline constexpr float kTransitionDuration_ = 1.0f; // seconds
+	static inline constexpr float kTransitionDuration_ = 1.0f;
 
-	// title sprites
 	std::unique_ptr<GameEngine::Sprite> titleSprite_;
 	uint32_t titleGH_ = 0;
 

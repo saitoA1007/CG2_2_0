@@ -389,6 +389,18 @@ void TDGameScene::Initialize(SceneContext* context) {
 	isTitleLocked_ = true;
 	isTransitioning_ = false;
 	transitionTimer_ = 0.0f;
+
+    // Letterbox 初期化（高さ0で開始）
+    letterbox_ = std::make_unique<Letterbox>();
+    if (letterbox_) {
+        float w = 1280.0f;
+        float h = 720.0f;
+        letterbox_->Initialize(w, h, 0.0f);
+        letterbox_->SetBoxHeight(0.0f);
+        letterboxAnimTimer_ = 0.0f;
+        letterboxStartHeight_ = 0.0f;
+        letterboxEndHeight_ = 0.0f;
+    }
 }
 
 void TDGameScene::Update() {
@@ -503,6 +515,7 @@ void TDGameScene::Update() {
 	}
 
 	// ロックオン: 入力が有効ならプレイヤーとボスの位置をターゲットに設定
+	bool prevLockOn = isBossLockOn_;
 	if (!isTitleLocked_) {
 		if (context_->inputCommand->IsCommandActive("LockOnBoss")) {
 			isBossLockOn_ = !isBossLockOn_;
@@ -518,6 +531,23 @@ void TDGameScene::Update() {
 			cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
 		}
 	}
+
+    // Letterbox easing control when lock-on toggles
+    if (letterbox_) {
+        // Detect state change to set new animation
+        if (prevLockOn != isBossLockOn_) {
+            letterboxAnimTimer_ = 0.0f;
+            letterboxStartHeight_ = letterboxEndHeight_;
+            letterboxEndHeight_ = isBossLockOn_ ? 64.0f : 0.0f;
+        }
+        // Progress animation
+        letterboxAnimTimer_ += FpsCounter::deltaTime;
+        float t = std::clamp(letterboxAnimTimer_ / letterboxAnimDuration_, 0.0f, 1.0f);
+        float eased = EaseOutCubic(0.0f, 1.0f, t);
+        float h = letterboxStartHeight_ + (letterboxEndHeight_ - letterboxStartHeight_) * eased;
+        letterbox_->SetBoxHeight(h);
+        letterbox_->Update();
+    }
 
 	//============================
 	// FOV設定
@@ -871,6 +901,12 @@ void TDGameScene::DrawUI() {
 
 	// 画像の描画前処理
 	SpriteRenderer::PreDraw(RenderMode2D::Normal);
+
+	if (letterbox_) {
+		if (auto s = letterbox_->GetTopSprite()) { SpriteRenderer::Draw(s, 0); }
+		if (auto s = letterbox_->GetBottomSprite()) { SpriteRenderer::Draw(s, 0); }
+	}
+
 	// タイトル描画
 	SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_);
 
@@ -941,20 +977,6 @@ void TDGameScene::UpdateCollision() {
 #ifdef _DEBUG
     debugRenderer_->AddSphere(player_->GetSphereData());
 #endif
-//
-//	for (auto &bc : boundaryColliders_) {
-//		if (bc && bc->GetSize().x > 0.0f) {
-//			collisionManager_->AddCollider(bc.get());
-//#ifdef _DEBUG
-//			OBB o = {};
-//			o.center = bc->GetWorldPosition();
-//			const Vector3* ors = bc->GetOrientations();
-//			for (int i=0;i<3;++i) o.orientations[i] = ors[i];
-//			o.size = bc->GetSize();
-//			debugRenderer_->AddBox(o, {0.0f,1.0f,0.0f,0.25f});
-//#endif
-//		}
-//	}
 
 #ifdef _DEBUG
     debugRenderer_->AddSphere(player_->GetSphereData());
