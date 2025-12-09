@@ -59,7 +59,7 @@ void Wall::Initialilze(const Transform& transform, float respawnTime, int32_t ma
 
 void Wall::Update() {
 #ifdef _DEBUG
-	ApplyDebugParam();
+	//ApplyDebugParam();
 #endif
 
 	if (currentHp_ <= 0) {
@@ -73,9 +73,9 @@ void Wall::Update() {
 	respawnTimer_ += FpsCounter::deltaTime / respawnTime_;
 
 	if (respawnTimer_ >= 0.5f) {
-		//float localT = (respawnTimer_ - 0.5f) / 0.5f;
-		//float alpha = Lerp(0.0f, 1.0f, EaseIn(localT));
-		//material_.SetColor({ 0.8f,0.8f,0.8f,alpha });
+		float localT = (respawnTimer_ - 0.5f) / 0.5f;
+		float alpha = Lerp(0.0f, 0.6f, EaseIn(localT));
+		iceMaterial_->materialData_->color.w = alpha;
 	}
 
 	// リスポーン時間を超えたら、復活する
@@ -83,7 +83,7 @@ void Wall::Update() {
 		isAlive_ = true;
 		respawnTimer_ = 0.0f;
 		currentHp_ = maxHp_;
-		//material_.SetColor({ 0.8f,0.8f,0.8f,1.0f });
+		iceMaterial_->materialData_->color.w = 0.6f;
 		// 壁の状態に応じてステータスを変更する
 		ChangeWallState();
 	}
@@ -137,7 +137,7 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 
 	if (currentHp_ <= 0) {
 		currentHp_ = 0;
-		//material_.SetColor({ 0.8f,0.8f,0.8f,0.0f });
+		iceMaterial_->materialData_->color.w = 0.0f;
 		isBreakParticleActive_ = true;
 		// 誰が破壊するかによって状態を変える
 		wallState_ = WallState::Normal;
