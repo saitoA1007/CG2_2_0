@@ -443,6 +443,13 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// クリアUI
 	clearUI_ = std::make_unique<ClearUI>();
 	clearUI_->Initialize(context_->inputCommand, context_->textureManager);
+	clearUI_->SetBackTitle([this]() {
+		nextSceneState_ = SceneState::TDGame;
+		TDGameScene::SetIsFirstGameStart(true);
+		AudioManager::GetInstance().Stop(titleBGMHandle_);
+		AudioManager::GetInstance().Stop(gameBGMHandle_);
+		isFinished_ = true;
+	});
 
 	// ボスの撃破時のフェード
 	bossDestroyFade_ = std::make_unique<BossDestroyFade>();

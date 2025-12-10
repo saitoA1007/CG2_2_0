@@ -1,5 +1,6 @@
 #include"ClearUI.h"
 #include"GameParamEditor.h"
+#include"AudioManager.h"
 using namespace GameEngine;
 
 void ClearUI::Initialize(GameEngine::InputCommand* inputCommand, GameEngine::TextureManager* textureManager) {
@@ -15,6 +16,9 @@ void ClearUI::Initialize(GameEngine::InputCommand* inputCommand, GameEngine::Tex
 
 	// 背景画像
 	bgSprite_ = Sprite::Create({ 0.0f,0.0f }, { 1280.0f,720.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,0.0f,0.5f });
+
+	// 選択音声を取得
+	selectSH_ = AudioManager::GetInstance().GetHandleByName("Select.png");
 
 #ifdef _DEBUG
 	RegisterBebugParam();
@@ -32,6 +36,7 @@ void ClearUI::Update() {
 	if (inputCommand_->IsCommandActive("Start")) {
 		// タイトルに戻る
 		if (backTitle_) {
+			AudioManager::GetInstance().Play(selectSH_, 0.8f, false);
 			backTitle_();
 		}
 	}

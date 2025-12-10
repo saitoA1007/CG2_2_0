@@ -45,6 +45,9 @@ private:
 
 	bool isActive_ = false;
 
+	// 選択音声
+	uint32_t selectSH_ = 0;
+
 	// 戻る
 	std::function<void()> backTitle_ = nullptr;
 
