@@ -78,9 +78,13 @@ private:
 	Vector2 titlePos_ = {640.0f, 488.0f};
 	Vector2 titleSize_ = {500.0f, 80.0f};
 
-	// ホバー判定フラグ
+	// ホバー判定フラグ（毎フレーム計算）
 	bool isHoverRetry_ = false;
 	bool isHoverTitle_ = false;
+
+	// マウス以外の選択状態（保持用）
+	bool kbSelectRetry_ = true;
+	bool kbSelectTitle_ = false;
 
 	// クリックコールバック
 	std::function<void()> onRetryClicked_ = nullptr;

@@ -73,7 +73,7 @@ void BossStateIn::Update() {
         timer_ += FpsCounter::deltaTime / waitTime_;
 		bossContext_.animationTimer = timer_;
 
-		if (timer_ >= waitTime_) {
+		if (timer_ >= 1.0f) {
 			bossContext_.bossStateRequest_ = BossState::Battle;
 		}
 	}

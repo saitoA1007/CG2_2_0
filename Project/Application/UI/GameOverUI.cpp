@@ -57,7 +57,7 @@ void GameOverUI::HandleInput() {
         return (p.x >= min.x && p.x <= max.x && p.y >= min.y && p.y <= max.y);
     };
 
-    // ホバー判定
+    // ホバー判定（毎フレーム再計算）
     isHoverRetry_ = isInRect(retryPos_, retrySize_, mousePos);
     isHoverTitle_ = isInRect(titlePos_, titleSize_, mousePos);
 
@@ -69,6 +69,41 @@ void GameOverUI::HandleInput() {
             onRetryClicked_();
         }
         if (isHoverTitle_ && onTitleClicked_) {
+            onTitleClicked_();
+        }
+    }
+
+    // マウスがボタンに重なっている際はマウス選択を優先して保持
+    bool mouseSelectingRetry = isHoverRetry_;
+    bool mouseSelectingTitle = isHoverTitle_;
+
+    // キーボード/パッド入力（マウスがどちらにも重なっていない場合のみ更新）
+    if (!mouseSelectingRetry && !mouseSelectingTitle && inputCommand_) {
+        if (inputCommand_->IsCommandActive("Up")) {
+            kbSelectRetry_ = true;
+            kbSelectTitle_ = false;
+        }
+        if (inputCommand_->IsCommandActive("Down")) {
+            kbSelectRetry_ = false;
+            kbSelectTitle_ = true;
+        }
+    }
+
+    // 現在の選択状態（マウス優先、なければキーボード/パッド）
+    bool currentSelectRetry = mouseSelectingRetry ? true : kbSelectRetry_;
+    bool currentSelectTitle = mouseSelectingTitle ? true : kbSelectTitle_;
+
+    // ボタンの色を選択状態に応じて変更
+    const Vector4 colorSelected = { 1.0f, 1.0f, 1.0f, 1.0f };
+    const Vector4 colorUnselected = { 0.25f, 0.25f, 0.25f, 1.0f };
+    if (retrySprite_) { retrySprite_->SetColor(currentSelectRetry ? colorSelected : colorUnselected); }
+    if (titleSprite_) { titleSprite_->SetColor(currentSelectTitle ? colorSelected : colorUnselected); }
+
+    // Start 決定
+    if (inputCommand_ && inputCommand_->IsCommandActive("Start")) {
+        if (currentSelectRetry && onRetryClicked_) {
+            onRetryClicked_();
+        } else if (currentSelectTitle && onTitleClicked_) {
             onTitleClicked_();
         }
     }
@@ -87,6 +122,14 @@ void GameOverUI::SetActive(bool active) {
         if (logoSprite_) logoSprite_->SetPosition({ 640.0f, 180.0f });
         if (retrySprite_) retrySprite_->SetPosition(retryPos_);
         if (titleSprite_) titleSprite_->SetPosition(titlePos_);
+        // 選択状態も初期化
+        kbSelectRetry_ = true;
+        kbSelectTitle_ = false;
+        // 色も初期化（Retry選択）
+        const Vector4 colorSelected = { 1.0f, 1.0f, 1.0f, 1.0f };
+        const Vector4 colorUnselected = { 0.1f, 0.1f, 0.1f, 1.0f };
+        if (retrySprite_) { retrySprite_->SetColor(colorSelected); }
+        if (titleSprite_) { titleSprite_->SetColor(colorUnselected); }
     } else {
         isActive_ = active;
     }
@@ -97,6 +140,7 @@ void GameOverUI::StartActivateAnimation() {
     activateAnimTimer_ = 0.0f;
     // 初期位置設定
     if (bgSprite_) bgSprite_->SetPosition({ 640.0f, 0.0f });
+    if (logoSprite_) bgSprite_->SetPosition({ 640.0f, 0.0f });
     if (logoSprite_) logoSprite_->SetPosition({ 640.0f, -128.0f });
     if (retrySprite_) retrySprite_->SetPosition({ -640.0f, retryPos_.y });
     if (titleSprite_) titleSprite_->SetPosition({ -640.0f, titlePos_.y });

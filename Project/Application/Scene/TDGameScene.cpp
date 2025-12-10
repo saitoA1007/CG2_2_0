@@ -674,7 +674,7 @@ void TDGameScene::Update() {
 	sceneLightingController_->Update();
 
 	// プレイヤーの更新処理
-	if (isTitleLocked_ || bossIntroPlaying_ || bossOutroPlaying_) {
+	if (isTitleLocked_ || bossIntroPlaying_ || bossOutroPlaying_ || !player_->IsAlive()) {
 		player_->Update(nullptr, cameraController_->GetCamera());
 	} else {
 		player_->Update(context_->inputCommand, cameraController_->GetCamera());
@@ -1227,8 +1227,8 @@ void TDGameScene::DrawUI() {
 	// Startゲーム開始（EnterキーまたはAボタン）
     context_->inputCommand->RegisterCommand("Start", { {InputState::KeyTrigger, DIK_RETURN}, {InputState::PadTrigger, XINPUT_GAMEPAD_A},{InputState::KeyTrigger, DIK_SPACE}, {InputState::MouseTrigger, 0} });
 	// メニュー移動
-	context_->inputCommand->RegisterCommand("Up", { {InputState::KeyTrigger, DIK_UP}, {InputState::PadTrigger, XINPUT_GAMEPAD_DPAD_UP} });
-	context_->inputCommand->RegisterCommand("Down", { {InputState::KeyTrigger, DIK_DOWN}, {InputState::PadTrigger, XINPUT_GAMEPAD_DPAD_DOWN} });
+	context_->inputCommand->RegisterCommand("Up", { {InputState::KeyTrigger, DIK_W},{InputState::KeyTrigger, DIK_UP}, {InputState::PadTrigger, XINPUT_GAMEPAD_DPAD_UP} });
+	context_->inputCommand->RegisterCommand("Down", { {InputState::KeyTrigger, DIK_S},{InputState::KeyTrigger, DIK_DOWN}, {InputState::PadTrigger, XINPUT_GAMEPAD_DPAD_DOWN} });
 	// バック/終了
 	context_->inputCommand->RegisterCommand("Back", { {InputState::KeyTrigger, DIK_ESCAPE}, {InputState::PadTrigger, XINPUT_GAMEPAD_B} });
 }
