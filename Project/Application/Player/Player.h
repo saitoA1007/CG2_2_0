@@ -216,6 +216,8 @@ private:
     float kAttackDownDistanceToMax_ = 5.0f;
     // 以前の速度ベース計算を使うフラグ
     bool useSpeedBasedAttackDown_ = false;
+    // 急降下準備中の上昇量
+    float kAttackDownPrepareRise_ = 4.0f;
 
     // 回転補間速度（ラジアン / 秒）
     float kRotationLerpSpeed_ = 10.0f;

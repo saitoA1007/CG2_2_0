@@ -96,7 +96,7 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
         float half = attackDownPrepareTotal_ * 0.5f;
         if (attackDownPrepareTimer_ <= half && half > 0.0f) {
             float t = std::clamp(attackDownPrepareTimer_ / half, 0.0f, 1.0f);
-            float yOffset = EaseOutCubic(0.0f, 2.0f, t);
+            float yOffset = EaseOutSine(0.0f, kAttackDownPrepareRise_, t);
             worldTransform_.transform_.translate.y = attackDownPrepareStartY_ + yOffset;
         }
         // 準備完了で急降下開始
@@ -913,7 +913,6 @@ void Player::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceStrengthLevel3", kWallBounceStrengthLevel3_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceMinSpeedFactor", kWallBounceMinSpeedFactor_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceMaxSpeedFactor", kWallBounceMaxSpeedFactor_);
-    // New: reflect factor parameters for different collision types
     GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "WallBounceReflectFactor", kWallBounceReflectFactor_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "IceWallBounceReflectFactor", kIceWallBounceReflectFactor_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[2], "BossBounceReflectFactor", kBossBounceReflectFactor_);
@@ -926,6 +925,7 @@ void Player::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownMaxPower", kAttackDownMaxPower_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownDistanceToMax", kAttackDownDistanceToMax_);
     GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "UseSpeedBasedAttackDown", useSpeedBasedAttackDown_);
+    GameParamEditor::GetInstance()->AddItem(kGroupNames[3], "AttackDownPrepareRise", kAttackDownPrepareRise_);
 
 	// Audio 設定 (Player-Audio)
 	GameParamEditor::GetInstance()->AddItem(kGroupNames[4], "PlayerDamagedVolume", audioVolume_PlayerDamaged_);
@@ -978,7 +978,6 @@ void Player::ApplyDebugParam() {
 	kWallBounceStrengthLevel3_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceStrengthLevel3");
     kWallBounceMinSpeedFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceMinSpeedFactor");
     kWallBounceMaxSpeedFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceMaxSpeedFactor");
-    // New: reflect factors
     kWallBounceReflectFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "WallBounceReflectFactor");
     kIceWallBounceReflectFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "IceWallBounceReflectFactor");
     kBossBounceReflectFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[2], "BossBounceReflectFactor");
@@ -991,6 +990,7 @@ void Player::ApplyDebugParam() {
 	kAttackDownMaxPower_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackDownMaxPower");
     kAttackDownDistanceToMax_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackDownDistanceToMax");
     useSpeedBasedAttackDown_ = GameParamEditor::GetInstance()->GetValue<bool>(kGroupNames[3], "UseSpeedBasedAttackDown");
+    kAttackDownPrepareRise_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[3], "AttackDownPrepareRise");
 
 	// Audio パラメータ取得
 	audioVolume_PlayerDamaged_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[4], "PlayerDamagedVolume");
