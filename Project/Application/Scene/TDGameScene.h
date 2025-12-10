@@ -292,6 +292,13 @@ private:
     static inline constexpr float kBossIntroDuration_ = 8.0f;
     static inline constexpr float kBossIntroStartDelay_ = 0.5f;
 
+    // ボス撃破時アニメーション制御（登場時演出に準拠）
+    bool bossOutroPlaying_ = false;           // 再生中フラグ
+    bool bossOutroScheduled_ = false;         // 予約フラグ
+    float bossOutroTimer_ = 0.0f;             // 再生時間
+    static inline constexpr float kBossOutroDuration_ = 8.0f; // 秒
+    static inline constexpr float kBossOutroStartDelay_ = 0.5f; // 秒
+
 	/// <summary>
 	/// 入力のコマンドを設定する
 	/// </summary>

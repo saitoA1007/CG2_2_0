@@ -491,7 +491,7 @@ void TDGameScene::Update() {
 			bossIntroDelayTimer_ = 0.0f;
 			bossIntroPlaying_ = false;
 			bossIntroTimer_ = 0.0f;
-			bossIntroDelayAfterFreeze_ = false; // フリーズ中は開始しない
+			bossIntroDelayAfterFreeze_ = false;
 		}
 		if (cameraController_) {
 			cameraController_->SetDesiredFov(1.0f);
@@ -555,8 +555,12 @@ void TDGameScene::Update() {
 		}
 	}
 
-	// 登場演出の再生
+	//==================================================
+	// ボス登場時演出処理
+    //==================================================
+
 	if (bossIntroPlaying_) {
+		float prev = bossIntroTimer_;
 		bossIntroTimer_ += GameEngine::FpsCounter::deltaTime;
 		if (bossEnemy_->GetBossState() == BossState::Egg && bossIntroTimer_ >= 1.0f) bossEnemy_->SetBossStateIn();
 
@@ -568,17 +572,28 @@ void TDGameScene::Update() {
 		// Euler未指定でLookAtを使用（即時反映）
 		Vector3 euler = { 0.0f, 0.0f, 0.0f };
 		float fov = 1.0f; // 演出用にやや広角
-		cameraController_->ApplyImmediateView(eye, center, euler, fov);
-		mainCamera_->SetCamera(cameraController_->GetCamera());
 
 		// Egg状態でタイマーが1.0f到達時に氷柱破壊パーティクルを発生させる（1回のみ）
 		if (bossEnemy_->GetBossState() == BossState::Egg) {
-            float prev = bossIntroTimer_ - GameEngine::FpsCounter::deltaTime;
             if (prev < 1.0f && bossIntroTimer_ >= 1.0f) {
                 enemyAttackManager_->AddEnemyDestroyEffect(bossPos);
+                enemyAttackManager_->AddEnemyDestroyEffect(center);
             }
         }
+		
+		//--------- ボスが上に上がりきったとき ---------//
+		if (bossIntroTimer_ >= 3.0f) {
+            eye = { 0.0f, 10.0f, -30.0f };
+		}
+		cameraController_->ApplyImmediateView(eye, center, euler, fov);
+		if (bossIntroTimer_ >= 4.0f && prev < 4.0f) {
+			cameraController_->StartCameraShake(2.0f, 2.0f, 64.0f,
+				[](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutCubic(a, b, t); },
+				CameraController::ShakeOrigin::TargetPosition,
+                true, true, true, false);
+		}
 
+		//--------- アニメーション終了 ---------//
         if (bossIntroTimer_ >= kBossIntroDuration_ && bossEnemy_->GetBossState() == BossState::Battle) {
 			bossIntroPlaying_ = false;
 			bossIntroTimer_ = 0.0f;
@@ -589,6 +604,59 @@ void TDGameScene::Update() {
 				letterboxEndHeight_ = 0.0f;
 			}
 		}
+
+		mainCamera_->SetCamera(cameraController_->GetCamera());
+	}
+
+	//==================================================
+    // ボス撃破時演出処理
+    //==================================================
+
+	// 撃破時演出開始ディレイ処理
+	if (bossOutroScheduled_ && !bossOutroPlaying_) {
+		// レターボックスを表示開始
+		if (letterbox_) {
+			letterboxAnimTimer_ = 0.0f;
+			letterboxStartHeight_ = letterboxEndHeight_;
+			letterboxEndHeight_ = 64.0f;
+		}
+		bossOutroTimer_ = 0.0f;
+		bossOutroPlaying_ = true;
+		bossOutroScheduled_ = false;
+	}
+
+	// 撃破時演出の再生
+	if (bossOutroPlaying_) {
+		[[maybe_unused]] float prev = bossOutroTimer_;
+		bossOutroTimer_ += GameEngine::FpsCounter::deltaTime;
+
+		// カメラをボス位置へズームアウトするような動き
+		Vector3 bossPos = bossEnemy_->GetWorldTransform().GetWorldPosition();
+		Vector3 eye = { 0.0f, 6.0f, -20.0f };
+		Vector3 center = bossPos;
+		center.y += 4.0f;
+		Vector3 euler = { 0.0f, 0.0f, 0.0f };
+		float fov = 1.0f;
+
+		if (bossOutroTimer_ >= 2.0f) {
+			// 少し引きの画に移行
+			eye = { 0.0f, 12.0f, -28.0f };
+			//fov = 0.7f;
+		}
+		cameraController_->ApplyImmediateView(eye, center, euler, fov);
+
+		//if (bossOutroTimer_ >= kBossOutroDuration_) {
+		//	bossOutroPlaying_ = false;
+		//	bossOutroTimer_ = 0.0f;
+		//	// レターボックスを閉じる
+		//	if (letterbox_) {
+		//		letterboxAnimTimer_ = 0.0f;
+		//		letterboxStartHeight_ = letterboxEndHeight_;
+		//		letterboxEndHeight_ = 0.0f;
+		//	}
+		//}
+
+		mainCamera_->SetCamera(cameraController_->GetCamera());
 	}
 
 	// デバックリストを削除
@@ -813,6 +881,7 @@ void TDGameScene::Update() {
 		if (!isBossDestroyFade_) {
 			bossDestroyFade_->SetActive();
 			isBossDestroyFade_ = true;
+			bossOutroScheduled_ = true;
 		}
 	}
 	// フェードが有効中の時、中間に来ていればリセットする
