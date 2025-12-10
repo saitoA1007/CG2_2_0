@@ -243,6 +243,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::IceBreath)] = context_->animationManager->GetNameByAnimations("BossBird.IceBreath");
 	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::Rush)] = context_->animationManager->GetNameByAnimations("BossBirdRush");
 	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::Scream)] = context_->animationManager->GetNameByAnimations("BossBirdScream");
+	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::Death)] = context_->animationManager->GetNameByAnimations("ShootDown_Animation");
 
 	// ボスのアニメーションの再生を管理する
 	bossEnemyAnimator_ = std::make_unique<Animator>();
