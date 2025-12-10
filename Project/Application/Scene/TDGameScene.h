@@ -289,6 +289,14 @@ private:
     uint32_t bossLockOnSEHandle_ = 0;
 	// ボスアンロック音
     uint32_t bossUnlockSEHandle_ = 0;
+    // ボス卵ダメージ音
+    uint32_t bossEggDamageSEHandle_ = 0;
+	// ボス卵ひび割れ音
+    uint32_t bossEggCrackSEHandle_ = 0;
+	// ボス卵破壊音
+    uint32_t bossEggBreakSEHandle_ = 0;
+	// ボス咆哮音
+    uint32_t bossScreamSEHandle_ = 0;
 
 private:
 

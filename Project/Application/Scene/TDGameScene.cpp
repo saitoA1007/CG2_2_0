@@ -454,6 +454,10 @@ void TDGameScene::Initialize(SceneContext* context) {
     selectSEHandle_ = AudioManager::GetInstance().GetHandleByName("Select.mp3");
     bossLockOnSEHandle_ = AudioManager::GetInstance().GetHandleByName("Camera_In.mp3");
     bossUnlockSEHandle_ = AudioManager::GetInstance().GetHandleByName("Camera_Out.mp3");
+    bossEggDamageSEHandle_ = AudioManager::GetInstance().GetHandleByName("Egg_Damaged.mp3");
+    bossEggCrackSEHandle_ = AudioManager::GetInstance().GetHandleByName("Egg_Clack_02.mp3");
+    bossEggBreakSEHandle_ = AudioManager::GetInstance().GetHandleByName("Egg_Clack.mp3");
+    bossScreamSEHandle_ = AudioManager::GetInstance().GetHandleByName("Scream.mp3");
     AudioManager::GetInstance().Play(titleBGMHandle_, 0.5f, true);
 
 	// 初回実行フラグを解除
@@ -508,6 +512,8 @@ void TDGameScene::Update() {
 			bossIntroPlaying_ = false;
 			bossIntroTimer_ = 0.0f;
 			bossIntroDelayAfterFreeze_ = false;
+            AudioManager::GetInstance().Play(bossEggCrackSEHandle_, 0.5f, false);
+            AudioManager::GetInstance().Play(bossEggDamageSEHandle_, 0.5f, false);
 		}
 		if (cameraController_) {
 			cameraController_->SetDesiredFov(1.0f);
@@ -597,6 +603,7 @@ void TDGameScene::Update() {
             if (prev < 1.0f && bossIntroTimer_ >= 1.0f) {
                 enemyAttackManager_->AddEnemyDestroyEffect(bossPos);
                 enemyAttackManager_->AddEnemyDestroyEffect(center);
+                AudioManager::GetInstance().Play(bossEggBreakSEHandle_, 0.5f, false);
             }
         }
 		
@@ -610,6 +617,7 @@ void TDGameScene::Update() {
 				[](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutCubic(a, b, t); },
 				CameraController::ShakeOrigin::TargetPosition,
                 true, true, true, false);
+            AudioManager::GetInstance().Play(bossScreamSEHandle_, 0.5f, false);
 		}
 
 		//--------- アニメーション終了 ---------//
@@ -728,7 +736,7 @@ void TDGameScene::Update() {
 			if (context_->inputCommand->IsCommandActive("LockOnBoss")) {
 				isBossLockOn_ = !isBossLockOn_;
 				if (isBossLockOn_) {
-					AudioManager::GetInstance().Play(bossLockOnSEHandle_, 0.5f, false);
+					AudioManager::GetInstance().Play(bossLockOnSEHandle_, 0.25f, false);
 				} else {
 					AudioManager::GetInstance().Play(bossUnlockSEHandle_, 0.5f, false);
                 }

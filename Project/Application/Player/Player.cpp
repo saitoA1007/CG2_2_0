@@ -50,6 +50,7 @@ void Player::Initialize(GameEngine::Animator *animator, const std::array<std::ma
 	audioHandle_RushLv3_ = AudioManager::GetInstance().GetHandleByName("Rush_lv3.mp3");
 	audioHandle_AirMotion_ = AudioManager::GetInstance().GetHandleByName("airMotion.mp3");
 	audioHandle_Reflect_ = AudioManager::GetInstance().GetHandleByName("Reflect.mp3");
+    audioHandle_Landing_ = AudioManager::GetInstance().GetHandleByName("landing.mp3");
 
 	// 初期アニメーションをセット
 	if (animator_) {
@@ -815,6 +816,7 @@ void Player::OnCollision(const CollisionResult &result) {
             worldTransform_.transform_.translate.y = collider_->GetRadius() / 2.0f;
 			if (isAttackDown_ && onLandHit_) {
 				onLandHit_();
+                AudioManager::GetInstance().Play(audioHandle_Landing_, 0.5f, false);
 			}
 		}
 		

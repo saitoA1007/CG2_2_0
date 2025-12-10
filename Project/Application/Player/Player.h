@@ -350,6 +350,7 @@ private:
 	uint32_t audioHandle_RushLv3_ = 0;
 	uint32_t audioHandle_AirMotion_ = 0;
 	uint32_t audioHandle_Reflect_ = 0;
+    uint32_t audioHandle_Landing_ = 0;
 
 	// 各音声の再生音量（0.0 - 1.0）
 	float audioVolume_PlayerDamaged_ = 1.0f;
