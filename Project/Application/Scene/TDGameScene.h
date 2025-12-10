@@ -44,6 +44,7 @@
 #include"Application/UI/ClearUI.h"
 #include"Application/UI/BossDestroyFade.h"
 #include"Application/UI/TutorialUI.h"
+#include"Application/UI/ArrowUI.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -270,6 +271,9 @@ private:
 
 	// ゲームオーバーUI
 	std::unique_ptr<GameOverUI> gameOverUI_;
+
+	// 矢印
+	std::unique_ptr<ArrowUI> arrowUI_;
 
     // 初のゲーム開始かどうかのフラグ
     static inline bool sIsFirstGameStart_ = true;

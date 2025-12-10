@@ -508,6 +508,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// 初回実行フラグを解除
 	TDGameScene::SetIsFirstGameStart(false);
 
+	// 矢印
+	arrowUI_ = std::make_unique<ArrowUI>();
+	arrowUI_->Initialize(context_->textureManager->GetHandleByName("Mark.png"));
+
     // UI初期状態
     uiDisabledForIntro_ = false;
     prevBossIntroPlaying_ = false;
@@ -1041,6 +1045,18 @@ void TDGameScene::Update() {
 	}
 	clearUI_->Update();
 
+	// 矢印UI
+	if (bossEnemy_->Isnow() && !isTitleLocked_) {
+		arrowUI_->SetIsActive(true);
+	} else {
+		arrowUI_->SetIsActive(false);
+	}
+	
+	if (arrowUI_->IsActive()) {
+		arrowUI_->Update(mainCamera_->GetWorldMatrix());
+	}
+	
+
 #ifdef _DEBUG
 	// 地面マテリアルの更新処理
 	terrain_->Update();
@@ -1214,6 +1230,10 @@ void TDGameScene::Draw(const bool &isDebugView) {
 				ModelRenderer::Draw(planeModel_, world, &effect->GetMaterial());
 			}
 		}
+	}
+
+	if (arrowUI_->IsActive()) {
+		ModelRenderer::Draw(planeModel_, *arrowUI_->GetWorldTransform(), &arrowUI_->GetMaterial());
 	}
 
 	// プレイヤーの攻撃演出を描画

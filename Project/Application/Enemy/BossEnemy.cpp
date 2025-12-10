@@ -124,7 +124,7 @@ void BossEnemy::Update(const Vector3& targetPos) {
     // 氷柱の発射をする
     if (bossContext_.isActiveIceFall) {
         enemyAttackManager_->CreateIceFallPositions(bossContext_.waitIceFallMaxTime);
-        //enemyAttackManager_->SetIsRoat(true);
+        enemyAttackManager_->SetIsRoat(true);
     }
 
     // 現在の氷柱の数を取得する

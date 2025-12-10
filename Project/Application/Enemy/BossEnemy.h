@@ -102,6 +102,10 @@ public:
 
 	bool IsStopBGm() const { return bossContext_.isStopBgm_; }
 
+	bool Isnow() {
+		return bossState_ == BossState::Egg;
+	}
+
 private: // 調整項目
 	
 	// 最大体力

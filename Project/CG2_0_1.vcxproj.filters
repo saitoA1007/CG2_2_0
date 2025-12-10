@@ -317,6 +317,7 @@
     <ClCompile Include="Application\Enemy\Effect\EnterWingsParticle.cpp" />
     <ClCompile Include="Application\Enemy\Effect\EnterBurstWingsParticle.cpp" />
     <ClCompile Include="Application\UI\TutorialUI.cpp" />
+    <ClCompile Include="Application\UI\ArrowUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -639,6 +640,7 @@
     <ClInclude Include="Application\Enemy\Effect\EnterWingsParticle.h" />
     <ClInclude Include="Application\Enemy\Effect\EnterBurstWingsParticle.h" />
     <ClInclude Include="Application\UI\TutorialUI.h" />
+    <ClInclude Include="Application\UI\ArrowUI.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

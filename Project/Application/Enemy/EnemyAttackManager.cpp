@@ -279,10 +279,10 @@ void EnemyAttackManager::RoatUpdate() {
 
     if (roatTimer_ <= 0.5f) {
         float localT = roatTimer_ / 0.5f;
-        postEffectManager_->radialBlurResource_.GetData()->blurWidth = Lerp(0.0f, -0.06f, EaseOutBounce(localT));
+        postEffectManager_->radialBlurResource_.GetData()->blurWidth = Lerp(0.0f, -0.04f, EaseOutBounce(localT));
     } else {
         float localT = (roatTimer_ - 0.5f) / 0.5f;
-        postEffectManager_->radialBlurResource_.GetData()->blurWidth = Lerp(-0.06f, 0.0f, EaseOutBounce(localT));
+        postEffectManager_->radialBlurResource_.GetData()->blurWidth = Lerp(-0.04f, 0.0f, EaseOutBounce(localT));
     }
 
     if (roatTimer_ >= 1.0f) {
