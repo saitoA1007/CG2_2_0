@@ -401,6 +401,12 @@ void TDGameScene::Initialize(SceneContext* context) {
 	airParticle_->Initialize("AirParticle", 128);
 	airParticle_->Emit({ 0.0f,0.0f,0.0f });
 
+	// プレイヤーの回復演出
+	playerGetHeartParticle_ = std::make_unique<ParticleBehavior>();
+	playerGetHeartParticle_->Initialize("PlayerHeartParticle", 16);
+	playerGetHeartParticle_->Emit({ 10.0f,-10.0f,0.0f });
+	playerGetHeartParticle_->SetIsLoop(false);
+
 	transitionStartTarget_ = Vector3{ 0.0f,32.0f,0.0f };
 	transitionEndTarget_ = player_ ? player_->GetWorldTransform().GetWorldPosition() : transitionStartTarget_;
 
@@ -722,6 +728,16 @@ void TDGameScene::Update() {
     playerAttackDownEffect_->Update();
 	playerAttackEffect_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 	playerLandingEffect_->Update();
+
+	// 回復演出
+	if (player_->IsHearted()) {
+		// プレイヤーの回復演出
+		playerGetHeartParticle_->SetEmitterPos(player_->GetPlayerPos() + Vector3(0.0f, 1.0f, 0.0f));
+		playerGetHeartParticle_->SetIsLoop(true);
+	} else {
+		playerGetHeartParticle_->SetIsLoop(false);
+	}
+	playerGetHeartParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
 	// プレイヤーの攻撃力に応じてAttackDownエフェクトの透明度を設定
 	if (player_ && playerAttackDownEffect_) {
@@ -1177,6 +1193,9 @@ void TDGameScene::Draw(const bool &isDebugView) {
 
 	// 空気を演出するためのパーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, airParticle_->GetCurrentNumInstance(), *airParticle_->GetWorldTransforms());
+
+	// プレイヤーの回復演出
+	ModelRenderer::DrawInstancing(planeModel_, playerGetHeartParticle_->GetCurrentNumInstance(), *playerGetHeartParticle_->GetWorldTransforms());
 
 #ifdef _DEBUG
 

@@ -1,0 +1,100 @@
+{
+    "PlayerHeartParticle": {
+        "ColorRange": {
+            "Max": [
+                1.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "Min": [
+                0.970588207244873,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "EndAlpha": 0.0,
+        "EndColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        ],
+        "EndSize": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "FieldAcceleration": [
+            0.0,
+            4.190000057220459,
+            0.0
+        ],
+        "IsBillBoard": true,
+        "IsEnableAlphaOverLifeTime": false,
+        "IsEnableColorOverLifeTime": false,
+        "IsEnableRotateZFromVelocity": true,
+        "IsEnableScaleXYZActive": false,
+        "IsEnableSizeOverLifeTime": true,
+        "IsEnableVelocityFromPosition": true,
+        "IsLoop": false,
+        "LifeTime": 2.0,
+        "MaxVelocity": 3.5,
+        "MinVelocity": 1.5,
+        "RotateRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "ScaleRange": {
+            "Max": [
+                2.0,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "SceneName": "TDGameScene",
+        "SpawnCoolTime": 0.0,
+        "SpawnMaxCount": 16,
+        "SpawnRange": {
+            "Max": [
+                0.5,
+                0.5,
+                -0.5
+            ],
+            "Min": [
+                -0.5,
+                -0.5,
+                -0.5
+            ]
+        },
+        "Textures": {
+            "PlayerHP.png": 57
+        },
+        "VelocityRange": {
+            "Max": [
+                0.0,
+                -0.8600000143051147,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                -0.8600000143051147,
+                0.0
+            ]
+        }
+    }
+}

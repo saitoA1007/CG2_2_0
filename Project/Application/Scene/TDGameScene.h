@@ -248,6 +248,9 @@ private:
 	// 空気を演出するためのパーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> airParticle_;
 
+	// プレイヤーの回復演出
+	std::unique_ptr<GameEngine::ParticleBehavior> playerGetHeartParticle_;
+
 	// 仮の操作方法UI
 	std::unique_ptr<GameEngine::Sprite> playGuideSprite_;
 	uint32_t playGuideGH_ = 0;
