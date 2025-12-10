@@ -372,7 +372,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// プレイヤーのhpUIを初期化 (仮の最大HP: 3)
 	playerHpUI_ = std::make_unique<PlayerHpUI>();
-    playerHpUI_->Initialize(player_->GetMaxHP());
+    playerHpUI_->Initialize(player_->GetMaxHP(), context_->textureManager);
 
 	// ゲームオーバーUIの初期化
 	gameOverUI_ = std::make_unique<GameOverUI>();
@@ -994,7 +994,7 @@ void TDGameScene::DrawUI() {
 
 	// プレイヤーのHPUIを表示
     for (const auto &sprite : playerHpUI_->GetHpSprites()) {
-		SpriteRenderer::Draw(sprite.get(), 0);
+        SpriteRenderer::Draw(sprite.get(), playerHpUI_->GetHpIconGH());
     }
 
 	// GameOverUI描画

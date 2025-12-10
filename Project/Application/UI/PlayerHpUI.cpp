@@ -3,7 +3,7 @@
 #include"FPSCounter.h"
 using namespace GameEngine;
 
-void PlayerHpUI::Initialize(const int32_t& maxHp) {
+void PlayerHpUI::Initialize(const int32_t &maxHp, GameEngine::TextureManager *textureManager) {
 
     maxHp_ = maxHp;
     currentHp_ = maxHp_;
@@ -17,6 +17,8 @@ void PlayerHpUI::Initialize(const int32_t& maxHp) {
         auto sprite = Sprite::Create(pos, iconSize_, { 0.0f,0.0f }, { 1.0f,1.0f,1.0f,1.0f });
         hpSprites_.push_back(std::move(sprite));
     }
+    // HPアイコンのテクスチャハンドルを取得
+    hpIconGH_ = textureManager->GetHandleByName("PlayerHP.png");
 }
 
 void PlayerHpUI::Update() {
