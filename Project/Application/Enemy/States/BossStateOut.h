@@ -55,6 +55,8 @@ private:
 
 	Phase phase_ = Phase::In;
 
+	uint32_t sh_ = 0;
+
 private:
 
 	/// <summary>

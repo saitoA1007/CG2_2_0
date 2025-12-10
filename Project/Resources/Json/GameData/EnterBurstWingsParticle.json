@@ -1,6 +1,6 @@
 {
     "EnterBurstWingsParticle": {
-        "LifeTime": 3.0,
+        "LifeTime": 5.0,
         "ScaleYMax": 2.0,
         "ScaleYMin": 1.0,
         "SceneName": "TDGameScene",
