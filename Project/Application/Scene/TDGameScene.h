@@ -45,6 +45,7 @@
 #include"Application/UI/BossDestroyFade.h"
 #include"Application/UI/TutorialUI.h"
 #include"Application/UI/ArrowUI.h"
+#include"Application/UI/BossAppearanceUI.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -380,4 +381,6 @@ private:
 
     // UIフェードアルファ（タイトルロゴ非表示に合わせて0->1）
     float uiFadeAlpha_ = 0.0f;
+
+	std::unique_ptr<BossAppearanceUI> bossAppearanceUI_;
 };

@@ -516,6 +516,11 @@ void TDGameScene::Initialize(SceneContext* context) {
     uiDisabledForIntro_ = false;
     prevBossIntroPlaying_ = false;
     uiPostIntroFadeTimer_ = 0.0f;
+
+    // BossAppearanceUI を初期化して非アクティブで保持
+    bossAppearanceUI_ = std::make_unique<BossAppearanceUI>();
+    bossAppearanceUI_->Initialize(context_->textureManager);
+    bossAppearanceUI_->SetActive(false);
 }
 
 void TDGameScene::Update() {
@@ -694,6 +699,8 @@ void TDGameScene::Update() {
 				CameraController::ShakeOrigin::TargetPosition,
                 true, true, true, false);
             AudioManager::GetInstance().Play(bossScreamSEHandle_, 0.5f, false);
+            // BossAppearanceUIを有効化
+            if (bossAppearanceUI_) { bossAppearanceUI_->SetActive(true); }
 		}
 
 		//--------- アニメーション終了 ---------//
@@ -1067,6 +1074,11 @@ void TDGameScene::Update() {
 	if (tutorialUI_) {
 		for (auto &spr : tutorialUI_->GetSprites()) { spr->Update(); }
 	}
+
+    // BossAppearanceUI 更新
+    if (bossAppearanceUI_ && bossAppearanceUI_->IsActive()) {
+        bossAppearanceUI_->Update();
+    }
 }
 
 void TDGameScene::Draw(const bool &isDebugView) {
@@ -1373,6 +1385,13 @@ void TDGameScene::DrawUI() {
     // 撃破フェード
     if (bossDestroyFade_->IsActive()) {
         SpriteRenderer::Draw(bossDestroyFade_->GetSprite(), 0);
+    }
+
+    // BossAppearanceUI の描画
+    if (bossAppearanceUI_ && bossAppearanceUI_->IsActive()) {
+        SpriteRenderer::Draw(bossAppearanceUI_->GetBossTitleSprite(), bossAppearanceUI_->GetCurrentBossTitleGH());
+        SpriteRenderer::Draw(bossAppearanceUI_->GetBossNameSprite(), bossAppearanceUI_->GetCurrentBossNameGH());
+        SpriteRenderer::Draw(bossAppearanceUI_->GetBossAppearanceStarSprite(), bossAppearanceUI_->GetBossAppearanceStarGH());
     }
 }
  
