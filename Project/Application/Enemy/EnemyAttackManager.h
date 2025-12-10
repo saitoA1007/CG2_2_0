@@ -11,6 +11,7 @@
 #include"LongLangeAttack/IceFall.h"
 #include"Application/Enemy/Effect/BreakIceFallParticle.h"
 #include"Application/Enemy/Effect/EnemyDestroyEffect.h"
+#include"Application/Enemy/LongLangeAttack/Heart.h"
 
 // ボスの遠距離攻撃を管理する
 class EnemyAttackManager {
@@ -105,6 +106,9 @@ public:
 	// 撃破演出を取得
 	std::list<std::unique_ptr<EnemyDestroyEffect>>& GetEnemyDestroyEffect() { return enemyDestroyEffects_; }
 
+	// ハートリスト
+	std::list<std::unique_ptr<Heart>>& GetHeartList() { return heartList_; }
+
 private:
 
 	// ポストエフェクトの管理
@@ -116,6 +120,9 @@ private:
 	std::list<std::unique_ptr<BreakIceFallParticle>> breakIceFallParticles_;
 	// 氷の壊れる音
 	uint32_t iceBreakSH_ = 0;
+
+	// ハート
+	std::list<std::unique_ptr<Heart>> heartList_;
 
 	// 氷の演出データ
 	std::vector<IceFallEffectData> iceFallEffectDatas_;
@@ -175,6 +182,12 @@ private:
 	/// 氷柱の破壊演出を追加
 	/// </summary>
 	void AddBreakIceParticle(const Vector3& pos);
+
+	/// <summary>
+	/// ハートを追加する
+	/// </summary>
+	/// <param name="pos"></param>
+	void AddHeart(const Vector3& pos);
 
 	/// <summary>
 	/// 値を登録する

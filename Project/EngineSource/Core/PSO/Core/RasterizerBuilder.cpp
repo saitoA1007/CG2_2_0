@@ -24,7 +24,7 @@ void RasterizerBuilder::Initialize() {
 			// 表(反時計回り)を表示しない
 			rasterizerDesc[i].CullMode = D3D12_CULL_MODE_FRONT;
 			// 三角形の中を塗りつぶす
-			rasterizerDesc[i].FillMode = D3D12_FILL_MODE_WIREFRAME;
+			rasterizerDesc[i].FillMode = D3D12_FILL_MODE_SOLID;
 			break;
 
 		case DrawModel::None:

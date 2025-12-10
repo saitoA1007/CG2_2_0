@@ -84,6 +84,13 @@ private:
 	float startRotateY_ = 0.0f;
 	float endRotateY_ = 0.0f;
 
+	// 氷柱の移動時間
+	float iceMoveMaxTime_ = 0.4f;
+	float startPosY = 0.0f;
+	float endPosY = 0.0f;
+
+	bool InMove_ = true;
+
 private: // 調整項目
 
 	float colliderSize_ = 2.0f;
@@ -95,6 +102,8 @@ private: // 調整項目
 	float rotMaxTime_ = 2.0f;
 
 	float height_ = 1.0f;
+
+	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 
 private:
 

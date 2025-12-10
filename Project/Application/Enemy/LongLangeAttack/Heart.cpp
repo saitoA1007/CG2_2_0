@@ -43,6 +43,7 @@ void Heart::Initialize(const Vector3& pos, const uint32_t& texture) {
     material_.SetTextureHandle(texture);
 
     isStop_ = true;
+    InMove_ = true;
 
 #ifdef _DEBUG
     // 値を登録する
@@ -50,7 +51,6 @@ void Heart::Initialize(const Vector3& pos, const uint32_t& texture) {
 #endif
     // 値を適応させる
     ApplyDebugParam();
-
 
     // 当たり判定の位置を更新
     collider_->SetWorldPosition(worldTransform_.transform_.translate);
@@ -68,7 +68,17 @@ void Heart::Update() {
 
     if (isStop_) {
 
-
+        if (InMove_) {
+            if (timer_ <= 1.0f) {
+                timer_ += FpsCounter::deltaTime / iceMoveMaxTime_;
+                worldTransform_.transform_.translate.y = Lerp(startPosY, endPosY, timer_ * timer_ * timer_);
+                // 行列の更新処理
+                worldTransform_.UpdateTransformMatrix();
+            } else {
+                timer_ = 0.0f;
+                InMove_ = 0.0f;
+            }
+        }
     } else {
 
         timer_ += FpsCounter::deltaTime / rotMaxTime_;
@@ -112,6 +122,9 @@ void Heart::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(kGroupName_, "Scale", scale_, index++);
     GameParamEditor::GetInstance()->AddItem(kGroupName_, "RotMaxTime", rotMaxTime_, index++);
     GameParamEditor::GetInstance()->AddItem(kGroupName_, "Height", height_, index++);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "StartPosY", startPosY, index++);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "EndPosY", endPosY, index++);
+    GameParamEditor::GetInstance()->AddItem(kGroupName_, "Color", color_, index++);
 }
 
 void Heart::ApplyDebugParam() {
@@ -119,6 +132,12 @@ void Heart::ApplyDebugParam() {
     scale_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "Scale");
     rotMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "RotMaxTime");
     height_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "Height");
+    startPosY = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "StartPosY");
+    endPosY = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "EndPosY");
+
+    color_ = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "Color");
+
+    material_.SetColor(color_);
 
     // 当たり判定を適応
     collider_->SetRadius(colliderSize_);

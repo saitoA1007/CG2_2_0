@@ -39,7 +39,6 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
-
 #pragma endregion
 
 	// 入力コマンドを設定する
@@ -431,6 +430,9 @@ void TDGameScene::Initialize(SceneContext* context) {
         letterboxStartHeight_ = 0.0f;
         letterboxEndHeight_ = 0.0f;
     }
+
+	// 回復用ハートモデルを取得
+	heartModel_ = context_->modelManager->GetNameByModel("Heart");
 
 	// クリアUI
 	clearUI_ = std::make_unique<ClearUI>();
@@ -985,10 +987,20 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	// 通常モデルの描画前処理
 	//ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
+	// 回復用のハート描画
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
+	// 回復用ハートを描画する
+	for (auto& heart : enemyAttackManager_->GetHeartList()) {
+		if (heart->IsAlive()) {
+			ModelRenderer::Draw(heartModel_, heart->GetWorldTransform(), &heart->GetMaterial());
+		}
+	}
+	
+	// 氷岩の両面描画
 	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
-	// 氷柱のモデルを描画
-	const std::list<std::unique_ptr<IceFall>> &iceFalls = enemyAttackManager_->GetIceFalls();
-	for (auto &iceFall : iceFalls) {
+
+	const std::list<std::unique_ptr<IceFall>>& iceFalls = enemyAttackManager_->GetIceFalls();
+	for (auto& iceFall : iceFalls) {
 		if (iceFall->IsAlive()) {
 			//ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 			CustomRenderer::DrawRock(iceFallModel_, iceFall->GetWorldTransform(), sceneLightingController_->GetResource(), iceFall->GetMaterial());
@@ -1119,7 +1131,6 @@ void TDGameScene::Draw(const bool &isDebugView) {
 
 	// 空気を演出するためのパーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, airParticle_->GetCurrentNumInstance(), *airParticle_->GetWorldTransforms());
-
 
 #ifdef _DEBUG
 

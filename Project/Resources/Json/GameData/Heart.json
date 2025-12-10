@@ -1,0 +1,17 @@
+{
+    "Heart": {
+        "ColliderSize": 2.0,
+        "Color": [
+            1.0,
+            0.044117629528045654,
+            0.044117629528045654,
+            1.0
+        ],
+        "EndPosY": 1.5,
+        "Height": 1.0,
+        "RotMaxTime": 2.0,
+        "Scale": 1.0,
+        "SceneName": "TDGameScene",
+        "StartPosY": -2.0
+    }
+}
