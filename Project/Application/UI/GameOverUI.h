@@ -37,7 +37,7 @@ public:
 
 	// 有効/無効
 	bool IsActive() const { return isActive_; }
-	void SetActive(bool active) { isActive_ = active; }
+	void SetActive(bool active); // 有効化時にアニメーション再生
 
 	// 入力処理（Updateから呼ぶ）
 	void HandleInput();
@@ -45,6 +45,9 @@ public:
 	// クリック時のコールバック
 	void SetOnRetryClicked(std::function<void()> cb) { onRetryClicked_ = std::move(cb); }
 	void SetOnTitleClicked(std::function<void()> cb) { onTitleClicked_ = std::move(cb); }
+
+	// UI有効化時アニメーション開始
+	void StartActivateAnimation();
 
 private:
 	// 入力関連
@@ -82,4 +85,11 @@ private:
 	// クリックコールバック
 	std::function<void()> onRetryClicked_ = nullptr;
 	std::function<void()> onTitleClicked_ = nullptr;
+
+	// 有効化アニメーション管理
+	bool isActivating_ = false;
+	float activateAnimTimer_ = 0.0f;
+	float activateAnimDuration_ = 1.0f; // 全体アニメ長さ
+
+	void UpdateActivateAnimation();
 };
