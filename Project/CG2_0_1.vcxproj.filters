@@ -313,6 +313,7 @@
     <ClCompile Include="Application\UI\BossDestroyFade.cpp" />
     <ClCompile Include="Application\UI\ClearUI.cpp" />
     <ClCompile Include="Application\Enemy\LongLangeAttack\Heart.cpp" />
+    <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\BossMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -631,6 +632,7 @@
     <ClInclude Include="Application\UI\ClearUI.h" />
     <ClInclude Include="Application\Enemy\LongLangeAttack\Heart.h" />
     <ClInclude Include="Application\Enemy\States\BossStateEgg.h" />
+    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\BossMaterial.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
@@ -762,5 +764,6 @@
     <FxCompile Include="Resources\Shaders\IceMaterial.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\IceMaterial.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\BgIceRock.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\Boss.PS.hlsl" />
   </ItemGroup>
 </Project>

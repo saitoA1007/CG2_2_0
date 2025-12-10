@@ -5,6 +5,7 @@
 #include"Collider.h"
 #include"DebugRenderer.h"
 #include"Animator.h"
+#include"Extension/CustomMaterial/BossMaterial.h"
 
 #include"BossContext.h"
 #include"States/IBossState.h"
@@ -19,6 +20,12 @@ public:
 	/// </summary>
 	void Initialize(const float& stageRadius, EnemyAttackManager* enemyAttackManager, GameEngine::Animator* animator,
 		std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)>* animationData, GameEngine::DebugRenderer* debugRenderer);
+
+	// テクスチャを設定する
+	void SetTexture(const uint32_t& bossTex, const uint32_t& noiseTex) {
+		bossMaterial_->materialData_->textureHandle = bossTex;
+		bossMaterial_->materialData_->noiseTexture = noiseTex;
+	}
 
 	/// <summary>
 	/// 更新処理
@@ -35,6 +42,9 @@ public:
 	/// コライダー取得
 	/// </summary>
 	GameEngine::Collider* GetCollider() { return bodyCollider_.get(); }
+
+	// マテリアルを取得
+	BossMaterial* GetMaterial() { return bossMaterial_.get(); };
 
 	// 当たり判定の球データ
 	Sphere GetSphereData();
@@ -117,6 +127,8 @@ private: // メンバ変数
 	// デバック用のグループ名
 	std::string kGroupName_ = "Boss";
 
+	std::string MatName_ = "BossMaterial";
+
 	// 当たり判定
 	bool isHit_ = false;
 
@@ -131,6 +143,9 @@ private: // メンバ変数
 
 	// 音声ハンドル
 	uint32_t bossDamagedSH_ = 0; // ダメージ音声
+
+	// ボスのマテリアル
+	std::unique_ptr<BossMaterial> bossMaterial_;
 
 private:
 

@@ -67,6 +67,10 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
     // ダメージ音声を取得する
     bossDamagedSH_ = AudioManager::GetInstance().GetHandleByName("BossDamaged.mp3");
 
+    // マテリアル
+    bossMaterial_ = std::make_unique<BossMaterial>();
+    bossMaterial_->Initialize();
+
 #ifdef _DEBUG
     // 値を登録する
     RegisterBebugParam();
@@ -210,6 +214,11 @@ void BossEnemy::RegisterBebugParam() {
     GameParamEditor::GetInstance()->AddItem(kGroupName_, "MaxHp", kMaxHp_);
     GameParamEditor::GetInstance()->AddItem(kGroupName_, "BodyColliderSize", bodyColliderSize_);
     GameParamEditor::GetInstance()->AddItem(kGroupName_, "Scale", scale_);
+
+    // マテリアル
+    GameParamEditor::GetInstance()->AddItem(MatName_, "BaseColor", bossMaterial_->materialData_->color);
+    GameParamEditor::GetInstance()->AddItem(MatName_, "Shininess", bossMaterial_->materialData_->shininess);
+    GameParamEditor::GetInstance()->AddItem(MatName_, "Time", bossMaterial_->materialData_->time);
 }
 
 void BossEnemy::ApplyDebugParam() {
@@ -222,4 +231,10 @@ void BossEnemy::ApplyDebugParam() {
 
     // スケールを設定
     worldTransform_.transform_.scale = { scale_ ,scale_ ,scale_ };
+
+    // マテリアル
+    bossMaterial_->materialData_->color = GameParamEditor::GetInstance()->GetValue<Vector4>(MatName_, "BaseColor");
+    bossMaterial_->materialData_->shininess = GameParamEditor::GetInstance()->GetValue<float>(MatName_, "Shininess");
+    bossMaterial_->materialData_->specularColor = { 1.0f,1.0f,1.0f };
+    bossMaterial_->materialData_->time = GameParamEditor::GetInstance()->GetValue<float>(MatName_, "Time");
 }

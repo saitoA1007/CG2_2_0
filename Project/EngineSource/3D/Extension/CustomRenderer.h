@@ -12,6 +12,7 @@
 #include"Model.h"
 #include"CustomMaterial/ICustomMaterial.h"
 #include"CustomMaterial/IceRockMaterial.h"
+#include"CustomMaterial/BossMaterial.h"
 
 using namespace GameEngine;
 
@@ -19,6 +20,7 @@ enum class CustomRenderMode {
 	Ice, // 氷
 	Rock, // 背景の岩
 	RockBoth, // 両面描画
+	BossAnimation, // ボスのアニメーション
 
 	MaxCount
 };
@@ -60,6 +62,8 @@ public:
 	static void DrawIce(const Model* model, WorldTransform& worldTransform, ID3D12Resource* lightGroupResource,ICustomMaterial* material);
 
 	static void DrawRock(const Model* model, WorldTransform& worldTransform, ID3D12Resource* lightGroupResource, IceRockMaterial* material);
+
+	static void DrawAnimationWithLight(const Model* model, WorldTransform& worldTransform, ID3D12Resource* lightGroupResource, BossMaterial* material);
 
 private:
 
