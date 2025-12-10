@@ -316,6 +316,7 @@
     <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\BossMaterial.cpp" />
     <ClCompile Include="Application\Enemy\Effect\EnterWingsParticle.cpp" />
     <ClCompile Include="Application\Enemy\Effect\EnterBurstWingsParticle.cpp" />
+    <ClCompile Include="Application\UI\TutorialUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -637,6 +638,7 @@
     <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\BossMaterial.h" />
     <ClInclude Include="Application\Enemy\Effect\EnterWingsParticle.h" />
     <ClInclude Include="Application\Enemy\Effect\EnterBurstWingsParticle.h" />
+    <ClInclude Include="Application\UI\TutorialUI.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

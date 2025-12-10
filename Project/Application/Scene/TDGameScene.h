@@ -43,6 +43,7 @@
 #include"Application/UI/Letterbox.h"
 #include"Application/UI/ClearUI.h"
 #include"Application/UI/BossDestroyFade.h"
+#include"Application/UI/TutorialUI.h"
 
 class TDGameScene : public BaseScene {
 public:
@@ -307,6 +308,9 @@ private:
 	// ボス咆哮音
     uint32_t bossScreamSEHandle_ = 0;
 
+    // チュートリアルUI
+    std::unique_ptr<TutorialUI> tutorialUI_;
+
 private:
 
 	// ボスヒット時にほとんどの更新を停止するための制御
@@ -331,6 +335,14 @@ private:
     float bossOutroTimer_ = 0.0f;             // 再生時間
     static inline constexpr float kBossOutroDuration_ = 8.0f; // 秒
     static inline constexpr float kBossOutroStartDelay_ = 0.5f; // 秒
+
+    // UI制御フラグ
+    bool uiDisabledForIntro_ = false;
+    bool prevBossIntroPlaying_ = false;
+    float uiPostIntroFadeTimer_ = 0.0f;
+    float uiPostIntroFadeDuration_ = 0.5f;
+    // ボス登場演出の完了フラグ（前後の明確な区別用）
+    bool bossIntroFinished_ = false;
 
 	/// <summary>
 	/// 入力のコマンドを設定する

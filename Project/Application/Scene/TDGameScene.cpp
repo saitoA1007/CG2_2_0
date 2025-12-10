@@ -1,4 +1,4 @@
-﻿#include"TDGameScene.h"
+#include"TDGameScene.h"
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
 #include"SpriteRenderer.h"
@@ -363,7 +363,6 @@ void TDGameScene::Initialize(SceneContext* context) {
 		//		CameraController::ShakeOrigin::TargetPosition,
 		//		false, true, true, true);
 		//}
-
 	}
 	cameraController_->SetCurrentAsDesired();
 
@@ -386,6 +385,15 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// プレイヤーのhpUIを初期化 (仮の最大HP: 3)
 	playerHpUI_ = std::make_unique<PlayerHpUI>();
     playerHpUI_->Initialize(player_->GetMaxHP(), context_->textureManager);
+
+	// TutorialUI 初期化
+	tutorialUI_ = std::make_unique<TutorialUI>();
+	if (tutorialUI_) {
+		tutorialUI_->Initialize(context_->textureManager);
+		for (auto &spr : tutorialUI_->GetSprites()) {
+			spr->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
+		}
+	}
 
 	// ゲームオーバーUIの初期化
 	gameOverUI_ = std::make_unique<GameOverUI>();
@@ -442,11 +450,17 @@ void TDGameScene::Initialize(SceneContext* context) {
         bossHpUI_->GetNameSprite()->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
         for (auto &s : playerHpUI_->GetHpSprites()) { s->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f)); }
         if (playGuideSprite_) playGuideSprite_->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
+        if (tutorialUI_) {
+            for (auto &spr : tutorialUI_->GetSprites()) { spr->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f)); }
+        }
     } else {
         isTitleLocked_ = false;
         titleSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, 0.0f));
         spaceSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, 0.0f));
         uiFadeAlpha_ = 1.0f;
+        if (tutorialUI_) {
+            for (auto &spr : tutorialUI_->GetSprites()) { spr->SetColor(Vector4(1.0f,1.0f,1.0f,1.0f)); }
+        }
     }
 
     // Letterbox 初期化（高さ0で開始）
@@ -493,6 +507,11 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// 初回実行フラグを解除
 	TDGameScene::SetIsFirstGameStart(false);
+
+    // UI初期状態
+    uiDisabledForIntro_ = false;
+    prevBossIntroPlaying_ = false;
+    uiPostIntroFadeTimer_ = 0.0f;
 }
 
 void TDGameScene::Update() {
@@ -524,6 +543,12 @@ void TDGameScene::Update() {
 			bossHpUI_->GetNameSprite()->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
 			for (auto &s : playerHpUI_->GetHpSprites()) { s->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_)); }
 			if (playGuideSprite_) playGuideSprite_->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
+            // TutorialUI のフェードイン
+            if (tutorialUI_) {
+                for (auto &spr : tutorialUI_->GetSprites()) {
+                    spr->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
+                }
+            }
 
 			if (transitionTimer_ >= kTransitionDuration_) {
 				isTransitioning_ = false;
@@ -558,6 +583,7 @@ void TDGameScene::Update() {
 			bossIntroPlaying_ = false;
 			bossIntroTimer_ = 0.0f;
 			bossIntroDelayAfterFreeze_ = false;
+			bossIntroFinished_ = false; // これから演出予定
             AudioManager::GetInstance().Play(bossEggCrackSEHandle_, 0.5f, false);
             AudioManager::GetInstance().Play(bossEggDamageSEHandle_, 0.5f, false);
 		}
@@ -671,6 +697,8 @@ void TDGameScene::Update() {
 			bossIntroPlaying_ = false;
 			bossIntroTimer_ = 0.0f;
 			AudioManager::GetInstance().Play(gameBGMHandle_, 0.5f, true);
+            uiDisabledForIntro_ = true;
+			bossIntroFinished_ = true; // 演出完了
 			// Letterbox を非表示に戻す
 			if (letterbox_) {
 				letterboxAnimTimer_ = 0.0f;
@@ -1013,6 +1041,10 @@ void TDGameScene::Update() {
 	bgRock_->Update();
 #endif
 
+	// TutorialUI の更新（描画は後段。ボス登場演出中は更新のみ）
+	if (tutorialUI_) {
+		for (auto &spr : tutorialUI_->GetSprites()) { spr->Update(); }
+	}
 }
 
 void TDGameScene::Draw(const bool &isDebugView) {
@@ -1255,51 +1287,66 @@ void TDGameScene::DrawUI() {
 	// 2D描画
 	//======================================================
 
-	// 画像の描画前処理
 	SpriteRenderer::PreDraw(RenderMode2D::Normal);
 
-	if (letterbox_) {
-		if (auto s = letterbox_->GetTopSprite()) { SpriteRenderer::Draw(s, 0); }
-		if (auto s = letterbox_->GetBottomSprite()) { SpriteRenderer::Draw(s, 0); }
-	}
-
-	// タイトルスプライト（フェードアウト後はアルファ0なので描かれても問題なし）
-	if (titleSprite_) { SpriteRenderer::Draw(titleSprite_.get(), titleGH_); }
-	if (spaceSprite_) { SpriteRenderer::Draw(spaceSprite_.get(), spaceGH_); }
-
-	// 操作ガイド（フェードに合わせたアルファ適用済）
-	if (playGuideSprite_) { SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_); }
-
-	// ボスのHPUIを表示（各スプライトに適用済みアルファ）
-	SpriteRenderer::Draw(bossHpUI_->GetFrameSprite(), 0);
-	SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
-	SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
-	SpriteRenderer::Draw(bossHpUI_->GetNameSprite(), bossNameGH_);
-
-	// プレイヤーのHPUIを表示
-    for (const auto &sprite : playerHpUI_->GetHpSprites()) {
-        SpriteRenderer::Draw(sprite.get(), playerHpUI_->GetHpIconGH());
+    if (letterbox_) {
+        if (auto s = letterbox_->GetTopSprite()) { SpriteRenderer::Draw(s, 0); }
+        if (auto s = letterbox_->GetBottomSprite()) { SpriteRenderer::Draw(s, 0); }
     }
 
-	// GameOverUI描画（タイトルロック中は表示しないためここで通常表示）
-	if (gameOverUI_->IsActive()) {
-		SpriteRenderer::Draw(gameOverUI_->GetBgSprite(), gameOverUI_->GetBgGH());
-		SpriteRenderer::Draw(gameOverUI_->GetLogoSprite(), gameOverUI_->GetLogoGH());
-		SpriteRenderer::Draw(gameOverUI_->GetRetrySprite(), gameOverUI_->GetRetryGH());
-		SpriteRenderer::Draw(gameOverUI_->GetTitleSprite(), gameOverUI_->GetTitleGH());
-	}
+    // タイトルスプライト
+    if (titleSprite_) { SpriteRenderer::Draw(titleSprite_.get(), titleGH_); }
+    if (spaceSprite_) { SpriteRenderer::Draw(spaceSprite_.get(), spaceGH_); }
 
-	// クリアUIを描画
-	if (clearUI_->IsActive()) {
-		SpriteRenderer::Draw(clearUI_->GetBgSprite(), 0);
-		SpriteRenderer::Draw(clearUI_->GetClearSprite(), clearUI_->GetClearTexture());
-		SpriteRenderer::Draw(clearUI_->GetGuideSprite(), clearUI_->GetGuidTexture());
-	}
+    // TutorialUI はボス登場演出が始まって以降は描画しない
+    if (tutorialUI_ && !bossIntroPlaying_ && !uiDisabledForIntro_ && !bossIntroFinished_) {
+        const auto &sprites = tutorialUI_->GetSprites();
+        const auto &handles = tutorialUI_->GetTextureHandles();
+        size_t n = std::min(sprites.size(), handles.size());
+        for (size_t i = 0; i < n; ++i) {
+            SpriteRenderer::Draw(sprites[i].get(), handles[i]);
+        }
+    }
 
-	// ボスの撃破時のフェード処理
-	if (bossDestroyFade_->IsActive()) {
-		SpriteRenderer::Draw(bossDestroyFade_->GetSprite(), 0);
-	}
+	// プレイヤーHP
+    if (!bossIntroPlaying_ && !isBossDestroyFade_) {
+        for (const auto &sprite : playerHpUI_->GetHpSprites()) {
+            SpriteRenderer::Draw(sprite.get(), playerHpUI_->GetHpIconGH());
+        }
+    }
+
+	// ボスのHPUIは演出が終わったあとにのみ描画
+    if (bossIntroFinished_ && !isBossDestroyFade_) {
+        SpriteRenderer::Draw(bossHpUI_->GetFrameSprite(), 0);
+        SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
+        SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
+        SpriteRenderer::Draw(bossHpUI_->GetNameSprite(), bossNameGH_);
+    }
+
+    // 操作ガイド
+    if (!bossIntroPlaying_ && playGuideSprite_ && !isBossDestroyFade_) {
+        SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_);
+    }
+
+    // GameOverUI
+    if (gameOverUI_->IsActive()) {
+        SpriteRenderer::Draw(gameOverUI_->GetBgSprite(), gameOverUI_->GetBgGH());
+        SpriteRenderer::Draw(gameOverUI_->GetLogoSprite(), gameOverUI_->GetLogoGH());
+        SpriteRenderer::Draw(gameOverUI_->GetRetrySprite(), gameOverUI_->GetRetryGH());
+        SpriteRenderer::Draw(gameOverUI_->GetTitleSprite(), gameOverUI_->GetTitleGH());
+    }
+
+    // クリアUI
+    if (clearUI_->IsActive()) {
+        SpriteRenderer::Draw(clearUI_->GetBgSprite(), 0);
+        SpriteRenderer::Draw(clearUI_->GetClearSprite(), clearUI_->GetClearTexture());
+        SpriteRenderer::Draw(clearUI_->GetGuideSprite(), clearUI_->GetGuidTexture());
+    }
+
+    // 撃破フェード
+    if (bossDestroyFade_->IsActive()) {
+        SpriteRenderer::Draw(bossDestroyFade_->GetSprite(), 0);
+    }
 }
  
  void TDGameScene::InputRegisterCommand() {
