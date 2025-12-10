@@ -281,6 +281,14 @@ private:
     uint32_t titleBGMHandle_ = 0;
 	// ゲームBGM
     uint32_t gameBGMHandle_ = 0;
+	// 決定音
+    uint32_t decideSEHandle_ = 0;
+	// 選択音
+    uint32_t selectSEHandle_ = 0;
+	// ボスロックオン音
+    uint32_t bossLockOnSEHandle_ = 0;
+	// ボスアンロック音
+    uint32_t bossUnlockSEHandle_ = 0;
 
 private:
 

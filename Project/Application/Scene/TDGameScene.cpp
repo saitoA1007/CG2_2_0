@@ -450,6 +450,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 
     titleBGMHandle_ = AudioManager::GetInstance().GetHandleByName("Title_BGM.mp3");
     gameBGMHandle_ = AudioManager::GetInstance().GetHandleByName("Game_BGM.mp3");
+    decideSEHandle_ = AudioManager::GetInstance().GetHandleByName("Decide.mp3");
+    selectSEHandle_ = AudioManager::GetInstance().GetHandleByName("Select.mp3");
+    bossLockOnSEHandle_ = AudioManager::GetInstance().GetHandleByName("Camera_In.mp3");
+    bossUnlockSEHandle_ = AudioManager::GetInstance().GetHandleByName("Camera_Out.mp3");
     AudioManager::GetInstance().Play(titleBGMHandle_, 0.5f, true);
 
 	// 初回実行フラグを解除
@@ -723,6 +727,11 @@ void TDGameScene::Update() {
 		if (!bossIntroDelayAfterFreeze_ && !bossIntroPlaying_ && !bossOutroPlaying_) {
 			if (context_->inputCommand->IsCommandActive("LockOnBoss")) {
 				isBossLockOn_ = !isBossLockOn_;
+				if (isBossLockOn_) {
+					AudioManager::GetInstance().Play(bossLockOnSEHandle_, 0.5f, false);
+				} else {
+					AudioManager::GetInstance().Play(bossUnlockSEHandle_, 0.5f, false);
+                }
 			}
 		}
 
@@ -886,6 +895,15 @@ void TDGameScene::Update() {
 
 	// GameOverUIの更新処理
 	gameOverUI_->Update();
+	if (gameOverUI_->IsActive()) {
+        if (context_->inputCommand->IsCommandActive("Up") ||
+			context_->inputCommand->IsCommandActive("Down")) {
+			AudioManager::GetInstance().Play(selectSEHandle_, 0.5f, false);
+        }
+		if (context_->inputCommand->IsCommandActive("Start")) {
+			AudioManager::GetInstance().Play(decideSEHandle_, 0.5f, false);
+		}
+    }
 
 	// ステージの更新処理
 	stageManager_->Update();
