@@ -501,7 +501,11 @@ void TDGameScene::Update() {
 				true, false, true, false);
 		}
 		// 攻撃演出のエミッター
-		playerAttackEffect_->Emitter(player_->GetPlayerPos());
+		Vector3 pos = player_->GetPlayerPos();
+		float ratio = player_->GetAttackDownPower() / player_->GetAttackDownMaxPower();
+		pos.y += 3.0f;
+		playerAttackEffect_->Emitter(pos, ratio);
+		enemyAttackManager_->AddEnemyDestroyEffect(bossEnemy_->GetWorldPosition());
 	}
 	prevBossHit_ = currentBossHit;
 
@@ -979,6 +983,7 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	}
 
 	// プレイヤーの攻撃演出を描画
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModelAdd);
 	if (playerAttackEffect_->IsActive()) {
 		ModelRenderer::Draw(planeModel_, playerAttackEffect_->GetWorldTransforms(), &playerAttackEffect_->GetMaterial());
 	}
@@ -1004,7 +1009,6 @@ void TDGameScene::Draw(const bool &isDebugView) {
 		ModelRenderer::DrawInstancing(wallModel_, particle->GetCurrentNumInstance(), *particle->GetWorldTransforms());
 	}
 
-	
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
 
