@@ -404,6 +404,10 @@ void PSOManager::DefaultLoadPSO() {
     rock3D.isDepthEnable = true;
     RegisterPSO("IceRock", rock3D, &rootSigBuilder, &inputLayoutBuilder);
 
+    // 背面描画
+    rock3D.drawMode = DrawModel::FrameBack;
+    RegisterPSO("IceRockBack", rock3D, &rootSigBuilder, &inputLayoutBuilder);
+
     // 両面描画
     rock3D.drawMode = DrawModel::None;
     RegisterPSO("IceRockBoth", rock3D, &rootSigBuilder, &inputLayoutBuilder);

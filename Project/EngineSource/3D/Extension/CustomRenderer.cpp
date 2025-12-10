@@ -24,6 +24,7 @@ void CustomRenderer::StaticInitialize(ID3D12Device* device,ID3D12GraphicsCommand
 	// 氷描画のpsoデータを取得する
 	psoList_[CustomRenderMode::Ice] = psoManager->GetDrawPsoData("IceMaterial");
 	psoList_[CustomRenderMode::Rock] = psoManager->GetDrawPsoData("IceRock");
+	psoList_[CustomRenderMode::RockBack] = psoManager->GetDrawPsoData("IceRockBack");
 	psoList_[CustomRenderMode::RockBoth] = psoManager->GetDrawPsoData("IceRockBoth");
 	psoList_[CustomRenderMode::BossAnimation] = psoManager->GetDrawPsoData("BossAnimation");
 }

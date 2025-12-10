@@ -110,6 +110,14 @@ void EnemyAttackManager::Update(const Matrix4x4& cameraWorldMatrix, const Matrix
         effect->Update(cameraWorldMatrix, viewMatrix);
     }
 
+    // ハート
+    heartList_.remove_if([](const std::unique_ptr<Heart>& effect) {
+        return effect->IsAlive() ? false : true;
+    });
+    for (auto& effect : heartList_) {
+        effect->Update();
+    }
+
     // 咆哮演出の更新処理
     RoatUpdate();
 
@@ -133,6 +141,12 @@ void EnemyAttackManager::AddEnemyDestroyEffect(const Vector3& pos) {
     std::unique_ptr<EnemyDestroyEffect> tmp = std::make_unique<EnemyDestroyEffect>();
     tmp->Initialize(iceFallTexture_,breakTexture_,pos);
     enemyDestroyEffects_.push_back(std::move(tmp));
+}
+
+void EnemyAttackManager::AddHeart(const Vector3& pos) {
+    std::unique_ptr<Heart> tmp = std::make_unique<Heart>();
+    tmp->Initialize(pos,0);
+    heartList_.push_back(std::move(tmp));
 }
 
 void EnemyAttackManager::CreateIceFallPositions(const float& waitIceFallTime) {
@@ -201,6 +215,7 @@ void EnemyAttackManager::EffectUpdate(const Matrix4x4& cameraWorldMatrix, const 
             
             // 氷柱を落とす
             AddIceFall(iceFallEffectData.particle->GetEmitterPos());
+            AddHeart(iceFallEffectData.particle->GetEmitterPos());
             // 叫ぶ演出
             //SetIsRoat(true);
         }

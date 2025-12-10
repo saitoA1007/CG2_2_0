@@ -19,6 +19,7 @@ using namespace GameEngine;
 enum class CustomRenderMode {
 	Ice, // 氷
 	Rock, // 背景の岩
+	RockBack, // 背面描画
 	RockBoth, // 両面描画
 	BossAnimation, // ボスのアニメーション
 

@@ -233,6 +233,9 @@ private:
 	// 風の演出用モデル
 	GameEngine::Model* windModel_;
 
+	// 回復用モデル
+	GameEngine::Model* heartModel_;
+
 	// プレイヤー用エフェクトのモデル（EnemyRushEffectと同じモデルを使用）
 	GameEngine::Model* playerChargeEffectModel_ = nullptr;
 	GameEngine::Model* playerRushEffectModel_ = nullptr;
