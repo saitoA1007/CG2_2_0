@@ -372,6 +372,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy\LongLangeAttack\Heart.h" />
     <ClInclude Include="Application\Enemy\LongLangeAttack\IceFall.h" />
     <ClInclude Include="Application\Enemy\States\BossStateBattle.h" />
+    <ClInclude Include="Application\Enemy\States\BossStateEgg.h" />
     <ClInclude Include="Application\Enemy\States\BossStateIn.h" />
     <ClInclude Include="Application\Enemy\States\BossStateOut.h" />
     <ClInclude Include="Application\Enemy\States\IBossState.h" />

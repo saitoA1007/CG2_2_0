@@ -181,8 +181,12 @@ void TDGameScene::Initialize(SceneContext* context) {
     playerLandingEffect_ = std::make_unique<PlayerLandingEffect>();
     playerLandingEffect_->Initialize();
 
-    // 着地時にエフェクトを起動
+    // 着地時にカメラシェイク実行とエフェクトを起動
     player_->SetOnLandHit([this]() {
+		cameraController_->StartCameraShake(5.0f, 1.0f, 100.0f,
+			[](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutCubic(a, b, t); },
+			CameraController::ShakeOrigin::TargetPosition,
+            true, false, true, false);
         if (playerLandingEffect_) {
             playerLandingEffect_->Emitter(player_->GetWorldTransform().GetWorldPosition());
         }
@@ -229,6 +233,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Boss");
 	bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	bossEnemyModel_->SetDefaultIsEnableLight(true);
+	// Egg用モデルを取得（存在すれば）
+	bossEggModel_ = context_->modelManager->GetNameByModel("BossEgg");
+	bossEggModel_->SetDefaultColor({1.0f,1.0f,1.0f,1.0f});
+	bossEggModel_->SetDefaultIsEnableLight(true);
 
 	// 敵のアニメーションデータを取得する
 	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::BaseMove)] = context_->animationManager->GetNameByAnimations("BossBirdBaseMove");
@@ -342,6 +350,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 		//		CameraController::ShakeOrigin::TargetPosition,
 		//		false, true, true, true);
 		//}
+
 		// 初回実行フラグを解除
 		TDGameScene::SetIsFirstGameStart(false);
 	}
@@ -365,7 +374,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// プレイヤーのhpUIを初期化 (仮の最大HP: 3)
 	playerHpUI_ = std::make_unique<PlayerHpUI>();
-	playerHpUI_->Initialize(3);
+    playerHpUI_->Initialize(player_->GetMaxHP());
 
 	// ゲームオーバーUIの初期化
 	gameOverUI_ = std::make_unique<GameOverUI>();
@@ -774,6 +783,10 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	// 背景のオブジェクトを描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(bgRockModel_, bgRock_->GetWorldTransform());
+	
+	if (bossEnemy_->GetBossState() == BossState::Egg) {
+		ModelRenderer::Draw(bossEggModel_, bossEnemy_->GetWorldTransform());
+	}
 
 	// 岩を描画
 	CustomRenderer::PreDraw(CustomRenderMode::Rock);
@@ -788,7 +801,9 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	ModelRenderer::DrawAnimation(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
 
 	// 敵を描画
-	ModelRenderer::DrawAnimationWithLight(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource());
+    if (bossEnemy_->GetBossState() != BossState::Egg) {
+		ModelRenderer::DrawAnimationWithLight(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource());
+	}
 	// 敵の影を描画する
 	ModelRenderer::DrawAnimation(bossEnemyModel_, bossEnemyShadow_->GetWorldTransform(), &bossEnemyShadow_->GetMaterial());
 
@@ -897,6 +912,9 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	// ボスの風攻撃を描画
 	ModelRenderer::DrawInstancing(windModel_, enemyWindAttackParticle_->GetCurrentNumInstance(), *enemyWindAttackParticle_->GetWorldTransforms());
 
+	// ボスの翼の演出を描画
+	ModelRenderer::DrawInstancing(wingModel_, enemyWingsParticleParticle_->GetCurrentNumInstance(), *enemyWingsParticleParticle_->GetWorldTransforms());
+
 	// インスタンシング描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::Instancing);
 
@@ -905,9 +923,7 @@ void TDGameScene::Draw(const bool &isDebugView) {
 		ModelRenderer::DrawInstancing(wallModel_, particle->GetCurrentNumInstance(), *particle->GetWorldTransforms());
 	}
 
-	// ボスの翼の演出を描画
-	ModelRenderer::DrawInstancing(wingModel_, enemyWingsParticleParticle_->GetCurrentNumInstance(), *enemyWingsParticleParticle_->GetWorldTransforms());
-
+	
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
 
@@ -944,25 +960,6 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	// デバック描画
 	debugRenderer_->DrawAll(isDebugView ? context_->debugCamera_->GetVPMatrix() : mainCamera_->GetVPMatrix());
 #endif
-
-	//======================================================
-	// 2D描画
-	//======================================================
-
-	// 画像の描画前処理
-	SpriteRenderer::PreDraw(RenderMode2D::Normal);
-
-	// プレイヤーのHPUIを表示
-	//SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
-	//SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
-
-	// GameOverUI描画
-	if (gameOverUI_->IsActive()) {
-		SpriteRenderer::Draw(gameOverUI_->GetBgSprite(), gameOverUI_->GetBgGH());
-		SpriteRenderer::Draw(gameOverUI_->GetLogoSprite(), gameOverUI_->GetLogoGH());
-		SpriteRenderer::Draw(gameOverUI_->GetRetrySprite(), gameOverUI_->GetRetryGH());
-		SpriteRenderer::Draw(gameOverUI_->GetTitleSprite(), gameOverUI_->GetTitleGH());
-	}
 }
 
 void TDGameScene::DrawUI() {
@@ -997,8 +994,9 @@ void TDGameScene::DrawUI() {
 	SpriteRenderer::Draw(bossHpUI_->GetNameSprite(), bossNameGH_);
 
 	// プレイヤーのHPUIを表示
-	//SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
-	//SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
+    for (const auto &sprite : playerHpUI_->GetHpSprites()) {
+		SpriteRenderer::Draw(sprite.get(), 0);
+    }
 
 	// GameOverUI描画
 	if (gameOverUI_->IsActive()) {

@@ -1,6 +1,7 @@
 #include"BossEnemy.h"
 
 // 敵の各状態
+#include"States/BossStateEgg.h"
 #include"States/BossStateIn.h"
 #include"States/BossStateBattle.h"
 #include"States/BossStateOut.h"
@@ -35,15 +36,16 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
     bossContext_.animator_ = animator;
 
     // 状態の生成
+    statesTable_[static_cast<size_t>(BossState::Egg)] = std::make_unique<BossStateEgg>(bossContext_);
     statesTable_[static_cast<size_t>(BossState::In)] = std::make_unique<BossStateIn>(bossContext_);
     statesTable_[static_cast<size_t>(BossState::Battle)] = std::make_unique<BossStateBattle>(bossContext_, stageRadius, debugRenderer);
     statesTable_[static_cast<size_t>(BossState::Out)] = std::make_unique<BossStateOut>(bossContext_);
 
-    // 最初の状態を設定する
-    bossState_ = BossState::In;
-    currentState_ = statesTable_[static_cast<size_t>(BossState::In)].get();
+    // 最初の状態を設定する（Egg）
+    bossState_ = BossState::Egg;
+    currentState_ = statesTable_[static_cast<size_t>(BossState::Egg)].get();
     currentState_->Enter();
-    Log("BossState : In","Enemy");
+    Log("BossState : Egg","Enemy");
 
     // 当たり判定を設定する
     bodyCollider_ = std::make_unique<SphereCollider>();
@@ -97,9 +99,10 @@ void BossEnemy::Update(const Vector3& targetPos) {
 #ifdef _DEBUG
         // 切り替わった状態のログを出す
         uint32_t i = static_cast<uint32_t>(*bossContext_.bossStateRequest_);
-        std::string s = "In";
-        if (i == 1) {  s = "Battle"; }
-        else if (i == 2) { s = "Out";}
+        std::string s = "Egg";
+        if (i == static_cast<uint32_t>(BossState::In)) {  s = "In"; }
+        else if (i == static_cast<uint32_t>(BossState::Battle)) { s = "Battle";}
+        else if (i == static_cast<uint32_t>(BossState::Out)) { s = "Out";}
         Log("BossState : " + s, "Enemy");
 #endif
         currentState_ = statesTable_[static_cast<size_t>(*bossContext_.bossStateRequest_)].get();
@@ -168,6 +171,12 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
         Player* player = nullptr;
         player = result.userData.As<Player>();
         if (player == nullptr) { return; }
+
+        // Egg状態で急降下攻撃を受けたらInへ遷移
+        if (bossState_ == BossState::Egg && player->IsAttackDown()) {
+            bossContext_.bossStateRequest_ = BossState::In;
+            return;
+        }
 
         // 突進、または上からの攻撃の時のみダメージ
         //player->IsRushing();

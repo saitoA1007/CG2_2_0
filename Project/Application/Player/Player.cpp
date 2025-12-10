@@ -147,6 +147,11 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 	worldTransform_.transform_.translate.y += velocity_.y * FpsCounter::deltaTime;
 	worldTransform_.transform_.translate.z += velocity_.z * FpsCounter::deltaTime;
 
+	// Yが-32以下になったら初期位置に戻す
+    if (worldTransform_.transform_.translate.y < -32.0f) {
+        worldTransform_.transform_.translate = { 0.0f, 1.0f, -8.0f };
+    }
+
     // 回転ターゲットを決定（溜め中はrushDirection_、それ以外はlastMoveDir_または移動速度）
     Vector3 targetDir = {0.0f, 0.0f, 0.0f};
     if (isCharging_) {
@@ -672,11 +677,11 @@ void Player::OnCollision(const CollisionResult &result) {
     // ボスとの衝突処理（通常時）
     // or 風攻撃の場合
     if ((isBoss && !isRushing_ && !isAttackDown_ && !isInvincible_ && !isBounceLock_) ||
-        (isWind && !isInvincible_)) {
+        (isWind && !isAttackDown_ && !isInvincible_)) {
 		Log("is hit Boss normally");
 		// HP減少処理（仮で1ダメージ）
 		currentHP_ -= 1;
-		if (currentHP_ < 0) {
+		if (currentHP_ <= 0) {
 			currentHP_ = 0;
             isAlive_ = false;
 		}

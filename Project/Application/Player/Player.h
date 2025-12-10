@@ -77,6 +77,8 @@ public:
     float GetAttackDownMinPower() const { return kAttackDownMinPower_; }
     // 急降下時の最大攻撃力取得
     float GetAttackDownMaxPower() const { return kAttackDownMaxPower_; }
+    // 最大HP取得
+    int32_t GetMaxHP() const { return kMaxHP_; }
     // 現在のHP取得
     int32_t GetCurrentHP() const { return currentHP_; }
 
