@@ -444,10 +444,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 		transitionTimer_ = 0.0f;
         // タイトル表示中はその他UIを非表示に（アルファ0）
         uiFadeAlpha_ = 0.0f;
-        bossHpUI_->GetFrameSprite()->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
+        /*bossHpUI_->GetFrameSprite()->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
         bossHpUI_->GetEffectSprite()->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
         bossHpUI_->GetSprite()->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
-        bossHpUI_->GetNameSprite()->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
+        bossHpUI_->GetNameSprite()->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));*/
         for (auto &s : playerHpUI_->GetHpSprites()) { s->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f)); }
         if (playGuideSprite_) playGuideSprite_->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
         if (tutorialUI_) {
@@ -537,10 +537,10 @@ void TDGameScene::Update() {
 			if (titleSprite_) titleSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, titleAlpha));
 			if (spaceSprite_) spaceSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, titleAlpha));
 			// UIフェードインを反映
-			bossHpUI_->GetFrameSprite()->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
-			bossHpUI_->GetEffectSprite()->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
-			bossHpUI_->GetSprite()->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
-			bossHpUI_->GetNameSprite()->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
+            /*bossHpUI_->GetFrameSprite()->SetAlpha(uiFadeAlpha_);
+            bossHpUI_->GetEffectSprite()->SetAlpha(uiFadeAlpha_);
+            bossHpUI_->GetSprite()->SetAlpha(uiFadeAlpha_);
+            bossHpUI_->GetNameSprite()->SetAlpha(uiFadeAlpha_);*/
 			for (auto &s : playerHpUI_->GetHpSprites()) { s->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_)); }
 			if (playGuideSprite_) playGuideSprite_->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
             // TutorialUI のフェードイン
