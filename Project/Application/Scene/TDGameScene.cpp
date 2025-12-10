@@ -747,7 +747,7 @@ void TDGameScene::Update() {
 		Vector3 bossPos = bossEnemy_->GetWorldTransform().GetWorldPosition();
 		Vector3 eye = { 0.0f, 6.0f, -24.0f };
 		Vector3 center = bossPos;
-		center.y += 4.0f;
+		center.y += 6.0f;
 		Vector3 euler = { 0.0f, 0.0f, 0.0f };
 		float fov = 1.0f;
 
