@@ -25,7 +25,13 @@ void BossStateOut::Enter() {
 
 	sh_ = AudioManager::GetInstance().GetHandleByName("Boss_Die.mp3");
 
+	faSH_ = AudioManager::GetInstance().GetHandleByName("fanfare.mp3");
+
 	phase_ = Phase::In;
+
+	bossContext_.isStopBgm_ = true;
+
+	AudioManager::GetInstance().Play(faSH_, 0.8f, false);
 }
 
 void BossStateOut::Update() {

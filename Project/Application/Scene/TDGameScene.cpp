@@ -939,8 +939,14 @@ void TDGameScene::Update() {
 	enterWingsParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition() + Vector3(0.0f, 3.0f, 0.0f));
 	enterWingsParticle_->Update();
 	enterBurstWingsParticle_->SetIsLoop(bossEnemy_->IsEnterBurstWingsEffect());
-	enterBurstWingsParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition() + Vector3(0.0f, 2.0f, 0.0f));
+	enterBurstWingsParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition() + Vector3(0.0f, 4.0f, 0.0f));
 	enterBurstWingsParticle_->Update();
+
+	// 敵が死亡した時にbgmを止める
+	if (bossEnemy_->IsStopBGm()) {
+		AudioManager::GetInstance().Stop(titleBGMHandle_);
+		AudioManager::GetInstance().Stop(gameBGMHandle_);
+	}
 
 	// ボスがヒットした時の演出
 	if (bossEnemy_->IsHit()) {
