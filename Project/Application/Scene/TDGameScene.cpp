@@ -770,6 +770,11 @@ void TDGameScene::Update() {
 		}
 	}
 
+	// 時間を取得する
+	if (bossEnemy_->Isnow()) {
+		clearUI_->StartTime();
+	}
+
 	// デバックリストを削除
 	debugRenderer_->Clear();
 
@@ -1055,7 +1060,6 @@ void TDGameScene::Update() {
 	if (arrowUI_->IsActive()) {
 		arrowUI_->Update(mainCamera_->GetWorldMatrix());
 	}
-	
 
 #ifdef _DEBUG
 	// 地面マテリアルの更新処理
@@ -1368,6 +1372,12 @@ void TDGameScene::DrawUI() {
         SpriteRenderer::Draw(clearUI_->GetClearBackSprite(), 0);
         SpriteRenderer::Draw(clearUI_->GetClearSprite(), clearUI_->GetClearTexture());
         SpriteRenderer::Draw(clearUI_->GetGuideSprite(), clearUI_->GetGuidTexture());
+		SpriteRenderer::Draw(clearUI_->GetClearTimeTextSprite(), clearUI_->GetClearTImeTextTexture());
+		SpriteRenderer::Draw(clearUI_->GetnumDottoSprite(), clearUI_->GetDottoTexture());
+
+		for (auto& num : clearUI_->GetNumberSprite()) {
+			SpriteRenderer::Draw(num.numSprite_.get(), num.number);
+		}
     }
 
     // 撃破フェード
