@@ -1,0 +1,12 @@
+{
+    "BossMaterial": {
+        "BaseColor": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+        ],
+        "SceneName": "TDGameScene",
+        "Shininess": 250.0
+    }
+}
