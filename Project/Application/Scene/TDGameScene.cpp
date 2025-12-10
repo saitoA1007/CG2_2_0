@@ -640,7 +640,7 @@ void TDGameScene::Update() {
 		Vector3 euler = { 0.0f, 0.0f, 0.0f };
 		float fov = 1.0f;
 
-		if (bossOutroTimer_ >= 2.0f) {
+		if (bossOutroTimer_ >= 4.0f) {
 			// 少し引きの画に移行
 			eye = { 0.0f, 12.0f, -28.0f };
 			//fov = 0.7f;
@@ -1212,7 +1212,7 @@ void TDGameScene::DrawUI() {
 	context_->inputCommand->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
 
 	// Startゲーム開始（EnterキーまたはAボタン）
-	context_->inputCommand->RegisterCommand("Start", { {InputState::KeyTrigger, DIK_RETURN}, {InputState::PadTrigger, XINPUT_GAMEPAD_A},{InputState::KeyTrigger, DIK_SPACE} });
+    context_->inputCommand->RegisterCommand("Start", { {InputState::KeyTrigger, DIK_RETURN}, {InputState::PadTrigger, XINPUT_GAMEPAD_A},{InputState::KeyTrigger, DIK_SPACE}, {InputState::MouseTrigger, 0} });
 	// メニュー移動
 	context_->inputCommand->RegisterCommand("Up", { {InputState::KeyTrigger, DIK_UP}, {InputState::PadTrigger, XINPUT_GAMEPAD_DPAD_UP} });
 	context_->inputCommand->RegisterCommand("Down", { {InputState::KeyTrigger, DIK_DOWN}, {InputState::PadTrigger, XINPUT_GAMEPAD_DPAD_DOWN} });
