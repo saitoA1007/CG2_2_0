@@ -178,6 +178,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Enemy\Effect\EnemyWindAttackParticle.cpp" />
     <ClCompile Include="Application\Enemy\Effect\WingsParticle.cpp" />
     <ClCompile Include="Application\Enemy\EnemyAttackManager.cpp" />
+    <ClCompile Include="Application\Enemy\LongLangeAttack\Heart.cpp" />
     <ClCompile Include="Application\Enemy\LongLangeAttack\IceFall.cpp" />
     <ClCompile Include="Application\Enemy\States\BossStateBattle.cpp" />
     <ClCompile Include="Application\Enemy\States\BossStateIn.cpp" />
@@ -368,6 +369,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy\Effect\EnemyWindAttackParticle.h" />
     <ClInclude Include="Application\Enemy\Effect\WingsParticle.h" />
     <ClInclude Include="Application\Enemy\EnemyAttackManager.h" />
+    <ClInclude Include="Application\Enemy\LongLangeAttack\Heart.h" />
     <ClInclude Include="Application\Enemy\LongLangeAttack\IceFall.h" />
     <ClInclude Include="Application\Enemy\States\BossStateBattle.h" />
     <ClInclude Include="Application\Enemy\States\BossStateIn.h" />
