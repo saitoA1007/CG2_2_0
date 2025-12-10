@@ -238,6 +238,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	bossEggModel_->SetDefaultIsEnableLight(true);
 
 	// 敵のアニメーションデータを取得する
+    enemyAnimationData_[static_cast<size_t>(enemyAnimationType::Appearance)] = context_->animationManager->GetNameByAnimations("BossBird_Appearance_Animation");
 	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::BaseMove)] = context_->animationManager->GetNameByAnimations("BossBirdBaseMove");
 	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::IceBreath)] = context_->animationManager->GetNameByAnimations("BossBird.IceBreath");
 	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::Rush)] = context_->animationManager->GetNameByAnimations("BossBirdRush");
@@ -590,8 +591,8 @@ void TDGameScene::Update() {
             eye = { 0.0f, 10.0f, -30.0f };
 		}
 		cameraController_->ApplyImmediateView(eye, center, euler, fov);
-		if (bossIntroTimer_ >= 4.0f && prev < 4.0f) {
-			cameraController_->StartCameraShake(2.0f, 2.0f, 64.0f,
+		if (bossIntroTimer_ >= 4.7f && prev < 4.7f) {
+			cameraController_->StartCameraShake(4.0f, 2.0f, 64.0f,
 				[](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutCubic(a, b, t); },
 				CameraController::ShakeOrigin::TargetPosition,
                 true, true, true, false);

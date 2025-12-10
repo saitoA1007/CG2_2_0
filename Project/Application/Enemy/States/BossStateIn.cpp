@@ -16,18 +16,24 @@ BossStateIn::BossStateIn(BossContext& context) : bossContext_(context) {
 	// 値を適応させる
 	ApplyDebugParam();
 #endif
+	// 仕様に合わせて固定値を設定
+	InTime_ = 3.0f;
+	waitTime_ = 6.0f;
 }
 
 void BossStateIn::Enter() {
 	// 自分の初期位置を設定
 	bossContext_.worldTransform->transform_.translate = startPos_;
 
-	// 正面を向くように
-	bossContext_.worldTransform->transform_.rotate.y = std::numbers::pi_v<float>;
+	// 初期回転を0度に設定
+	bossContext_.worldTransform->transform_.rotate.y = 0.0f;
 
-	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
+	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Appearance)]["Appearance_Animation_Rotate"]);
 	bossContext_.animationTimer = 0.0f;
 
+	// 移動開始
+	isMove_ = true;
+	timer_ = 0.0f;
 }
 
 void BossStateIn::Update() {
@@ -37,48 +43,40 @@ void BossStateIn::Update() {
 #endif
 
 	if (isMove_) {
-
+		// 正規化タイマー進行（0.0f〜1.0f）
 		timer_ += FpsCounter::deltaTime / InTime_;
+		float t = std::clamp(timer_, 0.0f, 1.0f);
 
-		// 縦移動
-		float posY = 0.0f;
-		float totalCycle = timer_ * static_cast<float>(cycleCount_);
-		float localTimer = std::fmodf(totalCycle, 1.0f);
+		// 上昇（Y: 0 -> 8）EaseOutBack
+		float riseY = EaseOutBack(0.0f, moveHeight_, t);
+		bossContext_.worldTransform->transform_.translate = startPos_;
+		bossContext_.worldTransform->transform_.translate.y = startPos_.y + riseY;
 
-		if (localTimer <= 0.5f) {
-			float t = localTimer / 0.5f;
-			posY = Lerp(0.0f, moveHeight_, EaseInOut(t));
-		} else {
-			float t = (localTimer - 0.5f) / 0.5f;
-			posY = Lerp(moveHeight_, 0.0f, EaseInOut(t));
-		}
+		// 回転（Y軸: 0deg -> 1800deg）EaseOutSine（度->ラジアンに変換）
+		float targetDeg = EaseOutSine(0.0f, 1620.0f, t);
+		float targetRad = targetDeg * (std::numbers::pi_v<float> / 180.0f);
+		bossContext_.worldTransform->transform_.rotate.y = targetRad;
 
-		bossContext_.worldTransform->transform_.translate = Lerp(startPos_, endPos_, EaseInOut(timer_));
-		bossContext_.worldTransform->transform_.translate.y += posY;
-
-		// アニメーション
+		// アニメーションタイマー更新（必要なら）
 		bossContext_.animationTimer += FpsCounter::deltaTime;
-		if (bossContext_.animationTimer >= 1.0f) {
-			bossContext_.animationTimer = 0.0f;
-		}
+		if (bossContext_.animationTimer >= 1.0f) { bossContext_.animationTimer = 0.0f; }
 
-		// 地面に付いたらバトル状態へ変更する
+		// 終了判定
 		if (timer_ >= 1.0f) {
-			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Scream)]["Scream"]);
+			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Appearance)]["Appearance_Animation_2nd"]);
 			isMove_ = false;
+			// 次フェーズへ向けてタイマーリセット
 			timer_ = 0.0f;
 		}
 	} else {
-
-		timer_ += FpsCounter::deltaTime / waitTime_;
-
-		// アニメーション
+		// 待機タイマー（正規化）
+        timer_ += FpsCounter::deltaTime / waitTime_;
 		bossContext_.animationTimer = timer_;
 
-		if(timer_ >= 1.0f){
+		if (timer_ >= waitTime_) {
 			bossContext_.bossStateRequest_ = BossState::Battle;
 		}
-	}	
+	}
 }
 
 void BossStateIn::Exit() {

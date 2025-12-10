@@ -6,6 +6,7 @@
 
 // 敵のアニメーション
 enum class enemyAnimationType : size_t {
+    Appearance,// 登場
 	BaseMove,  // 基本移動
 	Rush,      // 突進
 	Scream,    // 叫ぶ
