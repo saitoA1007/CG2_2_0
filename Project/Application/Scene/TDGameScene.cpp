@@ -567,7 +567,15 @@ void TDGameScene::Update() {
 		cameraController_->ApplyImmediateView(eye, center, euler, fov);
 		mainCamera_->SetCamera(cameraController_->GetCamera());
 
-		if (bossIntroTimer_ >= kBossIntroDuration_ && bossEnemy_->GetBossState() == BossState::Battle) {
+		// Egg状態でタイマーが1.0f到達時に氷柱破壊パーティクルを発生させる（1回のみ）
+		if (bossEnemy_->GetBossState() == BossState::Egg) {
+            float prev = bossIntroTimer_ - GameEngine::FpsCounter::deltaTime;
+            if (prev < 1.0f && bossIntroTimer_ >= 1.0f) {
+                enemyAttackManager_->AddEnemyDestroyEffect(bossPos);
+            }
+        }
+
+        if (bossIntroTimer_ >= kBossIntroDuration_ && bossEnemy_->GetBossState() == BossState::Battle) {
 			bossIntroPlaying_ = false;
 			bossIntroTimer_ = 0.0f;
 			// Letterbox を非表示に戻す
