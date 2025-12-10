@@ -253,6 +253,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	bossEnemy_ = std::make_unique<BossEnemy>();
 	bossEnemy_->Initialize(stageManager_->GetRadius(), enemyAttackManager_.get(), bossEnemyAnimator_.get(), 
 		&enemyAnimationData_,debugRenderer_.get());
+	bossEnemy_->SetTexture(bossEnemyModel_->GetDefaultTexture(), context_->textureManager->GetHandleByName("gras.png"));
 	
 	// ボスの影
 	bossEnemyShadow_ = std::make_unique<PlaneProjectionShadow>();
@@ -801,12 +802,17 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	// プレイヤーの影を描画する
 	ModelRenderer::DrawAnimation(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
 
-	// 敵を描画
-    if (bossEnemy_->GetBossState() != BossState::Egg) {
-		ModelRenderer::DrawAnimationWithLight(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource());
-	}
 	// 敵の影を描画する
 	ModelRenderer::DrawAnimation(bossEnemyModel_, bossEnemyShadow_->GetWorldTransform(), &bossEnemyShadow_->GetMaterial());
+
+	// ボスのアニメーション専用shader
+	CustomRenderer::PreDraw(CustomRenderMode::BossAnimation);
+
+	// 敵を描画
+    if (bossEnemy_->GetBossState() != BossState::Egg) {
+		//ModelRenderer::DrawAnimationWithLight(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource());
+		CustomRenderer::DrawAnimationWithLight(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource(), bossEnemy_->GetMaterial());
+	}
 
 	// 氷のテスト描画
 	CustomRenderer::PreDraw(CustomRenderMode::Ice);

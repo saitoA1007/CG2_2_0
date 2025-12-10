@@ -366,6 +366,14 @@ void PSOManager::DefaultLoadPSO() {
 
     LogManager::GetInstance().Log("Default PSOs loaded");
 
+    // ボス用のアニメーション描画用のPSO
+    animation.rootSigName = "BossAnimation";
+    animation.vsPath = L"Resources/Shaders/SkinningObject3d.VS.hlsl";
+    animation.psPath = L"Resources/Shaders/Boss.PS.hlsl";
+    animation.drawMode = DrawModel::FillFront;
+    animation.blendMode = BlendMode::kBlendModeNormal;
+    animation.isDepthEnable = true;
+    RegisterPSO("BossAnimation", animation, &animationRootSigBuilder, &animationInputLayoutBuilder);
 
     // 氷のモデル用
     CreatePSOData ice3D;

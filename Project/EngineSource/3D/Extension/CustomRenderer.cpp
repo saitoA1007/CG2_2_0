@@ -19,11 +19,13 @@ void CustomRenderer::StaticInitialize(ID3D12Device* device,ID3D12GraphicsCommand
 	// 使用するマテリアルの静的初期化
 	IceMaterial::StaticInitialize(device);
 	IceRockMaterial::StaticInitialize(device);
+	BossMaterial::StaticInitialize(device);
 
 	// 氷描画のpsoデータを取得する
 	psoList_[CustomRenderMode::Ice] = psoManager->GetDrawPsoData("IceMaterial");
 	psoList_[CustomRenderMode::Rock] = psoManager->GetDrawPsoData("IceRock");
 	psoList_[CustomRenderMode::RockBoth] = psoManager->GetDrawPsoData("IceRockBoth");
+	psoList_[CustomRenderMode::BossAnimation] = psoManager->GetDrawPsoData("BossAnimation");
 }
 
 void CustomRenderer::PreDraw(CustomRenderMode mode) {
@@ -104,4 +106,39 @@ void CustomRenderer::DrawRock(const Model* model, WorldTransform& worldTransform
 			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), 1, 0, 0);
 		}
 	}
+}
+
+void CustomRenderer::DrawAnimationWithLight(const Model* model, WorldTransform& worldTransform, ID3D12Resource* lightGroupResource, BossMaterial* material) {
+
+	// カメラ座標に変換
+	worldTransform.SetWVPMatrix(vpMatrix_);
+
+	// メッシュを取得
+	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
+
+	for (uint32_t i = 0; i < meshes.size(); ++i) {
+
+		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
+			meshes[i]->GetVertexBufferView(),
+			model->skinClusterBron_->influenceBufferView
+		};
+
+		commandList_->IASetVertexBuffers(0, 2, vbvs);
+		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+		commandList_->SetGraphicsRootDescriptorTable(3, model->skinClusterBron_->paletteSrvHandle.second);
+		commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(5, cameraResource_->GetGPUVirtualAddress());
+
+		if (meshes[i]->GetTotalIndices() != 0) {
+			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
+		} else {
+			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), 1, 0, 0);
+		}
+	}
+
 }

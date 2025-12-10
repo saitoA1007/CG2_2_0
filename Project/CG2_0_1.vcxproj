@@ -209,6 +209,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
+    <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\BossMaterial.cpp" />
     <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.cpp" />
     <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.cpp" />
     <ClCompile Include="EngineSource\3D\Extension\CustomRenderer.cpp" />
@@ -402,6 +403,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
+    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\BossMaterial.h" />
     <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.h" />
     <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.h" />
     <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\ICustomMaterial.h" />
@@ -594,6 +596,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BgIceRock.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Boss.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
