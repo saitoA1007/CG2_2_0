@@ -35,39 +35,44 @@ struct PixelShaderOutput
 };
 
 PixelShaderOutput main(VertexShaderOutput input)
-{
+{     
     PixelShaderOutput output;
     float4 transformedUV = mul(float32_t4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
+    float32_t mask = gTexture[gMaterial.noiseTexture].Sample(gSampler, transformedUV.xy).r;
+    if (mask <= gMaterial.time)
+    {
+        discard;
+    }
     float32_t4 textureColor = gTexture[gMaterial.textureHandle].Sample(gSampler, transformedUV.xy);
     
     float32_t3 tmpColor = { 0.0f, 0.0f, 0.0f };
         // cameraDirection
     float32_t3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
-        
-    if (gDirectionalLight.active)
-    {
-            // half lambert
-        float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
-        float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+    
+    // half lambert
+    float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
+    float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
             // 拡散反射
-        float32_t3 diffuseDirectionalLight = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+    float32_t3 diffuseDirectionalLight = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
               
             // cameraDirection
-        float32_t3 halfVector = normalize(-gDirectionalLight.direction + toEye);
-        float NDotH = dot(normalize(input.normal), halfVector);
-        float specularPow = pow(saturate(NDotH), gMaterial.shininess); // 反射強度
+    float32_t3 halfVector = normalize(-gDirectionalLight.direction + toEye);
+    float NDotH = dot(normalize(input.normal), halfVector);
+    float specularPow = pow(saturate(NDotH), gMaterial.shininess); // 反射強度
             // 鏡面反射
-        float32_t3 specularDirectionalLight = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * gMaterial.specularColor;
+    float32_t3 specularDirectionalLight = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * gMaterial.specularColor;
         
             // diffuse+specular
-        tmpColor += diffuseDirectionalLight + specularDirectionalLight;
-    }
-        
+    tmpColor += diffuseDirectionalLight + specularDirectionalLight;
         // 最終的な色を適応
     output.color.rgb = tmpColor;
-       
+        
         // アルファ値を適応
     output.color.a = gMaterial.color.a * textureColor.a;
+    
+    // エッジ
+    float32_t edge = 1.0f - smoothstep(gMaterial.time, gMaterial.time + 0.03f, mask);
+    output.color.rgb += edge * float32_t3(0.0f, 1.0f, 1.0f);
     
     if (output.color.a == 0.0)
     {
