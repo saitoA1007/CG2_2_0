@@ -184,6 +184,8 @@ private:
 
 	// ボス敵モデル
 	GameEngine::Model* bossEnemyModel_;
+	// ボス卵モデル
+	GameEngine::Model* bossEggModel_ = nullptr;
 	// ボス敵
 	std::unique_ptr<BossEnemy> bossEnemy_;
 

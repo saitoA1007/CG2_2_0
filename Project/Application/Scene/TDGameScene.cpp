@@ -233,6 +233,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Boss");
 	bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	bossEnemyModel_->SetDefaultIsEnableLight(true);
+	// Egg用モデルを取得（存在すれば）
+	bossEggModel_ = context_->modelManager->GetNameByModel("BossEgg");
+	bossEggModel_->SetDefaultColor({1.0f,1.0f,1.0f,1.0f});
+	bossEggModel_->SetDefaultIsEnableLight(true);
 
 	// 敵のアニメーションデータを取得する
 	enemyAnimationData_[static_cast<size_t>(enemyAnimationType::BaseMove)] = context_->animationManager->GetNameByAnimations("BossBirdBaseMove");
@@ -346,6 +350,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 		//		CameraController::ShakeOrigin::TargetPosition,
 		//		false, true, true, true);
 		//}
+
 		// 初回実行フラグを解除
 		TDGameScene::SetIsFirstGameStart(false);
 	}
@@ -778,6 +783,10 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	// 背景のオブジェクトを描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(bgRockModel_, bgRock_->GetWorldTransform());
+	
+	if (bossEnemy_->GetBossState() == BossState::Egg) {
+		ModelRenderer::Draw(bossEggModel_, bossEnemy_->GetWorldTransform());
+	}
 
 	// 岩を描画
 	CustomRenderer::PreDraw(CustomRenderMode::Rock);
@@ -792,7 +801,9 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	ModelRenderer::DrawAnimation(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
 
 	// 敵を描画
-	ModelRenderer::DrawAnimationWithLight(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource());
+    if (bossEnemy_->GetBossState() != BossState::Egg) {
+		ModelRenderer::DrawAnimationWithLight(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource());
+	}
 	// 敵の影を描画する
 	ModelRenderer::DrawAnimation(bossEnemyModel_, bossEnemyShadow_->GetWorldTransform(), &bossEnemyShadow_->GetMaterial());
 

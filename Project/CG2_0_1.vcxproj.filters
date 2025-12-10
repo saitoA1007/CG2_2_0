@@ -628,6 +628,7 @@
     <ClInclude Include="Application\Player\Effect\PlayerLandingEffect.h" />
     <ClInclude Include="Application\UI\BossDestroyFade.h" />
     <ClInclude Include="Application\UI\ClearUI.h" />
+    <ClInclude Include="Application\Enemy\States\BossStateEgg.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

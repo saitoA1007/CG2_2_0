@@ -78,6 +78,9 @@ public:
 		bossContext_.isResetPos = true;
 	}
 
+	// 現在の状態を取得する
+	BossState GetBossState() const { return bossState_; }
+
 private: // 調整項目
 
 	// 最大体力
