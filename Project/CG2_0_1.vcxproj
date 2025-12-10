@@ -202,6 +202,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="Application\Stage\StageWallPlane.cpp" />
     <ClCompile Include="Application\Stage\Wall.cpp" />
+    <ClCompile Include="Application\UI\ArrowUI.cpp" />
     <ClCompile Include="Application\UI\BossDestroyFade.cpp" />
     <ClCompile Include="Application\UI\BossHpUI.cpp" />
     <ClCompile Include="Application\UI\ClearUI.cpp" />
@@ -399,6 +400,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\Stage\StageWallPlane.h" />
     <ClInclude Include="Application\Stage\Wall.h" />
+    <ClInclude Include="Application\UI\ArrowUI.h" />
     <ClInclude Include="Application\UI\BossDestroyFade.h" />
     <ClInclude Include="Application\UI\BossHpUI.h" />
     <ClInclude Include="Application\UI\ClearUI.h" />
