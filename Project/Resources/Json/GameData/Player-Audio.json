@@ -1,0 +1,12 @@
+{
+    "Player-Audio": {
+        "AirMotionVolume": 1.0,
+        "PlayerDamagedVolume": 1.0,
+        "ReflectVolume": 1.0,
+        "RushChargeVolume": 1.0,
+        "RushLv1Volume": 1.0,
+        "RushLv2Volume": 1.0,
+        "RushLv3Volume": 1.0,
+        "SceneName": "TDGameScene"
+    }
+}

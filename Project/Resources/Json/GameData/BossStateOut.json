@@ -2,6 +2,8 @@
     "BossStateOut": {
         "CycleHeight": 4.0,
         "EndPosY": 14.0,
+        "FadeMaxTime": 2.0,
+        "InMaxTime": 4.0,
         "MaxTime": 4.0,
         "SceneName": "TDGameScene",
         "StartPosY": 8.0,

@@ -3,6 +3,7 @@
         "IceFallTime": 2.0,
         "RadiusRatio": 0.800000011920929,
         "SceneName": "TDGameScene",
+        "WaitIceFallTime": 1.0,
         "minDistance": 7.0
     }
 }
