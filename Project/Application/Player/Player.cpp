@@ -807,21 +807,15 @@ void Player::OnCollision(const CollisionResult &result) {
 	}
 
 	if (isGround) {
-		// 地面にめり込んでいる分だけ押し戻す
-		Vector3 n = result.contactNormal;
-		if (n.x != 0.0f || n.y != 0.0f || n.z != 0.0f) { n = Normalize(n); }
-		float depth = std::max(result.penetrationDepth, 0.0f);
-		Vector3 correction = n * depth;
-		worldTransform_.transform_.translate.x -= correction.x;
-		worldTransform_.transform_.translate.y -= correction.y;
-		worldTransform_.transform_.translate.z -= correction.z;
 		if (velocity_.y < 0.0f) {
 			velocity_.y = 0.0f;
 			attackDownPower_ = 0.0f;
+            worldTransform_.transform_.translate.y = collider_->GetRadius() / 2.0f;
 			if (isAttackDown_ && onLandHit_) {
 				onLandHit_();
 			}
 		}
+		
 		if (!isRushing_ && !isBounceLock_) {
 			isJump_ = false;
 			isAttackDown_ = false;
