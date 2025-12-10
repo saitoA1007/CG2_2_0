@@ -298,6 +298,16 @@ void TDGameScene::Initialize(SceneContext* context) {
 	enemyWingsParticleParticle_->Initialize(wingModel_->GetDefaultTexture());
 	//enemyWingsParticleParticle_->SetEmitterPos({ 0.0f,10.0f,0.0f });
 
+	// 翼のパーティクル
+	enterWingsParticle_ = std::make_unique<EnterWingsParticle>();
+	enterWingsParticle_->Initialize(wingModel_->GetDefaultTexture());
+	enterWingsParticle_->SetEmitterPos({ 0.0f,10.0f,0.0f });
+
+	// 翼のバースト
+	enterBurstWingsParticle_ = std::make_unique<EnterBurstWingsParticle>();
+	enterBurstWingsParticle_->Initialize(wingModel_->GetDefaultTexture());
+	enterBurstWingsParticle_->SetEmitterPos({ 0.0f,10.0f,0.0f });
+
 	// ボスが常に纏っているパーティクル
 	bossWearParticle_ = std::make_unique<ParticleBehavior>();
 	bossWearParticle_->Initialize("BossWearParticle", 16);
@@ -896,6 +906,14 @@ void TDGameScene::Update() {
 		Vector3(bossEnemy_->GetWorldPosition().x, bossEnemy_->GetWorldPosition().y + 3.0f, bossEnemy_->GetWorldPosition().z));
 	enemyWingsParticleParticle_->Update();
 
+	// ボスの入りの翼演出
+	enterWingsParticle_->SetIsLoop(bossEnemy_->IsEnterWingsEffect());
+	enterWingsParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition() + Vector3(0.0f, 3.0f, 0.0f));
+	enterWingsParticle_->Update();
+	enterBurstWingsParticle_->SetIsLoop(bossEnemy_->IsEnterBurstWingsEffect());
+	enterBurstWingsParticle_->SetEmitterPos(bossEnemy_->GetWorldPosition() + Vector3(0.0f, 2.0f, 0.0f));
+	enterBurstWingsParticle_->Update();
+
 	// ボスがヒットした時の演出
 	if (bossEnemy_->IsHit()) {
 		bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,bossEnemy_->GetAlpha() });
@@ -1178,6 +1196,10 @@ void TDGameScene::Draw(const bool &isDebugView) {
 
 	// ボスの翼の演出を描画
 	ModelRenderer::DrawInstancing(wingModel_, enemyWingsParticleParticle_->GetCurrentNumInstance(), *enemyWingsParticleParticle_->GetWorldTransforms());
+
+	// ボスの入りの翼の演出を描画
+	ModelRenderer::DrawInstancing(wingModel_, enterWingsParticle_->GetCurrentNumInstance(), *enterWingsParticle_->GetWorldTransforms());
+	ModelRenderer::DrawInstancing(wingModel_, enterBurstWingsParticle_->GetCurrentNumInstance(), *enterBurstWingsParticle_->GetWorldTransforms());
 
 	// インスタンシング描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::Instancing);

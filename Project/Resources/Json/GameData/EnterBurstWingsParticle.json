@@ -1,0 +1,14 @@
+{
+    "EnterBurstWingsParticle": {
+        "LifeTime": 3.0,
+        "ScaleYMax": 2.0,
+        "ScaleYMin": 1.0,
+        "SceneName": "TDGameScene",
+        "SpawnCoolTime": 0.0,
+        "SpawnCount": 32,
+        "SpawnPosMax": 3.0,
+        "SpawnPosMin": -3.0,
+        "SpeedMax": 15.0,
+        "SpeedMin": 10.0
+    }
+}

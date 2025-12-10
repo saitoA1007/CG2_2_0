@@ -31,6 +31,8 @@ void BossStateIn::Enter() {
 	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Appearance)]["Appearance_Animation_Rotate"]);
 	bossContext_.animationTimer = 0.0f;
 
+	bossContext_.isEnterWingsEffect_ = true;
+
 	// 移動開始
 	isMove_ = true;
 	timer_ = 0.0f;
@@ -61,6 +63,10 @@ void BossStateIn::Update() {
 		bossContext_.animationTimer += FpsCounter::deltaTime;
 		if (bossContext_.animationTimer >= 1.0f) { bossContext_.animationTimer = 0.0f; }
 
+		if (timer_ >= 0.8f) {
+			bossContext_.isEnterWingsEffect_ = false;
+		}
+
 		// 終了判定
 		if (timer_ >= 1.0f) {
 			bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Appearance)]["Appearance_Animation_2nd"]);
@@ -69,11 +75,17 @@ void BossStateIn::Update() {
 			timer_ = 0.0f;
 		}
 	} else {
+		
 		// 待機タイマー（正規化）
         timer_ += FpsCounter::deltaTime / waitTime_;
 		bossContext_.animationTimer = timer_;
 
+		if (timer_ >= 0.3f) {
+			bossContext_.isEnterBurstWingsEffect_ = true;
+		}
+
 		if (timer_ >= 1.0f) {
+			bossContext_.isEnterBurstWingsEffect_ = false;
 			bossContext_.bossStateRequest_ = BossState::Battle;
 		}
 	}
