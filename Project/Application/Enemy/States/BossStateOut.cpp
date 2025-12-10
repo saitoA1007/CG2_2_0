@@ -3,6 +3,7 @@
 #include"FPSCounter.h"
 #include"GameParamEditor.h"
 #include"EasingManager.h"
+#include"AudioManager.h"
 #include<numbers>
 using namespace GameEngine;
 
@@ -21,6 +22,8 @@ void BossStateOut::Enter() {
 
 	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Death)]["アーマチュア"]);
 	bossContext_.animationTimer = 0.0f;
+
+	sh_ = AudioManager::GetInstance().GetHandleByName("Boss_Die.mp3");
 
 	phase_ = Phase::In;
 }
@@ -90,6 +93,8 @@ void BossStateOut::Update() {
 		if (timer_ >= 1.0f) {
 			phase_ = Phase::Fade;
 			timer_ = 0.0f;
+
+			AudioManager::GetInstance().Play(sh_, 0.8f, false);
 		}
 		break;
 	}
