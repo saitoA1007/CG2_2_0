@@ -102,6 +102,9 @@ private:
 
 	std::string kGroupName_ = "Wall";
 
+	// 壊れる音
+	uint32_t iceBreakSH_ = 0;
+
 	// デバック用
 	Vector4 rimColor;
 	Vector4 specularColor;

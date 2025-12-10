@@ -6,6 +6,7 @@
 #include<numbers>
 #include"CollisionConfig.h"
 #include"GameParamEditor.h"
+#include"AudioManager.h"
 #include"Application/CollisionTypeID.h"
 using namespace GameEngine;
 
@@ -56,6 +57,9 @@ void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectMan
     iceFallTexture_ = texture;
     breakTexture_ = breakTexture;
 
+    // 氷の壊れる音を追加
+    iceBreakSH_ = AudioManager::GetInstance().GetHandleByName("Egg_Clack.mp3");
+
 #ifdef _DEBUG
     // 値を登録する
     RegisterBebugParam();
@@ -76,6 +80,7 @@ void EnemyAttackManager::Update(const Matrix4x4& cameraWorldMatrix, const Matrix
 	// 氷柱がデスフラグがたったら削除
     for (std::unique_ptr<IceFall>& iceFall : IceFallsList_) {
         if (!iceFall->IsAlive()) {
+            AudioManager::GetInstance().Play(iceBreakSH_, 0.5f, false);
             AddBreakIceParticle(iceFall->GetWorldPosition());
         }
     }
