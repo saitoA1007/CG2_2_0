@@ -106,6 +106,9 @@ public:
 
     // Bounce lock 状態取得
     bool IsBounceLock() const { return isBounceLock_; }
+
+	// 回復演出
+	bool IsHearted() const { return isHearted_; }
 	
 private:
 	//==================================================
