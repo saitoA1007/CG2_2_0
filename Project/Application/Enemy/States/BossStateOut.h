@@ -4,6 +4,12 @@
 
 class BossStateOut : public IBossState {
 public:
+
+	enum class Phase {
+		In,
+		Fade
+	};
+
     BossStateOut(BossContext& context);
 
 	/// <summary>
@@ -28,7 +34,8 @@ private:
 	uint32_t cout_ = 0; 
 
 	float timer_ = 0.0f;
-	float maxTime_ = 4.0f;
+	float InmaxTime_ = 4.0f;
+	float FadeMaxTime_ = 2.0f;
 
 	bool isSet_ = false;
 	bool isActive_ = false;
@@ -45,6 +52,8 @@ private:
 	float cycleHeight_ = 2.0f;
 
 	std::string kGroupName = "BossStateOut";
+
+	Phase phase_ = Phase::In;
 
 private:
 
