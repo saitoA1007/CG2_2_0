@@ -140,6 +140,12 @@ void BossEnemy::Update(const Vector3& targetPos) {
 
     // 体の当たり判定の位置を設定する
     bodyCollider_->SetWorldPosition(worldTransform_.transform_.translate + Vector3(0.0f, worldTransform_.transform_.scale.y * 0.7f,0.0f));
+    // 卵状態のときだけ当たり判定を大きくする
+    if (bossState_ == BossState::Egg) {
+        bodyCollider_->SetRadius(bodyColliderSize_ * 1.5f);
+    } else {
+        bodyCollider_->SetRadius(bodyColliderSize_);
+    }
 
     // アニメーションの更新処理
     bossContext_.animator_->NormalizeUpdate(bossContext_.animationTimer);
