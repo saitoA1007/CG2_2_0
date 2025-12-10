@@ -591,7 +591,7 @@ void TDGameScene::Update() {
             eye = { 0.0f, 10.0f, -30.0f };
 		}
 		cameraController_->ApplyImmediateView(eye, center, euler, fov);
-		if (bossIntroTimer_ >= 4.7f && prev < 4.7f) {
+		if (bossIntroTimer_ >= 5.0f && prev < 5.0f) {
 			cameraController_->StartCameraShake(4.0f, 2.0f, 64.0f,
 				[](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutCubic(a, b, t); },
 				CameraController::ShakeOrigin::TargetPosition,
@@ -599,7 +599,7 @@ void TDGameScene::Update() {
 		}
 
 		//--------- アニメーション終了 ---------//
-        if (bossIntroTimer_ >= kBossIntroDuration_ && bossEnemy_->GetBossState() == BossState::Battle) {
+        if (bossIntroTimer_ >= kBossIntroDuration_) {
 			bossIntroPlaying_ = false;
 			bossIntroTimer_ = 0.0f;
 			// Letterbox を非表示に戻す

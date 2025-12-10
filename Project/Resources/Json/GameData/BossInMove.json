@@ -7,13 +7,13 @@
             0.0
         ],
         "InTime": 3.0,
-        "MoveHeight": 5.0,
+        "MoveHeight": 16.0,
         "SceneName": "TDGameScene",
         "StartPos": [
             0.0,
             0.0,
             0.0
         ],
-        "WaitTime": 4.0
+        "WaitTime": 5.0
     }
 }

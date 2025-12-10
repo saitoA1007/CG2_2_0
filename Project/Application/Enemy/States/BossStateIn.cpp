@@ -52,7 +52,7 @@ void BossStateIn::Update() {
 		bossContext_.worldTransform->transform_.translate = startPos_;
 		bossContext_.worldTransform->transform_.translate.y = startPos_.y + riseY;
 
-		// 回転（Y軸: 0deg -> 1800deg）EaseOutSine（度->ラジアンに変換）
+		// 回転（Y軸: 0deg -> 1620deg）EaseOutSine（度->ラジアンに変換）
 		float targetDeg = EaseOutSine(0.0f, 1620.0f, t);
 		float targetRad = targetDeg * (std::numbers::pi_v<float> / 180.0f);
 		bossContext_.worldTransform->transform_.rotate.y = targetRad;
