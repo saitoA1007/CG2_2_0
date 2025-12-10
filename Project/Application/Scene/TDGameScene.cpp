@@ -671,7 +671,7 @@ void TDGameScene::Update() {
 	sceneLightingController_->Update();
 
 	// プレイヤーの更新処理
-	if (isTitleLocked_ || bossIntroPlaying_) {
+	if (isTitleLocked_ || bossIntroPlaying_ || bossOutroPlaying_) {
 		player_->Update(nullptr, cameraController_->GetCamera());
 	} else {
 		player_->Update(context_->inputCommand, cameraController_->GetCamera());
@@ -706,13 +706,13 @@ void TDGameScene::Update() {
 	// ロックオン: 入力が有効ならプレイヤーとボスの位置をターゲットに設定
 	bool prevLockOn = isBossLockOn_;
 	if (!isTitleLocked_) {
-		if (!bossIntroDelayAfterFreeze_ && !bossIntroPlaying_) {
+		if (!bossIntroDelayAfterFreeze_ && !bossIntroPlaying_ && !bossOutroPlaying_) {
 			if (context_->inputCommand->IsCommandActive("LockOnBoss")) {
 				isBossLockOn_ = !isBossLockOn_;
 			}
 		}
 
-		if (!bossIntroPlaying_) {
+		if (!bossIntroPlaying_ && !bossOutroPlaying_) {
 			if (isBossLockOn_) {
 				std::vector<Vector3> targets;
 				targets.reserve(2);
@@ -742,7 +742,7 @@ void TDGameScene::Update() {
 	//============================
 	// FOV設定
 	//============================
-	if (!bossIntroPlaying_) {
+	if (!bossIntroPlaying_ && !bossOutroPlaying_) {
 		float desiredFov = 0.7f; // 通常
 		if (player_->IsRushing()) {
 			desiredFov = 1.0f; // 突進中
@@ -771,7 +771,7 @@ void TDGameScene::Update() {
 		}
 	}
 
-	if (isTitleLocked_ || bossIntroPlaying_) {
+	if (isTitleLocked_ || bossIntroPlaying_ || bossOutroPlaying_) {
 		cameraController_->Update(nullptr, nullptr);
 	} else {
 		cameraController_->Update(context_->inputCommand, context_->input);
@@ -952,10 +952,12 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	// アニメーションの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 
-	// プレイヤーのアニメーションを描画
-	ModelRenderer::DrawAnimationWithLight(playerModel_, player_->GetWorldTransform(), sceneLightingController_->GetResource());
-	// プレイヤーの影を描画する
-	ModelRenderer::DrawAnimation(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
+	if (!bossIntroPlaying_ && !bossOutroPlaying_) {
+		// プレイヤーのアニメーションを描画
+		ModelRenderer::DrawAnimationWithLight(playerModel_, player_->GetWorldTransform(), sceneLightingController_->GetResource());
+		// プレイヤーの影を描画する
+		ModelRenderer::DrawAnimation(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
+	}
 
 	// 敵の影を描画する
 	if (bossEnemy_->GetBossState() != BossState::Egg) {
