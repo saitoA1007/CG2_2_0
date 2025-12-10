@@ -314,6 +314,8 @@
     <ClCompile Include="Application\UI\ClearUI.cpp" />
     <ClCompile Include="Application\Enemy\LongLangeAttack\Heart.cpp" />
     <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\BossMaterial.cpp" />
+    <ClCompile Include="Application\Enemy\Effect\EnterWingsParticle.cpp" />
+    <ClCompile Include="Application\Enemy\Effect\EnterBurstWingsParticle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -633,6 +635,8 @@
     <ClInclude Include="Application\Enemy\LongLangeAttack\Heart.h" />
     <ClInclude Include="Application\Enemy\States\BossStateEgg.h" />
     <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\BossMaterial.h" />
+    <ClInclude Include="Application\Enemy\Effect\EnterWingsParticle.h" />
+    <ClInclude Include="Application\Enemy\Effect\EnterBurstWingsParticle.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

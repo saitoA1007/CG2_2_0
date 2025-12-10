@@ -26,6 +26,8 @@
 #include"Application/Enemy/Effect/EnemyRushEffect.h"
 #include"Application/Enemy/Effect/EnemyWindAttackParticle.h"
 #include"Application/Enemy/Effect/WingsParticle.h"
+#include"Application/Enemy/Effect/EnterWingsParticle.h"
+#include"Application/Enemy/Effect/EnterBurstWingsParticle.h"
 #include"Application/Graphics/Terrain.h"
 #include"Application/Graphics/PlaneProjectionShadow.h"
 #include"Application/Graphics/BgRock.h"
@@ -206,6 +208,10 @@ private:
 	std::unique_ptr<EnemyWindAttackParticle> enemyWindShadowAttackParticle_;
 	// 翼の演出
 	std::unique_ptr<WingsParticle> enemyWingsParticleParticle_;
+
+	// 入りの翼演出の翼
+	std::unique_ptr<EnterWingsParticle> enterWingsParticle_;
+	std::unique_ptr<EnterBurstWingsParticle> enterBurstWingsParticle_;
 
 	// ボスの纏っているパーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> bossWearParticle_;

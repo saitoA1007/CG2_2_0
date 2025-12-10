@@ -59,6 +59,10 @@ struct BossContext {
 
 	float fadeTimer_ = 0.0f;
 
+	// 入りの翼演出
+	bool isEnterWingsEffect_ = false;
+	bool isEnterBurstWingsEffect_ = false;
+
 	// アニメーションデータ
 	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)>* animationData_;
 	GameEngine::Animator* animator_ = nullptr;

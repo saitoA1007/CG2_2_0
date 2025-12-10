@@ -176,6 +176,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Enemy\Effect\EnemyRushEffect.cpp" />
     <ClCompile Include="Application\Enemy\Effect\EnemyRushParticle.cpp" />
     <ClCompile Include="Application\Enemy\Effect\EnemyWindAttackParticle.cpp" />
+    <ClCompile Include="Application\Enemy\Effect\EnterBurstWingsParticle.cpp" />
+    <ClCompile Include="Application\Enemy\Effect\EnterWingsParticle.cpp" />
     <ClCompile Include="Application\Enemy\Effect\WingsParticle.cpp" />
     <ClCompile Include="Application\Enemy\EnemyAttackManager.cpp" />
     <ClCompile Include="Application\Enemy\LongLangeAttack\Heart.cpp" />
@@ -368,6 +370,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy\Effect\EnemyRushEffect.h" />
     <ClInclude Include="Application\Enemy\Effect\EnemyRushParticle.h" />
     <ClInclude Include="Application\Enemy\Effect\EnemyWindAttackParticle.h" />
+    <ClInclude Include="Application\Enemy\Effect\EnterBurstWingsParticle.h" />
+    <ClInclude Include="Application\Enemy\Effect\EnterWingsParticle.h" />
     <ClInclude Include="Application\Enemy\Effect\WingsParticle.h" />
     <ClInclude Include="Application\Enemy\EnemyAttackManager.h" />
     <ClInclude Include="Application\Enemy\LongLangeAttack\Heart.h" />

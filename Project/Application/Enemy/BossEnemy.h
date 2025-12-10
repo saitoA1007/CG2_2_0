@@ -96,8 +96,12 @@ public:
 	// 現在の状態を取得する
 	BossState GetBossState() const { return bossState_; }
 
-private: // 調整項目
+	// 入りの翼演出フラグ
+	bool IsEnterWingsEffect() const { return bossContext_.isEnterWingsEffect_; }
+	bool IsEnterBurstWingsEffect() const { return bossContext_.isEnterBurstWingsEffect_; }
 
+private: // 調整項目
+	
 	// 最大体力
 	int32_t kMaxHp_ = 2;
 
