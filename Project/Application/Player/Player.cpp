@@ -949,7 +949,8 @@ void Player::ApplyDebugParam() {
 	kWallHitReflectFactor_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "WallHitReflectFactor");
 	kGroundDeceleration_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "GroundDeceleration");
 	kRotationLerpSpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "RotationLerpSpeed");
-    kMaxHP_ = GameParamEditor::GetInstance()->GetValue<int32_t>(kGroupNames[0], "MaxHP");
+    uint32_t InputMaxHP_ = GameParamEditor::GetInstance()->GetValue<uint32_t>(kGroupNames[0], "MaxHP");
+	kMaxHP_ = static_cast<int32_t>(InputMaxHP_);
     kDamageInvincibleTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames[0], "DamageInvincibleTime");
 
 	// 突撃設定
