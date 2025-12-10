@@ -1,5 +1,6 @@
 #pragma once
 #include<list>
+#include<vector>
 #include"Sprite.h"
 
 class PlayerHpUI {
@@ -28,23 +29,13 @@ public:
 
     void SetCurrentHp(const int32_t& hp) { currentHp_ = hp; }
 
-    /// <summary>
-    /// 画像データを取得
-    /// </summary>
-    /// <returns></returns>
-    GameEngine::Sprite* GetSprite() { return sprite_.get(); }
-
-    // 演出用の画像データを取得
-    GameEngine::Sprite* GetEffectSprite() { return effectSprite_.get(); }
+    // HP表示用スプライト配列を取得
+    const std::vector<std::unique_ptr<GameEngine::Sprite>>& GetHpSprites() const { return hpSprites_; }
 
 private:
 
-    std::unique_ptr<GameEngine::Sprite> sprite_;
-
-    // hpの演出用
-    std::unique_ptr<GameEngine::Sprite> effectSprite_;
-
-    float preScaleX_ = 1.0f;
+    // HP表示用のスプライト配列（個数式）
+    std::vector<std::unique_ptr<GameEngine::Sprite>> hpSprites_;
 
     // 最大hp
     int32_t maxHp_ = 0;
@@ -52,14 +43,13 @@ private:
     // 現在のhp
     int32_t currentHp_ = 0;
 
-    // 演出用のhpゲージが移動する位置
-    std::list<Point> points_;
-
-    float maxTime_ = 0.5f;
+    Vector2 iconSize_ = { 24.0f, 24.0f };
+    Vector2 startPos_ = { 32.0f, 32.0f };
+    float iconSpacing_ = 4.0f;
 
 private:
     /// <summary>
-    /// 演出の更新処理
+    /// 演出の更新処理（個数式では未使用）
     /// </summary>
-    void EffectUpdate();
+    void EffectUpdate() {}
 };

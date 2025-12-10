@@ -365,7 +365,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 
 	// プレイヤーのhpUIを初期化 (仮の最大HP: 3)
 	playerHpUI_ = std::make_unique<PlayerHpUI>();
-	playerHpUI_->Initialize(3);
+    playerHpUI_->Initialize(player_->GetMaxHP());
 
 	// ゲームオーバーUIの初期化
 	gameOverUI_ = std::make_unique<GameOverUI>();
@@ -944,25 +944,6 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	// デバック描画
 	debugRenderer_->DrawAll(isDebugView ? context_->debugCamera_->GetVPMatrix() : mainCamera_->GetVPMatrix());
 #endif
-
-	//======================================================
-	// 2D描画
-	//======================================================
-
-	// 画像の描画前処理
-	SpriteRenderer::PreDraw(RenderMode2D::Normal);
-
-	// プレイヤーのHPUIを表示
-	//SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
-	//SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
-
-	// GameOverUI描画
-	if (gameOverUI_->IsActive()) {
-		SpriteRenderer::Draw(gameOverUI_->GetBgSprite(), gameOverUI_->GetBgGH());
-		SpriteRenderer::Draw(gameOverUI_->GetLogoSprite(), gameOverUI_->GetLogoGH());
-		SpriteRenderer::Draw(gameOverUI_->GetRetrySprite(), gameOverUI_->GetRetryGH());
-		SpriteRenderer::Draw(gameOverUI_->GetTitleSprite(), gameOverUI_->GetTitleGH());
-	}
 }
 
 void TDGameScene::DrawUI() {
@@ -997,8 +978,9 @@ void TDGameScene::DrawUI() {
 	SpriteRenderer::Draw(bossHpUI_->GetNameSprite(), bossNameGH_);
 
 	// プレイヤーのHPUIを表示
-	//SpriteRenderer::Draw(playerHpUI_->GetEffectSprite(), 0);
-	//SpriteRenderer::Draw(playerHpUI_->GetSprite(), 0);
+    for (const auto &sprite : playerHpUI_->GetHpSprites()) {
+		SpriteRenderer::Draw(sprite.get(), 0);
+    }
 
 	// GameOverUI描画
 	if (gameOverUI_->IsActive()) {
