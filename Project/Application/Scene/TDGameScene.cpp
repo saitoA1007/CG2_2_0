@@ -745,17 +745,17 @@ void TDGameScene::Update() {
 
 		// カメラをボス位置へズームアウトするような動き
 		Vector3 bossPos = bossEnemy_->GetWorldTransform().GetWorldPosition();
-		Vector3 eye = { 0.0f, 6.0f, -20.0f };
+		Vector3 eye = { 0.0f, 6.0f, -24.0f };
 		Vector3 center = bossPos;
 		center.y += 4.0f;
 		Vector3 euler = { 0.0f, 0.0f, 0.0f };
 		float fov = 1.0f;
 
-		if (bossOutroTimer_ >= 4.0f) {
-			// 少し引きの画に移行
-			eye = { 0.0f, 12.0f, -28.0f };
-			//fov = 0.7f;
-		}
+		//if (bossOutroTimer_ >= 4.0f) {
+		//	// 少し引きの画に移行
+		//	eye = { 0.0f, 12.0f, -28.0f };
+		//	fov = 0.7f;
+		//}
 		cameraController_->ApplyImmediateView(eye, center, euler, fov);
 
 		//if (bossOutroTimer_ >= kBossOutroDuration_) {

@@ -137,13 +137,13 @@ void ClearUI::Animate() {
 	// 2.5f～3.0f: クリア文字背景 X 1280 -> 0 (EaseOutCubic)
 	if (t >= 2.5f && t <= 3.0f) {
 		float ratio = std::clamp((t - 2.5f) / 0.5f, 0.0f, 1.0f);
-		float x = EaseOutCubic(1280.0f, 0.0f, ratio);
+		float x = EaseOutExpo(1280.0f, 0.0f, ratio);
 		clearTextBackSprite_->position_.x = x;
 	}
 	// 2.8f～3.3f: クリア文字 X 1280 -> 640 (EaseOutCubic)
 	if (t >= 2.8f && t <= 3.3f) {
 		float ratio = std::clamp((t - 2.8f) / 0.5f, 0.0f, 1.0f);
-		float x = EaseOutCubic(1720.0f, 640.0f, ratio);
+		float x = EaseOutExpo(1720.0f, 640.0f, ratio);
 		clearTextSprite_->position_.x = x;
 	}
 
