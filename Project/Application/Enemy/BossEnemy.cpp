@@ -86,6 +86,9 @@ void BossEnemy::Update(const Vector3& targetPos) {
     ApplyDebugParam();
 #endif
 
+    // 消えるtime
+    bossMaterial_->materialData_->time = bossContext_.fadeTimer_;
+
     if (bossContext_.hp <= 0) {
         if (bossState_ != BossState::Out) {
             bossContext_.bossStateRequest_ = BossState::Out;

@@ -21,6 +21,8 @@ void BossStateOut::Enter() {
 
 	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::Death)]["アーマチュア"]);
 	bossContext_.animationTimer = 0.0f;
+
+	phase_ = Phase::In;
 }
 
 void BossStateOut::Update() {
@@ -49,43 +51,64 @@ void BossStateOut::Update() {
 
 	if (!isActive_) { return; }
 
-	timer_ += FpsCounter::deltaTime / maxTime_;
+	switch (phase_)
+	{
+	case BossStateOut::Phase::In: {
+		timer_ += FpsCounter::deltaTime / InmaxTime_;
 
-	float swayFade = 1.0f - timer_;
+		float swayFade = 1.0f - timer_;
 
-	float timeValue = timer_ * swaySpeed_ + swayPhase_;
-	float swayOffsetX = std::sinf(timeValue) * swayWeithX_ * swayFade;
-	float swayOffsetZ = std::sinf(timeValue * 2.0f) * swayWeithZ_ * swayFade;
+		float timeValue = timer_ * swaySpeed_ + swayPhase_;
+		float swayOffsetX = std::sinf(timeValue) * swayWeithX_ * swayFade;
+		float swayOffsetZ = std::sinf(timeValue * 2.0f) * swayWeithZ_ * swayFade;
 
-	Vector3 basePos;
-	basePos.x = 0.0f;
-	basePos.y = Lerp(startPosY_, endPosY_, EaseInOut(timer_));
-	basePos.z = 0.0f;
+		Vector3 basePos;
+		basePos.x = 0.0f;
+		basePos.y = Lerp(startPosY_, endPosY_, EaseInOut(timer_));
+		basePos.z = 0.0f;
 
-	// 縦移動
-	float posY = 0.0f;
-	float totalCycle = timer_ * 3.0f;
-	float localTimer = std::fmodf(totalCycle, 1.0f);
+		// 縦移動
+		float posY = 0.0f;
+		float totalCycle = timer_ * 3.0f;
+		float localTimer = std::fmodf(totalCycle, 1.0f);
 
-	if (localTimer <= 0.5f) {
-		float t = localTimer / 0.5f;
-		posY = Lerp(0.0f, cycleHeight_, EaseInOut(t));
-	} else {
-		float t = (localTimer - 0.5f) / 0.5f;
-		posY = Lerp(cycleHeight_, 0.0f, EaseInOut(t));
+		if (localTimer <= 0.5f) {
+			float t = localTimer / 0.5f;
+			posY = Lerp(0.0f, cycleHeight_, EaseInOut(t));
+		} else {
+			float t = (localTimer - 0.5f) / 0.5f;
+			posY = Lerp(cycleHeight_, 0.0f, EaseInOut(t));
+		}
+
+		basePos.y += posY;
+
+		bossContext_.worldTransform->transform_.translate = basePos + Vector3(swayOffsetX, 0.0f, swayOffsetZ);
+
+		// アニメーションを遷移
+		bossContext_.animationTimer = timer_;
+
+		if (timer_ >= 1.0f) {
+			phase_ = Phase::Fade;
+			timer_ = 0.0f;
+		}
+		break;
 	}
 
-	basePos.y += posY;
+	case BossStateOut::Phase::Fade: {
 
-	bossContext_.worldTransform->transform_.translate = basePos + Vector3(swayOffsetX, 0.0f, swayOffsetZ);
+		timer_ += FpsCounter::deltaTime / FadeMaxTime_;
 
-	// アニメーションを遷移
-	bossContext_.animationTimer = timer_;
+		// 消える
+		bossContext_.fadeTimer_ = timer_;
 
-	if (timer_ >= 1.0f) {
-		// ボスの全ての処理が終了
-		bossContext_.isFinished_ = true;
-		isActive_ = false;
+		if (timer_ >= 1.0f) {
+			bossContext_.fadeTimer_ = 1.0f;
+			// ボスの全ての処理が終了
+			bossContext_.isFinished_ = true;
+			isActive_ = false;
+		}
+		break;
+	}
 	}
 }
 
@@ -94,7 +117,8 @@ void BossStateOut::Exit() {
 }
 
 void BossStateOut::RegisterBebugParam() {
-	GameParamEditor::GetInstance()->AddItem(kGroupName, "MaxTime", maxTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupName, "InMaxTime", InmaxTime_);
+	GameParamEditor::GetInstance()->AddItem(kGroupName, "FadeMaxTime", FadeMaxTime_);
 	GameParamEditor::GetInstance()->AddItem(kGroupName, "StartPosY", startPosY_);
 	GameParamEditor::GetInstance()->AddItem(kGroupName, "EndPosY", endPosY_);
 	GameParamEditor::GetInstance()->AddItem(kGroupName, "SwaySpeed", swaySpeed_);
@@ -105,7 +129,8 @@ void BossStateOut::RegisterBebugParam() {
 }
 
 void BossStateOut::ApplyDebugParam() {
-	maxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName, "MaxTime");
+	InmaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName, "InMaxTime");
+	FadeMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName, "FadeMaxTime");
 	startPosY_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName, "StartPosY");
 	endPosY_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName, "EndPosY");
 	swaySpeed_ = GameParamEditor::GetInstance()->GetValue<float>(kGroupName, "SwaySpeed");

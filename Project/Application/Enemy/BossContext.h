@@ -56,6 +56,8 @@ struct BossContext {
 	bool isFinished_ = false;
 	bool isResetPos = false;
 
+	float fadeTimer_ = 0.0f;
+
 	// アニメーションデータ
 	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)>* animationData_;
 	GameEngine::Animator* animator_ = nullptr;
