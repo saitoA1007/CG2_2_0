@@ -181,8 +181,12 @@ void TDGameScene::Initialize(SceneContext* context) {
     playerLandingEffect_ = std::make_unique<PlayerLandingEffect>();
     playerLandingEffect_->Initialize();
 
-    // 着地時にエフェクトを起動
+    // 着地時にカメラシェイク実行とエフェクトを起動
     player_->SetOnLandHit([this]() {
+		cameraController_->StartCameraShake(5.0f, 1.0f, 100.0f,
+			[](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutCubic(a, b, t); },
+			CameraController::ShakeOrigin::TargetPosition,
+            true, false, true, false);
         if (playerLandingEffect_) {
             playerLandingEffect_->Emitter(player_->GetWorldTransform().GetWorldPosition());
         }
