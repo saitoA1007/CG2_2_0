@@ -18,7 +18,7 @@ public:
 public:
 
     // エミッター
-    void Emitter(const Vector3& pos);
+    void Emitter(const Vector3& pos,const float& ratio);
 
     /// <summary>
     /// ワールド行列を取得
@@ -37,6 +37,9 @@ public:
 
     // 終了フラグ
     bool IsActive()const { return isActive_; }
+
+    // ヒットエフェクトの描画管理
+    bool IsDrawHitEffect() const { return isDrawHitEffect_; }
 
 private:
     // ワールド行列
@@ -58,6 +61,12 @@ private:
     float hitMaxTime_ = 1.0f;
     float endScale_ = 4.0f;
     float endRotZ_ = 30.0f;
+
+    bool isDrawHitEffect_ = false;
+
+    // 全体の時間管理
+    float entireTimer_ = 0.0f;
+    float entireTime_ = 2.5f;
 
 private:
 
