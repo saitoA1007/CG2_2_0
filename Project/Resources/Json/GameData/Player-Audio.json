@@ -1,6 +1,6 @@
 {
     "Player-Audio": {
-        "AirMotionVolume": 1.0,
+        "AirMotionVolume": 0.5,
         "PlayerDamagedVolume": 1.0,
         "ReflectVolume": 1.0,
         "RushChargeVolume": 1.0,
