@@ -40,6 +40,7 @@ void Heart::Initialize(const Vector3& pos, const uint32_t& texture) {
 
     // マテリアルを初期化
     material_.Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 10.0f, false);
+    material_.SetTextureHandle(texture);
 
     isStop_ = true;
 
