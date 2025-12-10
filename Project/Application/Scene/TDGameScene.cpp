@@ -1,4 +1,4 @@
-#include"TDGameScene.h"
+﻿#include"TDGameScene.h"
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
 #include"SpriteRenderer.h"
@@ -407,14 +407,13 @@ void TDGameScene::Initialize(SceneContext* context) {
 	playerGetHeartParticle_->Emit({ 10.0f,-10.0f,0.0f });
 	playerGetHeartParticle_->SetIsLoop(false);
 
-	transitionStartTarget_ = Vector3{ 0.0f,32.0f,0.0f };
+	transitionStartTarget_ = Vector3{ -2.0f,32.0f,-16.0f };
 	transitionEndTarget_ = player_ ? player_->GetWorldTransform().GetWorldPosition() : transitionStartTarget_;
 
 	// cameraController のターゲットを初期注視点に設定して内部状態を同期
 	cameraController_->SetTarget(transitionStartTarget_);
 	cameraController_->SetCameraCoordinateType(CameraController::CameraCoodinateType::Spherical);
 	cameraController_->SetDesiredFov(0.7f);
-	cameraController_->SetDesiredAsCurrent();
 	cameraController_->Update(context_->inputCommand, context_->input);
 	cameraController_->SetCurrentAsDesired();
 	cameraController_->Update(context_->inputCommand, context_->input);
@@ -425,10 +424,19 @@ void TDGameScene::Initialize(SceneContext* context) {
 		isTitleLocked_ = true;
 		isTransitioning_ = false;
 		transitionTimer_ = 0.0f;
+        // タイトル表示中はその他UIを非表示に（アルファ0）
+        uiFadeAlpha_ = 0.0f;
+        bossHpUI_->GetFrameSprite()->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
+        bossHpUI_->GetEffectSprite()->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
+        bossHpUI_->GetSprite()->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
+        bossHpUI_->GetNameSprite()->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
+        for (auto &s : playerHpUI_->GetHpSprites()) { s->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f)); }
+        if (playGuideSprite_) playGuideSprite_->SetColor(Vector4(1.0f,1.0f,1.0f,0.0f));
     } else {
         isTitleLocked_ = false;
         titleSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, 0.0f));
         spaceSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, 0.0f));
+        uiFadeAlpha_ = 1.0f;
     }
 
     // Letterbox 初期化（高さ0で開始）
@@ -494,16 +502,31 @@ void TDGameScene::Update() {
 			Vector3 currentTarget = Lerp(transitionStartTarget_, transitionEndTarget_, eased);
 			cameraController_->SetTarget(currentTarget);
 
-			// スプライトのフェード
-			float alpha = 1.0f - eased;
-			if (titleSprite_) titleSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, alpha));
-			if (spaceSprite_) spaceSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, alpha));
+			// スプライトのフェード（タイトルは1->0、その他UIは0->1）
+			float titleAlpha = 1.0f - eased;
+			uiFadeAlpha_ = eased;
+			if (titleSprite_) titleSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, titleAlpha));
+			if (spaceSprite_) spaceSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, titleAlpha));
+			// UIフェードインを反映
+			bossHpUI_->GetFrameSprite()->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
+			bossHpUI_->GetEffectSprite()->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
+			bossHpUI_->GetSprite()->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
+			bossHpUI_->GetNameSprite()->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
+			for (auto &s : playerHpUI_->GetHpSprites()) { s->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_)); }
+			if (playGuideSprite_) playGuideSprite_->SetColor(Vector4(1.0f,1.0f,1.0f, uiFadeAlpha_));
 
 			if (transitionTimer_ >= kTransitionDuration_) {
 				isTransitioning_ = false;
 				isTitleLocked_ = false;
+				uiFadeAlpha_ = 1.0f;
 			}
+		} else {
+			// タイトル表示中はUIは完全に隠す
+			uiFadeAlpha_ = 0.0f;
 		}
+	} else {
+		// タイトル解除後はUIをフル表示
+		uiFadeAlpha_ = 1.0f;
 	}
 
 	if (context_->input->TriggerKey(DIK_U)) {
@@ -1218,18 +1241,14 @@ void TDGameScene::DrawUI() {
 		if (auto s = letterbox_->GetBottomSprite()) { SpriteRenderer::Draw(s, 0); }
 	}
 
-	// タイトル描画
-	SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_);
+	// タイトルスプライト（フェードアウト後はアルファ0なので描かれても問題なし）
+	if (titleSprite_) { SpriteRenderer::Draw(titleSprite_.get(), titleGH_); }
+	if (spaceSprite_) { SpriteRenderer::Draw(spaceSprite_.get(), spaceGH_); }
 
-	// タイトルスプライトの描画（TitleSceneからコピー）
-	if (titleSprite_) {
-		SpriteRenderer::Draw(titleSprite_.get(), titleGH_);
-	}
-	if (spaceSprite_) {
-		SpriteRenderer::Draw(spaceSprite_.get(), spaceGH_);
-	}
+	// 操作ガイド（フェードに合わせたアルファ適用済）
+	if (playGuideSprite_) { SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_); }
 
-	// ボスのHPUIを表示
+	// ボスのHPUIを表示（各スプライトに適用済みアルファ）
 	SpriteRenderer::Draw(bossHpUI_->GetFrameSprite(), 0);
 	SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
 	SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
@@ -1240,7 +1259,7 @@ void TDGameScene::DrawUI() {
         SpriteRenderer::Draw(sprite.get(), playerHpUI_->GetHpIconGH());
     }
 
-	// GameOverUI描画
+	// GameOverUI描画（タイトルロック中は表示しないためここで通常表示）
 	if (gameOverUI_->IsActive()) {
 		SpriteRenderer::Draw(gameOverUI_->GetBgSprite(), gameOverUI_->GetBgGH());
 		SpriteRenderer::Draw(gameOverUI_->GetLogoSprite(), gameOverUI_->GetLogoGH());

@@ -355,4 +355,7 @@ private:
 	// イージングで遷移する注視点
 	Vector3 transitionStartTarget_ = {0.0f, 16.0f, 0.0f};
 	Vector3 transitionEndTarget_ = {0.0f, 16.0f, 0.0f};
+
+    // UIフェードアルファ（タイトルロゴ非表示に合わせて0->1）
+    float uiFadeAlpha_ = 0.0f;
 };

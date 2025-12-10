@@ -25,10 +25,11 @@ void PlayerHpUI::Update() {
     // 現在HPに応じて色を更新
     for (int i = 0; i < maxHp_; ++i) {
         auto& spr = hpSprites_[static_cast<size_t>(i)];
+        float alpha = spr->color_.w; // 現在の透明度を保持
         if (i < currentHp_) {
-            spr->SetColor({ 1.0f,1.0f,1.0f,1.0f }); // 残HPは白
+            spr->SetColor({ 1.0f,1.0f,1.0f,alpha }); // 残HPは白
         } else {
-            spr->SetColor({ 0.0f,0.0f,0.0f,1.0f }); // 減少分は黒
+            spr->SetColor({ 0.0f,0.0f,0.0f,alpha }); // 減少分は黒
         }
         spr->Update();
     }

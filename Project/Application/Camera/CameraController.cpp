@@ -324,7 +324,6 @@ void CameraController::UpdateTargetVector3Array(const std::vector<Vector3>& arr)
 }
 
 void CameraController::UpdateCartesian(GameEngine::InputCommand* inputCommand) {
-    if (!inputCommand) return;
 	if (inputCommand && inputCommand->IsCommandActive("CameraMoveLeft")) { position_.x -= 0.5f; }
 	if (inputCommand && inputCommand->IsCommandActive("CameraMoveRight")) { position_.x += 0.5f; }
 	Vector3 offset{0.0f, 4.0f, -10.0f};
@@ -333,7 +332,6 @@ void CameraController::UpdateCartesian(GameEngine::InputCommand* inputCommand) {
 }
 
 void CameraController::UpdateSpherical(GameEngine::InputCommand* inputCommand, GameEngine::Input* rawInput) {
-    if (!inputCommand || !rawInput) return;
 	if (inputCommand && inputCommand->IsCommandActive("CameraMoveLeft")) { rotateMove_.x += 0.02f; }
 	if (inputCommand && inputCommand->IsCommandActive("CameraMoveRight")) { rotateMove_.x -= 0.02f; }
 	if (rawInput && rawInput->PushMouse(1)) { Vector2 delta = rawInput->GetMouseDelta(); rotateMove_.x += delta.x * mouseRotateSensitivity_; }

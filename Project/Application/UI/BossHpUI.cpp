@@ -82,8 +82,14 @@ void BossHpUI::ApplyDebugParam() {
 	position_ = GameParamEditor::GetInstance()->GetValue<Vector2>(kGroupName_, "HpPosition");
 	bossNameSize_ = GameParamEditor::GetInstance()->GetValue<Vector2>(kGroupName_, "BossNameSize");
 	bossNamePosition_ = GameParamEditor::GetInstance()->GetValue<Vector2>(kGroupName_, "BossNamePosition");
-	sprite_->color_ = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "HpColor");
-	frameSprite_->color_ = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "HpFrameColor");
+
+	// カラーはエディタから取得したRGBを反映しつつ、現在のアルファを維持する
+	Vector4 hpColor = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "HpColor");
+	Vector4 frameColor = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "HpFrameColor");
+	float currentHpAlpha = sprite_->color_.w;
+	float currentFrameAlpha = frameSprite_->color_.w;
+	sprite_->color_ = { hpColor.x, hpColor.y, hpColor.z, currentHpAlpha };
+	frameSprite_->color_ = { frameColor.x, frameColor.y, frameColor.z, currentFrameAlpha };
 
 	sprite_->position_ = position_;
 	sprite_->size_ = size_;
