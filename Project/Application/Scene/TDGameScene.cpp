@@ -6,6 +6,7 @@
 #include"EasingManager.h"
 #include"LogManager.h"
 #include"CollisionConfig.h"
+#include"AudioManager.h"
 #include<numbers>
 
 #include"Application/CollisionTypeID.h"
@@ -383,11 +384,15 @@ void TDGameScene::Initialize(SceneContext* context) {
 	gameOverUI_->SetOnRetryClicked([this]() {
         nextSceneState_ = SceneState::TDGame;
         TDGameScene::SetIsFirstGameStart(false);
+        AudioManager::GetInstance().Stop(titleBGMHandle_);
+        AudioManager::GetInstance().Stop(gameBGMHandle_);
 		isFinished_ = true;
 	});
 	gameOverUI_->SetOnTitleClicked([this]() {
 		nextSceneState_ = SceneState::TDGame;
         TDGameScene::SetIsFirstGameStart(true);
+        AudioManager::GetInstance().Stop(titleBGMHandle_);
+        AudioManager::GetInstance().Stop(gameBGMHandle_);
 		isFinished_ = true;
 	});
 
@@ -442,6 +447,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// ボスの撃破時のフェード
 	bossDestroyFade_ = std::make_unique<BossDestroyFade>();
 	bossDestroyFade_->Initialize();
+
+    titleBGMHandle_ = AudioManager::GetInstance().GetHandleByName("Title_BGM.mp3");
+    gameBGMHandle_ = AudioManager::GetInstance().GetHandleByName("Game_BGM.mp3");
+    AudioManager::GetInstance().Play(titleBGMHandle_, 0.5f, true);
 
 	// 初回実行フラグを解除
 	TDGameScene::SetIsFirstGameStart(false);
@@ -551,6 +560,7 @@ void TDGameScene::Update() {
 			bossIntroDelayAfterFreeze_ = false;
 			bossIntroTimer_ = 0.0f;
 			player_->Restart();
+            AudioManager::GetInstance().Stop(titleBGMHandle_);
             // Letterbox を表示開始
             if (letterbox_) {
 				letterboxAnimTimer_ = 0.0f;
@@ -602,6 +612,7 @@ void TDGameScene::Update() {
         if (bossIntroTimer_ >= kBossIntroDuration_) {
 			bossIntroPlaying_ = false;
 			bossIntroTimer_ = 0.0f;
+			AudioManager::GetInstance().Play(gameBGMHandle_, 0.5f, true);
 			// Letterbox を非表示に戻す
 			if (letterbox_) {
 				letterboxAnimTimer_ = 0.0f;

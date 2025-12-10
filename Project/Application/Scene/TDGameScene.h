@@ -277,6 +277,11 @@ private:
 	// クリアUI
 	std::unique_ptr<ClearUI> clearUI_;
 
+	// タイトルBGM
+    uint32_t titleBGMHandle_ = 0;
+	// ゲームBGM
+    uint32_t gameBGMHandle_ = 0;
+
 private:
 
 	// ボスヒット時にほとんどの更新を停止するための制御
