@@ -84,9 +84,8 @@ void IceFall::OnCollision([[maybe_unused]] const GameEngine::CollisionResult& re
     if (!player && !bossEnemy) {
         return;
     }
-    // プレイヤーが突進中なら消滅
     if (player) {
-        if (player->IsRushing()) {
+        if (player->IsRushing() || player->IsAttackDown()) {
             isDeadNotified_ = true;
         }
     }
