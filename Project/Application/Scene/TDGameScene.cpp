@@ -763,6 +763,11 @@ void TDGameScene::Update() {
 		//}
 
 		mainCamera_->SetCamera(cameraController_->GetCamera());
+		if (bossOutroTimer_ >= 6.0f) {
+			if (!clearUI_->IsActive()) {
+				clearUI_->SetIsActice(true);
+			}
+		}
 	}
 
 	// デバックリストを削除
@@ -1038,11 +1043,6 @@ void TDGameScene::Update() {
 	bossDestroyFade_->Update();
 
 	// クリア処理
-	if (bossEnemy_->isFinished()) {
-		if (!clearUI_->IsActive()) {
-			clearUI_->SetIsActice(true);
-		}	
-	}
 	clearUI_->Update();
 
 	// 矢印UI
