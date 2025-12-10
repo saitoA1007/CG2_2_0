@@ -361,6 +361,10 @@ private:
 	float audioVolume_AirMotion_ = 1.0f;
 	float audioVolume_Reflect_ = 1.0f;
 
+	// 回復用フラグ
+	bool isHearted_ = false;
+	float heartTimer_ = 0.0f;
+
 private:
 	void ProcessMoveInput(GameEngine::InputCommand* inputCommand);
     void ProcessAttackDownInput(GameEngine::InputCommand *inputCommand);

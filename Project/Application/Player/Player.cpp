@@ -90,6 +90,15 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
         }
     }
 
+	// 回復のタイマー
+	if (isHearted_) {
+		heartTimer_ += FpsCounter::deltaTime;
+		if (heartTimer_ >= 1.0f) {
+			isHearted_ = false;
+			heartTimer_ = 0.0f;
+		}
+	}
+
     // 急降下準備中の処理
     if (isAttackDownPrepping_) {
         // 準備時間を進める
@@ -659,6 +668,15 @@ void Player::OnCollision(const CollisionResult &result) {
 	bool isGround = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Ground));
     bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss));
     bool isWind = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wind));
+	bool isHeart = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Heart));
+
+	// 回復する
+	if (isHeart && !isHearted_) {
+		if (currentHP_ < kMaxHP_) {
+			currentHP_ += 1;
+			isHearted_ = true;
+		}
+	}
 
     // ボスとの衝突処理（突進中の場合）
     if (isBoss && isRushing_) {
