@@ -283,6 +283,15 @@ private:
 	// ボスのヒット状態の前フレーム保存（ヒット瞬間の検出用）
 	bool prevBossHit_ = false;
 
+    // ボス登場時アニメーション制御
+    bool bossIntroPlaying_ = false;           // 再生中フラグ
+    bool bossIntroScheduled_ = false;         // 予約フラグ
+    bool bossIntroDelayAfterFreeze_ = false;  // フリーズ解除後の遅延待ちフラグ
+    float bossIntroTimer_ = 0.0f;             // 再生時間
+    float bossIntroDelayTimer_ = 0.0f;        // 開始遅延タイマー
+    static inline constexpr float kBossIntroDuration_ = 8.0f;
+    static inline constexpr float kBossIntroStartDelay_ = 0.5f;
+
 	/// <summary>
 	/// 入力のコマンドを設定する
 	/// </summary>

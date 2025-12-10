@@ -27,7 +27,7 @@ void Player::Initialize(GameEngine::Animator *animator, const std::array<std::ma
 	SetAnimator(animator);
 	SetAnimationData(animationData);
 	// ワールド行列を初期化
-	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,-8.0f} });
+	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,-16.0f} });
 	// コライダー生成・設定
 	collider_ = std::make_unique<SphereCollider>();
 	collider_->SetRadius(sphereData_.radius);
@@ -150,7 +150,7 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 
 	// Yが-32以下になったら初期位置に戻す
     if (worldTransform_.transform_.translate.y < -32.0f) {
-        worldTransform_.transform_.translate = { 0.0f, 1.0f, -8.0f };
+        worldTransform_.transform_.translate = { 0.0f, 1.0f, -16.0f };
     }
 
     // 回転ターゲットを決定（溜め中はrushDirection_、それ以外はlastMoveDir_または移動速度）
@@ -196,7 +196,8 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
 
 void Player::Restart() {
 	// 位置リセット
-	worldTransform_.transform_.translate = { -2.0f, 1.0f, 0.0f };
+	worldTransform_.transform_.translate = { 0.0f, 1.0f, -16.0f };
+	worldTransform_.transform_.rotate = { 0.0f, 0.0f, 0.0f };
 	worldTransform_.UpdateTransformMatrix();
 	// 速度リセット
 	velocity_ = { 0.0f, 0.0f, 0.0f };
@@ -453,7 +454,8 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 }
 
 void Player::ProcessAttackDownInput(GameEngine::InputCommand *inputCommand) {
-    if (isCharging_ || isPreRushing_ || isRushing_ || isBounceLock_ || isRushLock_ || !isJump_ || isAttackDownPrepping_) {
+    if (isCharging_ || isPreRushing_ || isRushing_ || isBounceLock_ || isRushLock_ || !isJump_ || isAttackDownPrepping_ ||
+		isAttackDown_ || isAttackDownPrepping_) {
         return;
     }
 	// 攻撃下降開始

@@ -485,6 +485,14 @@ void TDGameScene::Update() {
 	if (currentBossHit && !prevBossHit_) {
 		isBossHitFreezeActive_ = true;
 		bossHitFreezeTimer_ = kBossHitFreezeDuration;
+		// Boss登場時演出の予約（Egg状態でプレイヤーの急降下攻撃を喰らった場合）
+		if (bossEnemy_->GetBossState() == BossState::Egg && player_ && player_->IsAttackDown()) {
+			bossIntroScheduled_ = true;
+			bossIntroDelayTimer_ = 0.0f;
+			bossIntroPlaying_ = false;
+			bossIntroTimer_ = 0.0f;
+			bossIntroDelayAfterFreeze_ = false; // フリーズ中は開始しない
+		}
 		if (cameraController_) {
 			cameraController_->SetDesiredFov(1.0f);
 			cameraController_->StartCameraShake(64.0f, kBossHitFreezeDuration, 256.0f,
@@ -497,6 +505,7 @@ void TDGameScene::Update() {
 	}
 	prevBossHit_ = currentBossHit;
 
+	// フリーズ中の処理（ボスヒット演出）
 	if (isBossHitFreezeActive_) {
 		bossHitFreezeTimer_ -= GameEngine::FpsCounter::deltaTime;
 		cameraController_->Update(context_->inputCommand, context_->input);
@@ -505,9 +514,69 @@ void TDGameScene::Update() {
 		if (bossHitFreezeTimer_ <= 0.0f) {
 			isBossHitFreezeActive_ = false;
 			bossHitFreezeTimer_ = 0.0f;
+			// フリーズ解除後から0.5秒の猶予をカウント開始
+			if (bossIntroScheduled_) {
+				bossIntroDelayAfterFreeze_ = true;
+				bossIntroDelayTimer_ = 0.0f;
+				// 猶予時間開始前にロックオンが有効なら無効化し、レターボックスを閉じる
+				if (isBossLockOn_) {
+					isBossLockOn_ = false;
+					if (letterbox_) {
+						letterboxAnimTimer_ = 0.0f;
+						letterboxStartHeight_ = letterboxEndHeight_;
+						letterboxEndHeight_ = 0.0f;
+					}
+				}
+			}
 		}
 
 		return;
+	}
+
+	// フリーズ解除後の猶予時間をカウントし、0.5秒で登場演出開始
+	if (bossIntroDelayAfterFreeze_) {
+		bossIntroDelayTimer_ += GameEngine::FpsCounter::deltaTime;
+		if (bossIntroDelayTimer_ >= kBossIntroStartDelay_) {
+			bossIntroPlaying_ = true;
+			bossIntroScheduled_ = false;
+			bossIntroDelayAfterFreeze_ = false;
+			bossIntroTimer_ = 0.0f;
+			player_->Restart();
+            // Letterbox を表示開始
+            if (letterbox_) {
+				letterboxAnimTimer_ = 0.0f;
+				letterboxStartHeight_ = letterboxEndHeight_;
+				letterboxEndHeight_ = 64.0f;
+			}
+		}
+	}
+
+	// 登場演出の再生
+	if (bossIntroPlaying_) {
+		bossIntroTimer_ += GameEngine::FpsCounter::deltaTime;
+		if (bossEnemy_->GetBossState() == BossState::Egg && bossIntroTimer_ >= 1.0f) bossEnemy_->SetBossStateIn();
+
+		Vector3 bossPos = bossEnemy_->GetWorldTransform().GetWorldPosition();
+		// 斜め下からボスを見上げる構図: 目線を少し下へ
+		Vector3 eye = { 0.0f, 1.0f, -15.0f };
+		Vector3 center = bossPos;
+		center.y += 4.0f;
+		// Euler未指定でLookAtを使用（即時反映）
+		Vector3 euler = { 0.0f, 0.0f, 0.0f };
+		float fov = 1.0f; // 演出用にやや広角
+		cameraController_->ApplyImmediateView(eye, center, euler, fov);
+		mainCamera_->SetCamera(cameraController_->GetCamera());
+
+		if (bossIntroTimer_ >= kBossIntroDuration_ && bossEnemy_->GetBossState() == BossState::Battle) {
+			bossIntroPlaying_ = false;
+			bossIntroTimer_ = 0.0f;
+			// Letterbox を非表示に戻す
+			if (letterbox_) {
+				letterboxAnimTimer_ = 0.0f;
+				letterboxStartHeight_ = letterboxEndHeight_;
+				letterboxEndHeight_ = 0.0f;
+			}
+		}
 	}
 
 	// デバックリストを削除
@@ -520,7 +589,7 @@ void TDGameScene::Update() {
 	sceneLightingController_->Update();
 
 	// プレイヤーの更新処理
-	if (isTitleLocked_) {
+	if (isTitleLocked_ || bossIntroPlaying_) {
 		player_->Update(nullptr, cameraController_->GetCamera());
 	} else {
 		player_->Update(context_->inputCommand, cameraController_->GetCamera());
@@ -555,30 +624,31 @@ void TDGameScene::Update() {
 	// ロックオン: 入力が有効ならプレイヤーとボスの位置をターゲットに設定
 	bool prevLockOn = isBossLockOn_;
 	if (!isTitleLocked_) {
-		if (context_->inputCommand->IsCommandActive("LockOnBoss")) {
-			isBossLockOn_ = !isBossLockOn_;
+		if (!bossIntroDelayAfterFreeze_ && !bossIntroPlaying_) {
+			if (context_->inputCommand->IsCommandActive("LockOnBoss")) {
+				isBossLockOn_ = !isBossLockOn_;
+			}
 		}
 
-		if (isBossLockOn_) {
-			std::vector<Vector3> targets;
-			targets.reserve(2);
-			targets.emplace_back(player_->GetWorldTransform().GetWorldPosition());
-			targets.emplace_back(bossEnemy_->GetWorldTransform().GetWorldPosition());
-			cameraController_->SetTarget(targets);
-		} else {
-			cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
+		if (!bossIntroPlaying_) {
+			if (isBossLockOn_) {
+				std::vector<Vector3> targets;
+				targets.reserve(2);
+				targets.emplace_back(player_->GetWorldTransform().GetWorldPosition());
+				targets.emplace_back(bossEnemy_->GetWorldTransform().GetWorldPosition());
+				cameraController_->SetTarget(targets);
+			} else {
+				cameraController_->SetTarget(player_->GetWorldTransform().GetWorldPosition());
+			}
 		}
 	}
+	if (prevLockOn != isBossLockOn_) {
+		letterboxAnimTimer_ = 0.0f;
+		letterboxStartHeight_ = letterboxEndHeight_;
+		letterboxEndHeight_ = isBossLockOn_ ? 64.0f : 0.0f;
+	}
 
-    // Letterbox easing control when lock-on toggles
     if (letterbox_) {
-        // Detect state change to set new animation
-        if (prevLockOn != isBossLockOn_) {
-            letterboxAnimTimer_ = 0.0f;
-            letterboxStartHeight_ = letterboxEndHeight_;
-            letterboxEndHeight_ = isBossLockOn_ ? 64.0f : 0.0f;
-        }
-        // Progress animation
         letterboxAnimTimer_ += FpsCounter::deltaTime;
         float t = std::clamp(letterboxAnimTimer_ / letterboxAnimDuration_, 0.0f, 1.0f);
         float eased = EaseOutCubic(0.0f, 1.0f, t);
@@ -590,34 +660,36 @@ void TDGameScene::Update() {
 	//============================
 	// FOV設定
 	//============================
-	float desiredFov = 0.7f; // 通常
-	if (player_->IsRushing()) {
-		desiredFov = 1.0f; // 突進中
-	} else if (player_->IsCharging() || player_->IsPreRushing()) {
-		// 突進レベルに応じてFOVを変化させる
-		int rushLevel = player_->GetRushChargeLevel();
-		desiredFov = 0.4f + static_cast<float>(3 - rushLevel) * 0.1f;
-	}
-	cameraController_->SetDesiredFov(desiredFov);
+	if (!bossIntroPlaying_) {
+		float desiredFov = 0.7f; // 通常
+		if (player_->IsRushing()) {
+			desiredFov = 1.0f; // 突進中
+		} else if (player_->IsCharging() || player_->IsPreRushing()) {
+			// 突進レベルに応じてFOVを変化させる
+			int rushLevel = player_->GetRushChargeLevel();
+			desiredFov = 0.4f + static_cast<float>(3 - rushLevel) * 0.1f;
+		}
+		cameraController_->SetDesiredFov(desiredFov);
 
-	// ジャンプ中は見下ろし視点オフセットを適用
-	if (player_->IsJump()) {
-		// 斜め上から俯瞰するように、カメラ位置を上方向に、注視点を少し下へ
-		Vector3 eyeOffset{ 0.0f, 16.0f, 0.0f };
-		Vector3 lookOffset{ 0.0f, -4.0f, 0.0f };
-		cameraController_->SetViewOffset(eyeOffset, lookOffset, 0.2f);
-		cameraController_->EnableViewOffset(true);
-	} else if (isBossLockOn_) {
-		// ボスロックオン時は通常より低めのカメラアングルにする
-		Vector3 eyeOffset{ 0.0f, -8.0f, 0.0f };
-		Vector3 lookOffset{ 0.0f, 0.0f, 0.0f };
-		cameraController_->SetViewOffset(eyeOffset, lookOffset, 0.2f);
-		cameraController_->EnableViewOffset(true);
-	} else {
-		cameraController_->EnableViewOffset(false);
+		// ジャンプ中は見下ろし視点オフセットを適用
+		if (player_->IsJump()) {
+			// 斜め上から俯瞰するように、カメラ位置を上方向に、注視点を少し下へ
+			Vector3 eyeOffset{ 0.0f, 16.0f, 0.0f };
+			Vector3 lookOffset{ 0.0f, -4.0f, 0.0f };
+			cameraController_->SetViewOffset(eyeOffset, lookOffset, 0.2f);
+			cameraController_->EnableViewOffset(true);
+		} else if (isBossLockOn_) {
+			// ボスロックオン時は通常より低めのカメラアングルにする
+			Vector3 eyeOffset{ 0.0f, -8.0f, 0.0f };
+			Vector3 lookOffset{ 0.0f, 0.0f, 0.0f };
+			cameraController_->SetViewOffset(eyeOffset, lookOffset, 0.2f);
+			cameraController_->EnableViewOffset(true);
+		} else {
+			cameraController_->EnableViewOffset(false);
+		}
 	}
 
-	if (isTitleLocked_) {
+	if (isTitleLocked_ || bossIntroPlaying_) {
 		cameraController_->Update(nullptr, nullptr);
 	} else {
 		cameraController_->Update(context_->inputCommand, context_->input);

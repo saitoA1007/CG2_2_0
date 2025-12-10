@@ -176,9 +176,7 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
         player = result.userData.As<Player>();
         if (player == nullptr) { return; }
 
-        // Egg状態で急降下攻撃を受けたらInへ遷移
         if (bossState_ == BossState::Egg && player->IsAttackDown()) {
-            bossContext_.bossStateRequest_ = BossState::In;
             isHit_ = true;
             return;
         }

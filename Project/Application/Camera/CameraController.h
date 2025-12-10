@@ -168,6 +168,15 @@ public:
 		targetFov_ = desiredTargetFov_;
     }
 
+	/// <summary>
+	/// 指定の値を補間無しで即座にカメラに適用する
+	/// </summary>
+	/// <param name="eye">カメラ位置(ワールド座標)</param>
+	/// <param name="center">注視点(ワールド座標)</param>
+	/// <param name="euler">回転(Euler[rad], pitch=x,yaw=y,roll=z)。未使用なら{0,0,0}</param>
+	/// <param name="fov">FOV</param>
+	void ApplyImmediateView(const Vector3& eye, const Vector3& center, const Vector3& euler, float fov);
+
 private:
 
 	// カメラ

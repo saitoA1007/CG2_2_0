@@ -88,6 +88,11 @@ public:
 		bossContext_.isResetPos = true;
 	}
 
+	// ボスの状態をInに設定
+    void SetBossStateIn() {
+		bossContext_.bossStateRequest_ = BossState::In;
+    }
+
 	// 現在の状態を取得する
 	BossState GetBossState() const { return bossState_; }
 

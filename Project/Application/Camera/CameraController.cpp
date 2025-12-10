@@ -100,7 +100,7 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine
 
 		// 座標系種類でカメラ位置追従 (補間前に回転入力反映)
 		switch (cameraCoordinateType_) {
-			case CameraCoodinateType::Cartesian:  UpdateCartesian(inputCommand);  break;
+			case CameraCoodinateType::Cartesian: UpdateCartesian(inputCommand);  break;
 			case CameraCoodinateType::Spherical: UpdateSpherical(inputCommand, rawInput); break;
 		}
 	}
@@ -324,6 +324,7 @@ void CameraController::UpdateTargetVector3Array(const std::vector<Vector3>& arr)
 }
 
 void CameraController::UpdateCartesian(GameEngine::InputCommand* inputCommand) {
+    if (!inputCommand) return;
 	if (inputCommand && inputCommand->IsCommandActive("CameraMoveLeft")) { position_.x -= 0.5f; }
 	if (inputCommand && inputCommand->IsCommandActive("CameraMoveRight")) { position_.x += 0.5f; }
 	Vector3 offset{0.0f, 4.0f, -10.0f};
@@ -332,6 +333,7 @@ void CameraController::UpdateCartesian(GameEngine::InputCommand* inputCommand) {
 }
 
 void CameraController::UpdateSpherical(GameEngine::InputCommand* inputCommand, GameEngine::Input* rawInput) {
+    if (!inputCommand || !rawInput) return;
 	if (inputCommand && inputCommand->IsCommandActive("CameraMoveLeft")) { rotateMove_.x += 0.02f; }
 	if (inputCommand && inputCommand->IsCommandActive("CameraMoveRight")) { rotateMove_.x -= 0.02f; }
 	if (rawInput && rawInput->PushMouse(1)) { Vector2 delta = rawInput->GetMouseDelta(); rotateMove_.x += delta.x * mouseRotateSensitivity_; }
@@ -462,4 +464,36 @@ void CameraController::UpdateAnimation() {
 		}
 		isAnimationPlaying_ = false; // アニメーション終了
     }
+}
+
+// 即時適用関数
+void CameraController::ApplyImmediateView(const Vector3& eye, const Vector3& center, const Vector3& euler, float fov) {
+	if (!camera_) return;
+	// アニメーションを停止
+	isAnimationPlaying_ = false;
+	// ターゲットと目標を即時同期
+	targetLookAt_ = eye;
+	targetPos_ = center;
+	targetRotate_ = euler;
+	targetFov_ = fov;
+	desiredTargetLookAt_ = eye;
+	desiredTargetPos_ = center;
+	desiredTargetRotate_ = euler;
+	desiredTargetFov_ = fov;
+	prevTargetPos_ = center;
+
+	// ワールド行列を直接構築
+	Matrix4x4 rotateMatrix;
+	bool useEuler = (std::fabs(euler.x) > 1e-6f) || (std::fabs(euler.y) > 1e-6f) || (std::fabs(euler.z) > 1e-6f);
+	if (useEuler) {
+		rotateMatrix = RotationMatrixFromEuler(euler);
+	} else {
+		rotateMatrix = LookAt(eye, center, {0.0f,1.0f,0.0f});
+	}
+	Matrix4x4 worldMatrix = rotateMatrix;
+	worldMatrix.m[3][0] = eye.x; worldMatrix.m[3][1] = eye.y; worldMatrix.m[3][2] = eye.z;
+
+	camera_->SetWorldMatrix(worldMatrix);
+	camera_->SetProjectionMatrix(fov, 1280, 720, 0.1f, 1000.0f);
+	camera_->UpdateFromWorldMatrix();
 }
