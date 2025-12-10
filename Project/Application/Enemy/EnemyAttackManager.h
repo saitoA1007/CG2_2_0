@@ -109,6 +109,10 @@ public:
 	// ハートリスト
 	std::list<std::unique_ptr<Heart>>& GetHeartList() { return heartList_; }
 
+	void SetPlayerHp(const int32_t hp) {
+		playerHp_ = hp;
+	}
+
 private:
 
 	// ポストエフェクトの管理
@@ -123,6 +127,9 @@ private:
 
 	// ハート
 	std::list<std::unique_ptr<Heart>> heartList_;
+	bool isSetHeart_ = false;
+	int32_t playerHp_ = 3;
+	int32_t heartCount_ = 0;
 
 	// 氷の演出データ
 	std::vector<IceFallEffectData> iceFallEffectDatas_;

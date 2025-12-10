@@ -8,7 +8,7 @@
             1.0
         ],
         "EndPosY": 1.5,
-        "Height": 1.0,
+        "Height": 0.5,
         "RotMaxTime": 2.0,
         "Scale": 1.0,
         "SceneName": "TDGameScene",

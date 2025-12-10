@@ -76,7 +76,7 @@ void Heart::Update() {
                 worldTransform_.UpdateTransformMatrix();
             } else {
                 timer_ = 0.0f;
-                InMove_ = 0.0f;
+                InMove_ = false;
             }
         }
     } else {
@@ -85,10 +85,10 @@ void Heart::Update() {
 
         if (timer_ <= 0.5f) {
             float localT = timer_ / 0.5f;
-            worldTransform_.transform_.translate.y = Lerp(-height_, height_, EaseInOut(localT));
+            worldTransform_.transform_.translate.y = endPosY + Lerp(-height_, height_, EaseInOut(localT));
         } else {
             float localT = (timer_ - 0.5f) / 0.5f;
-            worldTransform_.transform_.translate.y = Lerp(height_, -height_, EaseInOut(localT));
+            worldTransform_.transform_.translate.y = endPosY + Lerp(height_, -height_, EaseInOut(localT));
         }
 
         worldTransform_.transform_.rotate.y = Lerp(startRotateY_, endRotateY_, timer_);
@@ -98,6 +98,7 @@ void Heart::Update() {
         }
 
         // 行列の更新処理
+        //shadow_->Update();
         worldTransform_.UpdateTransformMatrix();
     }
 
