@@ -1069,7 +1069,9 @@ void TDGameScene::UpdateCollision() {
 	//=================================
 #pragma region EnemyCollider
 	// 敵の当たり判定を登録する
-	collisionManager_->AddCollider(bossEnemy_->GetCollider());
+	if (bossEnemy_->GetCurrentHP() > 0) {
+		collisionManager_->AddCollider(bossEnemy_->GetCollider());
+	}
 #ifdef _DEBUG
 	debugRenderer_->AddSphere(bossEnemy_->GetSphereData(),{1.0f,1.0f,0.0f,1.0f});
 #endif

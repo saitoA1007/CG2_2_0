@@ -312,6 +312,7 @@
     <ClCompile Include="Application\Player\Effect\PlayerLandingEffect.cpp" />
     <ClCompile Include="Application\UI\BossDestroyFade.cpp" />
     <ClCompile Include="Application\UI\ClearUI.cpp" />
+    <ClCompile Include="Application\Enemy\LongLangeAttack\Heart.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -628,6 +629,7 @@
     <ClInclude Include="Application\Player\Effect\PlayerLandingEffect.h" />
     <ClInclude Include="Application\UI\BossDestroyFade.h" />
     <ClInclude Include="Application\UI\ClearUI.h" />
+    <ClInclude Include="Application\Enemy\LongLangeAttack\Heart.h" />
     <ClInclude Include="Application\Enemy\States\BossStateEgg.h" />
   </ItemGroup>
   <ItemGroup>
