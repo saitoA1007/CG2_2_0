@@ -218,7 +218,7 @@ void BossEnemy::RegisterBebugParam() {
     // マテリアル
     GameParamEditor::GetInstance()->AddItem(MatName_, "BaseColor", bossMaterial_->materialData_->color);
     GameParamEditor::GetInstance()->AddItem(MatName_, "Shininess", bossMaterial_->materialData_->shininess);
-    GameParamEditor::GetInstance()->AddItem(MatName_, "Time", bossMaterial_->materialData_->time);
+    //GameParamEditor::GetInstance()->AddItem(MatName_, "Time", bossMaterial_->materialData_->time);
 }
 
 void BossEnemy::ApplyDebugParam() {
@@ -236,5 +236,5 @@ void BossEnemy::ApplyDebugParam() {
     bossMaterial_->materialData_->color = GameParamEditor::GetInstance()->GetValue<Vector4>(MatName_, "BaseColor");
     bossMaterial_->materialData_->shininess = GameParamEditor::GetInstance()->GetValue<float>(MatName_, "Shininess");
     bossMaterial_->materialData_->specularColor = { 1.0f,1.0f,1.0f };
-    bossMaterial_->materialData_->time = GameParamEditor::GetInstance()->GetValue<float>(MatName_, "Time");
+    //bossMaterial_->materialData_->time = GameParamEditor::GetInstance()->GetValue<float>(MatName_, "Time");
 }
