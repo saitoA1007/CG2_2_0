@@ -167,7 +167,18 @@ void EnemyAttackManager::CreateIceFallPositions(const float& waitIceFallTime) {
 
     if (playerHp_ <= 2) {
         if (heartList_.size() == 0) {
-            if (RandomGenerator::Get(0, 2) == 1) {
+            // 乱数を設定
+            int RandomSeed = RandomGenerator::Get(0, 9);
+             
+            // ここでは60%に設定
+            if (
+                RandomSeed == 0 ||
+                RandomSeed == 1 ||
+                RandomSeed == 2 ||
+                RandomSeed == 3 ||
+                RandomSeed == 4 ||
+                RandomSeed == 5
+                )  {
                 isSetHeart_ = true;
                 heartCount_ = 0;
             } else {
