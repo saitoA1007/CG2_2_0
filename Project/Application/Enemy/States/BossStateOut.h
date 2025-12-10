@@ -33,6 +33,19 @@ private:
 	bool isSet_ = false;
 	bool isActive_ = false;
 
+	// 高さ
+	float startPosY_ = 0.0f;
+	float endPosY_ = 1.0f;
+
+	// 左右の触れば
+	float swaySpeed_ = 0.0f;
+	float swayPhase_ = 0.0f;
+	float swayWeithX_ = 10.0f;
+	float swayWeithZ_ = 5.0f; 
+	float cycleHeight_ = 2.0f;
+
+	std::string kGroupName = "BossStateOut";
+
 private:
 
 	/// <summary>

@@ -1,0 +1,13 @@
+{
+    "BossStateOut": {
+        "CycleHeight": 4.0,
+        "EndPosY": 14.0,
+        "MaxTime": 4.0,
+        "SceneName": "TDGameScene",
+        "StartPosY": 8.0,
+        "SwayPhase": 30.0,
+        "SwaySpeed": 10.0,
+        "SwayWeithX": 5.0,
+        "SwayWeithZ": 3.0
+    }
+}

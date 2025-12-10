@@ -10,6 +10,7 @@ enum class enemyAnimationType : size_t {
 	Rush,      // 突進
 	Scream,    // 叫ぶ
 	IceBreath, // ブレス
+	Death,     // 撃破アニメーション
 
 	MaxCount
 };
