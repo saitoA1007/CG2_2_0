@@ -57,6 +57,8 @@ private:
 
 	uint32_t sh_ = 0;
 
+	uint32_t faSH_ = 0;
+
 private:
 
 	/// <summary>

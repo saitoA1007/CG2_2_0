@@ -100,6 +100,8 @@ public:
 	bool IsEnterWingsEffect() const { return bossContext_.isEnterWingsEffect_; }
 	bool IsEnterBurstWingsEffect() const { return bossContext_.isEnterBurstWingsEffect_; }
 
+	bool IsStopBGm() const { return bossContext_.isStopBgm_; }
+
 private: // 調整項目
 	
 	// 最大体力
