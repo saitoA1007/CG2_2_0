@@ -6,6 +6,7 @@
 #include"Application/Enemy/BossEnemy.h"
 #include"GameParamEditor.h"
 #include"EasingManager.h"
+#include"AudioManager.h"
 #include "LogManager.h"
 using namespace GameEngine;
 
@@ -50,6 +51,9 @@ void Wall::Initialilze(const Transform& transform, float respawnTime, int32_t ma
 	});
 
 	worldTransform_.transform_ = transform;
+
+	// 音を取得
+	iceBreakSH_ = AudioManager::GetInstance().GetHandleByName("Egg_Clack.mp3");
 
 #ifdef _DEBUG
 	RegisterBebugParam();
@@ -148,6 +152,7 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 		currentHp_ = 0;
 		iceMaterial_->materialData_->color.w = 0.0f;
 		isBreakParticleActive_ = true;
+		AudioManager::GetInstance().Play(iceBreakSH_,0.5f,false);
 		// 誰が破壊するかによって状態を変える
 		wallState_ = WallState::Normal;
 	}

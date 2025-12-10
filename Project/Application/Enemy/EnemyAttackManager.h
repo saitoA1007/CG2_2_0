@@ -114,6 +114,8 @@ private:
 	std::list<std::unique_ptr<IceFall>> IceFallsList_;
 	// 氷柱の破壊演出
 	std::list<std::unique_ptr<BreakIceFallParticle>> breakIceFallParticles_;
+	// 氷の壊れる音
+	uint32_t iceBreakSH_ = 0;
 
 	// 氷の演出データ
 	std::vector<IceFallEffectData> iceFallEffectDatas_;
