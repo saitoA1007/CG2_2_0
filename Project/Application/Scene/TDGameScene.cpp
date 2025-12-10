@@ -1275,6 +1275,17 @@ void TDGameScene::UpdateCollision() {
 #endif
 		}
 	}
+
+	// 回復ハート
+	for (auto& heart : enemyAttackManager_->GetHeartList()) {
+		if (!heart->GetIsStop()) {
+			collisionManager_->AddCollider(heart->GetCollider());
+#ifdef _DEBUG
+			debugRenderer_->AddSphere({ heart->GetCollider()->GetWorldPosition(),heart->GetCollider()->GetRadius() }, { 1.0f,1.0f,0.0f,1.0f });
+#endif
+		}
+	}
+
 #pragma endregion
 
 	//=====================================

@@ -166,11 +166,13 @@ void EnemyAttackManager::CreateIceFallPositions(const float& waitIceFallTime) {
     if (IceFallsList_.size() > 5) { return; }
 
     if (playerHp_ <= 2) {
-        if (RandomGenerator::Get(0, 2) == 1) {
-            isSetHeart_ = true;
-            heartCount_ = 0;
-        } else {
-            isSetHeart_ = false;
+        if (heartList_.size() == 0) {
+            if (RandomGenerator::Get(0, 2) == 1) {
+                isSetHeart_ = true;
+                heartCount_ = 0;
+            } else {
+                isSetHeart_ = false;
+            }
         }
     }
 

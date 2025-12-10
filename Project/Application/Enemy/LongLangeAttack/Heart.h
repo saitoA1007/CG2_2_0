@@ -27,7 +27,7 @@ public:
 	/// <summary>
 	/// コライダー取得
 	/// </summary>
-	GameEngine::Collider* GetCollider() { return collider_.get(); }
+	GameEngine::SphereCollider* GetCollider() { return collider_.get(); }
 
 	/// <summary>
 	/// 生存フラグを取得
@@ -65,6 +65,8 @@ public:
 			InMove_ = false;
 		}
 	}
+
+	bool GetIsStop() const { return isStop_; }
 
 private:
 
