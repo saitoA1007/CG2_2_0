@@ -379,16 +379,13 @@ void TDGameScene::Initialize(SceneContext* context) {
 	gameOverUI_->Initialize(context_->input, context_->inputCommand, context_->textureManager);
 	// リトライ・タイトルのコールバックを設定
 	gameOverUI_->SetOnRetryClicked([this]() {
-		// リトライが選択されたら現在のシーンかResultへ遷移
-		if (bossEnemy_ && bossEnemy_->GetCurrentHP() == 0) {
-			nextSceneState_ = SceneState::Result;
-		} else {
-			nextSceneState_ = SceneState::TDGame;
-		}
+        nextSceneState_ = SceneState::TDGame;
+        TDGameScene::SetIsFirstGameStart(false);
 		isFinished_ = true;
 	});
 	gameOverUI_->SetOnTitleClicked([this]() {
-		nextSceneState_ = SceneState::Title;
+		nextSceneState_ = SceneState::TDGame;
+        TDGameScene::SetIsFirstGameStart(true);
 		isFinished_ = true;
 	});
 
@@ -415,7 +412,11 @@ void TDGameScene::Initialize(SceneContext* context) {
 		isTitleLocked_ = true;
 		isTransitioning_ = false;
 		transitionTimer_ = 0.0f;
-	} 
+    } else {
+        isTitleLocked_ = false;
+        titleSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, 0.0f));
+        spaceSprite_->SetColor(Vector4(1.0f, 1.0f, 1.0f, 0.0f));
+    }
 
     // Letterbox 初期化（高さ0で開始）
     letterbox_ = std::make_unique<Letterbox>();
