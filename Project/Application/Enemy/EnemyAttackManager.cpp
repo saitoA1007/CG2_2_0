@@ -274,10 +274,7 @@ void EnemyAttackManager::WindUpdate() {
 
     windTimer_ += FpsCounter::deltaTime / maxWindTime_;
 
-    // 角度を求める
-    float angle = LerpShortAngle(endAngle_,startAngle_, windTimer_);
-    float cos = std::cosf(angle);
-    float sin = std::sinf(angle);
+    float endRadius = 0.0f;
 
     // 風の攻撃
     size_t i = 0;
@@ -287,6 +284,15 @@ void EnemyAttackManager::WindUpdate() {
             float localT = windTimer_ / 0.2f;
             point.radius = Lerp(point.startRadius, point.endRadius, localT);
         }
+
+        // 角度を求める
+        float offset = (static_cast<float>(i) / 7) * -0.18f;
+        float angle = LerpShortAngle(endAngle_, startAngle_, windTimer_ + offset);
+        float cos = std::cosf(angle);
+        float sin = std::sinf(angle);
+
+        // 最後の半径を取得
+        endRadius = point.radius;
 
         point.pos = { sin * (point.radius), centerPos_.y * (static_cast<float>(7-i) / 7),cos * (point.radius)};
         point.pos.x += centerPos_.x;
@@ -298,9 +304,18 @@ void EnemyAttackManager::WindUpdate() {
         i++;
     }
 
+    // 角度を求める
+    float angle1 = LerpShortAngle(endAngle_, startAngle_, windTimer_);
+    float cos1 = std::cosf(angle1);
+    float sin1 = std::sinf(angle1);
+
+    // 最終位置を取得
+   Vector3 end = { sin1 * (endRadius), centerPos_.y * (static_cast<float>(7 - i) / 7),cos1 * (endRadius) };
+   end.x += centerPos_.x;
+   end.z += centerPos_.z;
     // 速度を求める
-    Vector3 tmp = Vector3(windPositions_[static_cast<size_t>(windPositions_.size() - 1)].pos.x, windPositions_[static_cast<size_t>(windPositions_.size() - 1)].pos.y + 1.0f,
-        windPositions_[static_cast<size_t>(windPositions_.size() - 1)].pos.z);
+    Vector3 tmp = Vector3(end.x, windPositions_[static_cast<size_t>(windPositions_.size() - 1)].pos.y + 1.0f, end.z);
+
     windVelocity_ = Normalize(tmp - windPositions_[0].pos) * windSpeed_;
 
     if (windTimer_ >= 1.0f) {
