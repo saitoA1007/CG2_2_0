@@ -897,6 +897,9 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	// ボスの風攻撃を描画
 	ModelRenderer::DrawInstancing(windModel_, enemyWindAttackParticle_->GetCurrentNumInstance(), *enemyWindAttackParticle_->GetWorldTransforms());
 
+	// ボスの翼の演出を描画
+	ModelRenderer::DrawInstancing(wingModel_, enemyWingsParticleParticle_->GetCurrentNumInstance(), *enemyWingsParticleParticle_->GetWorldTransforms());
+
 	// インスタンシング描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::Instancing);
 
@@ -905,9 +908,7 @@ void TDGameScene::Draw(const bool &isDebugView) {
 		ModelRenderer::DrawInstancing(wallModel_, particle->GetCurrentNumInstance(), *particle->GetWorldTransforms());
 	}
 
-	// ボスの翼の演出を描画
-	ModelRenderer::DrawInstancing(wingModel_, enemyWingsParticleParticle_->GetCurrentNumInstance(), *enemyWingsParticleParticle_->GetWorldTransforms());
-
+	
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
 
