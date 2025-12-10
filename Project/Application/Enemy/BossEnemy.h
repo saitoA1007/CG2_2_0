@@ -148,6 +148,7 @@ private: // メンバ変数
 
 	// 音声ハンドル
 	uint32_t bossDamagedSH_ = 0; // ダメージ音声
+    uint32_t attackHitSH_ = 0;   // 攻撃が当たった音声
 
 	// ボスのマテリアル
 	std::unique_ptr<BossMaterial> bossMaterial_;

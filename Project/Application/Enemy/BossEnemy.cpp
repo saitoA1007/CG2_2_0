@@ -66,6 +66,7 @@ void BossEnemy::Initialize(const float& stageRadius, EnemyAttackManager* enemyAt
 
     // ダメージ音声を取得する
     bossDamagedSH_ = AudioManager::GetInstance().GetHandleByName("BossDamaged.mp3");
+    attackHitSH_ = AudioManager::GetInstance().GetHandleByName("Attack_Hit.mp3");
 
     // マテリアル
     bossMaterial_ = std::make_unique<BossMaterial>();
@@ -200,6 +201,7 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
                 }
 
                 AudioManager::GetInstance().Play(bossDamagedSH_, 0.5f, false);
+                AudioManager::GetInstance().Play(attackHitSH_, 0.5f, false);
 
                 Log("CurrentHp : " + std::to_string(bossContext_.hp), "Enemy");
             }
