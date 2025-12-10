@@ -1365,6 +1365,7 @@ void TDGameScene::DrawUI() {
     // クリアUI
     if (clearUI_->IsActive()) {
         SpriteRenderer::Draw(clearUI_->GetBgSprite(), 0);
+        SpriteRenderer::Draw(clearUI_->GetClearBackSprite(), 0);
         SpriteRenderer::Draw(clearUI_->GetClearSprite(), clearUI_->GetClearTexture());
         SpriteRenderer::Draw(clearUI_->GetGuideSprite(), clearUI_->GetGuidTexture());
     }

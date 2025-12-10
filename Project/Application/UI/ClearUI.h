@@ -1,5 +1,6 @@
 #pragma once
 #include<functional>
+#include <array>
 #include"Sprite.h"
 #include "TextureManager.h"
 #include "InputCommand.h"
@@ -13,6 +14,8 @@ public:
 
 	// クリア文字
 	GameEngine::Sprite* GetClearSprite() { return clearTextSprite_.get(); }
+    // クリア文字の背面黒帯
+    GameEngine::Sprite *GetClearBackSprite() { return clearTextBackSprite_.get(); }
 	// 操作説明
 	GameEngine::Sprite* GetGuideSprite() { return guideSprite_.get(); }
 	// 背景
@@ -28,6 +31,12 @@ public:
 	uint32_t GetClearTexture() const { return clearTextGH_; }
 	uint32_t GetGuidTexture() const { return guideGH_; }
 
+	// 秒数に応じて時間のスプライトを表示する
+	void ShowTimeSprites(int seconds);
+
+	// スプライトのアニメーション用（実装無し)
+	void Animate();
+
 private:
 	// 入力処理
 	GameEngine::InputCommand* inputCommand_ = nullptr;
@@ -36,6 +45,9 @@ private:
 	std::unique_ptr<GameEngine::Sprite> clearTextSprite_;
 	uint32_t clearTextGH_ = 0;
 
+	// クリア文字の背面に敷く黒帯
+	std::unique_ptr<GameEngine::Sprite> clearTextBackSprite_;
+
 	// 操作UI
 	std::unique_ptr<GameEngine::Sprite> guideSprite_;
 	uint32_t guideGH_ = 0;
@@ -43,7 +55,17 @@ private:
 	// 背景画像
 	std::unique_ptr<GameEngine::Sprite> bgSprite_;
 
+	// 0〜9の数字スプライト
+	std::array<std::unique_ptr<GameEngine::Sprite>, 10> clearTimeNumSprites_{};
+	// クリア時間（秒)
+	int clearSeconds_ = 0;
+
 	bool isActive_ = false;
+	bool prevIsActive_ = false;
+
+	// アニメーションタイマー
+	float animTimer_ = 0.0f;
+	float animTotal_ = 4.0f;
 
 	// 選択音声
 	uint32_t selectSH_ = 0;
