@@ -505,7 +505,9 @@ void TDGameScene::Update() {
 		float ratio = player_->GetAttackDownPower() / player_->GetAttackDownMaxPower();
 		pos.y += 3.0f;
 		playerAttackEffect_->Emitter(pos, ratio);
-		enemyAttackManager_->AddEnemyDestroyEffect(bossEnemy_->GetWorldPosition());
+		Vector3 bp = bossEnemy_->GetWorldPosition();
+		bp.y += 2.0f;
+		enemyAttackManager_->AddEnemyDestroyEffect(bp);
 	}
 	prevBossHit_ = currentBossHit;
 
