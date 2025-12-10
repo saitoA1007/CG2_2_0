@@ -55,6 +55,9 @@ public:
 
 	Vector3 GetWorldPosition() { return worldTransform_.GetWorldPosition(); }
 
+	// 止まる演出
+	void SetIsStop(const bool& isStop) { isStop_ = isStop; }
+
 private:
 
 	// ワールド行列
