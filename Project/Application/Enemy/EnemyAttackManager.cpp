@@ -60,6 +60,8 @@ void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectMan
     // 氷の壊れる音を追加
     iceBreakSH_ = AudioManager::GetInstance().GetHandleByName("Egg_Clack.mp3");
 
+    heartList_.clear();
+
 #ifdef _DEBUG
     // 値を登録する
     RegisterBebugParam();
@@ -82,6 +84,16 @@ void EnemyAttackManager::Update(const Matrix4x4& cameraWorldMatrix, const Matrix
         if (!iceFall->IsAlive()) {
             AudioManager::GetInstance().Play(iceBreakSH_, 0.5f, false);
             AddBreakIceParticle(iceFall->GetWorldPosition());
+
+            Vector3 i = iceFall->GetWorldPosition();
+
+            for (auto& heart : heartList_) {
+                Vector3 h = heart->GetWorldPosition();
+             
+                if (i.x == h.x && i.z == h.z) {
+                    heart->SetIsStop(false);
+                }
+            }
         }
     }
 	IceFallsList_.remove_if([](const std::unique_ptr<IceFall>& iceFall) {
@@ -153,6 +165,15 @@ void EnemyAttackManager::CreateIceFallPositions(const float& waitIceFallTime) {
     maxIceFallEmitTime_ = waitIceFallTime;
     if (IceFallsList_.size() > 5) { return; }
 
+    if (playerHp_ <= 2) {
+        if (RandomGenerator::Get(0, 2) == 1) {
+            isSetHeart_ = true;
+            heartCount_ = 0;
+        } else {
+            isSetHeart_ = false;
+        }
+    }
+
     std::vector<Vector2> points;
     int attempts = 0;
 
@@ -215,7 +236,12 @@ void EnemyAttackManager::EffectUpdate(const Matrix4x4& cameraWorldMatrix, const 
             
             // 氷柱を落とす
             AddIceFall(iceFallEffectData.particle->GetEmitterPos());
-            AddHeart(iceFallEffectData.particle->GetEmitterPos());
+            if (isSetHeart_) {
+                if (heartCount_ == 0) {
+                    AddHeart(iceFallEffectData.particle->GetEmitterPos());
+                    heartCount_++;
+                }
+            }
             // 叫ぶ演出
             //SetIsRoat(true);
         }

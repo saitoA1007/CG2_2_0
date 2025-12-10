@@ -56,7 +56,15 @@ public:
 	Vector3 GetWorldPosition() { return worldTransform_.GetWorldPosition(); }
 
 	// 止まる演出
-	void SetIsStop(const bool& isStop) { isStop_ = isStop; }
+	void SetIsStop(const bool& isStop) { 
+
+		isStop_ = isStop;
+
+		if (!isStop_) {
+			timer_ = 0.0f;
+			InMove_ = false;
+		}
+	}
 
 private:
 

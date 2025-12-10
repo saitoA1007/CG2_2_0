@@ -788,6 +788,7 @@ void TDGameScene::Update() {
 	bossEnemy_->Update(player_->GetPlayerPos());
 	if (!isTitleLocked_) {
 		enemyAttackManager_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+		enemyAttackManager_->SetPlayerHp(player_->GetCurrentHP());
 	}
 	// 敵の影の更新処理
 	bossEnemyShadow_->Update();
