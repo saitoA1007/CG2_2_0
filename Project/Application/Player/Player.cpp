@@ -11,6 +11,7 @@
 #include"Application/Stage/Wall.h"
 #include "LogManager.h"
 #include "AudioManager.h"
+#include "Application/Enemy/BossEnemy.h"
 using namespace GameEngine;
 
 float Player::GetDamageFlashAlpha() const {
@@ -678,6 +679,31 @@ void Player::OnCollision(const CollisionResult &result) {
     // or 風攻撃の場合
     if ((isBoss && !isRushing_ && !isAttackDown_ && !isInvincible_ && !isBounceLock_) ||
         (isWind && !isAttackDown_ && !isInvincible_)) {
+		// ボスの場合、状態がBattleでない場合は無効
+		if (isBoss) {
+			BossEnemy* bossPtr = static_cast<BossEnemy *>(result.userData.object);
+			if (bossPtr->GetBossState() != BossState::Battle) {
+                // 卵状態の場合はめり込んだ分だけ押し出す
+				if (bossPtr->GetBossState() == BossState::Egg) {
+					Vector3 n = result.contactNormal;
+					if (n.x != 0.0f || n.y != 0.0f || n.z != 0.0f) { n = Normalize(n); }
+					float depth = -result.penetrationDepth;
+					Vector3 correction = n * depth;
+					worldTransform_.transform_.translate.x += correction.x;
+					worldTransform_.transform_.translate.y += correction.y;
+					worldTransform_.transform_.translate.z += correction.z;
+					float dot = velocity_.x * n.x + velocity_.y * n.y + velocity_.z * n.z;
+					if (dot < 0.0f) {
+						velocity_.x -= n.x * dot;
+						velocity_.y -= n.y * dot;
+						velocity_.z -= n.z * dot;
+					}
+                }
+				if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
+				return;
+			}
+        }
+
 		Log("is hit Boss normally");
 		// HP減少処理（仮で1ダメージ）
 		currentHP_ -= 1;

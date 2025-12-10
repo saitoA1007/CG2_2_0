@@ -351,8 +351,6 @@ void TDGameScene::Initialize(SceneContext* context) {
 		//		false, true, true, true);
 		//}
 
-		// 初回実行フラグを解除
-		TDGameScene::SetIsFirstGameStart(false);
 	}
 	cameraController_->SetCurrentAsDesired();
 
@@ -413,9 +411,11 @@ void TDGameScene::Initialize(SceneContext* context) {
 	mainCamera_->SetCamera(cameraController_->GetCamera());
 	mainCamera_->Update();
 
-	isTitleLocked_ = true;
-	isTransitioning_ = false;
-	transitionTimer_ = 0.0f;
+	if (sIsFirstGameStart_) {
+		isTitleLocked_ = true;
+		isTransitioning_ = false;
+		transitionTimer_ = 0.0f;
+	} 
 
     // Letterbox 初期化（高さ0で開始）
     letterbox_ = std::make_unique<Letterbox>();
@@ -436,6 +436,9 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// ボスの撃破時のフェード
 	bossDestroyFade_ = std::make_unique<BossDestroyFade>();
 	bossDestroyFade_->Initialize();
+
+	// 初回実行フラグを解除
+	TDGameScene::SetIsFirstGameStart(false);
 }
 
 void TDGameScene::Update() {
@@ -465,10 +468,6 @@ void TDGameScene::Update() {
 				isTitleLocked_ = false;
 			}
 		}
-
-		// カメラ更新
-		cameraController_->Update(context_->inputCommand, context_->input);
-		mainCamera_->SetCamera(cameraController_->GetCamera());
 	}
 
 	if (context_->input->TriggerKey(DIK_U)) {
@@ -616,7 +615,7 @@ void TDGameScene::Update() {
 	}
 
 	if (isTitleLocked_) {
-		cameraController_->Update(nullptr, context_->input);
+		cameraController_->Update(nullptr, nullptr);
 	} else {
 		cameraController_->Update(context_->inputCommand, context_->input);
 	}
@@ -626,9 +625,9 @@ void TDGameScene::Update() {
 	// 敵の更新処理
 	//========================================
 #pragma region EnemyUpdate
+	// 敵の移動処理
+	bossEnemy_->Update(player_->GetPlayerPos());
 	if (!isTitleLocked_) {
-		// 敵の移動処理
-		bossEnemy_->Update(player_->GetPlayerPos());
 		enemyAttackManager_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 	}
 	// 敵の影の更新処理
