@@ -593,8 +593,8 @@ void TDGameScene::Update() {
 			bossIntroTimer_ = 0.0f;
 			bossIntroDelayAfterFreeze_ = false;
 			bossIntroFinished_ = false; // これから演出予定
-            AudioManager::GetInstance().Play(bossEggCrackSEHandle_, 2.0f, false);
-            AudioManager::GetInstance().Play(bossEggDamageSEHandle_, 0.5f, false);
+            AudioManager::GetInstance().Play(bossEggCrackSEHandle_, 0.5f, false);
+            AudioManager::GetInstance().Play(bossEggDamageSEHandle_, 2.0f, false);
 		}
 		if (cameraController_) {
 			cameraController_->SetDesiredFov(1.0f);
