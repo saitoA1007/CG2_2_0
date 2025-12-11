@@ -39,7 +39,7 @@
         "IsEnableSizeOverLifeTime": false,
         "IsEnableVelocityFromPosition": false,
         "IsLoop": true,
-        "LifeTime": 7.0,
+        "LifeTime": 10.0,
         "MaxVelocity": 0.0,
         "MinVelocity": 0.0,
         "RotateRange": {
@@ -72,12 +72,12 @@
         "SpawnRange": {
             "Max": [
                 40.0,
-                25.0,
+                40.0,
                 40.0
             ],
             "Min": [
                 -40.0,
-                25.0,
+                40.0,
                 -40.0
             ]
         },
