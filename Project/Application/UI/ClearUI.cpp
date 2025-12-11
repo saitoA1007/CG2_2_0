@@ -47,24 +47,24 @@ void ClearUI::Initialize(GameEngine::InputCommand* inputCommand, GameEngine::Tex
 	for (size_t i = 0; i < numbersSprites_.size(); ++i) {
 		
 		if (i == 0) {
-			numbersSprites_[i].numSprite_ = Sprite::Create({ 640.0f - 8.0f - 64.0f, 400.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
+			numbersSprites_[i].numSprite_ = Sprite::Create({ 640.0f - 8.0f - 64.0f, 400.0f + 32.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
 		} else if (i == 1) {
-			numbersSprites_[i].numSprite_ = Sprite::Create({ 640.0f - 8.0f - 32.0f, 400.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
+			numbersSprites_[i].numSprite_ = Sprite::Create({ 640.0f - 8.0f - 32.0f, 400.0f + 32.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
 		} else if (i == 2) {
-			numbersSprites_[i].numSprite_ = Sprite::Create({ 640.0f + 8.0f + 32.0f, 400.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
+			numbersSprites_[i].numSprite_ = Sprite::Create({ 640.0f + 8.0f + 32.0f, 400.0f + 32.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
 		} else if (i == 3) {
-			numbersSprites_[i].numSprite_ = Sprite::Create({ 640.0f + 8.0f + 64.0f, 400.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
+			numbersSprites_[i].numSprite_ = Sprite::Create({ 640.0f + 8.0f + 64.0f, 400.0f + 32.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
 		}
 
 		numbersSprites_[i].number = 0;
 	}
 
 	// クリア時間UI
-	clearTimeText_ = Sprite::Create({ 640.0f, 316.0f + 32.0f }, { 240.0f, 64.0f }, { 0.5f, 0.5f }, { 1.0f,1.0f,1.0f,0.0f });
-	clearTimeTextGH_ = textureManager->GetHandleByName("retryText.png");
+	clearTimeText_ = Sprite::Create({ 640.0f, 316.0f + 32.0f + 32.0f }, { 240.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
+	clearTimeTextGH_ = textureManager->GetHandleByName("clearTimeText.png");
 
 	// 桁の中間
-	numMiddle_ = Sprite::Create({ 640.0f, 400.0f }, { 48.0f, 64.0f + 32.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
+	numMiddle_ = Sprite::Create({ 640.0f, 400.0f + 32.0f + 32.0f }, { 48.0f, 64.0f}, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
 	numMiddleGH_ = textureManager->GetHandleByName("dotto.png");
 
 #ifdef _DEBUG
