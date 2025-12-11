@@ -86,6 +86,9 @@ private:
 	// 生成する壁
 	std::vector<std::unique_ptr<Wall>> walls_;
 
+	// 下の氷
+	std::vector<std::unique_ptr<GameEngine::WorldTransform>> underWalls_;
+
 	// 生存状態の壁のデータ
 	std::vector<Wall*> aliveWalls_;
 
@@ -93,6 +96,13 @@ private:
 	std::list<std::unique_ptr<BreakWallParticle>> breakWallParticles_;
 
 	uint32_t wallTextureHandle_ = 0;
+
+	std::string kGroupName_ = "Wall";
+
+	std::unique_ptr<IceRockMaterial> iceMaterial_;
+	// デバック用
+	Vector4 rimColor;
+	Vector4 specularColor;
 
 private:
 

@@ -70,8 +70,13 @@ void StageManager::Update() {
 void StageManager::Draw(GameEngine::Model* wallModel, ID3D12Resource* lightGroupResource) {
 
 	// 生存している壁を描画
-	for (auto& wall : aliveWalls_) {
-		CustomRenderer::DrawRock(wallModel, wall->GetWorldTransform(),lightGroupResource,wall->GetMaterial());
+	//for (auto& wall : aliveWalls_) {
+	//	CustomRenderer::DrawRock(wallModel, wall->GetWorldTransform(),lightGroupResource,wall->GetMaterial());
+	//}
+
+	for (uint32_t i = 0; i < aliveWalls_.size(); ++i) {
+		CustomRenderer::DrawRock(wallModel, *underWalls_[i].get(), lightGroupResource, iceMaterial_.get());
+		CustomRenderer::DrawRock(wallModel, aliveWalls_[i]->GetWorldTransform(), lightGroupResource, aliveWalls_[i]->GetMaterial());
 	}
 }
 
@@ -109,7 +114,12 @@ void StageManager::GenerateWalls() {
 		std::unique_ptr<Wall> tmpWall = std::make_unique<Wall>();
 		tmpWall->Initialilze({ {wallWidth,wallHeight_,wallDepth_},{0.0f,rotateY,0.0f},{tmpPos} }, respawnTime_, maxHp_, wallTextureHandle_);
 
+		std::unique_ptr<GameEngine::WorldTransform> tmpUnderWall = std::make_unique<GameEngine::WorldTransform>();
+		tmpPos.y -=3.0f;
+		tmpUnderWall->Initialize({ {wallWidth,wallHeight_,wallDepth_},{0.0f,rotateY,0.0f},{tmpPos} });
+		tmpUnderWall->UpdateTransformMatrix();
 		// 登録する
+		underWalls_.push_back(std::move(tmpUnderWall));
 		walls_.push_back(std::move(tmpWall));
 	}
 }
@@ -146,6 +156,23 @@ void StageManager::ApplyDebugParam() {
 	offsetWallWidth_ = GameParamEditor::GetInstance()->GetValue<float>("StageManager", "OffsetWallWidth");
 
 	isCreate_ = GameParamEditor::GetInstance()->GetValue<bool>("StageManager", "IsCreate");
+
+
+	iceMaterial_ = std::make_unique<IceRockMaterial>();
+	iceMaterial_->Initialize();
+	iceMaterial_->materialData_->textureHandle = wallTextureHandle_;
+	iceMaterial_->materialData_->color = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "IceColor");
+	specularColor = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "SpecularColor");
+	rimColor = GameParamEditor::GetInstance()->GetValue<Vector4>(kGroupName_, "RimColor");
+	iceMaterial_->materialData_->shininess = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "Shininess");
+	iceMaterial_->materialData_->rimIntensity = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "RimIntensity");
+	iceMaterial_->materialData_->rimPower = GameParamEditor::GetInstance()->GetValue<float>(kGroupName_, "RimPower");
+	iceMaterial_->materialData_->rimColor.x = rimColor.x;
+	iceMaterial_->materialData_->rimColor.y = rimColor.y;
+	iceMaterial_->materialData_->rimColor.z = rimColor.z;
+	iceMaterial_->materialData_->specularColor.x = specularColor.x;
+	iceMaterial_->materialData_->specularColor.y = specularColor.y;
+	iceMaterial_->materialData_->specularColor.z = specularColor.z;
 }
 
 void StageManager::DebugUpdate() {
