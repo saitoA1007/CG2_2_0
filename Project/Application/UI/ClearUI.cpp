@@ -124,12 +124,14 @@ void ClearUI::Update() {
 
 	// アニメーション進行
 	Animate();
-
-	if (inputCommand_->IsCommandActive("Start")) {
-		// タイトルに戻る
-		if (backTitle_) {
-			AudioManager::GetInstance().Play(selectSH_, 0.8f, false);
-			backTitle_();
+	// アニメ―ションが終了したら入力受付
+	if (animTimer_ >= animTotal_) {
+		if (inputCommand_->IsCommandActive("Start")) {
+			// タイトルに戻る
+			if (backTitle_) {
+				AudioManager::GetInstance().Play(selectSH_, 0.8f, false);
+				backTitle_();
+			}
 		}
 	}
 
