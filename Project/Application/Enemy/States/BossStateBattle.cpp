@@ -109,6 +109,11 @@ void BossStateBattle::Exit() {
 	bossContext_.isRushCollisionActive_ = false;
 	bossContext_.isWindAttack_ = false;
 	bossContext_.isWingsEffect_ = false;
+
+	AudioManager::GetInstance().Stop(screamSH_);
+	AudioManager::GetInstance().Stop(rushSH_);
+	AudioManager::GetInstance().Stop(iceBreath_);
+	AudioManager::GetInstance().Stop(BossMove_);
 }
 
 void BossStateBattle::ResetNormal() {
