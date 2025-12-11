@@ -1,12 +1,12 @@
 {
     "Player-Audio": {
-        "AirMotionVolume": 0.5,
-        "PlayerDamagedVolume": 1.0,
-        "ReflectVolume": 1.0,
-        "RushChargeVolume": 1.0,
-        "RushLv1Volume": 1.0,
-        "RushLv2Volume": 1.0,
-        "RushLv3Volume": 1.0,
+        "AirMotionVolume": 0.30000001192092896,
+        "PlayerDamagedVolume": 0.5,
+        "ReflectVolume": 0.20000000298023224,
+        "RushChargeVolume": 0.5,
+        "RushLv1Volume": 0.5,
+        "RushLv2Volume": 0.5,
+        "RushLv3Volume": 0.800000011920929,
         "SceneName": "TDGameScene"
     }
 }
