@@ -593,7 +593,7 @@ void TDGameScene::Update() {
 			bossIntroTimer_ = 0.0f;
 			bossIntroDelayAfterFreeze_ = false;
 			bossIntroFinished_ = false; // これから演出予定
-            AudioManager::GetInstance().Play(bossEggCrackSEHandle_, 0.5f, false);
+            AudioManager::GetInstance().Play(bossEggCrackSEHandle_, 2.0f, false);
             AudioManager::GetInstance().Play(bossEggDamageSEHandle_, 0.5f, false);
 		}
 		if (cameraController_) {
@@ -698,7 +698,7 @@ void TDGameScene::Update() {
 				[](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutCubic(a, b, t); },
 				CameraController::ShakeOrigin::TargetPosition,
                 true, true, true, false);
-            AudioManager::GetInstance().Play(bossScreamSEHandle_, 0.5f, false);
+            AudioManager::GetInstance().Play(bossScreamSEHandle_, 1.0f, false);
             // BossAppearanceUIを有効化
             if (bossAppearanceUI_) { bossAppearanceUI_->SetActive(true); }
 		}
