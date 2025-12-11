@@ -1,6 +1,6 @@
 {
     "Player-Rush": {
-        "PreRushTime": 0.5,
+        "PreRushTime": 0.10000000149011612,
         "RushChargeLevel1Ratio": 0.0,
         "RushChargeLevel2Ratio": 0.20000000298023224,
         "RushChargeLevel3Ratio": 0.5,
