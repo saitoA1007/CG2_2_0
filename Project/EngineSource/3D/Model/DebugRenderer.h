@@ -5,7 +5,8 @@
 #include"Vector3.h"
 #include"Vector4.h"
 #include"Matrix4x4.h"
-#include"LinePSO.h"
+#include"PSO/Core/PSOManager.h"
+#include"PSO/Core/DrawPSOData.h"
 
 #include"Geometry.h"
 
@@ -33,7 +34,7 @@ namespace GameEngine {
 		/// <summary>
 		/// 静的初期化
 		/// </summary>
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, LinePSO* linePSO);
+		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, PSOManager* psoManager);
 
 		/// <summary>
 		/// インスタンス作成
@@ -98,7 +99,7 @@ namespace GameEngine {
 		// 静的メンバー
 		static ID3D12Device* device_;
 		static ID3D12GraphicsCommandList* commandList_;
-		static LinePSO* linePSO_;
+		static DrawPsoData pso_;
 
 		bool isEnabled_ = true;
 
