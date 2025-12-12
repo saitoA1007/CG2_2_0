@@ -1,13 +1,15 @@
 #pragma once
 #include"DXC.h"
+#include <string>
+#include <filesystem>
 
 namespace GameEngine {
 
 	class ShaderCompiler {
 	public:
 
-		// 読み込むシェーダー
-		enum class CompileShaderType {
+		// コンパイルするシェーダータイプ
+		enum class Type {
 			VS,
 			PS,
 			CS,
@@ -15,33 +17,54 @@ namespace GameEngine {
 			Count
 		};
 
+		/// <summary>
+		/// 初期化
+		/// </summary>
+		/// <param name="dxc"></param>
 		void Initialize(DXC* dxc);
 
-		void CompileVsShader(const std::wstring& vsPath);
-		void CompilePsShader(const std::wstring& psPath);
-
-		void CompileCsShader(const std::wstring& csPath);
-
-		IDxcBlob* GetVertexShaderBlob() const { return vertexShaderBlob_.Get(); }
-		IDxcBlob* GetPixelShaderBlob() const { return pixelShaderBlob_.Get(); }
-
-		IDxcBlob* GetCsShaderBlob() const { return csShaderBlob_.Get(); }
-
-		Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& Path, CompileShaderType type);
+		// コンパイルするシェーダー
+		Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(Type type, const std::wstring& path);
 
 	private:
 
 		DXC* dxc_ = nullptr;
 
-		Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
-		Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
-
-		Microsoft::WRL::ComPtr<IDxcBlob> csShaderBlob_;
-
-		std::wstring paths_[static_cast<size_t>(CompileShaderType::Count)] = {
+		// コンパイルタイプ
+		std::wstring compileTypes[static_cast<size_t>(Type::Count)] = {
 			L"vs_6_0",
 			L"ps_6_0",
 			L"cs_6_0"
 		};
+
+		// csoファイルのディレクトリパス
+		const std::wstring csoDirectory_ = L"Resources/Shaders/Compiled/";
+
+	private:
+
+		/// <summary>
+		/// HLSLからCSOを生成
+		/// </summary>
+		std::wstring GetCsoPath(const std::wstring& hlslPath);
+
+		/// <summary>
+		/// CSOファイルを読み込む
+		/// </summary>
+		Microsoft::WRL::ComPtr<IDxcBlob> LoadCsoFile(const std::wstring& csoPath);
+
+		/// <summary>
+		/// CSOファイルに保存
+		/// </summary>
+		void SaveCsoFile(const std::wstring& csoPath, IDxcBlob* blob);
+
+		/// <summary>
+		/// HLSLファイルがCSOより新しいかチェック
+		/// </summary>
+		bool IsHlslNewer(const std::wstring& hlslPath, const std::wstring& csoPath);
+
+		/// <summary>
+		/// HLSLをコンパイルしてCSOとして保存
+		/// </summary>
+		Microsoft::WRL::ComPtr<IDxcBlob> CompileAndSave(Type type, const std::wstring& hlslPath);
 	};
 }
