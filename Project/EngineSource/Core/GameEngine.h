@@ -5,7 +5,6 @@
 #include"SrvManager.h"
 
 // Core/PSO
-#include"LinePSO.h"
 #include"PostProcess/CopyPSO.h"
 #include"PostProcess/BloomPSO.h"
 #include"PostProcess/ScanLinePSO.h"
@@ -106,9 +105,6 @@ namespace GameEngine {
 		std::unique_ptr<SrvManager> srvManager_;
 
 		/// PSO ======================================
-
-		// 線のPSO設定
-		std::unique_ptr<LinePSO> linePSO_;
 
 		/// ↓ポストエフェクト用のPSO設定
 

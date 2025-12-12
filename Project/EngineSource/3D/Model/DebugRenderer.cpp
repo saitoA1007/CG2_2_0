@@ -6,12 +6,12 @@ using namespace GameEngine;
 
 ID3D12Device* DebugRenderer::device_ = nullptr;
 ID3D12GraphicsCommandList* DebugRenderer::commandList_ = nullptr;
-LinePSO* DebugRenderer::linePSO_ = nullptr;
+DrawPsoData DebugRenderer::pso_;
 
-void DebugRenderer::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, LinePSO* linePSO) {
+void DebugRenderer::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, PSOManager* psoManager) {
     device_ = device;
     commandList_ = commandList;
-    linePSO_ = linePSO;
+    pso_ = psoManager->GetDrawPsoData("Line");
 }
 
 std::unique_ptr<DebugRenderer> DebugRenderer::Create() {
@@ -287,8 +287,8 @@ void DebugRenderer::DrawAll(const Matrix4x4& VPMatrix) {
 }
 
 void DebugRenderer::PreDraw() {
-    commandList_->SetGraphicsRootSignature(linePSO_->GetRootSignature());
-    commandList_->SetPipelineState(linePSO_->GetPipelineState());
+    commandList_->SetGraphicsRootSignature(pso_.rootSignature);
+    commandList_->SetPipelineState(pso_.graphicsPipelineState);
 }
 
 void DebugRenderer::UpdateLineMeshes() {

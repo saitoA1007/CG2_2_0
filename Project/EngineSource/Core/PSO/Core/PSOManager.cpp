@@ -325,6 +325,23 @@ void PSOManager::DefaultLoadPSO() {
     gridInputLayoutBuilder.CreateGridElement();
     RegisterPSO("Grid", grid, &gridRootSigBuilder, &gridInputLayoutBuilder);
 
+    // デバックライン描画用のPSO
+    CreatePSOData line;
+    line.rootSigName = "Line";
+    line.vsPath = L"Resources/Shaders/Primitive.VS.hlsl";
+    line.psPath = L"Resources/Shaders/Primitive.PS.hlsl";
+    line.drawMode = DrawModel::None;
+    line.blendMode = BlendMode::kBlendModeNormal;
+    line.isDepthEnable = true;
+    line.primitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+    RootSignatureBuilder lineRootSigBuilder;
+    lineRootSigBuilder.Initialize(device_);
+    lineRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
+    lineRootSigBuilder.CreateRootSignature();
+    InputLayoutBuilder lineInputLayoutBuilder;
+    lineInputLayoutBuilder.CreateDefaultLineElement();
+    RegisterPSO("Line", line, &lineRootSigBuilder, &lineInputLayoutBuilder);
+
     // アニメーション描画用のPSO
     CreatePSOData animation;
     animation.rootSigName = "Animation";

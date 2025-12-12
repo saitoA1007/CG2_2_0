@@ -126,9 +126,6 @@
     <ClCompile Include="EngineSource\Common\LogManager.cpp">
       <Filter>EngineSource\Common</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\LinePSO.cpp">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Core\DXC.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
@@ -355,9 +352,6 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Common\ResourceLeakChecker.h">
       <Filter>EngineSource\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\LinePSO.h">
-      <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Core\DXC.h">
       <Filter>EngineSource\Core</Filter>
