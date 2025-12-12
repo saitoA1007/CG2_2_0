@@ -171,10 +171,10 @@
     <ClCompile Include="Application\ColorEditor.cpp">
       <Filter>GameSource</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PostProcess\PostEffectManager.cpp">
+    <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectManager.cpp">
       <Filter>EngineSource\Core\PostProcess</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\GaussianBlurPSO.cpp">
+    <ClCompile Include="EngineSource\Graphics\PSO\GaussianBlurPSO.cpp">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\3D\Model\Mesh.cpp">
@@ -189,7 +189,7 @@
     <ClCompile Include="Externals\imgui\ImGuizmo.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\ComputePSO\ParticleCSPSO.cpp">
+    <ClCompile Include="EngineSource\Graphics\ComputePSO\ParticleCSPSO.cpp">
       <Filter>EngineSource\Core\ComputePSO</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\3D\Model\Particle.cpp">
@@ -201,25 +201,25 @@
     <ClCompile Include="EngineSource\Collision\CollisionUtils.cpp">
       <Filter>EngineSource\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.cpp">
+    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\RadialBlurPSO.cpp">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.cpp">
+    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\ScanLinePSO.cpp">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.cpp">
+    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\VignettingPSO.cpp">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\PostProcess\BloomPSO.cpp">
+    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.cpp">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\PostProcess\CopyPSO.cpp">
+    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.cpp">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Editor\GameParamEditor.cpp">
       <Filter>GameSource</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.cpp">
+    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\OutLinePSO.cpp">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Core\RandomGenerator.cpp">
@@ -247,18 +247,18 @@
     <ClCompile Include="EngineSource\Graphics\DirectX\DXRenderTarget.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\DXDepthStencil.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\DXFence.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\PSOManager.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\ShaderCompiler.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\BlendBuilder.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\RasterizerBuilder.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\test.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\PSOManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\InputLayoutBuilder.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\ShaderCompiler.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\BlendBuilder.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\RasterizerBuilder.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\test.cpp" />
     <ClCompile Include="Externals\imgui\imgui_node_editor.cpp" />
     <ClCompile Include="Externals\imgui\crude_json.cpp" />
     <ClCompile Include="Externals\imgui\imgui_canvas.cpp" />
     <ClCompile Include="Externals\imgui\imgui_node_editor_api.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\MaterialEditor.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\MaterialEditor.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
     <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp" />
     <ClCompile Include="EngineSource\Collision\CollisionManager.cpp" />
@@ -392,7 +392,7 @@
     <ClInclude Include="EngineSource\3D\Model\WorldTransform.h">
       <Filter>EngineSource\3D</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\BlendMode.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\BlendMode.h">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\WorldTransforms.h">
@@ -422,13 +422,13 @@
     <ClInclude Include="Application\ColorEditor.h">
       <Filter>GameSource</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PostProcess\BasePostEffect.h">
+    <ClInclude Include="EngineSource\Graphics\PostProcess\BasePostEffect.h">
       <Filter>EngineSource\Core\PostProcess</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PostProcess\PostEffectManager.h">
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectManager.h">
       <Filter>EngineSource\Core\PostProcess</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\GaussianBlurPSO.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\GaussianBlurPSO.h">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\Mesh.h">
@@ -446,7 +446,7 @@
     <ClInclude Include="EngineSource\3D\Model\AnimationData.h">
       <Filter>EngineSource\3D</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\ComputePSO\ParticleCSPSO.h">
+    <ClInclude Include="EngineSource\Graphics\ComputePSO\ParticleCSPSO.h">
       <Filter>EngineSource\Core\ComputePSO</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\Particle.h">
@@ -461,25 +461,25 @@
     <ClInclude Include="EngineSource\Math\Quaternion.h">
       <Filter>EngineSource\Math</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\RadialBlurPSO.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\RadialBlurPSO.h">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\ScanLinePSO.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\ScanLinePSO.h">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\VignettingPSO.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\VignettingPSO.h">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\BloomPSO.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.h">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\CopyPSO.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.h">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Editor\GameParamEditor.h">
       <Filter>GameSource</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\OutLinePSO.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\OutLinePSO.h">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Core\RandomGenerator.h">
@@ -510,21 +510,21 @@
     <ClInclude Include="EngineSource\Graphics\DirectX\DXRenderTarget.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\DXDepthStencil.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\DXFence.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\PSOManager.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\ShaderCompiler.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\BlendBuilder.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\RasterizerBuilder.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\test.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\PSOManager.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\InputLayoutBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\ShaderCompiler.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\BlendBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\RasterizerBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\test.h" />
     <ClInclude Include="Externals\imgui\imgui_node_editor.h" />
     <ClInclude Include="Externals\imgui\imgui_node_editor_internal.h" />
     <ClInclude Include="Externals\imgui\crude_json.h" />
     <ClInclude Include="Externals\imgui\imgui_extra_math.h" />
     <ClInclude Include="Externals\imgui\imgui_canvas.h" />
     <ClInclude Include="Externals\imgui\imgui_bezier_math.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\MaterialEditor.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\DrawPSOData.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\MaterialEditor.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\DrawPSOData.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
     <ClInclude Include="EngineSource\Editor\ParamEditorManager.h" />
     <ClInclude Include="EngineSource\Collision\Collider.h" />
@@ -557,7 +557,7 @@
     <ClInclude Include="EngineSource\Graphics\FrameRateController.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\DXViewportState.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPipeline.h" />
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\IPostEffect.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\IPostEffect.h" />
     <ClInclude Include="Application\Light\SceneLightingController.h" />
     <ClInclude Include="EngineSource\Collision\CollisionResult.h" />
     <ClInclude Include="EngineSource\Collision\ColliderData.h" />
