@@ -111,9 +111,6 @@
     <ClCompile Include="EngineSource\2D\Sprite.cpp">
       <Filter>EngineSource\2D</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\3D\Model\AxisIndicator.cpp">
-      <Filter>EngineSource\3D</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\3D\Model\Material.cpp">
       <Filter>EngineSource\3D</Filter>
     </ClCompile>
@@ -347,9 +344,6 @@
     </ClInclude>
     <ClInclude Include="EngineSource\2D\Sprite.h">
       <Filter>EngineSource\2D</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\3D\Model\AxisIndicator.h">
-      <Filter>EngineSource\3D</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\Material.h">
       <Filter>EngineSource\3D</Filter>
