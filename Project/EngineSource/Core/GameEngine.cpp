@@ -106,7 +106,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// マテリアルの初期化
 	Material::StaticInitialize(graphicsDevice_->GetDevice());
 	// デバック描画用
-	DebugRenderer::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), linePSO_.get());
+	DebugRenderer::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), psoManager_.get());
 
 	// 軸方向表示の初期化
 	AxisIndicator::StaticInitialize(graphicsDevice_->GetCommandList());
@@ -301,10 +301,6 @@ bool Engine::IsWindowOpen() {
 }
 
 void Engine::CreatePSO() {
-
-	// 線のPSO設定の初期化
-	linePSO_ = std::make_unique<LinePSO>();
-	linePSO_->Initialize(L"Resources/Shaders/Primitive.VS.hlsl", L"Resources/Shaders/Primitive.PS.hlsl", graphicsDevice_->GetDevice(), dxc_.get());
 
 	// CopyPSOの初期化
 	copyPSO_ = std::make_unique<CopyPSO>();
