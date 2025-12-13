@@ -4,7 +4,7 @@
 
 using namespace GameEngine;
 
-void RenderPipeline::Initialize(uint32_t width, uint32_t height, SrvManager* srvManager, GraphicsDevice* graphicsDevice) {
+void RenderPipeline::Initialize(GraphicsDevice* graphicsDevice, PostEffectManager* postEffectManager) {
     LogManager::GetInstance().Log("RenderPipeline start Initialize");
 
     // DirectXのコア機能を取得
@@ -16,7 +16,7 @@ void RenderPipeline::Initialize(uint32_t width, uint32_t height, SrvManager* srv
 
     // レンダラーマネージャーの初期化
     rendererManager_ = std::make_unique<RendererManager>();
-    rendererManager_->Initialize(graphicsDevice_, width, height, srvManager);
+    rendererManager_->Initialize(graphicsDevice_, postEffectManager);
 
     LogManager::GetInstance().Log("RenderPipeline end Initialize\n");
 }

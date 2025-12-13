@@ -1,15 +1,14 @@
-#include"ScanLine.hlsli"
-#define PI    3.14159265359f
+#include"../FullScreen.hlsli"
 
-Texture2D<float32_t4> gTexture : register(t0);
+Texture2D<float32_t4> gTexture[] : register(t0);
 SamplerState gSampler : register(s0);
 
 struct Material
 {
-    float32_t interval;
-    float32_t time;
-    float32_t speed;
-    float32_t3 lineColor;
+    float32_t2 center; // 中心点
+    int32_t numSamles; // サンプリング処理。大きい程滑らか
+    float32_t blurWidth;
+    uint32_t textureHandle;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 
@@ -20,16 +19,18 @@ struct PixelShaderOutput
 
 PixelShaderOutput main(VertexShaderOutput input)
 {
+    float32_t2 direction = input.texcoord - gMaterial.center;
+    float32_t3 outputColor = float32_t3(0.0f, 0.0f, 0.0f);
+    for (int32_t sampleIndex = 0; sampleIndex < gMaterial.numSamles; ++sampleIndex)
+    {
+        float32_t2 texcoord = input.texcoord + direction * gMaterial.blurWidth * float32_t(sampleIndex);
+        outputColor.rgb += gTexture[gMaterial.textureHandle].Sample(gSampler, texcoord).rgb;
+    }
+    // 平均化
+    outputColor.rgb *= rcp(gMaterial.numSamles);
+    
     PixelShaderOutput output;
-    float32_t4 texColor = gTexture.Sample(gSampler, input.texcoord);
-    
-    float scanline = input.texcoord.y * gMaterial.interval + gMaterial.time * gMaterial.speed;
-    
-    float mask = (sin(scanline * 2.0f * PI) + 1.0f) * 0.5f;
-    
-    output.color.rgb = lerp(texColor.rgb, gMaterial.lineColor, mask);
-    float alpha = lerp(1.0f, 0.1f, mask);
-    output.color.a = alpha;
-    
+    output.color.rgb = outputColor;
+    output.color.a = 1.0f;
     return output;
 }

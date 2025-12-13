@@ -204,7 +204,7 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
     // 書き込むためのアドレスを取得
     bloomParameterResource_->Map(0, nullptr, reinterpret_cast<void**>(&constBuffer_));
     constBuffer_->bloomIteration = 1;
-    constBuffer_->highLumMask = 0.8f;
+    constBuffer_->highLumMask = 1.0f;
     constBuffer_->sigma = 1.0f;
     constBuffer_->intensity = 0.0f;
 }

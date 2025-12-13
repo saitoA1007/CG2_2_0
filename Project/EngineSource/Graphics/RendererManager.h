@@ -21,7 +21,7 @@ namespace GameEngine {
 		/// <param name="width"></param>
 		/// <param name="height"></param>
 		/// <param name="srvManager"></param>
-		void Initialize(GraphicsDevice* graphicsDevice, uint32_t width, uint32_t height, SrvManager* srvManager);
+		void Initialize(GraphicsDevice* graphicsDevice, PostEffectManager* postEffectManager);
 
         /// <summary>
         /// 描画前処理
@@ -72,7 +72,7 @@ namespace GameEngine {
         GraphicsDevice* graphicsDevice_ = nullptr;
 
         // ポストエフェクト
-        std::unique_ptr<PostEffectManager> postEffectManager_;
+        PostEffectManager* postEffectManager_ = nullptr;
 
         // コピー用PSO
         CopyPSO* copyPSO_ = nullptr;
