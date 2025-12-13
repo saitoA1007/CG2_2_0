@@ -5,17 +5,16 @@
 using namespace GameEngine;
 
 BloomPSO* PostEffectManager::bloomPSO_ = nullptr;
-ScanLinePSO* PostEffectManager::scanLinePSO_ = nullptr;
-VignettingPSO* PostEffectManager::vignettingPSO_ = nullptr;
-RadialBlurPSO* PostEffectManager::radialBlurPSO_ = nullptr;
 OutLinePSO* PostEffectManager::outLinePSO_ = nullptr;
+std::array<DrawPsoData, static_cast<size_t>(PostEffectManager::PSOType::MaxCount)> PostEffectManager::psoList_;
 
-void PostEffectManager::StaticInitialize(BloomPSO* bloomPSO, ScanLinePSO* scanLinePSO, VignettingPSO* vignettingPSO, RadialBlurPSO* radialBlurPSO, OutLinePSO* outLinePSO) {
+void PostEffectManager::StaticInitialize(BloomPSO* bloomPSO, OutLinePSO* outLinePSO, PSOManager* psoManager) {
     bloomPSO_ = bloomPSO;
-    scanLinePSO_ = scanLinePSO;
-    vignettingPSO_ = vignettingPSO;
-    radialBlurPSO_ = radialBlurPSO;
     outLinePSO_ = outLinePSO;
+
+    psoList_[static_cast<size_t>(PSOType::Vignetting)] = psoManager->GetDrawPsoData("Vignetting");
+    psoList_[static_cast<size_t>(PSOType::ScanLine)] = psoManager->GetDrawPsoData("ScanLine");
+    psoList_[static_cast<size_t>(PSOType::RadialBlur)] = psoManager->GetDrawPsoData("RadialBlur");
 }
 
 void PostEffectManager::Initialize(ID3D12Device* device, float clearColor_[4], uint32_t width, uint32_t height, uint32_t descriptorSizeRTV, SrvManager* srvManager) {
@@ -79,6 +78,7 @@ void PostEffectManager::Initialize(ID3D12Device* device, float clearColor_[4], u
     uint32_t index = srvManager_->AllocateSrvIndex(SrvHeapType::System);
     D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(index);
     drawObjectSRVHandle_ = srvManager_->GetGPUHandle(index);
+    drawObjectIndex_ = index;
 
     // オブジェクト描画用SRV
     device_->CreateShaderResourceView(DrawObjectResource_.Get(), &srvDesc, srvCPUHandle);
@@ -90,7 +90,7 @@ void PostEffectManager::Initialize(ID3D12Device* device, float clearColor_[4], u
     InitializePostEffectData(width, height, descriptorSizeRTV);
 }
 
-void PostEffectManager::PreDraw(ID3D12GraphicsCommandList* commandList,const D3D12_VIEWPORT& viewport, const D3D12_RECT& scissorRect, float clearColor[4], ID3D12DescriptorHeap* dsvHeap) {
+void PostEffectManager::PreDraw(ID3D12GraphicsCommandList* commandList, const D3D12_VIEWPORT& viewport, const D3D12_RECT& scissorRect, float clearColor[4], ID3D12DescriptorHeap* dsvHeap) {
 
     // バリア: オフスクリーンをレンダーターゲットに
     D3D12_RESOURCE_BARRIER barrier{};
@@ -136,15 +136,16 @@ void PostEffectManager::PostDraw(ID3D12GraphicsCommandList* commandList, const D
     D3D12_GPU_DESCRIPTOR_HANDLE currentInputSRV = drawObjectSRVHandle_;
 
     // アウトラインを描画
-    DrawOutLine(commandList, depthSRV, currentInputSRV);
-    currentInputSRV = outLineData_.srvHandle;
+   // DrawOutLine(commandList, depthSRV, currentInputSRV);
+    //currentInputSRV = outLineData_.srvHandle;
+    depthSRV;
 
     // ブルームを描画
     DrawBloom(commandList, currentInputSRV, viewport, scissorRect);
     currentInputSRV = bloomSRVHandle_[3];
 
     // ヴィネットの描画
-    DrawVignetting(commandList, currentInputSRV);
+    DrawEffect(commandList, vignettingData_, vignettingResource_.GetResource());
     currentInputSRV = vignettingData_.srvHandle;
 
     switch (drawMode_)
@@ -154,13 +155,13 @@ void PostEffectManager::PostDraw(ID3D12GraphicsCommandList* commandList, const D
 
     case GameEngine::PostEffectManager::DrawMode::ScanLine:
         // scanLineを描画
-        DrawScanLine(commandList, currentInputSRV);
+        DrawEffect(commandList, scanLineData_, scanLineResource_.GetResource());
         currentInputSRV = scanLineData_.srvHandle;
         break;
 
     case GameEngine::PostEffectManager::DrawMode::RadialBlur:
         // ラジアルブルーを描画
-        DrawRadialBlur(commandList, currentInputSRV);
+        DrawEffect(commandList, radialBlurData_, radialBlurResource_.GetResource());
         currentInputSRV = radialBlurData_.srvHandle;
         break;
     }
@@ -168,7 +169,7 @@ void PostEffectManager::PostDraw(ID3D12GraphicsCommandList* commandList, const D
     resultSRVHandle_ = currentInputSRV;
 }
 
-CD3DX12_GPU_DESCRIPTOR_HANDLE& PostEffectManager::GetSRVHandle() { 
+CD3DX12_GPU_DESCRIPTOR_HANDLE& PostEffectManager::GetSRVHandle() {
     return resultSRVHandle_;
 }
 
@@ -219,7 +220,7 @@ void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_
         &clearValue_, IID_PPV_ARGS(&bloomResultResource_));
     assert(SUCCEEDED(hr));
 
-     // 合成したものを描画のリソースを作成
+    // 合成したものを描画のリソースを作成
     hr = device_->CreateCommittedResource(
         &heapProps, D3D12_HEAP_FLAG_NONE, &desc,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
@@ -249,7 +250,7 @@ void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.Texture2D.MipLevels = 1;
-     
+
     uint32_t index[4] = {};
     D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle[4];
 
@@ -275,14 +276,14 @@ void PostEffectManager::InitializeBloom(uint32_t width, uint32_t height, uint32_
     srvCPUHandle[3] = srvManager_->GetCPUHandle(index[3]);
     bloomSRVHandle_[3] = srvManager_->GetGPUHandle(index[3]);
     device_->CreateShaderResourceView(bloomCompositeResource_.Get(), &srvDesc, srvCPUHandle[3]);
+    bloomIndex_ = index[3];
 
-    
     LogManager::GetInstance().Log("End Create BloomRenderTargets\n");
 }
 
 void PostEffectManager::DrawBloom(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv, const D3D12_VIEWPORT& baseViewport, const D3D12_RECT& baseScissorRect) {
     // SRVヒープをセット
-    ID3D12DescriptorHeap* heaps[] = { srvManager_->GetSRVHeap()};
+    ID3D12DescriptorHeap* heaps[] = { srvManager_->GetSRVHeap() };
     commandList->SetDescriptorHeaps(1, heaps);
 
     // ルート
@@ -305,7 +306,7 @@ void PostEffectManager::DrawBloom(ID3D12GraphicsCommandList* commandList, D3D12_
 
     commandList->SetGraphicsRootConstantBufferView(1, bloomPSO_->GetBloomParameterResource()->GetGPUVirtualAddress());
     commandList->SetGraphicsRootDescriptorTable(2, currentSrv);
-    
+
     // 明るい部分抽出の描画
     bloomPSO_->Draw(commandList, bloomSRVHandle_[0]);
 
@@ -416,7 +417,7 @@ void PostEffectManager::DrawBloom(ID3D12GraphicsCommandList* commandList, D3D12_
 }
 
 void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV) {
-    
+
     // ヴィネットの生成
     LogManager::GetInstance().Log("Start Create VignettingRenderTargets");
 
@@ -426,8 +427,19 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
         width, height,
         vignettingData_.resource,
         vignettingData_.rtvHandle,
-        vignettingData_.srvHandle
+        vignettingData_.srvHandle,
+        vignettingData_.srvIndex
     );
+
+    // psoデータを取得する
+    vignettingData_.psoData = &psoList_[static_cast<size_t>(PSOType::Vignetting)];
+
+    // パラメータリソースを作成
+    vignettingResource_.CreateResource(device_);
+    vignettingResource_.GetData()->intensity = 16.0f;
+    vignettingResource_.GetData()->time = 0.15f;
+    vignettingResource_.GetData()->textureHandle = bloomIndex_;
+
     LogManager::GetInstance().Log("End Create VignettingRenderTargets\n");
 
     // スキャンラインの生成
@@ -439,8 +451,21 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
         width, height,
         scanLineData_.resource,
         scanLineData_.rtvHandle,
-        scanLineData_.srvHandle
+        scanLineData_.srvHandle,
+        scanLineData_.srvIndex
     );
+
+    // psoデータを取得する
+    scanLineData_.psoData = &psoList_[static_cast<size_t>(PSOType::ScanLine)];
+
+    // パラメータリソースを作成
+    scanLineResource_.CreateResource(device_);
+    scanLineResource_.GetData()->interval = 96.0f;
+    scanLineResource_.GetData()->speed = -2.0f;
+    scanLineResource_.GetData()->time = 0.0f;
+    scanLineResource_.GetData()->lineColor = { 0.3f,0.3f,0.3f };
+    scanLineResource_.GetData()->textureHandle = vignettingData_.srvIndex;
+
     LogManager::GetInstance().Log("End Create ScanLineRenderTargets\n");
 
     // ラジアルブラーの生成
@@ -452,8 +477,20 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
         width, height,
         radialBlurData_.resource,
         radialBlurData_.rtvHandle,
-        radialBlurData_.srvHandle
+        radialBlurData_.srvHandle,
+        radialBlurData_.srvIndex
     );
+
+    // psoデータを取得する
+    radialBlurData_.psoData = &psoList_[static_cast<size_t>(PSOType::RadialBlur)];
+
+    // パラメータリソースを作成
+    radialBlurResource_.CreateResource(device_);
+    radialBlurResource_.GetData()->centerPos = { 0.5f,0.5f };
+    radialBlurResource_.GetData()->numSamles = 2;
+    radialBlurResource_.GetData()->blurWidth = 0.01f;
+    radialBlurResource_.GetData()->textureHandle = vignettingData_.srvIndex;
+
     LogManager::GetInstance().Log("End Create RadialBlurRenderTargets");
 
     // アウトラインの生成
@@ -465,85 +502,10 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
         width, height,
         outLineData_.resource,
         outLineData_.rtvHandle,
-        outLineData_.srvHandle
+        outLineData_.srvHandle,
+        outLineData_.srvIndex
     );
     LogManager::GetInstance().Log("End Create OutLineRenderTargets");
-}
-
-void PostEffectManager::DrawScanLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv) {
-   
-    D3D12_RESOURCE_BARRIER barrier{};
-    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-    // バリアを張る対象のリソース
-    barrier.Transition.pResource = scanLineData_.resource.Get();
-    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    commandList->ResourceBarrier(1, &barrier);
-
-    // レンダーターゲット設定
-    commandList->SetGraphicsRootSignature(scanLinePSO_->GetRootSignature());
-    commandList->SetPipelineState(scanLinePSO_->GetPipelineState());
-    commandList->OMSetRenderTargets(1, &scanLineData_.rtvHandle, false, nullptr);
-
-    // ラインを描画
-    scanLinePSO_->Draw(commandList, currentSrv);
-
-    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-    commandList->ResourceBarrier(1, &barrier);
-}
-
-void PostEffectManager::DrawVignetting(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv) {
-    D3D12_RESOURCE_BARRIER barrier{};
-    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-    // バリアを張る対象のリソース
-    barrier.Transition.pResource = vignettingData_.resource.Get();
-    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    commandList->ResourceBarrier(1, &barrier);
-
-    // レンダーターゲット設定
-    commandList->SetGraphicsRootSignature(vignettingPSO_->GetRootSignature());
-    commandList->SetPipelineState(vignettingPSO_->GetPipelineState());
-    commandList->OMSetRenderTargets(1, &vignettingData_.rtvHandle, false, nullptr);
-
-    // ヴィネットを描画
-    vignettingPSO_->Draw(commandList, currentSrv);
-
-    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-    commandList->ResourceBarrier(1, &barrier);
-}
-
-void PostEffectManager::DrawRadialBlur(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv) {
-    D3D12_RESOURCE_BARRIER barrier{};
-    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-    // バリアを張る対象のリソース
-    barrier.Transition.pResource = radialBlurData_.resource.Get();
-    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    commandList->ResourceBarrier(1, &barrier);
-
-    // レンダーターゲット設定
-    commandList->SetGraphicsRootSignature(radialBlurPSO_->GetRootSignature());
-    commandList->SetPipelineState(radialBlurPSO_->GetPipelineState());
-    commandList->OMSetRenderTargets(1, &radialBlurData_.rtvHandle, false, nullptr);
-
-    // ラジアルブルーを描画
-    radialBlurPSO_->Draw(commandList, currentSrv);
-
-    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-    commandList->ResourceBarrier(1, &barrier);
 }
 
 void  PostEffectManager::DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv) {
@@ -571,6 +533,31 @@ void  PostEffectManager::DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D
     commandList->ResourceBarrier(1, &barrier);
 }
 
+void PostEffectManager::DrawEffect(ID3D12GraphicsCommandList* commandList, EffectData data, ID3D12Resource* resource) {
+    D3D12_RESOURCE_BARRIER barrier{};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    // バリアを張る対象のリソース
+    barrier.Transition.pResource = data.resource.Get();
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    commandList->ResourceBarrier(1, &barrier);
+
+    // レンダーターゲット設定
+    commandList->OMSetRenderTargets(1, &data.rtvHandle, false, nullptr);
+    commandList->SetGraphicsRootSignature(data.psoData->rootSignature);
+    commandList->SetPipelineState(data.psoData->graphicsPipelineState);
+    commandList->SetGraphicsRootDescriptorTable(0, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+    commandList->SetGraphicsRootConstantBufferView(1, resource->GetGPUVirtualAddress());
+    commandList->DrawInstanced(3, 1, 0, 0);
+
+    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    commandList->ResourceBarrier(1, &barrier);
+}
+
 void PostEffectManager::CreatePostEffectResources(
     ID3D12DescriptorHeap* rtvHeap,
     uint32_t& rtvIndex,
@@ -579,7 +566,8 @@ void PostEffectManager::CreatePostEffectResources(
     uint32_t height,
     Microsoft::WRL::ComPtr<ID3D12Resource>& resource,
     D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle,
-    D3D12_GPU_DESCRIPTOR_HANDLE& srvGpuHandle
+    D3D12_GPU_DESCRIPTOR_HANDLE& srvGpuHandle,
+    uint32_t& srvIndex
 ) {
 
     // テクスチャリソース作成
@@ -625,7 +613,7 @@ void PostEffectManager::CreatePostEffectResources(
     srvDesc.Texture2D.MipLevels = 1;
 
     // SRVハンドル取得
-    uint32_t srvIndex = srvManager_->AllocateSrvIndex(SrvHeapType::System);
+    srvIndex = srvManager_->AllocateSrvIndex(SrvHeapType::System);
     D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle = srvManager_->GetCPUHandle(srvIndex);
     srvGpuHandle = srvManager_->GetGPUHandle(srvIndex);
 

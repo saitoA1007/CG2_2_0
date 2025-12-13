@@ -4,14 +4,13 @@
 
 using namespace GameEngine;
 
-void RendererManager::Initialize(GraphicsDevice* graphicsDevice, uint32_t width, uint32_t height, SrvManager* srvManager) {
+void RendererManager::Initialize(GraphicsDevice* graphicsDevice, PostEffectManager* postEffectManager) {
     LogManager::GetInstance().Log("RendererManager start Initialize");
 
     graphicsDevice_ = graphicsDevice;
 
     // ポストエフェクトマネージャーの初期化
-    postEffectManager_ = std::make_unique<PostEffectManager>();
-    postEffectManager_->Initialize(graphicsDevice_->GetDevice(),clearColor_,width,height,graphicsDevice_->GetRTVDescriptorSize(),srvManager);
+    postEffectManager_ = postEffectManager;
 
     LogManager::GetInstance().Log("RendererManager end Initialize\n");
 }

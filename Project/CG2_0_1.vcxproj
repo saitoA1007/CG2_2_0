@@ -222,9 +222,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\OutLinePSO.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\RadialBlurPSO.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\ScanLinePSO.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\VignettingPSO.cpp" />
     <ClCompile Include="EngineSource\Core\RandomGenerator.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\DXViewportState.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\SrvManager.cpp" />
@@ -270,6 +267,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="EngineSource\Graphics\FrameRateController.cpp" />
     <ClCompile Include="EngineSource\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="EngineSource\Graphics\RendererManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPassController.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPipeline.cpp" />
     <ClCompile Include="EngineSource\Input\InPut.cpp" />
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
@@ -369,6 +367,8 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\Common\LogManager.h" />
     <ClInclude Include="EngineSource\Common\ResourceLeakChecker.h" />
     <ClInclude Include="EngineSource\Graphics\ComputePSO\ParticleCSPSO.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\ParameterResource.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectData.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\IPostEffect.h" />
     <ClInclude Include="EngineSource\Graphics\DescriptorCounts.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\DXCommand.h" />
@@ -397,9 +397,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\OutLinePSO.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\RadialBlurPSO.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\ScanLinePSO.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\VignettingPSO.h" />
     <ClInclude Include="EngineSource\Core\RandomGenerator.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\DXViewportState.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\SrvManager.h" />
@@ -446,6 +443,8 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\Graphics\FrameRateController.h" />
     <ClInclude Include="EngineSource\Graphics\GraphicsDevice.h" />
     <ClInclude Include="EngineSource\Graphics\RendererManager.h" />
+    <ClInclude Include="EngineSource\Graphics\RenderPass\IRenderPass.h" />
+    <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPassController.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPipeline.h" />
     <ClInclude Include="EngineSource\Input\InPut.h" />
     <ClInclude Include="EngineSource\Input\InputCommand.h" />
@@ -510,9 +509,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <None Include="Resources\Shaders\PostEffect\FullScreen.hlsli" />
     <None Include="Resources\Shaders\PostEffect\GaussianBlur.hlsli" />
     <None Include="Resources\Shaders\PostEffect\PostProcessGrayScale.hlsli" />
-    <None Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.hlsli" />
-    <None Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.hlsli" />
-    <None Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.hlsli" />
     <None Include="Resources\Shaders\Primitive.hlsli" />
     <None Include="Resources\Shaders\Sprite.hlsli" />
   </ItemGroup>
@@ -679,27 +675,12 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.VS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-    </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.VS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-    </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.PS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.VS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>

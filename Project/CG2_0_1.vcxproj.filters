@@ -201,15 +201,6 @@
     <ClCompile Include="EngineSource\Collision\CollisionUtils.cpp">
       <Filter>EngineSource\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\RadialBlurPSO.cpp">
-      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\ScanLinePSO.cpp">
-      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\VignettingPSO.cpp">
-      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.cpp">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClCompile>
@@ -285,6 +276,7 @@
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
     <ClCompile Include="EngineSource\3D\Model\AnimationManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Animator.cpp" />
+    <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPassController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -461,15 +453,6 @@
     <ClInclude Include="EngineSource\Math\Quaternion.h">
       <Filter>EngineSource\Math</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\RadialBlurPSO.h">
-      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\ScanLinePSO.h">
-      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\VignettingPSO.h">
-      <Filter>EngineSource\Core\PSO\PostProcess</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.h">
       <Filter>EngineSource\Core\PSO\PostProcess</Filter>
     </ClInclude>
@@ -565,6 +548,10 @@
     <ClInclude Include="EngineSource\3D\Model\AnimationManager.h" />
     <ClInclude Include="EngineSource\3D\Model\Animator.h" />
     <ClInclude Include="EngineSource\Graphics\DescriptorCounts.h" />
+    <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPassController.h" />
+    <ClInclude Include="EngineSource\Graphics\RenderPass\IRenderPass.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectData.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\ParameterResource.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
@@ -601,15 +588,6 @@
     </None>
     <None Include="Resources\Shaders\PostEffect\PostProcessGrayScale.hlsli">
       <Filter>Shaders\PostEffect</Filter>
-    </None>
-    <None Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.hlsli">
-      <Filter>Shaders\PostEffect\RadialBlur</Filter>
-    </None>
-    <None Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.hlsli">
-      <Filter>Shaders\PostEffect\ScanLine</Filter>
-    </None>
-    <None Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.hlsli">
-      <Filter>Shaders\PostEffect\Vignetting</Filter>
     </None>
     <None Include="Resources\Shaders\PostEffect\FullScreen.hlsli">
       <Filter>Shaders\PostEffect</Filter>
@@ -688,19 +666,10 @@
     <FxCompile Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.PS.hlsl">
       <Filter>Shaders\PostEffect\RadialBlur</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\RadialBlur\RadialBlur.VS.hlsl">
-      <Filter>Shaders\PostEffect\RadialBlur</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.PS.hlsl">
       <Filter>Shaders\PostEffect\ScanLine</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\ScanLine\ScanLine.VS.hlsl">
-      <Filter>Shaders\PostEffect\ScanLine</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.PS.hlsl">
-      <Filter>Shaders\PostEffect\Vignetting</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\Vignetting\Vignetting.VS.hlsl">
       <Filter>Shaders\PostEffect\Vignetting</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\OutLine\OutLine.PS.hlsl">
