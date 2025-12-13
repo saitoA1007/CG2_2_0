@@ -1,6 +1,6 @@
 #pragma once
-#include"SceneState.h"
 #include"SceneContext.h"
+#include <string>
 
 /// <summary>
 /// 各シーンの元
@@ -40,10 +40,10 @@ public:
 	virtual bool IsFinished() = 0;
 
 	/// <summary>
-	/// 次のシーン遷移する場面の値を取得
+	/// 次のシーン遷移する場面の名前を取得
 	/// </summary>
-	/// <returns></returns>
-	virtual SceneState NextSceneState() = 0;
+	/// <returns>次のシーン名</returns>
+	virtual std::string NextSceneName() = 0;
 
 protected:
 	// エンジン機能

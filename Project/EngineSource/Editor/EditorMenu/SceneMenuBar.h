@@ -1,6 +1,6 @@
 #pragma once
-#include"SceneState.h"
 #include"SceneChangeRequest.h"
+#include <string>
 
 namespace GameEngine {
 
@@ -12,9 +12,7 @@ namespace GameEngine {
 		void Run();
 
 	private:
-		SceneState sceneState_ = SceneState::GE;
 		SceneChangeRequest* sceneChangeRequest_ = nullptr;
-		static inline const char* sceneNames_[] = { "Title", "Game", "GE"};
 	};
 }
 

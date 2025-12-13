@@ -1,10 +1,5 @@
 #include"SceneManager.h"
 
-// 各シーン
-#include"Application/Scene/TitleScene.h"
-#include"Application/Scene/GameScene.h"
-#include"Application/Scene/GEScene.h"
-
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
 
@@ -15,7 +10,7 @@ SceneManager::~SceneManager() {
 	currentScene_.release();
 }
 
-void SceneManager::Initialize(SceneContext* context) {
+void SceneManager::Initialize(SceneContext* context, SceneRegistry* sceneRegistry) {
 
 	// エンジン機能を取得する
 	context_ = context;
@@ -32,6 +27,9 @@ void SceneManager::Initialize(SceneContext* context) {
 	// 音声データを読み込む
 	LoadAudioData();
 
+	// シーンの生成機能を初期化
+	sceneRegistry_ = sceneRegistry;
+
 	// デバックカメラを生成
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->graphicsDevice->GetDevice());
@@ -47,8 +45,8 @@ void SceneManager::Initialize(SceneContext* context) {
 	isDebugView_ = false;
 #endif
 	
-	// シーンの初期化。
-	ChangeScene(SceneState::Title);
+	// デフォルトシーンで初期化
+	ChangeScene(sceneRegistry_->GetDefaultScene());
 }
 
 void SceneManager::Update() {
@@ -65,7 +63,7 @@ void SceneManager::Update() {
 	if (isChangeScene_) {
 
 		// シーンを切り替える
-		ChangeScene(currentScene_->NextSceneState());
+		ChangeScene(currentScene_->NextSceneName());
 		isChangeScene_ = false;
 	} else {
 
@@ -126,13 +124,6 @@ void SceneManager::LoadModelData() {
 
 void SceneManager::LoadSpriteData() {
 
-	// white2x2の画像を登録する
-	//context_->textureManager->RegisterTexture("Resources/Textures/white2x2.png");
-	//// uvCheckerの画像を登録する
-	//context_->textureManager->RegisterTexture("Resources/Textures/uvChecker.png");
-	//// 草原の画像を登録する
-	//context_->textureManager->RegisterTexture("Resources/Models/Terrain/grass.png");
-
 	// テクスチャのリソースを全てロードする
 	context_->textureManager->LoadAllTexture();
 }
@@ -146,16 +137,16 @@ void SceneManager::LoadAudioData() {
 	context_->audioManager->LoadAllAudio();
 }
 
-void SceneManager::ChangeScene(SceneState nextSceneState) {
+void SceneManager::ChangeScene(const std::string& sceneName) {
 
-	// シーンの状態を保存
-	currentSceneState_ = nextSceneState;
+	// シーン名を保存
+	currentSceneName_ = sceneName;
 
 	// 前の要素を削除
 	currentScene_.reset();
 
 	// 新しいシーンを作成
-	currentScene_ = CreateScene(nextSceneState);
+	currentScene_ = sceneRegistry_->CreateScene(sceneName);
 
 	if (currentScene_) {
 		// 新しく作ったシーンを初期化
@@ -164,33 +155,11 @@ void SceneManager::ChangeScene(SceneState nextSceneState) {
 		currentScene_->Update();
 	} else {
 		// 新しいシーンのインスタンスを作れなかった場合
-		assert(0);
+		assert(0 && "Scene not found");
 	}
 }
 
 void SceneManager::ResetCurrentScene() {
 	// 現在のシーンを再初期化する
-	ChangeScene(currentSceneState_);
-}
-
-std::unique_ptr<BaseScene> SceneManager::CreateScene(SceneState sceneState) {
-	switch (sceneState) {
-
-	case SceneState::Unknown:
-	case SceneState::Title:
-		return std::make_unique<TitleScene>();
-		break;
-
-	case SceneState::Game:
-		return std::make_unique<GameScene>();
-		break;
-
-	case SceneState::GE:
-		return std::make_unique<GEScene>();
-		break;
-
-	default:
-		return nullptr;
-		break;
-	}
+	ChangeScene(currentSceneName_);
 }

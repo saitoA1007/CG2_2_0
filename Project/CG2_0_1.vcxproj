@@ -324,6 +324,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="Application\Light\SceneLightingController.h" />
     <ClInclude Include="Application\Scene\GEScene.h" />
     <ClInclude Include="Application\Player\Player.h" />
+    <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
@@ -461,7 +462,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\Math\Vector4.h" />
     <ClInclude Include="EngineSource\Scene\SceneChangeRequest.h" />
     <ClInclude Include="EngineSource\Scene\SceneContext.h" />
-    <ClInclude Include="EngineSource\Scene\SceneState.h" />
+    <ClInclude Include="EngineSource\Scene\SceneRegistry.h" />
     <ClInclude Include="Externals\imgui\crude_json.h" />
     <ClInclude Include="Externals\imgui\imconfig.h" />
     <ClInclude Include="Externals\imgui\imgui.h" />

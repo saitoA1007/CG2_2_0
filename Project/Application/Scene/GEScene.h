@@ -47,10 +47,10 @@ public:
 	bool IsFinished() override { return isFinished_; };
 
 	/// <summary>
-	/// 次のシーン遷移する場面の値を取得
+	/// 次のシーン遷移する場面の名前を取得
 	/// </summary>
 	/// <returns></returns>
-	SceneState NextSceneState() override { return SceneState::Game; }
+	std::string NextSceneName() override { return "Game"; }
 
 private: // エンジンの低レイヤー機能を取得
 

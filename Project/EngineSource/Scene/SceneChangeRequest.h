@@ -1,6 +1,7 @@
 #pragma once
-#include"SceneState.h"
+#include <string>
 #include <optional>
+#include<vector>
 
 class SceneChangeRequest {
 public:
@@ -8,37 +9,60 @@ public:
 	/// <summary>
 	/// シーンの切り替えをリクエストする
 	/// </summary>
-	/// <param name="nextScene"></param>
-	void RequestChange(SceneState nextScene) { requestSceneState_ = nextScene; }
+	/// <param name="nextScene">次のシーン名</param>
+	void RequestChange(const std::string& nextScene) { requestSceneName_ = nextScene; }
 
 	/// <summary>
 	/// リクエストがあるかを取得
 	/// </summary>
 	/// <returns></returns>
-	bool HasChangeRequest() const { return requestSceneState_.has_value(); }
+	bool HasChangeRequest() const { return requestSceneName_.has_value(); }
 
 	/// <summary>
-	/// 変更したいシーンを取得
+	/// 変更したいシーン名を取得
 	/// </summary>
 	/// <returns></returns>
-	SceneState GetRequestScene() const { return requestSceneState_.value(); }
+	const std::string& GetRequestScene() const { return requestSceneName_.value(); }
 
 	/// <summary>
 	/// シーンを変更するリクエストをクリア
 	/// </summary>
-	void ClearChangeRequest() { requestSceneState_.reset(); }
+	void ClearChangeRequest() { requestSceneName_.reset(); }
 
 	/// <summary>
-	/// 現在のシーンを取得
+	/// 現在のシーン名を設定
 	/// </summary>
-	/// <param name="currentScene"></param>
-	void SetCurrentSceneState(SceneState currentScene) { currentSceneState_ = currentScene; }
+	/// <param name="currentScene">現在のシーン名</param>
+	void SetCurrentSceneName(const std::string& currentScene) { currentSceneName_ = currentScene; }
 
-	SceneState GetCurrentSceneState() const { return currentSceneState_; }
+	/// <summary>
+	/// 現在のシーン名を取得
+	/// </summary>
+	/// <returns></returns>
+	const std::string& GetCurrentSceneName() const { return currentSceneName_; }
+
+	/// <summary>
+	/// シーンの名前を取得する
+	/// </summary>
+	/// <param name="sceneName"></param>
+	void SetSceneNames(const std::vector<std::string>& sceneName) {
+		sceneNames_ = sceneName;
+	}
+
+	/// <summary>
+	/// 登録されているシーン名のリストを取得
+	/// </summary>
+	/// <returns></returns>
+	const std::vector<std::string>& GetSceneNames() const {
+		return sceneNames_;
+	}
 
 private:
-	// リクエストするシーン
-	std::optional<SceneState> requestSceneState_;
-	// 現在のシーン
-	SceneState currentSceneState_;
+	// リクエストするシーン名
+	std::optional<std::string> requestSceneName_;
+	// 現在のシーン名
+	std::string currentSceneName_;
+
+	// 登録されているシーン名
+	std::vector<std::string> sceneNames_;
 };
