@@ -1,5 +1,6 @@
 #pragma once
 #include"SceneContext.h"
+#include"ITransitionEffect.h"
 #include <string>
 
 /// <summary>
@@ -44,6 +45,9 @@ public:
 	/// </summary>
 	/// <returns>次のシーン名</returns>
 	virtual std::string NextSceneName() = 0;
+
+	// 遷移クラス
+	virtual std::unique_ptr<ITransitionEffect> GetTransitionEffect() = 0;
 
 protected:
 	// エンジン機能

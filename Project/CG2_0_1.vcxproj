@@ -172,6 +172,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
     <ClCompile Include="Application\Scene\GEScene.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
+    <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
@@ -273,6 +274,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
     <ClCompile Include="EngineSource\Math\EasingManager.cpp" />
     <ClCompile Include="EngineSource\Math\MyMath.cpp" />
+    <ClCompile Include="EngineSource\Scene\SceneTransition.cpp" />
     <ClCompile Include="Externals\imgui\crude_json.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -325,6 +327,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="Application\Scene\GEScene.h" />
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
+    <ClInclude Include="Application\Scene\Transition\Fade.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
@@ -460,9 +463,11 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\Math\Vector2.h" />
     <ClInclude Include="EngineSource\Math\Vector3.h" />
     <ClInclude Include="EngineSource\Math\Vector4.h" />
+    <ClInclude Include="EngineSource\Scene\ITransitionEffect.h" />
     <ClInclude Include="EngineSource\Scene\SceneChangeRequest.h" />
     <ClInclude Include="EngineSource\Scene\SceneContext.h" />
     <ClInclude Include="EngineSource\Scene\SceneRegistry.h" />
+    <ClInclude Include="EngineSource\Scene\SceneTransition.h" />
     <ClInclude Include="Externals\imgui\crude_json.h" />
     <ClInclude Include="Externals\imgui\imconfig.h" />
     <ClInclude Include="Externals\imgui\imgui.h" />
