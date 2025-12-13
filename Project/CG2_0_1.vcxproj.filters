@@ -532,7 +532,6 @@
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorToolBar.h" />
     <ClInclude Include="EngineSource\Scene\SceneContext.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\SceneMenuBar.h" />
-    <ClInclude Include="EngineSource\Scene\SceneState.h" />
     <ClInclude Include="EngineSource\Scene\SceneChangeRequest.h" />
     <ClInclude Include="EngineSource\Graphics\RendererManager.h" />
     <ClInclude Include="EngineSource\Graphics\GraphicsDevice.h" />
@@ -552,6 +551,8 @@
     <ClInclude Include="EngineSource\Graphics\RenderPass\IRenderPass.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectData.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\ParameterResource.h" />
+    <ClInclude Include="EngineSource\Scene\SceneRegistry.h" />
+    <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

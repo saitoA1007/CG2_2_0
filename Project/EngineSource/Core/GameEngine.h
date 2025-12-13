@@ -55,6 +55,7 @@
 #include"SceneContext.h"
 #include"SceneChangeRequest.h"
 #include"SceneManager.h"
+#include"SceneRegistry.h"
 
 namespace GameEngine {
 
@@ -158,6 +159,9 @@ namespace GameEngine {
 
 		// 雑種
 		std::unique_ptr<FpsCounter> fpsCounter_;
+
+		// シーンの生成機能
+		std::unique_ptr<SceneRegistry> sceneRegistry_;
 
 	private:
 

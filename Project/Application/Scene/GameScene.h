@@ -44,10 +44,10 @@ public:
 	bool IsFinished() override { return isFinished_; };
 
 	/// <summary>
-	/// 次のシーン遷移する場面の値を取得
+	/// 次のシーン遷移する場面の名前を取得
 	/// </summary>
 	/// <returns></returns>
-	SceneState NextSceneState() override { return SceneState::Title; }	
+	std::string NextSceneName() override { return "Title"; }	
 
 private: // シーン機能
 

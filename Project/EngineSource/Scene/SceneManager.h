@@ -1,5 +1,7 @@
 #pragma once
+#include <string>
 #include"SceneContext.h"
+#include"SceneRegistry.h"
 #include"BaseScene.h"
 #include"Camera.h"
 
@@ -15,7 +17,7 @@ public:
 	/// 初期化処理
 	/// </summary>
 	/// <param name="context"></param>
-	void Initialize(SceneContext* context);
+	void Initialize(SceneContext* context, SceneRegistry* sceneRegistry);
 
 	/// <summary>
 	/// 更新処理
@@ -40,8 +42,8 @@ public:
 	/// <summary>
 	/// シーンの切り替え処理
 	/// </summary>
-	/// <param name="sceneState">切り替え先の状態</param>
-	void ChangeScene(SceneState nextSceneState);
+	/// <param name="sceneName">切り替え先のシーン名</param>
+	void ChangeScene(const std::string& sceneName);
 
 	/// <summary>
 	/// 現在のシーンをリセットする
@@ -49,15 +51,18 @@ public:
 	void ResetCurrentScene();
 
 	/// <summary>
-	/// 現在のシーンの状態を取得する
+	/// 現在のシーン名を取得する
 	/// </summary>
 	/// <returns></returns>
-	SceneState GetCurrentSceneState() const { return currentSceneState_; }
+	const std::string& GetCurrentSceneName() const { return currentSceneName_; }
 
 private: // エンジン機能
 
 	// エンジン機能群
 	SceneContext* context_ = nullptr;
+
+	// シーン機能
+	SceneRegistry* sceneRegistry_ = nullptr;
 
 private: // シーン機能
 
@@ -67,8 +72,8 @@ private: // シーン機能
 	// シーンの切り替え処理をしているか判断する
 	bool isChangeScene_ = false;
 
-	// 現在のシーン状態の保存
-	SceneState currentSceneState_ = SceneState::Unknown;
+	// 現在のシーン名
+	std::string currentSceneName_;
 
 	// デバックカメラ
 	std::unique_ptr<GameEngine::DebugCamera> debugCamera_;
@@ -101,11 +106,4 @@ private:
 	/// 使用する音声データを読み込む
 	/// </summary>
 	void LoadAudioData();
-
-	/// <summary>
-	/// シーンを作成する
-	/// </summary>
-	/// <param name="sceneState"></param>
-	/// <returns></returns>
-	std::unique_ptr<BaseScene> CreateScene(SceneState sceneState);
 };

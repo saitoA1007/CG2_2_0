@@ -1,5 +1,7 @@
 #include"GameEngine.h"
 
+#include"Application/Scene/Register/SetUpScenes.h"
+
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
@@ -118,6 +120,11 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// 全てのデバック用ファイルを読み込み
 	GameParamEditor::GetInstance()->LoadFiles();
 
+	// シーンの生成機能を初期化
+	sceneRegistry_ = std::make_unique<SceneRegistry>();
+	// シーンを登録する
+	SetupScenes(*sceneRegistry_);
+
 	// ゲームシーンで使用するエンジン機能を取得
 	sceneContext.input = input_.get();
 	sceneContext.inputCommand = inputCommand_.get();
@@ -129,13 +136,14 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();
-	sceneManager_->Initialize(&sceneContext);
-
+	sceneManager_->Initialize(&sceneContext, sceneRegistry_.get());
+	
 	// エディターの初期化
 #ifdef USE_IMGUI
 	// シーン切り替えの通知を管理する機能を初期化
 	sceneChangeRequest_ = std::make_unique<SceneChangeRequest>();
-	sceneChangeRequest_->SetCurrentSceneState(sceneManager_->GetCurrentSceneState());
+	sceneChangeRequest_->SetCurrentSceneName(sceneManager_->GetCurrentSceneName());
+	sceneChangeRequest_->SetSceneNames(sceneRegistry_->GetSceneNames());
 
 	editorCore_ = std::make_unique<EditorCore>();
 	editorCore_->Initialize(textureManager_.get(), sceneChangeRequest_.get(), renderPipeline_->GetRendererManager());
@@ -220,8 +228,8 @@ void Engine::PreUpdate() {
 		// シーンを切り替える
 		sceneManager_->ChangeScene(sceneChangeRequest_->GetRequestScene());
 		sceneChangeRequest_->ClearChangeRequest();
-		// 変更したシーンの状態を取得
-		sceneChangeRequest_->SetCurrentSceneState(sceneManager_->GetCurrentSceneState());
+		// 変更したシーンの名前を取得
+		sceneChangeRequest_->SetCurrentSceneName(sceneManager_->GetCurrentSceneName());
 	}
 
 	// シーンのデバックに必要な処理を更新する
