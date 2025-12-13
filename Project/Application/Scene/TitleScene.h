@@ -1,4 +1,6 @@
 #pragma once
+#include <d3d12.h>
+#include <wrl.h>
 #include"BaseScene.h"
 
 // エンジン機能をインクルード
@@ -52,4 +54,26 @@ private: // シーン機能
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
+
+	// 平面モデル
+	GameEngine::Model* planeModel_ = nullptr;
+	GameEngine::WorldTransform worldTransform_;
+
+private:
+
+	struct alignas(16) MaterialData {
+		Vector4 color;
+		Matrix4x4 uvTransform;
+		uint32_t textureHandle;
+		float timer;
+		float padding[2];
+	};
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
+	// マテリアルにデータを書き込む
+	MaterialData* materialData_ = nullptr;
+
+	ID3D12GraphicsCommandList* commandList_ = nullptr;
+
+	GameEngine::SrvManager* srvManager_ = nullptr;
 };

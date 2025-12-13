@@ -275,6 +275,24 @@ void PSOManager::DefaultLoadPSO() {
     default3D.blendMode = BlendMode::kBlendModeAdd;
     RegisterPSO("Additive3D", default3D, &rootSigBuilder, &inputLayoutBuilder);
 
+    // テスト用
+    CreatePSOData test3D;
+    test3D.rootSigName = "TestVS";
+    test3D.vsPath = L"Resources/Shaders/Object3d.VS.hlsl";
+    test3D.psPath = L"Resources/Shaders/Test.PS.hlsl";
+    test3D.drawMode = DrawModel::FillFront;
+    test3D.blendMode = BlendMode::kBlendModeNormal;
+    test3D.isDepthEnable = true;
+    RootSignatureBuilder rootSigBuilderTest;
+    rootSigBuilderTest.Initialize(device_);
+    rootSigBuilderTest.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilderTest.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
+    rootSigBuilderTest.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilderTest.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilderTest.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilderTest.CreateRootSignature();
+    RegisterPSO("Test", test3D, &rootSigBuilderTest, &inputLayoutBuilder);
+
     // デフォルトのスプライト用PSO
     CreatePSOData defaultSprite;
     defaultSprite.rootSigName = "Default2D";
@@ -288,25 +306,25 @@ void PSOManager::DefaultLoadPSO() {
     RegisterPSO("AdditiveSprite", defaultSprite);
 
     // インスタンシング描画用PSO
-    CreatePSOData instancing3D;
-    instancing3D.rootSigName = "Instancing3D";
-    instancing3D.vsPath = L"Resources/Shaders/Particle.VS.hlsl";
-    instancing3D.psPath = L"Resources/Shaders/Particle.PS.hlsl";
-    instancing3D.drawMode = DrawModel::FillFront;
-    instancing3D.blendMode = BlendMode::kBlendModeNormal;
-    instancing3D.isDepthEnable = true;
-    RootSignatureBuilder instancingRootSigBuilder;
-    instancingRootSigBuilder.Initialize(device_);
-    instancingRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
-    instancingRootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_VERTEX);
-    instancingRootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount),0, D3D12_SHADER_VISIBILITY_PIXEL);
-    instancingRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
-    instancingRootSigBuilder.CreateRootSignature();
-    RegisterPSO("Instancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
-
-    // インスタンシング描画の加算合成用PSO
-    instancing3D.blendMode = BlendMode::kBlendModeAdd;
-    RegisterPSO("AdditiveInstancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
+   //CreatePSOData instancing3D;
+   //instancing3D.rootSigName = "Instancing3D";
+   //instancing3D.vsPath = L"Resources/Shaders/Particle.VS.hlsl";
+   //instancing3D.psPath = L"Resources/Shaders/Particle.PS.hlsl";
+   //instancing3D.drawMode = DrawModel::FillFront;
+   //instancing3D.blendMode = BlendMode::kBlendModeNormal;
+   //instancing3D.isDepthEnable = true;
+   //RootSignatureBuilder instancingRootSigBuilder;
+   //instancingRootSigBuilder.Initialize(device_);
+   //instancingRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
+   //instancingRootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_VERTEX);
+   //instancingRootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount),0, D3D12_SHADER_VISIBILITY_PIXEL);
+   //instancingRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+   //instancingRootSigBuilder.CreateRootSignature();
+   //RegisterPSO("Instancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
+   //
+   //// インスタンシング描画の加算合成用PSO
+   //instancing3D.blendMode = BlendMode::kBlendModeAdd;
+   //RegisterPSO("AdditiveInstancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
 
     // グリッド描画用のPSO
     CreatePSOData grid;
@@ -343,26 +361,26 @@ void PSOManager::DefaultLoadPSO() {
     RegisterPSO("Line", line, &lineRootSigBuilder, &lineInputLayoutBuilder);
 
     // アニメーション描画用のPSO
-    CreatePSOData animation;
-    animation.rootSigName = "Animation";
-    animation.vsPath = L"Resources/Shaders/SkinningObject3d.VS.hlsl";
-    animation.psPath = L"Resources/Shaders/Object3d.PS.hlsl";
-    animation.drawMode = DrawModel::FillFront;
-    animation.blendMode = BlendMode::kBlendModeNormal;
-    animation.isDepthEnable = true;
-    RootSignatureBuilder animationRootSigBuilder;
-    animationRootSigBuilder.Initialize(device_);
-    animationRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
-    animationRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
-    animationRootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
-    animationRootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_VERTEX);
-    animationRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
-    animationRootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
-    animationRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
-    animationRootSigBuilder.CreateRootSignature();
-    InputLayoutBuilder animationInputLayoutBuilder;
-    animationInputLayoutBuilder.CreateDefaultAnimationElement();
-    RegisterPSO("Animation", animation, &animationRootSigBuilder, &animationInputLayoutBuilder);
+    //CreatePSOData animation;
+    //animation.rootSigName = "Animation";
+    //animation.vsPath = L"Resources/Shaders/SkinningObject3d.VS.hlsl";
+    //animation.psPath = L"Resources/Shaders/Object3d.PS.hlsl";
+    //animation.drawMode = DrawModel::FillFront;
+    //animation.blendMode = BlendMode::kBlendModeNormal;
+    //animation.isDepthEnable = true;
+    //RootSignatureBuilder animationRootSigBuilder;
+    //animationRootSigBuilder.Initialize(device_);
+    //animationRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
+    //animationRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
+    //animationRootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    //animationRootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_VERTEX);
+    //animationRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
+    //animationRootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
+    //animationRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    //animationRootSigBuilder.CreateRootSignature();
+    //InputLayoutBuilder animationInputLayoutBuilder;
+    //animationInputLayoutBuilder.CreateDefaultAnimationElement();
+    //RegisterPSO("Animation", animation, &animationRootSigBuilder, &animationInputLayoutBuilder);
 
     LogManager::GetInstance().Log("Default PSOs loaded");
 }

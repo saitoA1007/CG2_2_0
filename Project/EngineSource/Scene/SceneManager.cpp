@@ -25,7 +25,7 @@ void SceneManager::Initialize(SceneContext* context, SceneRegistry* sceneRegistr
 	LoadAnimationData();
 
 	// 音声データを読み込む
-	LoadAudioData();
+	//LoadAudioData();
 
 	// シーンの生成機能を初期化
 	sceneRegistry_ = sceneRegistry;
@@ -89,8 +89,8 @@ void SceneManager::DebugUpdate() {
 	// デバックカメラを操作
 	debugCamera_->Update(context_->input);
 	// グリッドの更新処理
-	gridWorldTransform_.transform_.translate = Vector3(context_->debugCamera_->GetTargetPosition().x, -0.1f, context_->debugCamera_->GetTargetPosition().z);
-	gridWorldTransform_.UpdateTransformMatrix();
+	//gridWorldTransform_.transform_.translate = Vector3(context_->debugCamera_->GetTargetPosition().x, -0.1f, context_->debugCamera_->GetTargetPosition().z);
+	//gridWorldTransform_.UpdateTransformMatrix();
 }
 
 void SceneManager::DebugSceneUpdate() {
@@ -101,12 +101,12 @@ void SceneManager::DebugSceneUpdate() {
 void SceneManager::Draw() {
 	// デバック用のグリッドを描画
 #ifdef _DEBUG
-	if (isDebugView_) {
-		// モデルの単体描画前処理
-		ModelRenderer::PreDraw(RenderMode3D::Grid);
-		// グリッドを描画
-		ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
-	}
+	//if (isDebugView_) {
+	//	// モデルの単体描画前処理
+	//	ModelRenderer::PreDraw(RenderMode3D::Grid);
+	//	// グリッドを描画
+	//	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	//}
 #endif
 
 	// 現在シーンの描画処理
@@ -130,7 +130,7 @@ void SceneManager::LoadSpriteData() {
 
 void SceneManager::LoadAnimationData() {
 	// 歩くアニメーションデータを登録する
-	context_->animationManager->RegisterAnimation("Walk", "walk.gltf");
+	//context_->animationManager->RegisterAnimation("Walk", "walk.gltf");
 }
 
 void SceneManager::LoadAudioData() {

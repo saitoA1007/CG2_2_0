@@ -19,12 +19,14 @@ void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, Tex
 	psoList_[RenderMode3D::DefaultModel] = psoManager->GetDrawPsoData("Default3D");
 	psoList_[RenderMode3D::DefaultModelAdd] = psoManager->GetDrawPsoData("Additive3D");
 	// インスタンシング描画用のデータを取得する
-	psoList_[RenderMode3D::Instancing] = psoManager->GetDrawPsoData("Instancing3D");
-	psoList_[RenderMode3D::InstancingAdd] = psoManager->GetDrawPsoData("AdditiveInstancing3D");
+	//psoList_[RenderMode3D::Instancing] = psoManager->GetDrawPsoData("Instancing3D");
+	//psoList_[RenderMode3D::InstancingAdd] = psoManager->GetDrawPsoData("AdditiveInstancing3D");
 	// グリッド描画用のデータを取得する
 	psoList_[RenderMode3D::Grid] = psoManager->GetDrawPsoData("Grid");
 	// アニメーション描画用のデータを取得する
-	psoList_[RenderMode3D::AnimationModel] = psoManager->GetDrawPsoData("Animation");
+	//psoList_[RenderMode3D::AnimationModel] = psoManager->GetDrawPsoData("Animation");
+
+	psoList_[RenderMode3D::Test] = psoManager->GetDrawPsoData("Test");
 }
 
 void ModelRenderer::PreDraw(RenderMode3D mode) {

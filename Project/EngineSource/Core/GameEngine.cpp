@@ -107,9 +107,6 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// デバック描画用
 	DebugRenderer::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), psoManager_.get());
 
-	// 軸方向表示の初期化
-	AxisIndicator::StaticInitialize(graphicsDevice_->GetCommandList());
-
 	// fpsを計測する
 	fpsCounter_ = std::make_unique<FpsCounter>();
 	fpsCounter_->Initialize();
@@ -133,6 +130,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneContext.audioManager = audioManager_.get();
 	sceneContext.graphicsDevice = graphicsDevice_.get();
 	sceneContext.animationManager = animationManager_.get();
+	sceneContext.srvManager = srvManager_.get();
 
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();

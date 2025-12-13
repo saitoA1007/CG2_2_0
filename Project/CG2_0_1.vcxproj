@@ -168,10 +168,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Application\Camera\CameraController.cpp" />
-    <ClCompile Include="Application\Light\SceneLightingController.cpp" />
-    <ClCompile Include="Application\Scene\GEScene.cpp" />
-    <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
@@ -179,7 +175,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="EngineSource\3D\Model\Animator.cpp" />
     <ClCompile Include="EngineSource\3D\Model\DebugRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelRenderer.cpp" />
-    <ClCompile Include="EngineSource\3D\Model\AxisIndicator.cpp" />
     <ClCompile Include="EngineSource\3D\Camera\Camera.cpp" />
     <ClCompile Include="EngineSource\3D\Camera\DebugCamera.cpp" />
     <ClCompile Include="EngineSource\3D\Light\DirectionalLight.cpp" />
@@ -190,7 +185,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="EngineSource\3D\Model\Mesh.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Model.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
-    <ClCompile Include="EngineSource\3D\Model\Particle.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.cpp" />
     <ClCompile Include="EngineSource\3D\Model\WorldTransform.cpp" />
     <ClCompile Include="EngineSource\3D\Model\WorldTransforms.cpp" />
@@ -198,7 +192,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="EngineSource\Collision\CollisionManager.cpp" />
     <ClCompile Include="EngineSource\Collision\CollisionUtils.cpp" />
     <ClCompile Include="EngineSource\Common\LogManager.cpp" />
-    <ClCompile Include="EngineSource\Graphics\ComputePSO\ParticleCSPSO.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\DXCommand.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\DXDebugger.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\DXDepthStencil.cpp" />
@@ -245,7 +238,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="EngineSource\Editor\EditorMenu\SceneMenuBar.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\AssetWindow.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -267,7 +259,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="EngineSource\Graphics\FrameRateController.cpp" />
     <ClCompile Include="EngineSource\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="EngineSource\Graphics\RendererManager.cpp" />
-    <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPassController.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPipeline.cpp" />
     <ClCompile Include="EngineSource\Input\InPut.cpp" />
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
@@ -309,9 +300,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="Externals\imgui\imgui_widgets.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Application\ColorEditor.cpp" />
     <ClCompile Include="EngineSource\Scene\SceneManager.cpp" />
-    <ClCompile Include="Application\Scene\GameScene.cpp" />
     <ClCompile Include="Application\Scene\TitleScene.cpp" />
     <ClCompile Include="EngineSource\Editor\GameParamEditor.cpp" />
     <ClCompile Include="main.cpp">
@@ -320,10 +309,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application\Camera\CameraController.h" />
-    <ClInclude Include="Application\Light\SceneLightingController.h" />
-    <ClInclude Include="Application\Scene\GEScene.h" />
-    <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
@@ -333,7 +318,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\3D\Model\DebugRenderer.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelRenderer.h" />
     <ClInclude Include="EngineSource\3D\Model\AnimationData.h" />
-    <ClInclude Include="EngineSource\3D\Model\AxisIndicator.h" />
     <ClInclude Include="EngineSource\3D\Camera\Camera.h" />
     <ClInclude Include="EngineSource\3D\Camera\DebugCamera.h" />
     <ClInclude Include="EngineSource\3D\Light\DirectionalLight.h" />
@@ -344,7 +328,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\3D\Model\Mesh.h" />
     <ClInclude Include="EngineSource\3D\Model\Model.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
-    <ClInclude Include="EngineSource\3D\Model\Particle.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleData.h" />
     <ClInclude Include="EngineSource\3D\Model\VertexData.h" />
@@ -367,7 +350,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\Common\DescriptorHeap.h" />
     <ClInclude Include="EngineSource\Common\LogManager.h" />
     <ClInclude Include="EngineSource\Common\ResourceLeakChecker.h" />
-    <ClInclude Include="EngineSource\Graphics\ComputePSO\ParticleCSPSO.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\ParameterResource.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectData.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\IPostEffect.h" />
@@ -382,7 +364,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\Core\DXC.h" />
     <ClInclude Include="EngineSource\Core\FPSCounter.h" />
     <ClInclude Include="EngineSource\Core\GameEngine.h" />
-    <ClInclude Include="EngineSource\Graphics\PostProcess\BasePostEffect.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectManager.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\BlendMode.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\BlendBuilder.h" />
@@ -419,7 +400,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\Editor\EditorMenu\SceneMenuBar.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="EngineSource\Editor\ParamEditorManager.h" />
     <ClInclude Include="EngineSource\Editor\Windows\AssetWindow.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -444,8 +424,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\Graphics\FrameRateController.h" />
     <ClInclude Include="EngineSource\Graphics\GraphicsDevice.h" />
     <ClInclude Include="EngineSource\Graphics\RendererManager.h" />
-    <ClInclude Include="EngineSource\Graphics\RenderPass\IRenderPass.h" />
-    <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPassController.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPipeline.h" />
     <ClInclude Include="EngineSource\Input\InPut.h" />
     <ClInclude Include="EngineSource\Input\InputCommand.h" />
@@ -478,10 +456,8 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="Externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="Externals\imgui\imstb_textedit.h" />
     <ClInclude Include="Externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="Application\ColorEditor.h" />
     <ClInclude Include="EngineSource\Scene\SceneManager.h" />
     <ClInclude Include="EngineSource\Scene\BaseScene.h" />
-    <ClInclude Include="Application\Scene\GameScene.h" />
     <ClInclude Include="Application\Scene\TitleScene.h" />
     <ClInclude Include="EngineSource\Editor\GameParamEditor.h" />
   </ItemGroup>
@@ -719,6 +695,14 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\Test.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
