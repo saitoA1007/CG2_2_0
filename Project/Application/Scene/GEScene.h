@@ -9,6 +9,8 @@
 #include"Sprite.h"
 #include"DebugRenderer.h"
 
+#include"Application/Scene/Transition/Fade.h"
+
 #include"Application/Player/Player.h"
 #include"Application/Camera/CameraController.h"
 
@@ -51,6 +53,12 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	std::string NextSceneName() override { return "Game"; }
+
+	/// <summary>
+	/// 遷移する演出
+	/// </summary>
+	/// <returns></returns>
+	std::unique_ptr<ITransitionEffect> GetTransitionEffect() override { return std::make_unique<Fade>(); }
 
 private: // エンジンの低レイヤー機能を取得
 

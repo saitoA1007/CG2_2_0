@@ -277,6 +277,8 @@
     <ClCompile Include="EngineSource\3D\Model\AnimationManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Animator.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPassController.cpp" />
+    <ClCompile Include="EngineSource\Scene\SceneTransition.cpp" />
+    <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -553,6 +555,9 @@
     <ClInclude Include="EngineSource\Graphics\PostProcess\ParameterResource.h" />
     <ClInclude Include="EngineSource\Scene\SceneRegistry.h" />
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
+    <ClInclude Include="EngineSource\Scene\SceneTransition.h" />
+    <ClInclude Include="EngineSource\Scene\ITransitionEffect.h" />
+    <ClInclude Include="Application\Scene\Transition\Fade.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
