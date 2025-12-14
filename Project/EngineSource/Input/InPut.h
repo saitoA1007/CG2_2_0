@@ -157,6 +157,13 @@ namespace GameEngine {
 		bool GetReleasePadRightTrigger(const float& value = static_cast<float>(XINPUT_GAMEPAD_TRIGGER_THRESHOLD));
 
 		/// <summary>
+		/// 振動させる
+		/// </summary>
+		/// <param name="leftMotorSpeed">0~1に正規化済み</param>
+		/// <param name="rightMotorSpeed">0~1に正規化済み</param>
+		void SetVibration(float leftMotorSpeed, float rightMotorSpeed);
+
+		/// <summary>
 		/// パッドの接続を確認
 		/// </summary>
 		/// <returns></returns>

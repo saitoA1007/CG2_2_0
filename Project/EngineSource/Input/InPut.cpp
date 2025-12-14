@@ -1,6 +1,7 @@
 #define NOMINMAX
 #include"InPut.h"
 #include<cassert>
+#include<algorithm>
 
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
@@ -272,6 +273,20 @@ bool Input::GetReleasePadRightTrigger(const float& value) {
 		return true;
 	}
 	return false;
+}
+
+void Input::SetVibration(float leftMotorSpeed, float rightMotorSpeed) {
+	leftMotorSpeed = std::clamp(leftMotorSpeed, 0.0f, 1.0f);
+	rightMotorSpeed = std::clamp(rightMotorSpeed, 0.0f, 1.0f);
+
+	WORD leftSpeed = static_cast<WORD>(leftMotorSpeed * 65535.0f);
+	WORD rightSpeed = static_cast<WORD>(rightMotorSpeed * 65535.0f);
+
+	XINPUT_VIBRATION vibration;
+	ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
+	vibration.wLeftMotorSpeed = leftSpeed;   // 左
+	vibration.wRightMotorSpeed = rightSpeed; // 右
+	XInputSetState(0, &vibration);
 }
 
 bool Input::IsPadConnected() const {

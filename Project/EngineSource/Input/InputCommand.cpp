@@ -145,3 +145,8 @@ bool InputCommand::CheckCondition(const InputCondition& condition) {
 		break;
 	}
 }
+
+void InputCommand::PlayPadVibration(float left, float right) {
+	// 振動させる
+	input_->SetVibration(left, right);
+}
