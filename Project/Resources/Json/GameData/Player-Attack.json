@@ -4,7 +4,7 @@
         "AttackDownMaxPower": 20.0,
         "AttackDownMinPower": 5.0,
         "AttackDownPrepareRise": 4.0,
-        "AttackDownSpeed": 50.0,
+        "AttackDownSpeed": 80.0,
         "AttackPreDownTime": 0.30000001192092896,
         "SceneName": "TDGameScene",
         "UseSpeedBasedAttackDown": false
