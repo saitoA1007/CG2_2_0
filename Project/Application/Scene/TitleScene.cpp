@@ -52,6 +52,17 @@ void TitleScene::Update() {
 
 	// カメラの更新処理
 	mainCamera_->Update();
+
+}
+
+void TitleScene::DebugUpdate() {
+
+	ImGui::Begin("Shader");
+
+	ImGui::DragFloat("Time", &materialData_->timer, 0.1f);
+
+	ImGui::End();
+
 }
 
 void TitleScene::Draw(const bool& isDebugView) {

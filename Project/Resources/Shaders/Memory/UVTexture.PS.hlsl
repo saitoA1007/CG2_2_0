@@ -26,20 +26,9 @@ struct PixelShaderOutput
 PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
-    float4 transuv = mul(float32_t4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-    float2 uv = transuv.xy;
-    
-    uv *= 15.0f;
-
-    float32_t2 id = floor(uv);
-    float32_t2 f = frac(uv);
-
-    float32_t2 c = id * 0.2f * 0.2f;
-    float32_t3 col = float32_t3(c, 0.0);
-
-    // if (f.x > 0.98 || f.y > 0.98) col += vec3(1.0, 0.0, 0.0);
-
-    output.color = float32_t4(col, 1.0);
+    float4 transformedUV = mul(float32_t4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
+  
+    output.color = float32_t4(transformedUV.x, transformedUV.y, 0.0f, 1.0f);  
   
     return output;
 }

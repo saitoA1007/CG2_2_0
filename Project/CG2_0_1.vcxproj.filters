@@ -635,5 +635,6 @@
     </FxCompile>
     <FxCompile Include="Resources\Shaders\SkinningObject3d.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Test.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\Memory\UVTexture.PS.hlsl" />
   </ItemGroup>
 </Project>
