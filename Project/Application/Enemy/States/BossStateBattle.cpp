@@ -121,66 +121,72 @@ void BossStateBattle::ResetNormal() {
 	if (bossContext_.isHited) {
 		bossContext_.isHited = false;
 
-		if (RandomGenerator::Get(0, 1) == 0) {
-			selectButtleBehavior_ = ButtleBehavior::CrossMove;
-		} else {
-			selectButtleBehavior_ = ButtleBehavior::RotateMove;
-		}
+		// 風攻撃をしている時にダメージを食らった場合回避行動を取る
+		if (isWindMoved_) {
+			if (RandomGenerator::Get(0, 1) == 0) {
+				selectButtleBehavior_ = ButtleBehavior::CrossMove;
+			} else {
+				selectButtleBehavior_ = ButtleBehavior::RotateMove;
+			}
 
+			isWindMoved_ = false;
+			return;
+		}
+	}
+	isWindMoved_ = false;
+
+	// 氷柱がステージに存在してる場合は処理をおこなわない
+	std::vector<BehaviorWeight> list;
+	list.resize(lotteryList_.size());
+	if (bossContext_.iceFallCount + 3 > 5) {
+		for (size_t i = 0; i < lotteryList_.size(); ++i) {
+			if (lotteryList_[i].behavior != ButtleBehavior::IceFallAttack) {
+				list.push_back(lotteryList_[i]);
+			}
+		}
 	} else {
-		// 氷柱がステージに存在してる場合は処理をおこなわない
-		std::vector<BehaviorWeight> list;
-		list.resize(lotteryList_.size());
-		if (bossContext_.iceFallCount + 3 > 5) {
-			for (size_t i = 0; i < lotteryList_.size(); ++i) {
-				if (lotteryList_[i].behavior != ButtleBehavior::IceFallAttack) {
-					list.push_back(lotteryList_[i]);
-				}
-			}
-		} else {
-			list = lotteryList_;
+		list = lotteryList_;
+	}
+
+	// 全体の重みを計算する
+	int32_t totalWeight = 0;
+	for (const auto& item : list) {
+		totalWeight += item.weight;
+	}
+
+	int32_t randomValue = RandomGenerator::Get<int32_t>(0, totalWeight - 1);
+
+	for (const auto& item : list) {
+		if (randomValue < item.weight) {
+			selectButtleBehavior_ = item.behavior;
+			break;
 		}
+		// 次の範囲へ進むために値を引く
+		randomValue -= item.weight;
+	}
 
-		// 全体の重みを計算する
-		int32_t totalWeight = 0;
-		for (const auto& item : list) {
-			totalWeight += item.weight;
-		}
+	// 突進が選ばれた場合に距離が短過ぎる場合は移動させる
+	if (selectButtleBehavior_ == ButtleBehavior::RushAttack) {
+		// 円の中心からプレイヤーへのベクトルを求める
+		Vector3 tmpTarget = Normalize(Vector3(bossContext_.targetPos.x, 0.0f, bossContext_.targetPos.z));
+		Vector3 targetDir = tmpTarget;
 
-		int32_t randomValue = RandomGenerator::Get<int32_t>(0, totalWeight - 1);
+		// 反転する
+		targetDir = targetDir * -1.0f;
+		// 反対側の角度を求める
+		float endAngle = std::atan2f(targetDir.z, targetDir.x);
 
-		for (const auto& item : list) {
-			if (randomValue < item.weight) {
-				selectButtleBehavior_ = item.behavior;
-				break;
-			}
-			// 次の範囲へ進むために値を引く
-			randomValue -= item.weight;
-		}
+		// プレイヤーの一番後ろの位置
+		Vector3 targetPos = { std::cosf(endAngle) * (stageRadius_), 0.0f,std::sinf(endAngle) * (stageRadius_) };
 
-		// 突進が選ばれた場合に距離が短過ぎる場合は移動させる
-		if (selectButtleBehavior_ == ButtleBehavior::RushAttack) {
-			// 円の中心からプレイヤーへのベクトルを求める
-			Vector3 tmpTarget = Normalize(Vector3(bossContext_.targetPos.x, 0.0f, bossContext_.targetPos.z));
-			Vector3 targetDir = tmpTarget;
+		float length = Length(targetPos - bossContext_.worldTransform->transform_.translate);
 
-			// 反転する
-			targetDir = targetDir * -1.0f;
-			// 反対側の角度を求める
-			float endAngle = std::atan2f(targetDir.z, targetDir.x);
-
-			// プレイヤーの一番後ろの位置
-			Vector3 targetPos = { std::cosf(endAngle) * (stageRadius_), 0.0f,std::sinf(endAngle) * (stageRadius_) };
-
-			float length = Length(targetPos - bossContext_.worldTransform->transform_.translate);
-
-			// 距離が近い場合は離れる行動をとる用にする
-			if (length <= stageRadius_ * 0.2f) {
-				if (RandomGenerator::Get(0, 1) == 0) {
-					selectButtleBehavior_ = ButtleBehavior::CrossMove;
-				} else {
-					selectButtleBehavior_ = ButtleBehavior::RotateMove;
-				}
+		// 距離が近い場合は離れる行動をとる用にする
+		if (length <= stageRadius_ * 0.2f) {
+			if (RandomGenerator::Get(0, 1) == 0) {
+				selectButtleBehavior_ = ButtleBehavior::CrossMove;
+			} else {
+				selectButtleBehavior_ = ButtleBehavior::RotateMove;
 			}
 		}
 	}
@@ -594,8 +600,7 @@ void BossStateBattle::ResetWind() {
 	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::IceBreath)]["IceBreath_Prepare"]);
 	bossContext_.animationTimer = 0.0f;
 
-	/*isMidAnimation_ = false;
-	isEndANimation_ = false;*/
+	isWindMoved_ =true;
 
 	windPhase_ = WindPhase::In;
 }
