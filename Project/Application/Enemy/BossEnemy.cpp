@@ -206,6 +206,9 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
                     bossContext_.hp -= player->GetAttackDownPower();
                 }
 
+                // ヒット通知
+                bossContext_.isHited = true;
+
                 AudioManager::GetInstance().Play(bossDamagedSH_, 0.5f, false);
                 AudioManager::GetInstance().Play(attackHitSH_, 0.5f, false);
 

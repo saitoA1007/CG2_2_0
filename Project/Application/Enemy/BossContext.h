@@ -65,6 +65,9 @@ struct BossContext {
 
 	bool isStopBgm_ = false;
 
+	// 当たったことを伝える変数
+	bool isHited = false;
+
 	// アニメーションデータ
 	std::array<std::map<std::string, AnimationData>, static_cast<size_t>(enemyAnimationType::MaxCount)>* animationData_;
 	GameEngine::Animator* animator_ = nullptr;
