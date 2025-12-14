@@ -241,6 +241,9 @@ private:
 	float windMainTime_ = 5.0f;
 	float windOutTime_ = 1.0f;
 
+	// 風の行動だったか
+	bool isWindMoved_ = false;
+
 	// ブレスのフェーズ
 	WindPhase windPhase_ = WindPhase::In;
 
