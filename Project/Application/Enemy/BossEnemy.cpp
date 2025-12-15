@@ -144,7 +144,13 @@ void BossEnemy::Update(const Vector3& targetPos) {
     if (bossState_ == BossState::Egg) {
         bodyCollider_->SetRadius(bodyColliderSize_ * 1.5f);
     } else {
-        bodyCollider_->SetRadius(bodyColliderSize_);
+
+        // 突き刺し攻撃の時に当たり判定を大きくする
+        if (isPlayerDownAttack_) {
+            bodyCollider_->SetRadius(bodyColliderSize_ + 1.5f);
+        } else {
+            bodyCollider_->SetRadius(bodyColliderSize_);
+        }
     }
 
     // アニメーションの更新処理

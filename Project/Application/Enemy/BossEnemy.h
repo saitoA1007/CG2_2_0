@@ -106,6 +106,10 @@ public:
 		return bossState_ == BossState::Egg;
 	}
 
+	void SetIsPlayerDownAttack(const bool& isAttack) {
+		isPlayerDownAttack_ = isAttack;
+	}
+
 private: // 調整項目
 	
 	// 最大体力
@@ -163,6 +167,9 @@ private: // メンバ変数
 	// ボスのマテリアル
 	std::unique_ptr<BossMaterial> bossMaterial_;
 	Vector4 specularColor_ = { 1.0f,1.0f,1.0f,1.0f };
+
+	// ダウン攻撃を取得
+	bool isPlayerDownAttack_ = false;
 
 private:
 

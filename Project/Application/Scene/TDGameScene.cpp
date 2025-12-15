@@ -983,6 +983,9 @@ void TDGameScene::Update() {
 		bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,bossEnemy_->GetAlpha() });
 	}
 
+	// プレイヤーの攻撃状態を取得
+	bossEnemy_->SetIsPlayerDownAttack(player_->IsAttackDown());
+	
 	// プレイヤーがダメージ無敵中の点滅演出
 	if (player_ && player_->IsDamagedInvincible()) {
 		float a = player_->GetDamageFlashAlpha();
