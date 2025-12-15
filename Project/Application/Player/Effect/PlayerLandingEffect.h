@@ -22,7 +22,8 @@ public:
     /// エミッタを起動 (着地エフェクト開始)
     /// </summary>
     /// <param name="pos">発生位置</param>
-    void Emitter(const Vector3 &pos);
+    /// <param name="power">着地の強さ（0.0f～1.0f）</param>
+    void Emitter(const Vector3 &pos, float power);
 
 public:
     /// <summary>
@@ -66,4 +67,7 @@ private:
 
     // エフェクト継続時間
     float duration_ = 0.6f;
+
+    // 着地の強さ
+    float landingPower_ = 0.0f;
 };

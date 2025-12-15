@@ -18,7 +18,7 @@ void PlayerLandingEffect::Initialize() {
     }
 }
 
-void PlayerLandingEffect::Emitter(const Vector3 &pos) {
+void PlayerLandingEffect::Emitter(const Vector3 &pos, float power) {
     // 位置を設定してタイマーをリセット
     for (auto &wt : worldTransforms_) {
         wt.transform_.translate = pos;
@@ -26,12 +26,30 @@ void PlayerLandingEffect::Emitter(const Vector3 &pos) {
         wt.transform_.scale = {0.1f, 0.1f, 0.1f};
         wt.UpdateTransformMatrix();
     }
-    // マテリアル初期透明度
-    for (auto &m : materials_) {
-        if (m) { m->SetAplha(1.0f); }
-    }
     timer_ = 0.0f;
     isActive_ = true;
+    landingPower_ = std::clamp(power, 0.0f, 1.0f);
+
+    // 開始色
+    Vector4 startColor{ 1.0f, 1.0f, 1.0f, 1.0f };
+    // 中間色
+    Vector4 middleColor{ 1.0f, 1.0f, 0.0f, 1.0f };
+    // 終了色
+    Vector4 endColor{ 1.0f, 0.25f, 0.0f, 1.0f };
+
+    Vector4 resultColor;
+    if (landingPower_ <= 0.5f) {
+        float localT = landingPower_ / 0.5f;
+        resultColor = Lerp(startColor, middleColor, localT);
+    } else {
+        float localT = (landingPower_ - 0.5f) / 0.5f;
+        resultColor = Lerp(middleColor, endColor, localT);
+    }
+
+    // マテリアル初期透明度
+    for (auto &m : materials_) {
+        if (m) { m->SetColor(resultColor); }
+    }
 }
 
 void PlayerLandingEffect::Update() {
@@ -49,8 +67,8 @@ void PlayerLandingEffect::Update() {
         float t = std::clamp(localTime / duration_, 0.0f, 1.0f);
 
         // スケールを徐々に拡大
-        float startScale = 1.0f;
-        float endScale = 8.0f;
+        float startScale = 1.0f * landingPower_;
+        float endScale = 8.0f * landingPower_;
         float s = EaseOutQuad(startScale, endScale, t);
 
         // 透明度を徐々に減少 (1.0 -> 0.0)

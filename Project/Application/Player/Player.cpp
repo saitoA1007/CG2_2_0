@@ -830,12 +830,12 @@ void Player::OnCollision(const CollisionResult &result) {
 	if (isGround) {
 		if (velocity_.y < 0.0f) {
 			velocity_.y = 0.0f;
-			attackDownPower_ = 0.0f;
             worldTransform_.transform_.translate.y = collider_->GetRadius() / 2.0f;
 			if (isAttackDown_ && onLandHit_) {
 				onLandHit_();
                 AudioManager::GetInstance().Play(audioHandle_Landing_, 0.5f, false);
 			}
+			attackDownPower_ = 0.0f;
 		}
 		
 		if (!isRushing_ && !isBounceLock_) {

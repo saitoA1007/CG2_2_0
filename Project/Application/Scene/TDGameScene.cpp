@@ -183,12 +183,22 @@ void TDGameScene::Initialize(SceneContext* context) {
 
     // 着地時にカメラシェイク実行とエフェクトを起動
     player_->SetOnLandHit([this]() {
-		cameraController_->StartCameraShake(5.0f, 1.0f, 100.0f,
+		// 入力時の攻撃力を0.0f-1.0fに正規化
+		float rawPower = player_->GetAttackDownPowerf();
+		float minP = player_->GetAttackDownMinPower();
+		float maxP = player_->GetAttackDownMaxPower();
+		float normalized = 0.0f;
+		float denom = maxP - minP;
+		if (denom > 1e-6f) {
+			normalized = std::clamp((rawPower - minP) / denom, 0.0f, 1.0f);
+		}
+
+		cameraController_->StartCameraShake(8.0f * normalized, 1.0f, 128.0f * normalized,
 			[](const Vector3 &a, const Vector3 &b, float t) { return EaseInOutCubic(a, b, t); },
 			CameraController::ShakeOrigin::TargetPosition,
             true, false, true, false);
         if (playerLandingEffect_) {
-            playerLandingEffect_->Emitter(player_->GetWorldTransform().GetWorldPosition());
+            playerLandingEffect_->Emitter(player_->GetWorldTransform().GetWorldPosition(), normalized);
         }
     });
 
