@@ -1,0 +1,100 @@
+{
+    "PlayerWalkParticle": {
+        "ColorRange": {
+            "Max": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "EndAlpha": 0.0,
+        "EndColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        ],
+        "EndSize": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "FieldAcceleration": [
+            0.0,
+            2.0,
+            0.0
+        ],
+        "IsBillBoard": true,
+        "IsEnableAlphaOverLifeTime": true,
+        "IsEnableColorOverLifeTime": false,
+        "IsEnableRotateZFromVelocity": false,
+        "IsEnableScaleXYZActive": false,
+        "IsEnableSizeOverLifeTime": false,
+        "IsEnableVelocityFromPosition": false,
+        "IsLoop": true,
+        "LifeTime": 1.0,
+        "MaxVelocity": 0.0,
+        "MinVelocity": 0.0,
+        "RotateRange": {
+            "Max": [
+                0.0,
+                0.0,
+                6.400000095367432
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "ScaleRange": {
+            "Max": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                0.5,
+                1.0,
+                1.0
+            ]
+        },
+        "SceneName": "TDGameScene",
+        "SpawnCoolTime": 0.20000000298023224,
+        "SpawnMaxCount": 1,
+        "SpawnRange": {
+            "Max": [
+                0.10000000149011612,
+                0.0,
+                0.10000000149011612
+            ],
+            "Min": [
+                -0.10000000149011612,
+                0.0,
+                -0.10000000149011612
+            ]
+        },
+        "Textures": {
+            "smoke.png": 59
+        },
+        "VelocityRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    }
+}

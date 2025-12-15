@@ -84,6 +84,9 @@ public:
     // 現在のHP取得
     int32_t GetCurrentHP() const { return currentHP_; }
 
+	// 向いている方向を取得
+	Vector3 GetDir() const { return lastMoveDir_; }
+
     // ダメージ無敵中フラグ取得
     bool IsDamagedInvincible() const { return isInvincible_; }
     // ダメージ点滅時のアルファ取得
