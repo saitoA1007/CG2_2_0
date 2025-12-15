@@ -40,6 +40,7 @@
 #include"Application/Player/Effect/PlayerAttackDownEffect.h"
 #include"Application/Player/Effect/PlayerAttackEffect.h"
 #include"Application/Player/Effect/PlayerLandingEffect.h"
+#include"Application/Player/Effect/PlayerDamageNumberEffect.h"
 #include"Application/UI/Letterbox.h"
 #include"Application/UI/ClearUI.h"
 #include"Application/UI/BossDestroyFade.h"
@@ -162,6 +163,8 @@ private:
 	std::unique_ptr<PlayerAttackDownEffect> playerAttackDownEffect_;
 	std::unique_ptr<PlayerAttackEffect> playerAttackEffect_;
 	std::unique_ptr<PlayerLandingEffect> playerLandingEffect_;
+    // プレイヤーのダメージ数字UI
+    std::unique_ptr<PlayerDamageNumberEffect> playerDamageNumberEffect_;
 
 	//==================================================
 	// ステージ
@@ -325,7 +328,7 @@ private:
 	// ボスのヒット状態の前フレーム保存（ヒット瞬間の検出用）
 	bool prevBossHit_ = false;
 
-    // ボス登場時アニメーション制御
+    // ボス登場時アニメーション制御（登場時演出に準拠）
     bool bossIntroPlaying_ = false;           // 再生中フラグ
     bool bossIntroScheduled_ = false;         // 予約フラグ
     bool bossIntroDelayAfterFreeze_ = false;  // フリーズ解除後の遅延待ちフラグ

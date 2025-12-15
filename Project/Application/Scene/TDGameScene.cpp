@@ -8,10 +8,12 @@
 #include"CollisionConfig.h"
 #include"AudioManager.h"
 #include<numbers>
+#include<algorithm>
 
 #include"Application/CollisionTypeID.h"
 #include"Extension/CustomRenderer.h"
 #include"FPSCounter.h"
+#include"Application/Player/Effect/PlayerDamageNumberEffect.h"
 
 using namespace GameEngine;
 
@@ -405,6 +407,10 @@ void TDGameScene::Initialize(SceneContext* context) {
 		}
 	}
 
+    // プレイヤーダメージ数値エフェクトの初期化
+    playerDamageNumberEffect_ = std::make_unique<PlayerDamageNumberEffect>();
+    playerDamageNumberEffect_->Initialize(context_->textureManager);
+
 	// ゲームオーバーUIの初期化
 	gameOverUI_ = std::make_unique<GameOverUI>();
 	gameOverUI_->Initialize(context_->input, context_->inputCommand, context_->textureManager);
@@ -621,8 +627,17 @@ void TDGameScene::Update() {
 		Vector3 bp = bossEnemy_->GetWorldPosition();
 		bp.y += 2.0f;
 		enemyAttackManager_->AddEnemyDestroyEffect(bp);
+
+		// ダメージ数字表示
+        int damageVal = player_ ? player_->GetAttackDownPower() : 0;
+        Vector3 screenWorldPos = bossEnemy_->GetWorldPosition();
+        screenWorldPos.y += 4.0f;
+        if (playerDamageNumberEffect_) {
+            playerDamageNumberEffect_->Emitter(screenWorldPos, damageVal, cameraController_->GetCamera());
+        }
 	}
 	prevBossHit_ = currentBossHit;
+    playerDamageNumberEffect_->Update();
 
 	// フリーズ中の処理（ボスヒット演出）
 	if (isBossHitFreezeActive_) {
@@ -1415,6 +1430,16 @@ void TDGameScene::DrawUI() {
         SpriteRenderer::Draw(bossAppearanceUI_->GetBossTitleSprite(), bossAppearanceUI_->GetCurrentBossTitleGH());
         SpriteRenderer::Draw(bossAppearanceUI_->GetBossNameSprite(), bossAppearanceUI_->GetCurrentBossNameGH());
         SpriteRenderer::Draw(bossAppearanceUI_->GetBossAppearanceStarSprite(), bossAppearanceUI_->GetBossAppearanceStarGH());
+    }
+
+    // ダメージ数字の描画
+    if (playerDamageNumberEffect_ && playerDamageNumberEffect_->IsActive()) {
+        const auto &spritesRef = playerDamageNumberEffect_->GetDigitSprites();
+        const auto &handlesRef = playerDamageNumberEffect_->GetTextureHandles();
+        size_t n = std::min(spritesRef.size(), handlesRef.size());
+        for (size_t i = 0; i < n; ++i) {
+            SpriteRenderer::Draw(spritesRef[i], handlesRef[i]);
+        }
     }
 }
  

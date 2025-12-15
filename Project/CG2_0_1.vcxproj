@@ -192,6 +192,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="Application\Player\Effect\PlayerAttackDownEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerAttackEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerChargeEffect.cpp" />
+    <ClCompile Include="Application\Player\Effect\PlayerDamageNumberEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerLandingEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerRushEffect.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
@@ -389,6 +390,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="Application\Player\Effect\PlayerAttackDownEffect.h" />
     <ClInclude Include="Application\Player\Effect\PlayerAttackEffect.h" />
     <ClInclude Include="Application\Player\Effect\PlayerChargeEffect.h" />
+    <ClInclude Include="Application\Player\Effect\PlayerDamageNumberEffect.h" />
     <ClInclude Include="Application\Player\Effect\PlayerLandingEffect.h" />
     <ClInclude Include="Application\Player\Effect\PlayerRushEffect.h" />
     <ClInclude Include="Application\Player\Player.h" />

@@ -313,6 +313,7 @@
     <ClCompile Include="Application\UI\TutorialUI.cpp" />
     <ClCompile Include="Application\UI\ArrowUI.cpp" />
     <ClCompile Include="Application\UI\BossAppearanceUI.cpp" />
+    <ClCompile Include="Application\Player\Effect\PlayerDamageNumberEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -631,6 +632,7 @@
     <ClInclude Include="Application\UI\TutorialUI.h" />
     <ClInclude Include="Application\UI\ArrowUI.h" />
     <ClInclude Include="Application\UI\BossAppearanceUI.h" />
+    <ClInclude Include="Application\Player\Effect\PlayerDamageNumberEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
