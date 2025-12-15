@@ -24,6 +24,16 @@ LRESULT CALLBACK WindowsApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPAR
 		// OSに対して、アプリの終了を伝える
 		PostQuitMessage(0);
 		return 0;
+
+		// キーが押された
+	case WM_KEYDOWN:
+		// ESCキーが押された場合
+		if (wparam == VK_ESCAPE) {
+			// ウィンドウを閉じる
+			PostQuitMessage(0);
+			return 0;
+		}
+		break;
 	}
 
 	// 標準のメッセージ処理を行う
