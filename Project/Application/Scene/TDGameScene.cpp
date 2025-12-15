@@ -1256,6 +1256,10 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModelAdd);
 	if (playerAttackEffect_->IsActive()) {
 		ModelRenderer::Draw(planeModel_, playerAttackEffect_->GetWorldTransforms(), &playerAttackEffect_->GetMaterial());
+
+		if (playerAttackEffect_->IsSubDraw()) {
+			ModelRenderer::Draw(planeModel_, playerAttackEffect_->GetSubWorldTransforms(), &playerAttackEffect_->GetSubMaterial());
+		}
 	}
 
 	// インスタンシング描画前処理

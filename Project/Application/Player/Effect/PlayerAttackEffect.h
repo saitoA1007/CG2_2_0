@@ -41,11 +41,25 @@ public:
     // ヒットエフェクトの描画管理
     bool IsDrawHitEffect() const { return isDrawHitEffect_; }
 
+    // サブのワールド行列
+    GameEngine::WorldTransform& GetSubWorldTransforms() { return subWorldTransform_; }
+
+    // サブのマテリアル
+    GameEngine::Material& GetSubMaterial() { return subMaterial_; }
+
+    // サブ描画
+    bool IsSubDraw() const { return isSubDraw_; }
+
 private:
     // ワールド行列
     GameEngine::WorldTransform worldTransform_;
     // マテリアル
     GameEngine::Material material_;
+
+    // ワールド行列
+    GameEngine::WorldTransform subWorldTransform_;
+    // マテリアル
+    GameEngine::Material subMaterial_;
 
     // 終了フラグ
     bool isActive_ = false;
@@ -67,6 +81,11 @@ private:
     // 全体の時間管理
     float entireTimer_ = 0.0f;
     float entireTime_ = 2.5f;
+
+    float diffScale_ = 5.0f;
+    Vector4 color_;
+
+    bool isSubDraw_ = false;
 
 private:
 

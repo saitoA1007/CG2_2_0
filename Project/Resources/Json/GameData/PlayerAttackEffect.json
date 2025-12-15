@@ -1,7 +1,14 @@
 {
     "PlayerAttackEffect": {
+        "Color": [
+            1.0,
+            0.11764705181121826,
+            0.0,
+            1.0
+        ],
+        "DiffScale": 15.0,
         "EndRotateZ": 2.0,
-        "EndScale": 15.0,
+        "EndScale": 10.0,
         "EntireMaxTime": 2.5,
         "MaxTime": 0.20000000298023224,
         "SceneName": "TDGameScene"
