@@ -28,14 +28,16 @@ public:
     void SetSprite1Params(const Vector2& pos, const Vector2& size) { sprite1Pos_ = pos; sprite1Size_ = size; }
 
 private:
-    // 2枚のスプライト
+    // スプライト
     std::vector<std::unique_ptr<GameEngine::Sprite>> sprites_;
-    // テクスチャハンドル（2枚ぶん）
+    // テクスチャハンドル
     std::vector<uint32_t> textureHandles_;
 
     // パラメータ（位置とサイズ）
-    Vector2 sprite0Pos_ = { 16.0f, 360.0f - 16.0f };
+    Vector2 sprite0Pos_ = { 16.0f, 360.0f - 136.0f };
     Vector2 sprite0Size_ = { 300.0f, 120.0f };
-    Vector2 sprite1Pos_ = { 16.0f, 360.0f + 16.0f };
+    Vector2 sprite1Pos_ = { 16.0f, 360.0f };
     Vector2 sprite1Size_ = { 300.0f, 120.0f };
+    Vector2 sprite2Pos_ = { 16.0f, 360.0f + 136.0f };
+    Vector2 sprite2Size_ = { 300.0f, 120.0f };
 };
