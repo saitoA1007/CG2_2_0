@@ -7,6 +7,12 @@
             1.0
         ],
         "SceneName": "TDGameScene",
-        "Shininess": 250.0
+        "Shininess": 250.0,
+        "SpecularColor": [
+            0.08333331346511841,
+            0.865196168422699,
+            1.0,
+            1.0
+        ]
     }
 }
