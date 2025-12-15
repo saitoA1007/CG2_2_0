@@ -263,6 +263,9 @@ private:
 	// プレイヤーの回復演出
 	std::unique_ptr<GameEngine::ParticleBehavior> playerGetHeartParticle_;
 
+	// プレイヤーの歩く演出
+	std::unique_ptr<GameEngine::ParticleBehavior> playerWalkParticle_;
+
 	// 仮の操作方法UI
 	std::unique_ptr<GameEngine::Sprite> playGuideSprite_;
 	uint32_t playGuideGH_ = 0;

@@ -441,6 +441,11 @@ void TDGameScene::Initialize(SceneContext* context) {
 	playerGetHeartParticle_->Emit({ 10.0f,-10.0f,0.0f });
 	playerGetHeartParticle_->SetIsLoop(false);
 
+	// プレイヤーの歩く時の演出
+	playerWalkParticle_ = std::make_unique<ParticleBehavior>();
+	playerWalkParticle_->Initialize("PlayerWalkParticle", 32);
+	playerWalkParticle_->Emit({ 10.0f,10.0f,0.0f });
+
 	transitionStartTarget_ = Vector3{ -2.0f,32.0f,-16.0f };
 	transitionEndTarget_ = player_ ? player_->GetWorldTransform().GetWorldPosition() : transitionStartTarget_;
 
@@ -848,6 +853,16 @@ void TDGameScene::Update() {
 		playerGetHeartParticle_->SetIsLoop(false);
 	}
 	playerGetHeartParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+
+	// プレイヤーの歩く演出
+	if (player_->GetPlayerPos().y <= 1.0f) {
+		playerWalkParticle_->SetIsLoop(true);
+		playerWalkParticle_->SetEmitterPos(player_->GetPlayerPos());
+		playerWalkParticle_->SetVelocity(player_->GetDir() * -1.0f);
+	} else {
+		playerWalkParticle_->SetIsLoop(false);
+	}
+	playerWalkParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
     // プレイヤーの攻撃力に応じてAttackDownエフェクトの色を変化させる
 	if (player_ && playerAttackDownEffect_) {
@@ -1346,6 +1361,9 @@ void TDGameScene::Draw(const bool &isDebugView) {
 
 	// プレイヤーの回復演出
 	ModelRenderer::DrawInstancing(planeModel_, playerGetHeartParticle_->GetCurrentNumInstance(), *playerGetHeartParticle_->GetWorldTransforms());
+
+	// プレイヤーの歩く演出
+	ModelRenderer::DrawInstancing(planeModel_, playerWalkParticle_->GetCurrentNumInstance(), *playerWalkParticle_->GetWorldTransforms());
 
 #ifdef _DEBUG
 
