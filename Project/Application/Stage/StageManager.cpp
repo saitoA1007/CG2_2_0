@@ -115,8 +115,8 @@ void StageManager::GenerateWalls() {
 		tmpWall->Initialilze({ {wallWidth,wallHeight_,wallDepth_},{0.0f,rotateY,0.0f},{tmpPos} }, respawnTime_, maxHp_, wallTextureHandle_);
 
 		std::unique_ptr<GameEngine::WorldTransform> tmpUnderWall = std::make_unique<GameEngine::WorldTransform>();
-		tmpPos.y -=0.5f;
-		tmpUnderWall->Initialize({ {wallWidth,1.0f,wallDepth_},{0.0f,rotateY,0.0f},{tmpPos} });
+		tmpPos.y -=1.0f;
+		tmpUnderWall->Initialize({ {wallWidth,2.0f,wallDepth_},{0.0f,rotateY,0.0f},{tmpPos} });
 		tmpUnderWall->UpdateTransformMatrix();
 		// 登録する
 		underWalls_.push_back(std::move(tmpUnderWall));
