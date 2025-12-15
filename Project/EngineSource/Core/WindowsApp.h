@@ -51,6 +51,18 @@ namespace GameEngine {
 		HWND GetHwnd() const { return hwnd_; }
 
 		HINSTANCE GetHInstance() const { return wc_.hInstance; }
+
+		/// <summary>
+		/// フルスクリーンモードと通常モードを切り替える
+		/// </summary>
+		void ToggleFullScreen();
+
+		/// <summary>
+		/// 現在フルスクリーンモードかどうかを取得
+		/// </summary>
+		/// <returns>フルスクリーンならtrue</returns>
+		bool IsFullScreen() const { return isFullScreen_; }
+
 	private:
 		//WindowsApp() = default;
 		//~WindowsApp() = default;
@@ -64,5 +76,10 @@ namespace GameEngine {
 		RECT wrc_{};
 
 		MSG msg_{};
+
+		// フルスクリーン関連
+		bool isFullScreen_ = false;
+		RECT windowedRect_{};  // ウィンドウモード時の位置とサイズを保存
+		LONG windowedStyle_ = 0;  // ウィンドウモード時のスタイルを保存
 	};
 }

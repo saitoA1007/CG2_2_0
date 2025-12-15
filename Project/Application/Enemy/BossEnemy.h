@@ -162,6 +162,7 @@ private: // メンバ変数
 
 	// ボスのマテリアル
 	std::unique_ptr<BossMaterial> bossMaterial_;
+	Vector4 specularColor_ = { 1.0f,1.0f,1.0f,1.0f };
 
 private:
 

@@ -220,6 +220,11 @@ void Engine::PreUpdate() {
 	// キー入力の更新処理
 	input_->Update();
 
+	// F12キーでフルスクリーン切り替え
+	if (input_->TriggerKey(DIK_F12)) {
+		windowsApp_->ToggleFullScreen();
+	}
+
 	// ImGuiにフレームが始まる旨を伝える
 	imGuiManager_->BeginFrame();
 
@@ -251,7 +256,7 @@ void Engine::PreUpdate() {
 		// シーンを切り替える
 		sceneManager_->ChangeScene(sceneChangeRequest_->GetRequestScene());
 		sceneChangeRequest_->ClearChangeRequest();
-		// 変更したシーンの状態を取得
+		// 変更したシーンの名前を取得
 		sceneChangeRequest_->SetCurrentSceneState(sceneManager_->GetCurrentSceneState());
 	}
 

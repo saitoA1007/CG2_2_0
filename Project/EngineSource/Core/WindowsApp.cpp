@@ -57,7 +57,7 @@ void WindowsApp::CreateGameWindow(const std::wstring& title, int32_t kClientWidt
 	hwnd_ = CreateWindow(
 		wc_.lpszClassName,      // 利用するクラス名
 		title.c_str(),          // タイトルバーの文字
-		WS_OVERLAPPEDWINDOW,
+		WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,
 		CW_USEDEFAULT,          // 表示X座標(Windowに任せる)
 		CW_USEDEFAULT,          // 表示Y座標(WindowOSに任せる)
 		wrc_.right - wrc_.left, // ウィンドウ横幅
@@ -66,6 +66,9 @@ void WindowsApp::CreateGameWindow(const std::wstring& title, int32_t kClientWidt
 		nullptr,                // メニューハンドル
 		wc_.hInstance,          // インスタンスハンドル
 		nullptr);               // オプション
+
+	// ウィンドウモード時のスタイルを保存
+	windowedStyle_ = GetWindowLong(hwnd_, GWL_STYLE);
 
 	// ウィンドウを表示する
 	ShowWindow(hwnd_, SW_SHOW);
@@ -92,4 +95,49 @@ void WindowsApp::BreakGameWindow() {
 	CoUninitialize();
 
 	CloseWindow(hwnd_);
+}
+
+void WindowsApp::ToggleFullScreen() {
+	if (!isFullScreen_) {
+		// フルスクリーンモードに切り替え
+
+		// 現在のウィンドウ位置とサイズを保存
+		GetWindowRect(hwnd_, &windowedRect_);
+
+		// ウィンドウスタイルを変更
+		SetWindowLong(hwnd_, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+
+		// プライマリモニターの解像度を取得
+		int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+		int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+		// ウィンドウを画面全体に配置
+		SetWindowPos(
+			hwnd_,
+			HWND_TOP,
+			0, 0,
+			screenWidth, screenHeight,
+			SWP_FRAMECHANGED | SWP_SHOWWINDOW
+		);
+
+		isFullScreen_ = true;
+	} else {
+		// 通常モードに戻す
+
+		// ウィンドウスタイルを元に戻す
+		SetWindowLong(hwnd_, GWL_STYLE, windowedStyle_);
+
+		// 保存しておいた位置とサイズに戻す
+		SetWindowPos(
+			hwnd_,
+			HWND_TOP,
+			windowedRect_.left,
+			windowedRect_.top,
+			windowedRect_.right - windowedRect_.left,
+			windowedRect_.bottom - windowedRect_.top,
+			SWP_FRAMECHANGED | SWP_SHOWWINDOW
+		);
+
+		isFullScreen_ = false;
+	}
 }
