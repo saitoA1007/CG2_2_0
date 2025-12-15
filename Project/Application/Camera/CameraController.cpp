@@ -140,7 +140,7 @@ void CameraController::Update(GameEngine::InputCommand* inputCommand, GameEngine
         center = targetPos_;
     }
 
-	if (!isAnimationPlaying_) {
+	if (!isAnimationPlaying_ && isAutoRotate_) {
 		ApplyAutoRotate(eye, center);
 	}
 

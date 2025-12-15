@@ -92,6 +92,8 @@ namespace GameEngine {
 
 		const uint32_t& GetTextureHandle() const { return materialData_->textureHandle; }
 
+        const Vector4 &GetColor() const { return materialData_->color; }
+
 		void SetDefaultTexture(const uint32_t& handle) { defaultTextureHandle_ = handle; }
 
 		void AdaptDefaultTexture() { materialData_->textureHandle = defaultTextureHandle_; }

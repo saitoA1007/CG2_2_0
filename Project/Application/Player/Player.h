@@ -73,6 +73,8 @@ public:
     int GetRushChargeLevel() const { return rushChargeLevel_; }
     // 急降下時の攻撃力取得
     int32_t GetAttackDownPower() const { return static_cast<int32_t>(attackDownPower_); }
+    // 急降下時の攻撃力取得（float型）
+    float GetAttackDownPowerf() const { return attackDownPower_; }
     // 急降下時の最小攻撃力取得
     float GetAttackDownMinPower() const { return kAttackDownMinPower_; }
     // 急降下時の最大攻撃力取得

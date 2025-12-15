@@ -149,6 +149,11 @@ public:
 	/// </summary>
 	void EnableViewOffset(bool enable) { viewOffsetEnabled_ = enable; }
 
+	/// <summary>
+	/// 視点オフセットの有効/無効
+	/// </summary>
+	void EnableAutoRotate(bool enable) { isAutoRotate_ = enable; }
+
     /// <summary>
     /// 現在位置を目標位置として設定
 	/// </summary>
@@ -184,7 +189,7 @@ private:
 	Vector3 position_ = { 0.0f,4.0f,-10.0f };
 
 	// 距離
-	static inline const float kDistance_ = 32.0f;
+	static inline const float kDistance_ = 48.0f;
 
 	// 回転の移動量(球面: θ=x(azimuth/yaw), φ=y(polar/pitch))
 	Vector2 rotateMove_ = { 3.1f,1.0f };
@@ -233,6 +238,9 @@ private:
 	float autoRotateApproachScale_ = 1.0f; // 接近速度 * scale を乗算
 	// 自動回転の全体倍率
 	float autoRotateOverallGain_ = 0.4f;
+
+	// 自動回転フラグ
+	bool isAutoRotate_ = true;
 
 	//--------- アニメーション用 ---------//
 

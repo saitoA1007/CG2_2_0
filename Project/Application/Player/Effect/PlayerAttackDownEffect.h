@@ -40,6 +40,9 @@ public:
     // 透明度を設定
     void SetAlpha(float a);
 
+    // ダメージ量に応じて色を変化
+    void SetColorFromAttackPower(float minPower, float maxPower, float currentPower);
+
 private:
     // ワールド行列
     std::array<GameEngine::WorldTransform,3> worldTransforms_;

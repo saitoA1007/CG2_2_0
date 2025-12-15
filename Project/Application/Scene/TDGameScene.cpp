@@ -651,6 +651,7 @@ void TDGameScene::Update() {
 			bossIntroDelayAfterFreeze_ = false;
 			bossIntroTimer_ = 0.0f;
 			player_->Restart();
+			cameraController_->EnableAutoRotate(false);
             AudioManager::GetInstance().Stop(titleBGMHandle_);
             // Letterbox を表示開始
             if (letterbox_) {
@@ -710,6 +711,7 @@ void TDGameScene::Update() {
 			AudioManager::GetInstance().Play(gameBGMHandle_, 0.5f, true);
             uiDisabledForIntro_ = true;
 			bossIntroFinished_ = true; // 演出完了
+			cameraController_->EnableAutoRotate(true);
 			// Letterbox を非表示に戻す
 			if (letterbox_) {
 				letterboxAnimTimer_ = 0.0f;
@@ -736,6 +738,7 @@ void TDGameScene::Update() {
 		bossOutroTimer_ = 0.0f;
 		bossOutroPlaying_ = true;
 		bossOutroScheduled_ = false;
+		cameraController_->EnableAutoRotate(false);
 	}
 
 	// 撃破時演出の再生
@@ -821,17 +824,13 @@ void TDGameScene::Update() {
 	}
 	playerGetHeartParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
-	// プレイヤーの攻撃力に応じてAttackDownエフェクトの透明度を設定
+    // プレイヤーの攻撃力に応じてAttackDownエフェクトの色を変化させる
 	if (player_ && playerAttackDownEffect_) {
-		float power = static_cast<float>(player_->GetAttackDownPower());
-		float minP = player_->GetAttackDownMinPower();
-		float maxP = player_->GetAttackDownMaxPower();
-		float alpha = 0.0f;
-		if (maxP - minP > 1e-6f) {
-			alpha = (power - minP) / (maxP - minP);
-			alpha = std::clamp(alpha, 0.0f, 1.0f);
-		}
-		playerAttackDownEffect_->SetAlpha(alpha);
+		playerAttackDownEffect_->SetColorFromAttackPower(
+			player_->GetAttackDownMinPower(),
+			player_->GetAttackDownMaxPower(),
+			player_->GetAttackDownPowerf()
+		);
 	}
 
 	// ロックオン: 入力が有効ならプレイヤーとボスの位置をターゲットに設定
@@ -882,11 +881,11 @@ void TDGameScene::Update() {
 		float desiredFov = 0.7f; // 通常
 		if (player_->IsRushing()) {
 			desiredFov = 1.0f; // 突進中
-		} else if (player_->IsCharging() || player_->IsPreRushing()) {
+		}/* else if (player_->IsCharging() || player_->IsPreRushing()) {
 			// 突進レベルに応じてFOVを変化させる
 			int rushLevel = player_->GetRushChargeLevel();
 			desiredFov = 0.4f + static_cast<float>(3 - rushLevel) * 0.1f;
-		}
+		}*/
 		cameraController_->SetDesiredFov(desiredFov);
 
 		// ジャンプ中は見下ろし視点オフセットを適用
