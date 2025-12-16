@@ -189,7 +189,7 @@ private:
 	Vector3 position_ = { 0.0f,4.0f,-10.0f };
 
 	// 距離
-	static inline const float kDistance_ = 48.0f;
+	static inline const float kDistance_ = 40.0f;
 
 	// 回転の移動量(球面: θ=x(azimuth/yaw), φ=y(polar/pitch))
 	Vector2 rotateMove_ = { 3.1f,1.0f };

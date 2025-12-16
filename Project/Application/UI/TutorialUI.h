@@ -34,10 +34,10 @@ private:
     std::vector<uint32_t> textureHandles_;
 
     // パラメータ（位置とサイズ）
-    Vector2 sprite0Pos_ = { 16.0f, 360.0f - 136.0f };
+    Vector2 sprite0Pos_ = { 16.0f, 360.0f - 120.0f };
     Vector2 sprite0Size_ = { 300.0f, 120.0f };
     Vector2 sprite1Pos_ = { 16.0f, 360.0f };
     Vector2 sprite1Size_ = { 300.0f, 120.0f };
-    Vector2 sprite2Pos_ = { 16.0f, 360.0f + 136.0f };
+    Vector2 sprite2Pos_ = { 16.0f, 360.0f + 120.0f };
     Vector2 sprite2Size_ = { 300.0f, 120.0f };
 };
