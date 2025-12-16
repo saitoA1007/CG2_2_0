@@ -4,7 +4,7 @@
         "IceWallBounceReflectFactor": 0.800000011920929,
         "IsLegacyWallBounce": true,
         "SceneName": "TDGameScene",
-        "WallBounceAwaySpeed": 5.0,
+        "WallBounceAwaySpeed": 3.0,
         "WallBounceLockTime": 0.800000011920929,
         "WallBounceMaxSpeedFactor": 1.5,
         "WallBounceMinSpeedFactor": 0.5,

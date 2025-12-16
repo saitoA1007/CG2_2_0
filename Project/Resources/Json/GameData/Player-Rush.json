@@ -6,7 +6,7 @@
         "RushChargeLevel3Ratio": 0.5,
         "RushChargeMaxTime": 2.0,
         "RushCooldownTime": 0.699999988079071,
-        "RushLockMaxTime": 1.2000000476837158,
+        "RushLockMaxTime": 1.5,
         "RushSpeed": 30.0,
         "RushStrengthLevel1": 0.5,
         "RushStrengthLevel2": 0.699999988079071,
