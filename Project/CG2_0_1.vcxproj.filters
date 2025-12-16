@@ -314,6 +314,7 @@
     <ClCompile Include="Application\UI\ArrowUI.cpp" />
     <ClCompile Include="Application\UI\BossAppearanceUI.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerDamageNumberEffect.cpp" />
+    <ClCompile Include="Application\Player\Effect\PlayerBreakWallEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -633,6 +634,7 @@
     <ClInclude Include="Application\UI\ArrowUI.h" />
     <ClInclude Include="Application\UI\BossAppearanceUI.h" />
     <ClInclude Include="Application\Player\Effect\PlayerDamageNumberEffect.h" />
+    <ClInclude Include="Application\Player\Effect\PlayerBreakWallEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
