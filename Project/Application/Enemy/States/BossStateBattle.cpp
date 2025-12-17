@@ -700,6 +700,8 @@ void BossStateBattle::ResetIceFall() {
 	bossContext_.animator_->SetAnimationData(&(*bossContext_.animationData_)[static_cast<size_t>(enemyAnimationType::BaseMove)]["基本移動"]);
 	bossContext_.animationTimer = 0.0f;
 
+	isWindMoved_ = true;
+
 	isWaitIceFall_ = true;
 }
 
