@@ -3,11 +3,11 @@
         "Elasticity": 0.5,
         "FieldAcceleration": -15.0,
         "LifeTime": 3.0,
-        "ScaleMax": 1.5,
+        "ScaleMax": 2.0,
         "ScaleMin": 0.5,
         "SceneName": "TDGameScene",
-        "SpawnPosMax": 4.0,
-        "SpawnPosMin": -4.0,
+        "SpawnPosMax": 6.0,
+        "SpawnPosMin": -6.0,
         "SpeedMax": 15.0,
         "SpeedMin": 2.0
     }

@@ -56,12 +56,12 @@ PlayerBreakWallEffect::ParticleData PlayerBreakWallEffect::MakeNewParticle() {
 	particleData.startScale = particleData.transform.scale;
 	particleData.transform.rotate = RandomGenerator::GetVector3(0.0f, 6.4f);
 	// 位置
-	particleData.transform.translate = RandomGenerator::GetVector3(spawnPosMin_, spawnPosMax_) + emitterPos_;
+	particleData.transform.translate = RandomGenerator::GetVector3(spawnPosMin_, spawnPosMax_) + emitterPos_ + -playerDir_;
 	particleData.transform.translate.y = emitterPos_.y + RandomGenerator::Get(1.0f, 3.0f);
 	// 速度
 	particleData.velocity = Normalize(particleData.transform.translate - emitterPos_) * RandomGenerator::Get(speedMin_, speedMax_);
 	// 色
-	particleData.color = { 0.07f,0.5f,1.0f,0.7f };
+	particleData.color = color_;
 	// 時間の設定
 	particleData.lifeTime = RandomGenerator::Get(2.0f, 3.0f);
 	particleData.currentTime = 0.0f;
@@ -145,6 +145,8 @@ void PlayerBreakWallEffect::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem(name_, "SpawnPosMax", spawnPosMax_, index++);
 	GameParamEditor::GetInstance()->AddItem(name_, "FieldAcceleration", fieldAcceleration_, index++);
 	GameParamEditor::GetInstance()->AddItem(name_, "Elasticity", elasticity_, index++);
+	GameParamEditor::GetInstance()->AddItem(name_, "Color", color_, index++);
+	
 }
 
 void PlayerBreakWallEffect::ApplyDebugParam() {
@@ -162,4 +164,6 @@ void PlayerBreakWallEffect::ApplyDebugParam() {
 
 	fieldAcceleration_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "FieldAcceleration");
 	elasticity_ = GameParamEditor::GetInstance()->GetValue<float>(name_, "Elasticity");
+
+	color_ = GameParamEditor::GetInstance()->GetValue<Vector4>(name_, "Color");
 }

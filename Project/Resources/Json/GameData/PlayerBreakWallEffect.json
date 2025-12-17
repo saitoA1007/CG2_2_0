@@ -1,0 +1,19 @@
+{
+    "PlayerBreakWallEffect": {
+        "Color": [
+            0.0,
+            0.41176486015319824,
+            1.0,
+            0.6235294342041016
+        ],
+        "Elasticity": 0.800000011920929,
+        "FieldAcceleration": -30.0,
+        "ScaleMax": 2.0,
+        "ScaleMin": 0.5,
+        "SceneName": "TDGameScene",
+        "SpawnPosMax": 1.0,
+        "SpawnPosMin": -1.0,
+        "SpeedMax": 25.0,
+        "SpeedMin": 10.0
+    }
+}
