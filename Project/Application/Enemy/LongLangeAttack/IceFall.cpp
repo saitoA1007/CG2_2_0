@@ -63,7 +63,7 @@ void IceFall::Update() {
     if (timer_ <= 1.0f) {
 
         timer_ += FpsCounter::deltaTime / maxTime_;
-
+        timer_ = std::min(timer_, 1.0f);
         worldTransform_.transform_.translate.y = Lerp(startPosY, endPosY, timer_ * timer_ * timer_);
 
         // 行列の更新処理
@@ -71,7 +71,7 @@ void IceFall::Update() {
 
         // 当たり判定の位置を更新
         collider_->SetWorldPosition(worldTransform_.transform_.translate);
-    }
+    } 
 
 #ifdef _DEBUG
     worldTransform_.UpdateTransformMatrix();

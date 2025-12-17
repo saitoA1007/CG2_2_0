@@ -38,15 +38,15 @@
         "IsEnableScaleXYZActive": false,
         "IsEnableSizeOverLifeTime": true,
         "IsEnableVelocityFromPosition": true,
-        "IsLoop": true,
-        "LifeTime": 2.0,
+        "IsLoop": false,
+        "LifeTime": 1.0,
         "MaxVelocity": -1.0,
         "MinVelocity": -2.0,
         "RotateRange": {
             "Max": [
                 0.0,
                 0.0,
-                0.0
+                6.400000095367432
             ],
             "Min": [
                 0.0,
