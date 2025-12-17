@@ -198,7 +198,6 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
         }
 
         // 突進、または上からの攻撃の時のみダメージ
-        //player->IsRushing();
         if (player->IsAttackDown()) {
 
             // フラグ
@@ -218,6 +217,10 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
                 AudioManager::GetInstance().Play(bossDamagedSH_, 0.5f, false);
                 AudioManager::GetInstance().Play(attackHitSH_, 0.5f, false);
 
+                // ダメージ時のコールバックを呼ぶ
+                if (onDamaged_) {
+                    onDamaged_();
+                }
                 Log("CurrentHp : " + std::to_string(bossContext_.hp), "Enemy");
             }
         } 

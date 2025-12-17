@@ -542,6 +542,14 @@ void TDGameScene::Initialize(SceneContext* context) {
     bossAppearanceUI_ = std::make_unique<BossAppearanceUI>();
     bossAppearanceUI_->Initialize(context_->textureManager);
     bossAppearanceUI_->SetActive(false);
+
+    // ボスダメージ時コールバック
+	bossEnemy_->SetOnDamaged([this]() {
+        int attackPower = player_ ? player_->GetAttackDownPower() : 0;
+		if (attackPower >= 15) {
+			AudioManager::GetInstance().Play(bossEggBreakSEHandle_, 1.0f, false);
+        }
+    });
 }
 
 void TDGameScene::Update() {

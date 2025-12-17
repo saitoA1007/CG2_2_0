@@ -87,6 +87,8 @@ public:
 	void SetResetPosition() {
 		bossContext_.isResetPos = true;
 	}
+	// ダメージ時コールバック設定
+	void SetOnDamaged(std::function<void()> cb) { onDamaged_ = std::move(cb); }
 
 	// ボスの状態をInに設定
     void SetBossStateIn() {
@@ -170,6 +172,8 @@ private: // メンバ変数
 
 	// ダウン攻撃を取得
 	bool isPlayerDownAttack_ = false;
+	// ダメージイベント
+	std::function<void()> onDamaged_;
 
 private:
 
