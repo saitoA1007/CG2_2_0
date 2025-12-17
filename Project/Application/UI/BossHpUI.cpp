@@ -12,7 +12,7 @@ void BossHpUI::Initialize(const int32_t& maxHp) {
 	// 初期化
 	sprite_ = Sprite::Create(position_, size_, { 0.0f,0.0f }, { 1.0f,0.0f,0.0f,1.0f });
 
-	effectSprite_ = Sprite::Create(position_, size_, { 0.0f,0.0f }, { 0.5f,0.0f,0.0f,1.0f });
+	effectSprite_ = Sprite::Create(position_, size_, { 0.0f,0.0f }, { 0.8f,0.8f,0.0f,1.0f });
 
 	// 後ろのフレーム
 	frameSprite_ = Sprite::Create(position_, size_, { 0.0f,0.0f }, { 0.0f,0.0f,0.0f,1.0f });
