@@ -3,6 +3,7 @@
 #include"Model.h"
 #include"Wall.h"
 #include"Effect/BreakWallParticle.h"
+#include"Application/Player/Effect/PlayerBreakWallEffect.h"
 
 class StageManager {
 public:
@@ -15,7 +16,7 @@ public:
 	/// <summary>
 	/// 更新処理
 	/// </summary>
-	void Update();
+	void Update(const Vector3& playerPos,const Vector3& playerDir);
 
 	/// <summary>
 	/// 描画処理
@@ -53,6 +54,9 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	std::list<std::unique_ptr<BreakWallParticle>>& GetBreakWallParticles() { return breakWallParticles_; }
+
+	// プレイヤーが壁を破壊する演出
+	std::list<std::unique_ptr<PlayerBreakWallEffect>>& GetPlayerBreakWallParticle() { return playerBreakWallParticles_; }
 
 private:
 
@@ -95,6 +99,8 @@ private:
 	// 壊れた演出
 	std::list<std::unique_ptr<BreakWallParticle>> breakWallParticles_;
 
+	std::list<std::unique_ptr<PlayerBreakWallEffect>> playerBreakWallParticles_;
+
 	uint32_t wallTextureHandle_ = 0;
 
 	std::string kGroupName_ = "Wall";
@@ -112,6 +118,8 @@ private:
 	void GenerateWalls();
 
 	void AddBreakWallParticle(const Vector3& pos);
+
+	void AddPlayerBreaKParticle(const Vector3& pos, const Vector3& dir);
 
 	/// <summary>
 	/// 値を登録する

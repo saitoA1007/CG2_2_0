@@ -78,7 +78,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// ステージを生成を初期化
 	stageManager_ = std::make_unique<StageManager>();
 	stageManager_->Initialize(0);
-	stageManager_->Update();
+	stageManager_->Update({},{});
 
 	// StageWallPlane用モデル
 	stageWallPlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
@@ -1075,7 +1075,7 @@ void TDGameScene::Update() {
     }
 
 	// ステージの更新処理
-	stageManager_->Update();
+	stageManager_->Update(player_->GetPlayerPos(),player_->GetDir());
 
 	// 空気を演出するためのパーティクル
 	airParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
@@ -1326,6 +1326,11 @@ void TDGameScene::Draw(const bool &isDebugView) {
 
 	// 壁破壊のパーティクルを描画
 	for (auto& particle : stageManager_->GetBreakWallParticles()) {
+		ModelRenderer::DrawInstancing(wallModel_, particle->GetCurrentNumInstance(), *particle->GetWorldTransforms());
+	}
+
+	// 壁の破壊表現
+	for (auto& particle : stageManager_->GetPlayerBreakWallParticle()) {
 		ModelRenderer::DrawInstancing(wallModel_, particle->GetCurrentNumInstance(), *particle->GetWorldTransforms());
 	}
 

@@ -33,8 +33,9 @@ public:
 	/// 発生位置を設定
 	/// </summary>
 	/// <param name="pos"></param>
-	void SetEmitterPos(const Vector3& pos) {
+	void SetEmitterPos(const Vector3& pos, const Vector3& dir) {
 		emitterPos_ = pos;
+		playerDir_ = dir;
 		Create();
 	}
 
@@ -104,6 +105,10 @@ private:
 	float fieldAcceleration_ = 0.1f;
 
 	float elasticity_ = 0.8f;
+
+	Vector3 playerDir_ = { 0.0f,0.0f,1.0f };
+
+	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 
 private:
 

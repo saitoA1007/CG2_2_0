@@ -241,7 +241,7 @@ void TitleScene::Update() {
 
     if (terrain_) terrain_->Update();
 
-    if (stageManager_) stageManager_->Update();
+    //if (stageManager_) stageManager_->Update();
 
     // タイトルロック中はプレイヤーの操作/物理更新を行わない
     if (!isTitleLocked_) {
