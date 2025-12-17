@@ -57,12 +57,11 @@ PixelShaderOutput main(VertexShaderOutput input)
     // [0,1]範囲を[-1,1]範囲にリマップ
     float32_t3 textureNormal = normalMapColor.rgb * 2.0f - 1.0f;
     
-    // TBN行列（Tangent, Binormal, Normal）を構築
-    // 法線と接線の正規化
+    // TBN行列を構築
     float32_t3 normal = normalize(input.normal);
     float32_t3 tangent = normalize(input.tangent);
 
-    // 従法線 (Binormal) の計算
+    // 従法線の計算
     float32_t3 binormal = normalize(cross(tangent,normal));
 
     // 接空間からワールド空間への変換行列

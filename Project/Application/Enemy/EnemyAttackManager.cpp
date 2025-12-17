@@ -50,6 +50,7 @@ void EnemyAttackManager::Initialize(GameEngine::PostEffectManager* postEffectMan
         iceFallEffectData.timer = 0.0f;
         iceFallEffectData.particle = std::make_unique<ParticleBehavior>();
         iceFallEffectData.particle->Initialize("WaitIceFallParticle", 32);
+        iceFallEffectData.particle->SetIsLoop(false);
         iceFallEffectDatas_.push_back(std::move(iceFallEffectData));
     }
 
@@ -255,6 +256,7 @@ void EnemyAttackManager::CreateIceFallPositions(const float& waitIceFallTime) {
             iceFallEffectDatas_[i].particle->SetEmitterPos(Vector3(points[i].x, 0.0f, points[i].y));
             iceFallEffectDatas_[i].isActive = true;
             iceFallEffectDatas_[i].timer = 0.0f;
+            iceFallEffectDatas_[i].particle->SetIsLoop(true);
         }
     }
 }
@@ -264,13 +266,16 @@ void EnemyAttackManager::EffectUpdate(const Matrix4x4& cameraWorldMatrix, const 
 
     for (auto& iceFallEffectData : iceFallEffectDatas_) {
 
+        // 更新処理
+        iceFallEffectData.particle->Update(cameraWorldMatrix, viewMatrix);
+
         if (!iceFallEffectData.isActive) { continue; }
 
         iceFallEffectData.timer += FpsCounter::deltaTime / maxIceFallEmitTime_;
 
         if (iceFallEffectData.timer >= 1.0f) {
             iceFallEffectData.isActive = false;
-            
+            iceFallEffectData.particle->SetIsLoop(false);
             // 氷柱を落とす
             AddIceFall(iceFallEffectData.particle->GetEmitterPos());
             if (isSetHeart_) {
@@ -282,9 +287,6 @@ void EnemyAttackManager::EffectUpdate(const Matrix4x4& cameraWorldMatrix, const 
             // 叫ぶ演出
             //SetIsRoat(true);
         }
-
-        // 更新処理
-        iceFallEffectData.particle->Update(cameraWorldMatrix, viewMatrix);
     }
 }
 

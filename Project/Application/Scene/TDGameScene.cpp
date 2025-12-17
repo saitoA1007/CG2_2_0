@@ -1347,7 +1347,7 @@ void TDGameScene::Draw(const bool &isDebugView) {
 
 	// 氷柱を落とすまでの演出を描画
 	for (auto &iceFallEffect : enemyAttackManager_->GetIceFallEffectDatas()) {
-		if (!iceFallEffect.isActive) { continue; }
+		//if (!iceFallEffect.isActive) { continue; }
 		ModelRenderer::DrawInstancing(planeModel_, iceFallEffect.particle->GetCurrentNumInstance(), *iceFallEffect.particle->GetWorldTransforms());
 	}
 
