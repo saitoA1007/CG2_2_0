@@ -1467,14 +1467,14 @@ void TDGameScene::DrawUI() {
     }
 
     // ダメージ数字の描画
-    if (playerDamageNumberEffect_ && playerDamageNumberEffect_->IsActive()) {
+    /*if (playerDamageNumberEffect_ && playerDamageNumberEffect_->IsActive()) {
         const auto &spritesRef = playerDamageNumberEffect_->GetDigitSprites();
         const auto &handlesRef = playerDamageNumberEffect_->GetTextureHandles();
         size_t n = std::min(spritesRef.size(), handlesRef.size());
         for (size_t i = 0; i < n; ++i) {
             SpriteRenderer::Draw(spritesRef[i], handlesRef[i]);
         }
-    }
+    }*/
 }
  
  void TDGameScene::InputRegisterCommand() {
