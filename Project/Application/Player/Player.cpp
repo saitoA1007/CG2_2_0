@@ -9,9 +9,9 @@
 #include"CollisionConfig.h"
 #include"Application/CollisionTypeID.h"
 #include"Application/Stage/Wall.h"
-#include "LogManager.h"
-#include "AudioManager.h"
-#include "Application/Enemy/BossEnemy.h"
+ #include "LogManager.h"
+ #include "AudioManager.h"
+ #include "Application/Enemy/BossEnemy.h"
 using namespace GameEngine;
 
 float Player::GetDamageFlashAlpha() const {
@@ -398,6 +398,8 @@ void Player::ProcessMoveInput(GameEngine::InputCommand *inputCommand) {
 				// Rush方向更新
 				rushDirection_ = lastMoveDir_;
 			}
+
+			inputCommand->PlayPadVibration(0.5f, 0.5f);
 		}
 	} else {
 		Vector3 dir = { 0.0f, 0.0f, 0.0f };
@@ -623,6 +625,8 @@ void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength, bool i
 			velocity_ = bounceAwayDir_ * (kWallBounceAwaySpeed_ * bounceStrength);
 			velocity_.y = kWallBounceUpSpeed_ * bounceStrength;
 			currentBounceLockTime_ = kWallBounceLockTime_;
+            // IceFallヒット通知
+            if (onIceFallHit_) { onIceFallHit_(static_cast<float>(rushChargeLevel_) / 3.0f); }
 			return;
 		}
 		// 既存の bounceStrength に加えて溜めレベルに応じた倍率を適用
@@ -635,6 +639,8 @@ void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength, bool i
 		}
 		velocity_ = bounceAwayDir_ * (kWallBounceAwaySpeed_ * bounceStrength * levelMultiplier);
 		velocity_.y = kWallBounceUpSpeed_ * bounceStrength * levelMultiplier; currentBounceLockTime_ = kWallBounceLockTime_;
+        // 壁ヒット通知（溜めレベル比率）
+        if (onWallBounceHit_) { onWallBounceHit_(static_cast<float>(rushChargeLevel_) / 3.0f); }
 	
 	} else {
 		// 変更: 跳ね返る高さを直前の水平速度に応じて変化させる
@@ -654,6 +660,8 @@ void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength, bool i
 		// 上方向速度は強さと速度倍率に応じて変化
 		velocity_.y = kWallBounceUpSpeed_ * bounceStrength * heightMultiplier;
 		currentBounceLockTime_ = kWallBounceLockTime_;
+        // 壁ヒット通知（スピード比率）
+        if (onWallBounceHit_) { onWallBounceHit_(speedRatio); }
 	}
 }
 
@@ -686,12 +694,23 @@ void Player::OnCollision(const CollisionResult &result) {
         if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
         if (onWallHit_) { onWallHit_(); }
         Bounce(bounceDir, kBossBounceReflectFactor_);
+        // Boss攻撃ヒット（突進中は溜めレベル比率）
+        if (onBossAttackHit_) { onBossAttackHit_(static_cast<float>(rushChargeLevel_) / 3.0f); }
         return;
     }
 
     // ボスとの衝突処理（空中急降下中の場合）
     if (isBoss && isAttackDown_) {
         Log("is hit Boss with Attack Down" + std::to_string(attackDownPower_));
+        // Boss攻撃ヒット（急降下時は攻撃力比率）
+        if (onBossAttackHit_) {
+            float ratio = 0.0f;
+            float denom = (kAttackDownMaxPower_ - kAttackDownMinPower_);
+            if (denom > 1e-6f) {
+                ratio = std::clamp((attackDownPower_ - kAttackDownMinPower_) / denom, 0.0f, 1.0f);
+            }
+            onBossAttackHit_(ratio);
+        }
         //if (collider_) { collider_->SetWorldPosition(worldTransform_.transform_.translate); }
         return;
     }
@@ -756,6 +775,8 @@ void Player::OnCollision(const CollisionResult &result) {
 		if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
 		if (onWallHit_) { onWallHit_(); }
 		Bounce(bounceDir, kWallBounceReflectFactor_);
+        // 壁ヒット通知（溜めレベル比率）
+        if (onWallBounceHit_) { onWallBounceHit_(static_cast<float>(rushChargeLevel_) / 3.0f); }
 		return;
 	}
 
@@ -793,6 +814,8 @@ void Player::OnCollision(const CollisionResult &result) {
 		if (bounceDir.x != 0.0f || bounceDir.z != 0.0f) { bounceDir = Normalize(bounceDir); }
 		if (onWallHit_) { onWallHit_(); }
 		Bounce(bounceDir, kIceWallBounceReflectFactor_, true);
+        // IceFallヒット通知（溜めレベル比率）
+        if (onIceFallHit_) { onIceFallHit_(static_cast<float>(rushChargeLevel_) / 3.0f); }
 		return;
 	}
 
@@ -835,6 +858,11 @@ void Player::OnCollision(const CollisionResult &result) {
 				onLandHit_();
                 AudioManager::GetInstance().Play(audioHandle_Landing_, 0.5f, false);
 			}
+            // 急降下での着地時は1.0f秒の無敵を付与
+            /*if (isAttackDown_) {
+                isInvincible_ = true;
+                damageInvincibleTimer_ = 1.0f;
+            }*/
 			attackDownPower_ = 0.0f;
 		}
 		

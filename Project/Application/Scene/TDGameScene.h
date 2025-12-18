@@ -389,4 +389,80 @@ private:
     float uiFadeAlpha_ = 0.0f;
 
 	std::unique_ptr<BossAppearanceUI> bossAppearanceUI_;
+
+	// Vibration state
+	float currentRushVibration_ = 0.0f;
+	bool isRushVibrationInitialized_ = false;
+
+	bool wallHitVibrationActive_ = false;
+	float wallHitVibrationTimer_ = 0.0f;
+	float wallHitVibrationDuration_ = 0.0f;
+	float wallHitVibrationStart_ = 0.0f;
+
+	bool iceHitVibrationActive_ = false;
+	float iceHitVibrationTimer_ = 0.0f;
+	float iceHitVibrationDuration_ = 0.0f;
+	float iceHitVibrationStart_ = 0.0f;
+
+	bool landHitVibrationActive_ = false;
+	float landHitVibrationTimer_ = 0.0f;
+	float landHitVibrationDuration_ = 0.0f;
+	float landHitVibrationStart_ = 0.0f;
+
+	bool bossAttackVibrationActive_ = false;
+	float bossAttackVibrationTimer_ = 0.0f;
+	float bossAttackVibrationDuration_ = 0.0f;
+	float bossAttackVibrationStrength_ = 0.0f;
+
+    // ボス登場演出のための時間制御
+    bool isBossIntroDelay_ = false;
+    float bossIntroDelayDuration_ = 0.0f;
+
+    // プレイヤー突進中の振動強度
+    float playerRushVibrationStrength_ = 0.0f;
+
+    //==================================================
+    // ステージ固有
+    //==================================================
+
+    // ウェーブの状態
+    enum class WaveState {
+        None,
+        Rising,
+        Holding,
+        Falling,
+        Finished
+    };
+    WaveState waveState_ = WaveState::None;
+
+    // ウェーブのパラメータ
+    float waveElapsedTime_ = 0.0f;
+    float waveDuration_ = 0.0f;
+	Vector3 waveStartPosition_ = Vector3(0.0f, 0.0f, 0.0f);
+    Vector3 waveEndPosition_ = Vector3(0.0f, 0.0f, 0.0f);
+    Vector3 waveCurrentPosition_ = Vector3(0.0f, 0.0f, 0.0f);
+    Vector3 waveTargetPosition_ = Vector3(0.0f, 0.0f, 0.0f);
+
+    //==================================================
+    // 演出用変数
+    //==================================================
+
+    // スポーンエフェクト用
+    std::unique_ptr<GameEngine::ParticleBehavior> spawnEffect_;
+
+    // ボス登場時の揺れ
+    void BossIntroShake();
+
+    // ボス撃破時の揺れ
+    void BossOutroShake();
+
+    //==================================================
+    // 効果音
+    //==================================================
+
+    // 効果音用ハンドル
+    uint32_t seHandle_ = 0;
+
+    // 音声再生フラグ
+    bool isSoundPlaying_ = false;
 };

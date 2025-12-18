@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include"TDGameScene.h"
 #include"ImguiManager.h"
 #include"ModelRenderer.h"
@@ -78,7 +79,7 @@ void TDGameScene::Initialize(SceneContext* context) {
 	// ステージを生成を初期化
 	stageManager_ = std::make_unique<StageManager>();
 	stageManager_->Initialize(0);
-	stageManager_->Update({},{});
+	stageManager_->Update({},{ });
 
 	// StageWallPlane用モデル
 	stageWallPlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
@@ -202,6 +203,11 @@ void TDGameScene::Initialize(SceneContext* context) {
         if (playerLandingEffect_) {
             playerLandingEffect_->Emitter(player_->GetWorldTransform().GetWorldPosition(), normalized);
         }
+        // 急降下時地面衝突のバイブレーション（1.0f秒 Lerp）
+        landHitVibrationTimer_ = 0.0f;
+        landHitVibrationDuration_ = 1.0f;
+        landHitVibrationStart_ = normalized * 1.0f;
+        landHitVibrationActive_ = true;
     });
 
 	// カメラコントローラークラスを初期化
@@ -219,6 +225,20 @@ void TDGameScene::Initialize(SceneContext* context) {
 			CameraController::ShakeOrigin::TargetPosition,
 			true, false, true, false);
 	});
+
+    // 追加: 壁/つららヒットでの振動比率通知
+    player_->SetOnWallBounceHit([this](float ratio){
+        wallHitVibrationTimer_ = 0.0f;
+        wallHitVibrationDuration_ = 1.0f;
+        wallHitVibrationStart_ = std::clamp(ratio, 0.0f, 1.0f) * 1.0f; // 最大で1.0f
+        wallHitVibrationActive_ = true;
+    });
+    player_->SetOnIceFallHit([this](float ratio){
+        iceHitVibrationTimer_ = 0.0f;
+        iceHitVibrationDuration_ = 1.0f;
+        iceHitVibrationStart_ = std::clamp(ratio, 0.0f, 1.0f) * 0.5f; // 最大で0.5f
+        iceHitVibrationActive_ = true;
+    });
 
 	// プレイヤーがダメージを受けたときのカメラシェイク
 	player_->SetOnDamaged([this]() {
@@ -549,6 +569,14 @@ void TDGameScene::Initialize(SceneContext* context) {
 		if (attackPower >= 15) {
 			AudioManager::GetInstance().Play(bossEggBreakSEHandle_, 1.0f, false);
         }
+    });
+
+    // 追加: ボス攻撃ヒットでの振動（0.5秒保持、強度は攻撃力比率）
+    player_->SetOnBossAttackHit([this](float ratio){
+        bossAttackVibrationTimer_ = 0.0f;
+        bossAttackVibrationDuration_ = 0.5f;
+        bossAttackVibrationStrength_ = std::clamp(ratio, 0.0f, 1.0f);
+        bossAttackVibrationActive_ = true;
     });
 }
 
@@ -960,6 +988,71 @@ void TDGameScene::Update() {
 		cameraController_->Update(context_->inputCommand, context_->input);
 	}
 	mainCamera_->SetCamera(cameraController_->GetCamera());
+
+    //============================
+    // Pad Vibration 制御
+    //============================
+    // 1) 溜め中の段階別固定振動
+    if (player_->IsCharging()) {
+        float base = 0.2f;
+        int lvl = player_->GetRushChargeLevel();
+        if (lvl == 2) base = 0.5f;
+        else if (lvl >= 3) base = 1.0f;
+        context_->inputCommand->PlayPadVibration(base, base);
+    } else if (player_->IsPreRushing()) {
+        // 溜め終了時: 0.0f
+        context_->inputCommand->PlayPadVibration(0.0f, 0.0f);
+    }
+
+    // 2) 突進中: 1.0 -> 0.0 Lerp（残り時間で）
+    if (player_->IsRushing()) {
+        // rushLockMaxTime を使って減衰
+        float total = player_->GetRushChargeLevel() > 0 ? 1.0f : 1.0f;
+        // 便宜的に時間を取れないので最大値固定から線形減衰（毎フレーム少し下げる）
+        // より正確にするならPlayerに突進残り時間のGetterを追加して使う
+        currentRushVibration_ = std::max(currentRushVibration_ - FpsCounter::deltaTime / 1.0f, 0.0f);
+        if (!isRushVibrationInitialized_) { currentRushVibration_ = 1.0f; isRushVibrationInitialized_ = true; }
+        context_->inputCommand->PlayPadVibration(currentRushVibration_, currentRushVibration_);
+    } else {
+        isRushVibrationInitialized_ = false;
+        // 突進終了時: 0.0f
+        context_->inputCommand->PlayPadVibration(0.0f, 0.0f);
+    }
+
+    // 3) 壁衝突時: 1.0 -> 0.0 Lerp (1.0秒) 比率反映
+    if (wallHitVibrationActive_) {
+        wallHitVibrationTimer_ += FpsCounter::deltaTime;
+        float t = std::clamp(wallHitVibrationTimer_ / wallHitVibrationDuration_, 0.0f, 1.0f);
+        float v = Lerp(wallHitVibrationStart_, 0.0f, t);
+        context_->inputCommand->PlayPadVibration(v, v);
+        if (t >= 1.0f) { wallHitVibrationActive_ = false; }
+    }
+    // 4) つらら衝突時: 0.5 -> 0.0 Lerp (1.0秒) 比率反映
+    if (iceHitVibrationActive_) {
+        iceHitVibrationTimer_ += FpsCounter::deltaTime;
+        float t = std::clamp(iceHitVibrationTimer_ / iceHitVibrationDuration_, 0.0f, 1.0f);
+        float v = Lerp(iceHitVibrationStart_, 0.0f, t);
+        context_->inputCommand->PlayPadVibration(v, v);
+        if (t >= 1.0f) { iceHitVibrationActive_ = false; }
+    }
+    // 5) 急降下時地面衝突: 1.0 -> 0.0 Lerp (1.0秒) 比率反映
+    if (landHitVibrationActive_) {
+        landHitVibrationTimer_ += FpsCounter::deltaTime;
+        float t = std::clamp(landHitVibrationTimer_ / landHitVibrationDuration_, 0.0f, 1.0f);
+        float v = Lerp(landHitVibrationStart_, 0.0f, t);
+        context_->inputCommand->PlayPadVibration(v, v);
+        if (t >= 1.0f) { landHitVibrationActive_ = false; }
+    }
+    // 6) プレイヤーからボス攻撃時: 固定 0.5秒 持続、強度比率
+    if (bossAttackVibrationActive_) {
+        bossAttackVibrationTimer_ += FpsCounter::deltaTime;
+        float v = bossAttackVibrationStrength_;
+        context_->inputCommand->PlayPadVibration(v, v);
+        if (bossAttackVibrationTimer_ >= bossAttackVibrationDuration_) {
+            bossAttackVibrationActive_ = false;
+            context_->inputCommand->PlayPadVibration(0.0f, 0.0f);
+        }
+    }
 
 	//========================================
 	// 敵の更新処理

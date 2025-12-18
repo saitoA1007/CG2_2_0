@@ -11,7 +11,7 @@
 
 enum class PlayerAnimationType : std::size_t {
     None,       // 無効
-    Walk,		// 歩き
+    Walk,       // 歩き
     Rush,       // 突進
     DownAttack, // 攻撃
     AirMove,    // 空中移動
@@ -102,6 +102,12 @@ public:
     // 突起跳ね返り終了時コールバック設定（タイトル遷移用）
     void SetOnBounceLockEnd(std::function<void()> cb) { onBounceLockEnd_ = std::move(cb); }
 
+    // 追加: ボス攻撃ヒット通知（振動用）ratio: 0..1
+    void SetOnBossAttackHit(std::function<void(float)> cb) { onBossAttackHit_ = std::move(cb); }
+    // 追加: 壁バウンスヒット通知（振動用）ratio: 0..1
+    void SetOnWallBounceHit(std::function<void(float)> cb) { onWallBounceHit_ = std::move(cb); }
+    // 追加: つららヒット通知（振動用）ratio: 0..1
+    void SetOnIceFallHit(std::function<void(float)> cb) { onIceFallHit_ = std::move(cb); }
 
 	// リスタート処理
 	void Restart();
@@ -190,7 +196,7 @@ private:
 	// 跳ね返り直後の硬直時間
     float kWallBounceLockTime_ = 0.8f;
 
-	// 壁衝突時の跳ね上がり強さ（溜めレベルごとの倍率）
+	// 壁跳ね返り音
 	float kWallBounceStrengthLevel1_ = 0.5f;
 	float kWallBounceStrengthLevel2_ = 0.75f;
 	float kWallBounceStrengthLevel3_ = 1.0f;
@@ -297,6 +303,11 @@ private:
 
     // Bounce lock end callback for external use
     std::function<void()> onBounceLockEnd_;
+
+    // 追加: ヒット通知（外部で振動管理に使用）
+    std::function<void(float)> onBossAttackHit_;
+    std::function<void(float)> onWallBounceHit_;
+    std::function<void(float)> onIceFallHit_;
 
 	// 急降下攻撃フラグ
     bool isAttackDown_ = false;
