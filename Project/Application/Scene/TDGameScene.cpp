@@ -1007,7 +1007,7 @@ void TDGameScene::Update() {
     // 2) 突進中: 1.0 -> 0.0 Lerp（残り時間で）
     if (player_->IsRushing()) {
         // rushLockMaxTime を使って減衰
-        float total = player_->GetRushChargeLevel() > 0 ? 1.0f : 1.0f;
+        //float total = player_->GetRushChargeLevel() > 0 ? 1.0f : 1.0f;
         // 便宜的に時間を取れないので最大値固定から線形減衰（毎フレーム少し下げる）
         // より正確にするならPlayerに突進残り時間のGetterを追加して使う
         currentRushVibration_ = std::max(currentRushVibration_ - FpsCounter::deltaTime / 1.0f, 0.0f);
@@ -1408,12 +1408,16 @@ void TDGameScene::Draw(const bool &isDebugView) {
 	// インスタンシング描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingBothNone);
 	// ボスの風攻撃を描画
-	ModelRenderer::DrawInstancing(windModel_, enemyWindShadowAttackParticle_->GetCurrentNumInstance(), *enemyWindShadowAttackParticle_->GetWorldTransforms());
+	if (bossEnemy_->GetCurrentHP() > 0) {
+		ModelRenderer::DrawInstancing(windModel_, enemyWindShadowAttackParticle_->GetCurrentNumInstance(), *enemyWindShadowAttackParticle_->GetWorldTransforms());
+	}
 
 	// インスタンシング描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingBoth);
 	// ボスの風攻撃を描画
-	ModelRenderer::DrawInstancing(windModel_, enemyWindAttackParticle_->GetCurrentNumInstance(), *enemyWindAttackParticle_->GetWorldTransforms());
+	if (bossEnemy_->GetCurrentHP() > 0) {
+		ModelRenderer::DrawInstancing(windModel_, enemyWindAttackParticle_->GetCurrentNumInstance(), *enemyWindAttackParticle_->GetWorldTransforms());
+	}
 
 	// ボスの翼の演出を描画
 	ModelRenderer::DrawInstancing(wingModel_, enemyWingsParticleParticle_->GetCurrentNumInstance(), *enemyWingsParticleParticle_->GetWorldTransforms());

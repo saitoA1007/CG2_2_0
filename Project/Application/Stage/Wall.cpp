@@ -149,6 +149,12 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 	worldTransform_.UpdateTransformMatrix();
 
 	if (currentHp_ <= 0) {
+
+		if (player != nullptr) {
+			if (player->IsRushing()) {
+				isCollisionFromPlayerRush_ = true;
+			}
+		}
 		currentHp_ = 0;
 		iceMaterial_->materialData_->color.w = 0.0f;
 		isBreakParticleActive_ = true;
