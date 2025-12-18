@@ -46,7 +46,12 @@ void StageManager::Update(const Vector3& playerPos, const Vector3& playerDir) {
 		// 壁が壊れた演出を追加
 		if (wall->IsBreakParticleActive()) {
 			AddBreakWallParticle(wall->GetWorldPosition());
-			AddPlayerBreaKParticle(playerPos, playerDir);
+			if (playerPos.y <= 1.0f) {
+				if (wall->isCollisionFromPlayerRush_) {
+					AddPlayerBreaKParticle(playerPos, playerDir);
+					wall->isCollisionFromPlayerRush_ = false;
+				}
+			}
 		}
 
 		// 壁の更新処理

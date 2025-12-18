@@ -69,6 +69,8 @@ public:
 
 	Vector3 GetWorldPosition() { return worldTransform_.GetWorldPosition(); }
 
+	bool isCollisionFromPlayerRush_ = false;
+
 private: // 固定値
 
 	// 復活までの時間
