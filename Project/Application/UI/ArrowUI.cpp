@@ -6,7 +6,7 @@ using namespace GameEngine;
 
 void ArrowUI::Initialize(const uint32_t& texture) {
 
-    worldTransform_.Initialize({ {1.5f,1.5f,1.5f},{0.0f,0.0f,0.0f},{0.0f,15.0f,0.0f} });
+    worldTransform_.Initialize({ {1.5f,1.5f,1.5f},{0.0f,0.0f,0.0f},{0.0f,12.0f,0.0f} });
 
     material_.Initialize({ 1.0f,0.0f,0.0f,1.0f }, {}, 0.0f, false);
     material_.SetTextureHandle(texture);
