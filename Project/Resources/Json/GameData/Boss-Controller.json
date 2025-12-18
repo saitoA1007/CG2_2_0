@@ -1,7 +1,7 @@
 {
     "Boss-Controller": {
         "CrossMoveWeight": 10,
-        "IceFallWeight": 30,
+        "IceFallWeight": 40,
         "RotateMoveWeight": 10,
         "RushAttackWeight": 30,
         "SceneName": "TDGameScene",
