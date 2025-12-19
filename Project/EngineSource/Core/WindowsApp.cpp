@@ -67,7 +67,7 @@ void WindowsApp::CreateGameWindow(const std::wstring& title, int32_t kClientWidt
 	hwnd_ = CreateWindow(
 		wc_.lpszClassName,      // 利用するクラス名
 		title.c_str(),          // タイトルバーの文字
-		WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,
+		WS_OVERLAPPEDWINDOW/* & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME*/,
 		CW_USEDEFAULT,          // 表示X座標(Windowに任せる)
 		CW_USEDEFAULT,          // 表示Y座標(WindowOSに任せる)
 		wrc_.right - wrc_.left, // ウィンドウ横幅
