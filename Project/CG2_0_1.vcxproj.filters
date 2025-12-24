@@ -293,6 +293,9 @@
     <ClCompile Include="Application\Weapon\Sword.cpp" />
     <ClCompile Include="Application\UI\BossHpUI.cpp" />
     <ClCompile Include="EngineSource\Scene\SceneTransition.cpp" />
+    <ClCompile Include="Application\Enemy\State\BossStateIn.cpp" />
+    <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
+    <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -584,6 +587,12 @@
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleExtensionData.h" />
     <ClInclude Include="Application\UI\BossHpUI.h" />
     <ClInclude Include="EngineSource\Scene\SceneTransition.h" />
+    <ClInclude Include="Application\Enemy\BossContext.h" />
+    <ClInclude Include="Application\Enemy\BossState.h" />
+    <ClInclude Include="Application\Enemy\State\BossStateIn.h" />
+    <ClInclude Include="Application\Enemy\State\BossStateOut.h" />
+    <ClInclude Include="Application\Enemy\State\BossStateBattle.h" />
+    <ClInclude Include="Application\Enemy\State\IBossState.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

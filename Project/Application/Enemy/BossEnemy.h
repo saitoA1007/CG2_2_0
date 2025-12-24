@@ -1,6 +1,12 @@
 #pragma once
+#include<array>
+//#include<functional>
+
 #include"WorldTransform.h"
 #include"Collider.h"
+
+#include"BossContext.h"
+#include"State/IBossState.h"
 
 class BossEnemy {
 public:
@@ -42,15 +48,15 @@ public:
 	Vector3 GetPosition() const { return worldTransform_.GetWorldPosition(); }
 
 	// 最大hpを取得する
-	uint32_t GetMaxHp() const { return maxHp_; }
+	uint32_t GetMaxHp() const { return kMaxHp_; }
 
 	// 現在のhp
-	uint32_t GetCurrentHp() const { return hp_; }
+	uint32_t GetCurrentHp() const { return bossContext_.hp; }
 
 private:
 
 	// 最大hp
-	uint32_t maxHp_ = 5;
+	uint32_t kMaxHp_ = 5;
 
 	// 当たり判定の大きさ
 	float collisionRadius_ = 2.5f;
@@ -60,25 +66,30 @@ private:
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
 
-	// hp
-	uint32_t hp_ = 5;
+	// ボスの共通パラメータ
+	BossContext bossContext_;
 
 	// 生存フラグ
 	bool isAlive_ = true;
 
+	// 行動状態を保存
+	std::array<std::unique_ptr<IBossState>, static_cast<size_t>(BossState::MaxCount)> statesTable_;
+	// 現在の状態
+	IBossState* currentState_ = nullptr;
+
 	// 球の当たり判定
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
 
-	float alpha_ = 1.0f;
+	// 現在の状態
+	BossState bossState_ = BossState::In;
 
+	// ヒットフラグ
 	bool isHit_ = false;
 
+	// ヒット演出で使用
+	float alpha_ = 1.0f;
 	float hitTimer_ = 0.0f;
-
 	float maxHitTime_ = 1.0f;
-
-	// 角度
-	float theta_ = 1.5f;
 
 private:
 

@@ -1,4 +1,10 @@
 #include"BossEnemy.h"
+
+// 敵の各状態
+#include"State/BossStateIn.h"
+#include"State/BossStateBattle.h"
+#include"State/BossStateOut.h"
+
 #include"CollisionConfig.h"
 #include"FPSCounter.h"
 #include"Application/Player/Player.h"
@@ -8,11 +14,24 @@ using namespace GameEngine;
 
 void BossEnemy::Initialize() {
 
-	// hpを設定
-	hp_ = maxHp_;
-
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,10.0f} });
+
+	// コンテキストの設定
+	bossContext_.worldTransform = &worldTransform_;
+	bossContext_.hp = kMaxHp_;
+	bossContext_.bossStateRequest_ = std::nullopt;
+
+	// 状態の生成
+	statesTable_[static_cast<size_t>(BossState::In)] = std::make_unique<BossStateIn>(bossContext_);
+	statesTable_[static_cast<size_t>(BossState::Battle)] = std::make_unique<BossStateBattle>(bossContext_);
+	statesTable_[static_cast<size_t>(BossState::Out)] = std::make_unique<BossStateOut>(bossContext_);
+
+	// 最初の状態を設定する
+	bossState_ = BossState::In;
+	currentState_ = statesTable_[static_cast<size_t>(BossState::In)].get();
+	currentState_->Enter();
+	Log("BossState : In", "Enemy");
 
 	// 当たり判定を設定
 	collider_ = std::make_unique<SphereCollider>();
@@ -28,12 +47,10 @@ void BossEnemy::Initialize() {
 
 #ifdef _DEBUG
 	// 値を登録する
-	RegisterBebugParam();
-	ApplyDebugParam();
-#else
+	RegisterBebugParam();	
+#endif
 	// 値を適応させる
 	ApplyDebugParam();
-#endif
 }
 
 void BossEnemy::Update() {
@@ -42,10 +59,31 @@ void BossEnemy::Update() {
 	ApplyDebugParam();
 #endif
 
-	// 円運動をおこなう
-	theta_ += FpsCounter::deltaTime;
-	worldTransform_.transform_.translate.x = std::cosf(theta_) * 15.0f;
-	worldTransform_.transform_.translate.z = std::sinf(theta_) * 15.0f;
+	// 状態変更が有効であれば、切り替える
+	if (bossContext_.bossStateRequest_) {
+		currentState_->Exit();
+		bossState_ = bossContext_.bossStateRequest_.value();
+		currentState_ = nullptr;
+#ifdef _DEBUG
+		// 切り替わった状態のログを出す
+		uint32_t i = static_cast<uint32_t>(*bossContext_.bossStateRequest_);
+		std::string s = "In";
+		if (i == static_cast<uint32_t>(BossState::Battle)) { s = "Battle"; } else if (i == static_cast<uint32_t>(BossState::Out)) { s = "Out"; }
+		Log("BossState : " + s, "Enemy");
+#endif
+		currentState_ = statesTable_[static_cast<size_t>(*bossContext_.bossStateRequest_)].get();
+		currentState_->Enter();
+		bossContext_.bossStateRequest_ = std::nullopt;
+	}
+
+	// 現在の状態の更新処理
+	currentState_->Update();
+
+	// 行列の更新
+	worldTransform_.UpdateTransformMatrix();
+
+	// 当たり判定の位置を更新
+	collider_->SetWorldPosition(worldTransform_.transform_.translate);
 
 	// ヒットした時に点滅する処理
 	if (isHit_) {
@@ -63,12 +101,6 @@ void BossEnemy::Update() {
 			hitTimer_ = 0.0f;
 		}
 	}
-
-	// 行列の更新
-	worldTransform_.UpdateTransformMatrix();
-
-	// 当たり判定の位置を更新
-	collider_->SetWorldPosition(worldTransform_.transform_.translate);
 }
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
@@ -80,9 +112,9 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 
 		if (player->GetPlayerBehavior() == Player::Behavior::Jump) {
 			Log("isHitBoss");
-			hp_ -= 1;
+			bossContext_.hp -= 1;
 			isHit_ = true;
-			if (hp_ <= 0) {
+			if (bossContext_.hp <= 0) {
 				isAlive_ = false;
 			}
 		}
