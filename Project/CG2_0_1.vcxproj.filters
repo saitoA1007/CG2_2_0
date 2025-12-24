@@ -280,6 +280,8 @@
     <ClCompile Include="EngineSource\Scene\SceneTransition.cpp" />
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\RtvManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\RenderTexture.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\RenderTextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -560,6 +562,8 @@
     <ClInclude Include="EngineSource\Scene\ITransitionEffect.h" />
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\RtvManager.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\RenderTexture.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\RenderTextureManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

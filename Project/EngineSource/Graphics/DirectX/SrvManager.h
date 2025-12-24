@@ -60,10 +60,6 @@ namespace GameEngine {
 
 		static ID3D12Device* device_;
 
-		//std::queue<uint32_t> availableIndices_;  // 利用出来るインデックス
-		//std::unordered_set<uint32_t> usedIndices_; // 利用しているインデックスを保持
-		//uint32_t nextNewIndex_ = 1; // 次のsrvインデックス
-
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_;
 		uint32_t descriptorSizeSRV_ = 0;
 
