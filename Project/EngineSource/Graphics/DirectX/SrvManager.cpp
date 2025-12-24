@@ -42,7 +42,7 @@ uint32_t SrvManager::AllocateSrvIndex(SrvHeapType srvHeapType) {
 		index = range.current++;
 	} else {
 		// 枯渇エラー
-		assert(0 && "Descriptor Heap Range Run Out!");
+		assert(0 && "Descriptor Heap Range Run Out");
 		return 0;
 	}
 
