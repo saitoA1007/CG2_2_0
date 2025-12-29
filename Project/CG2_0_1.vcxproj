@@ -169,7 +169,13 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application\Camera\FollowCameraController.cpp" />
+    <ClCompile Include="Application\Effect\EffectManager.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
+    <ClCompile Include="Application\Enemy\Projectile\EnemyProjectileManager.cpp" />
+    <ClCompile Include="Application\Enemy\Projectile\Object\RockBullet.cpp" />
+    <ClCompile Include="Application\Enemy\State\BattleState\ShotBall.cpp" />
+    <ClCompile Include="Application\Enemy\State\BattleState\StampFall.cpp" />
+    <ClCompile Include="Application\Enemy\State\BattleState\Wait.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateIn.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
@@ -333,9 +339,18 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
   <ItemGroup>
     <ClInclude Include="Application\Camera\FollowCameraController.h" />
     <ClInclude Include="Application\CollisionTypeID.h" />
+    <ClInclude Include="Application\Effect\EffectManager.h" />
+    <ClInclude Include="Application\Effect\IEffect.h" />
     <ClInclude Include="Application\Enemy\BossContext.h" />
     <ClInclude Include="Application\Enemy\BossEnemy.h" />
     <ClInclude Include="Application\Enemy\BossState.h" />
+    <ClInclude Include="Application\Enemy\Projectile\EnemyProjectileManager.h" />
+    <ClInclude Include="Application\Enemy\Projectile\IProjectile.h" />
+    <ClInclude Include="Application\Enemy\Projectile\Object\RockBullet.h" />
+    <ClInclude Include="Application\Enemy\State\BattleState\IBossAttack.h" />
+    <ClInclude Include="Application\Enemy\State\BattleState\ShotBall.h" />
+    <ClInclude Include="Application\Enemy\State\BattleState\StampFall.h" />
+    <ClInclude Include="Application\Enemy\State\BattleState\Wait.h" />
     <ClInclude Include="Application\Enemy\State\BossStateBattle.h" />
     <ClInclude Include="Application\Enemy\State\BossStateIn.h" />
     <ClInclude Include="Application\Enemy\State\BossStateOut.h" />

@@ -296,6 +296,12 @@
     <ClCompile Include="Application\Enemy\State\BossStateIn.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp" />
+    <ClCompile Include="Application\Enemy\Projectile\EnemyProjectileManager.cpp" />
+    <ClCompile Include="Application\Enemy\Projectile\Object\RockBullet.cpp" />
+    <ClCompile Include="Application\Effect\EffectManager.cpp" />
+    <ClCompile Include="Application\Enemy\State\BattleState\StampFall.cpp" />
+    <ClCompile Include="Application\Enemy\State\BattleState\ShotBall.cpp" />
+    <ClCompile Include="Application\Enemy\State\BattleState\Wait.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -593,6 +599,15 @@
     <ClInclude Include="Application\Enemy\State\BossStateOut.h" />
     <ClInclude Include="Application\Enemy\State\BossStateBattle.h" />
     <ClInclude Include="Application\Enemy\State\IBossState.h" />
+    <ClInclude Include="Application\Enemy\Projectile\EnemyProjectileManager.h" />
+    <ClInclude Include="Application\Enemy\Projectile\IProjectile.h" />
+    <ClInclude Include="Application\Enemy\Projectile\Object\RockBullet.h" />
+    <ClInclude Include="Application\Effect\EffectManager.h" />
+    <ClInclude Include="Application\Effect\IEffect.h" />
+    <ClInclude Include="Application\Enemy\State\BattleState\IBossAttack.h" />
+    <ClInclude Include="Application\Enemy\State\BattleState\StampFall.h" />
+    <ClInclude Include="Application\Enemy\State\BattleState\ShotBall.h" />
+    <ClInclude Include="Application\Enemy\State\BattleState\Wait.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

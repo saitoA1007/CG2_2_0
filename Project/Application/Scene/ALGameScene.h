@@ -131,4 +131,9 @@ private:
 	/// 当たり判定の更新処理
 	/// </summary>
 	void UpdateCollision();
+
+	/// <summary>
+	/// ゲームプレイの更新処理
+	/// </summary>
+	void GamePlayUpdate();
 };
