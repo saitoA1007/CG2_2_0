@@ -2,16 +2,25 @@
 #include"IBossAttack.h"
 #include "Application/Enemy/BossContext.h"
 
-class Wait : public IBossAttack {
+class RandMove : public IBossAttack {
 public:
-    Wait(BossContext& context);
+    RandMove(BossContext& context);
 
     void Initialize() override;
     void Update() override;
     void Finalize() override;
 
     bool IsFinished() const override { return isFinished_; }
-    
+
+private:
+
+    // 移動
+    enum class Phase {
+        In,   // 移動する方向を向く
+        Move, // 移動する
+        Out,  // プレイヤー側を向くようにする
+    };
+
 private:
     BossContext& bossContext_;
 
@@ -19,6 +28,9 @@ private:
 
     float timer_ = 0.0f;
     float maxTime_ = 1.0f;
+
+    // 移動する
+    Phase phase_ = Phase::In;
 
 private:
     /// <summary>

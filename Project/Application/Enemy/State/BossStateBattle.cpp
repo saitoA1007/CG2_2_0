@@ -24,7 +24,6 @@ BossStateBattle::BossStateBattle(BossContext& context) : bossContext_(context) {
 	lotteryList_ = {
 		{ BattleBehavior::StampFall,stampFallWeight_ }, // スタンプ攻撃
 	};
-
 }
 	
 void BossStateBattle::Enter() {

@@ -2,6 +2,7 @@
 #include <optional>
 #include"WorldTransform.h"
 #include"BossState.h"
+#include"Projectile/EnemyProjectileManager.h"
 
 struct BossContext {
 	// ワールド行列
@@ -15,4 +16,7 @@ struct BossContext {
 
 	// 状態の切り替えを管理
 	std::optional<BossState> bossStateRequest_ = std::nullopt;
+
+	// 遠距離攻撃を管理するクラス
+	EnemyProjectileManager* projectileManager = nullptr;
 };

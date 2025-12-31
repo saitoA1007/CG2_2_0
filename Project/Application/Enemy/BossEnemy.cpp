@@ -12,7 +12,7 @@
 #include"LogManager.h"
 using namespace GameEngine;
 
-void BossEnemy::Initialize() {
+void BossEnemy::Initialize(EnemyProjectileManager* projectile) {
 
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,10.0f} });
@@ -21,6 +21,7 @@ void BossEnemy::Initialize() {
 	bossContext_.worldTransform = &worldTransform_;
 	bossContext_.hp = kMaxHp_;
 	bossContext_.bossStateRequest_ = std::nullopt;
+	bossContext_.projectileManager = projectile;
 
 	// 状態の生成
 	statesTable_[static_cast<size_t>(BossState::In)] = std::make_unique<BossStateIn>(bossContext_);
@@ -53,11 +54,14 @@ void BossEnemy::Initialize() {
 	ApplyDebugParam();
 }
 
-void BossEnemy::Update() {
+void BossEnemy::Update(const Vector3& targetPos) {
 #ifdef _DEBUG
 	// 値を適応
 	ApplyDebugParam();
 #endif
+
+	// ターゲットの位置を更新する
+	bossContext_.targetPos = targetPos;
 
 	// 状態変更が有効であれば、切り替える
 	if (bossContext_.bossStateRequest_) {

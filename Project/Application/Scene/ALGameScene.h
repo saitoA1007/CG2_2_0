@@ -16,6 +16,7 @@
 #include"Application/Light/SceneLightingController.h"
 #include"Application/Enemy/BossEnemy.h"
 #include"Application/UI/BossHpUI.h"
+#include"Application/Enemy/Projectile/EnemyProjectileManager.h"
 
 
 class ALGameScene : public BaseScene {
@@ -72,6 +73,48 @@ private: // シーン機能
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
 
+	// カメラコントローラークラス
+	std::unique_ptr<FollowCameraController> followCameraController_;
+
+	// ライト
+	std::unique_ptr<SceneLightingController> sceneLightingController_;
+
+	//================================================
+	// プレイヤー
+	//================================================
+
+	// 自キャラのモデル
+	GameEngine::Model* playerModel_;
+	// プレイヤー
+	std::unique_ptr<Player> player_;
+
+	// プレイやーの移動パーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> playerMoveParticle_;
+
+	// ダメージを受けた時のパーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> hitEffectParticle_;
+	// ダメージを与えた時のパーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> attackEffectParticle_;
+	std::unique_ptr<GameEngine::ParticleBehavior> attackAccentEffectParticle_;
+
+	//=======================================================
+	// 敵
+	//=======================================================
+
+	// ボスキャラのモデル
+	GameEngine::Model* bossEnemyModel_;
+	// ボス敵キャラのモデル
+	std::unique_ptr<BossEnemy> bossEnemy_;
+	// ボスの移動パーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> bossEnmeyMoveParticle_;
+
+	// 敵の遠距離攻撃を管理するクラス
+	std::unique_ptr<EnemyProjectileManager> enemyProjectileManager_;
+
+	//=========================================================
+	// 地形
+	//=========================================================
+
 	// 天球
 	GameEngine::Model* skyDomeModel_;
 	GameEngine::WorldTransform skyDomeWorldTransform_;
@@ -81,35 +124,6 @@ private: // シーン機能
 	uint32_t grassGH_ = 0u;
 	GameEngine::WorldTransform terrainWorldTransform_;
 
-	// ライト
-	std::unique_ptr<SceneLightingController> sceneLightingController_;
-
-	// 自キャラのモデル
-	GameEngine::Model* playerModel_;
-	// プレイヤー
-	std::unique_ptr<Player> player_;
-
-	// 平面モデル
-	GameEngine::Model* planeModel_;
-	// プレイやーの移動パーティクル
-	std::unique_ptr<GameEngine::ParticleBehavior> playerMoveParticle_;
-
-	// ダメージを受けた時のパーティクル
-	std::unique_ptr<GameEngine::ParticleBehavior> hitEffectParticle_;
-	// ダメージを与えた時のパーティクル
-	std::unique_ptr<GameEngine::ParticleBehavior> attackEffectParticle_;
-	std::unique_ptr<GameEngine::ParticleBehavior> attackAccentEffectParticle_;
-	
-	// カメラコントローラークラス
-	std::unique_ptr<FollowCameraController> followCameraController_;
-
-	// ボスキャラのモデル
-	GameEngine::Model* bossEnemyModel_;
-	// ボス敵キャラのモデル
-	std::unique_ptr<BossEnemy> bossEnemy_;
-	// ボスの移動パーティクル
-	std::unique_ptr<GameEngine::ParticleBehavior> bossEnmeyMoveParticle_;
-
 	// 空気を演出するためのパーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> airParticle_;
 	// 空気の揺らぎを管理
@@ -117,8 +131,17 @@ private: // シーン機能
 	float maxAirTime_ = 4.0f;
 	float airSpeed_ = 2.0f;
 
+	//===============================================
+	// UI
+	//===============================================
+
 	// ボスのHpを表示
 	std::unique_ptr<BossHpUI> bossHpUI_;
+
+	/// 演出
+
+	// 平面モデル
+	GameEngine::Model* planeModel_;
 
 private:
 
