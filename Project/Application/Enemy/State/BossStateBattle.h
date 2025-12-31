@@ -50,14 +50,18 @@ public:
 private: // 調整項目
 
 	// 行動に対応する重み
-	int32_t stampFallWeight_;
-	int32_t shotBallWeight_;
-	int32_t rotateAttackMoveWeight_;
-	int32_t rushAttackWeight_;
-	int32_t randBallAttackWeight_;
-	int32_t waitWeight_;
+	int32_t stampFallWeight_ = 1;
+	int32_t shotBallWeight_ = 1;
+	int32_t rotateAttackMoveWeight_ = 1;
+	int32_t rushAttackWeight_ = 1;
+	int32_t randBallAttackWeight_ = 1;
+	int32_t waitWeight_ = 1;
 
 private:
+
+	// 値の保存グループ名
+	const std::string groupName_ = "Boss_Controller";
+
 	// ボスの共通データを取得
 	BossContext& bossContext_;
 

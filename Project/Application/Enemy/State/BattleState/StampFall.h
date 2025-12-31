@@ -28,7 +28,22 @@ private:
     // 行動
     Phase phase_ = Phase::Rise;
 
+    // 値の保存グループ名
+    const std::string groupName_ = "Boss_StampFall";
+
+    // 最初の移動する位置
+    float startRisePosY_ = 0.0f;
+    // 移動する最初の位置
+    Vector3 startMovePos_ = {};
+    // 移動する最後の位置
+    Vector3 endMovePos_ = {};
+
     float timer_ = 0.0f;
+
+private: // 調整項目
+
+    // 最大の高さ
+    float maxHeightPosY_ = 15.0f;
 
     // 移動時間
     float riseTime_ = 1.0f;
