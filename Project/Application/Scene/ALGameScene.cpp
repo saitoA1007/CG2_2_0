@@ -30,7 +30,6 @@ void ALGameScene::Initialize(SceneContext* context) {
 	collisionManager_ = std::make_unique<CollisionManager>();
 	collisionManager_->ClearList();
 
-
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
@@ -40,6 +39,18 @@ void ALGameScene::Initialize(SceneContext* context) {
 	// 入力コマンドを設定する
 	InputRegisterCommand();
 
+	// カメラをコントロールするクラスを初期化
+	followCameraController_ = std::make_unique<FollowCameraController>();
+	followCameraController_->Initialize();
+
+	// ライトの生成
+	sceneLightingController_ = std::make_unique<SceneLightingController>();
+	sceneLightingController_->Initialize(context_->graphicsDevice->GetDevice());
+
+	//====================================================
+	// 地形の初期化
+	//====================================================
+#pragma region Terrain
 	// 天球モデルを生成
 	skyDomeModel_ = context_->modelManager->GetNameByModel("SkyDome");
 	skyDomeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
@@ -49,14 +60,16 @@ void ALGameScene::Initialize(SceneContext* context) {
 	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
 	terrainWorldTransform_.Initialize({ {30.0f,30.0f,30.0f},{0.0f,0.0f,0.0f},{0.0f,-0.2f,0.0f} });
 
-	// カメラをコントロールするクラスを初期化
-	followCameraController_ = std::make_unique<FollowCameraController>();
-	followCameraController_->Initialize();
+	// 空気を演出するためのパーティクル
+	airParticle_ = std::make_unique<ParticleBehavior>();
+	airParticle_->Initialize("AirParticle", 128);
+	airParticle_->Emit({ 0.0f,0.0f,0.0f });
+#pragma endregion
 
-	// ライトの生成
-	sceneLightingController_ = std::make_unique<SceneLightingController>();
-	sceneLightingController_->Initialize(context_->graphicsDevice->GetDevice());
-
+	//================================================================
+	// プレイヤーの初期化
+	//================================================================
+#pragma region Player
 	// プレイヤーモデルを生成
 	playerModel_ = context_->modelManager->GetNameByModel("Triangular");
 	playerModel_->SetDefaultIsEnableLight(true);
@@ -81,28 +94,40 @@ void ALGameScene::Initialize(SceneContext* context) {
 	// 攻撃演出のアクセント
 	attackAccentEffectParticle_ = std::make_unique<ParticleBehavior>();
 	attackAccentEffectParticle_->Initialize("PlayerAttackAccentEffect", 32);
+#pragma endregion
+
+	//========================================================
+	// 敵の初期化
+	//========================================================
+#pragma region Enemy
 
 	// ボスモデルを生成
 	bossEnemyModel_ = context_->modelManager->GetNameByModel("Cube");
 	bossEnemyModel_->SetDefaultIsEnableLight(true);
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
-	// ボス敵クラスを初期化
-	bossEnemy_ = std::make_unique<BossEnemy>();
-	bossEnemy_->Initialize();
+
+	// 敵の遠距離攻撃管理クラスを初期化
+	enemyProjectileManager_ = std::make_unique<EnemyProjectileManager>();
+	enemyProjectileManager_->Initialize();
 
 	// ボスの移動パーティクル
 	bossEnmeyMoveParticle_ = std::make_unique<ParticleBehavior>();
 	bossEnmeyMoveParticle_->Initialize("BossSmokeParticle", 32);
 	bossEnmeyMoveParticle_->Emit({ 0.0f,0.0f,0.0f });
 
-	// 空気を演出するためのパーティクル
-	airParticle_ = std::make_unique<ParticleBehavior>();
-	airParticle_->Initialize("AirParticle", 128);
-	airParticle_->Emit({ 0.0f,0.0f,0.0f });
+	// ボス敵クラスを初期化
+	bossEnemy_ = std::make_unique<BossEnemy>();
+	bossEnemy_->Initialize(enemyProjectileManager_.get());
+#pragma endregion
 
+	//==================================================
+	// UIの初期化
+	//==================================================
+#pragma region UI
 	// ボスのhpUIを初期化
 	bossHpUI_ = std::make_unique<BossHpUI>();
 	bossHpUI_->Initialize(bossEnemy_->GetMaxHp());
+#pragma endregion
 }
 
 void ALGameScene::Update() {
@@ -216,40 +241,39 @@ void ALGameScene::GamePlayUpdate() {
 	// ライトの更新処理
 	sceneLightingController_->Update();
 
+	//============================================
+	// プレイヤーの更新処理
+	//============================================
+#pragma region PlayerUpdate
 	// プレイヤーの更新処理
 	player_->SetRotateMatrix(followCameraController_->GetRotateMatrix());
 	player_->Update();
 	// パーティクルの更新処理
 	playerMoveParticle_->SetEmitterPos(player_->GetPlayerPos());
 	playerMoveParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+#pragma endregion
 
-	// カメラコントロールの更新処理
-	followCameraController_->Update(context_->inputCommand);
-	// プレイヤーの要素をカメラに送る
-	followCameraController_->SetFollowPos(player_->GetPlayerPos(), player_->GetVelocity());
-
+	//===========================================
+	// 敵の更新処理
+	//===========================================
+#pragma region EnemyUpdate
 	// ボス敵の更新処理
-	bossEnemy_->Update();
+	bossEnemy_->Update(player_->GetPlayerPos());
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,bossEnemy_->GetAlpha() });
 	// ボスの移動パーティクル
 	bossEnmeyMoveParticle_->SetEmitterPos(bossEnemy_->GetPosition());
 	bossEnmeyMoveParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+#pragma endregion
 
-	// カメラの更新処理
-	mainCamera_->SetCamera(followCameraController_->GetCamera());
-
-	airTimer_ += FpsCounter::deltaTime / maxAirTime_;
-	if (airTimer_ >= 1.0f) {
-		airParticle_->SetFieldAcceleration(Vector3(airSpeed_, -1.0f, 0.0f));
-		airSpeed_ *= -1.0f;
-		airTimer_ = 0.0f;
-	}
-	// 空気を演出するためのパーティクル
-	airParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
-
+	//======================================================
 	// 当たり判定の更新処理
+	//======================================================
 	UpdateCollision();
-
+	
+	//===================================================
+	// ヒット演出の更新処理
+	//===================================================
+#pragma region HitEffectUpdate
 	// ヒットした時のエフェクト
 	if (player_->IsHit()) {
 		hitEffectParticle_->Emit(player_->GetPlayerPos());
@@ -264,14 +288,42 @@ void ALGameScene::GamePlayUpdate() {
 	// 攻撃演出の更新処理
 	attackEffectParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 	attackAccentEffectParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+#pragma endregion
 
+	//=====================================================================
+	// 地形関係の更新処理
+	//=====================================================================
+#pragma region TerrainUpdate
+	airTimer_ += FpsCounter::deltaTime / maxAirTime_;
+	if (airTimer_ >= 1.0f) {
+		airParticle_->SetFieldAcceleration(Vector3(airSpeed_, -1.0f, 0.0f));
+		airSpeed_ *= -1.0f;
+		airTimer_ = 0.0f;
+	}
+	// 空気を演出するためのパーティクル
+	airParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+#pragma endregion
+
+	//==================================================================
+	// カメラの更新処理
+	//==================================================================
+#pragma region CameraUpdate
+	// カメラコントロールの更新処理
+	followCameraController_->Update(context_->inputCommand);
+	// プレイヤーの要素をカメラに送る
+	followCameraController_->SetFollowPos(player_->GetPlayerPos(), player_->GetVelocity());
+
+	// カメラの更新処理
+	mainCamera_->SetCamera(followCameraController_->GetCamera());
+#pragma endregion
+
+	//============================================================
 	// UIの更新処理
+	//============================================================
 #pragma region UIUpdate
-
 	// ボスのHpUIの更新処理
 	bossHpUI_->SetCurrentHp(bossEnemy_->GetCurrentHp());
 	bossHpUI_->Update();
-
 #pragma endregion
 }
 

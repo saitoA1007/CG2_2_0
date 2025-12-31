@@ -14,12 +14,12 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Initialize();
+	void Initialize(EnemyProjectileManager* projectile);
 
 	/// <summary>
 	/// 更新処理
 	/// </summary>
-	void Update();
+	void Update(const Vector3& targetPos);
 
 public:
 

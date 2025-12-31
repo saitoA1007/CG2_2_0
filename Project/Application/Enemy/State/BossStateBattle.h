@@ -17,6 +17,7 @@ public:
 		RushAttack, // 突進
 		RandBallAttack, // ランダムにボールを飛ばす攻撃
 		Wait, // 待機
+		RandMove, // ランダムに移動する
 
 		MaxCount // 状態の数
 	};
