@@ -1,5 +1,6 @@
 #include"BossStateBattle.h"
 #include"RandomGenerator.h"
+#include"GameParamEditor.h"
 
 // 各攻撃行動
 #include"BattleState/StampFall.h"
@@ -23,7 +24,13 @@ BossStateBattle::BossStateBattle(BossContext& context) : bossContext_(context) {
 	lotteryList_.resize(static_cast<size_t>(BattleBehavior::MaxCount));
 	lotteryList_ = {
 		{ BattleBehavior::StampFall,stampFallWeight_ }, // スタンプ攻撃
+		{ BattleBehavior::Wait,waitWeight_ }, // 待機
 	};
+
+#ifdef USE_IMGUI
+	RegisterBebugParam();
+#endif
+	ApplyDebugParam();
 }
 	
 void BossStateBattle::Enter() {
@@ -33,6 +40,10 @@ void BossStateBattle::Enter() {
 }
 	
 void BossStateBattle::Update() {
+#ifdef USE_IMGUI
+	ApplyDebugParam();
+#endif
+
 	// 切り替え処理
 	if (behaviorsTable_[static_cast<size_t>(currentBehavior_)]->IsFinished()) {
 		// 終了処理をおこなう
@@ -75,9 +86,21 @@ BossStateBattle::BattleBehavior BossStateBattle::SelectWeightedAttack() {
 }
 
 void BossStateBattle::RegisterBebugParam() {
-
+	// 値の登録
+	GameParamEditor::GetInstance()->AddItem(groupName_, "StampFallWeight", stampFallWeight_);
+	GameParamEditor::GetInstance()->AddItem(groupName_, "ShotBallWeight", shotBallWeight_);
+	GameParamEditor::GetInstance()->AddItem(groupName_, "RotateAttackMoveWeight", rotateAttackMoveWeight_);
+	GameParamEditor::GetInstance()->AddItem(groupName_, "RushAttackWeight", rushAttackWeight_);
+	GameParamEditor::GetInstance()->AddItem(groupName_, "RandBallAttackWeight", randBallAttackWeight_);
+	GameParamEditor::GetInstance()->AddItem(groupName_, "WaitWeight", waitWeight_);
 }
 
 void BossStateBattle::ApplyDebugParam() {
-
+	// 値の適応
+	stampFallWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "StampFallWeight"));
+	shotBallWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "ShotBallWeight"));
+	rotateAttackMoveWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "RotateAttackMoveWeight"));
+	rushAttackWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "RushAttackWeight"));
+	randBallAttackWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "RandBallAttackWeight"));
+	waitWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "WaitWeight"));
 }

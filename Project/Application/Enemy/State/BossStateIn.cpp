@@ -12,6 +12,8 @@ void BossStateIn::Enter() {
 	
 void BossStateIn::Update() {
 
+	bossContext_.bossStateRequest_ = BossState::Battle;
+
 }
 
 void BossStateIn::Exit() {

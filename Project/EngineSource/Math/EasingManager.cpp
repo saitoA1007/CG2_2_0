@@ -60,3 +60,21 @@ Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
 	float scale1 = std::sinf(t * theta) / sinTheta;
 	return scale0 * q0 + scale1 * q1Copy;
 }
+
+float EaseOutBounce(float t) {
+	const float n1 = 7.5625f;
+	const float d1 = 2.75f;
+
+	if (t < 1.0f / d1) {
+		return n1 * t * t;
+	} else if (t < 2.0f / d1) {
+		t -= 1.5f / d1;
+		return n1 * t * t + 0.75f;
+	} else if (t < 2.5f / d1) {
+		t -= 2.25f / d1;
+		return n1 * t * t + 0.9375f;
+	} else {
+		t -= 2.625f / d1;
+		return n1 * t * t + 0.984375f;
+	}
+}

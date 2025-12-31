@@ -26,3 +26,6 @@ float EaseInOut(const float& t);
 
 // 球面線形補間
 Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t);
+
+// イージングアウトバウンド
+float EaseOutBounce(float t);
