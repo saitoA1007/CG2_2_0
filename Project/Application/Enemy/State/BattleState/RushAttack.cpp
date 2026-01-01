@@ -55,6 +55,7 @@ void RushAttack::Update() {
 		break;
 	}
 
+
 	case RushAttack::Phase::Move: {
 		timer_ += FpsCounter::deltaTime / moveTime_;
 
@@ -71,6 +72,7 @@ void RushAttack::Update() {
 		}
 		break;
 	}
+
 
 	case RushAttack::Phase::Out:
 		timer_ += FpsCounter::deltaTime / OutTime_;

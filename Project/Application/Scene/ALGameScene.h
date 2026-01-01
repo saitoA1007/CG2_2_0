@@ -108,6 +108,9 @@ private: // シーン機能
 	// ボスの移動パーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> bossEnmeyMoveParticle_;
 
+	// 岩弾のモデル
+	GameEngine::Model* rockBulletModel_;
+
 	// 敵の遠距離攻撃を管理するクラス
 	std::unique_ptr<EnemyProjectileManager> enemyProjectileManager_;
 

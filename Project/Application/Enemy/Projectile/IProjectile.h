@@ -22,9 +22,6 @@ public:
 	// 生存フラグ
 	virtual bool IsAlive() const = 0;
 
-	// 削除
-	virtual void Destroy() = 0;
-
 	// ワールド行列を取得
 	virtual GameEngine::WorldTransform& GetWorldTransform() = 0;
 
