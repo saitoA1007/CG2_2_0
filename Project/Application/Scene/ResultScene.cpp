@@ -34,6 +34,9 @@ void ResultScene::Initialize(SceneContext* context) {
 	// スペースボタン
 	spaceSprite_ = Sprite::Create({ 640.0f,500.0f }, { 256.0f,64.0f }, { 0.5f,0.5f });
 	spaceGH_ = context_->textureManager->GetHandleByName("spaceText.png");
+
+	// クリア時間UI
+	clearTimeUI_ = std::make_unique<ClearTimeUI>(context_->textureManager);
 }
 
 void ResultScene::Update() {
@@ -79,4 +82,11 @@ void ResultScene::Draw(const bool& isDebugView) {
 
 	// スペース画像
 	SpriteRenderer::Draw(spaceSprite_.get(), spaceGH_);
+
+	// クリアUI
+	SpriteRenderer::Draw(clearTimeUI_->GetnumDottoSprite(), clearTimeUI_->GetDottoTexture());
+	// 時間を表示
+	for (auto& num : clearTimeUI_->GetNumberSprite()) {
+		SpriteRenderer::Draw(num.numSprite_.get(), num.number);
+	}
 }

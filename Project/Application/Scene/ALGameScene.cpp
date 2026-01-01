@@ -131,6 +131,11 @@ void ALGameScene::Initialize(SceneContext* context) {
 	bossHpUI_ = std::make_unique<BossHpUI>();
 	bossHpUI_->Initialize(bossEnemy_->GetMaxHp());
 #pragma endregion
+
+	// クリアまでの時間を計測する
+	clearTimeTracker_ = std::make_unique<ClearTimeTracker>();
+	// 時間の計測を開始
+	clearTimeTracker_->StartMeasureTimes();
 }
 
 void ALGameScene::Update() {
@@ -239,6 +244,9 @@ void ALGameScene::GamePlayUpdate() {
 	// ボスの体力がなくなったらシーンを切り替える
 	if (!bossEnemy_->GetIsAlive()) {
 		isFinished_ = true;
+
+		// 時間の計測を終了
+		clearTimeTracker_->EndMeasureTimes();
 	}
 
 	// 当たり判定のリストを削除

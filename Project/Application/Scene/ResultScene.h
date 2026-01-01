@@ -8,6 +8,8 @@
 #include"Sprite.h"
 #include"WorldTransform.h"
 
+#include"Application/UI/ClearTimeUI.h"
+
 class ResultScene : public BaseScene {
 public:
 
@@ -65,4 +67,7 @@ private: // シーン機能
 	// スペース画像
 	std::unique_ptr<GameEngine::Sprite> spaceSprite_;
 	uint32_t spaceGH_ = 0;
+
+	// クリア時間を表示
+	std::unique_ptr<ClearTimeUI> clearTimeUI_;
 };

@@ -17,6 +17,7 @@
 #include"Application/Enemy/BossEnemy.h"
 #include"Application/UI/BossHpUI.h"
 #include"Application/Enemy/Projectile/EnemyProjectileManager.h"
+#include"Application/ClearTimeTracker.h"
 
 
 class ALGameScene : public BaseScene {
@@ -145,6 +146,10 @@ private: // シーン機能
 
 	// 平面モデル
 	GameEngine::Model* planeModel_;
+
+	
+	// クリアまでの時間を計測
+	std::unique_ptr<ClearTimeTracker> clearTimeTracker_;
 
 private:
 
