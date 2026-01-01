@@ -305,6 +305,8 @@
     <ClCompile Include="Application\Enemy\State\BattleState\RandMove.cpp" />
     <ClCompile Include="Application\Enemy\State\BattleState\RushAttack.cpp" />
     <ClCompile Include="Application\Enemy\State\BattleState\RotateAttack.cpp" />
+    <ClCompile Include="Application\ClearTimeTracker.cpp" />
+    <ClCompile Include="Application\UI\ClearTimeUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -614,6 +616,9 @@
     <ClInclude Include="Application\Enemy\State\BattleState\RandMove.h" />
     <ClInclude Include="Application\Enemy\State\BattleState\RushAttack.h" />
     <ClInclude Include="Application\Enemy\State\BattleState\RotateAttack.h" />
+    <ClInclude Include="Application\ClearTime.h" />
+    <ClInclude Include="Application\ClearTimeTracker.h" />
+    <ClInclude Include="Application\UI\ClearTimeUI.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

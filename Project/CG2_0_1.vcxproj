@@ -169,6 +169,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application\Camera\FollowCameraController.cpp" />
+    <ClCompile Include="Application\ClearTimeTracker.cpp" />
     <ClCompile Include="Application\Effect\EffectManager.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
     <ClCompile Include="Application\Enemy\Projectile\EnemyProjectileManager.cpp" />
@@ -187,6 +188,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="Application\Scene\ResultScene.cpp" />
     <ClCompile Include="Application\UI\BossHpUI.cpp" />
+    <ClCompile Include="Application\UI\ClearTimeUI.cpp" />
     <ClCompile Include="Application\Weapon\Sword.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
@@ -341,6 +343,8 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Camera\FollowCameraController.h" />
+    <ClInclude Include="Application\ClearTime.h" />
+    <ClInclude Include="Application\ClearTimeTracker.h" />
     <ClInclude Include="Application\CollisionTypeID.h" />
     <ClInclude Include="Application\Effect\EffectManager.h" />
     <ClInclude Include="Application\Effect\IEffect.h" />
@@ -366,6 +370,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Scene\ResultScene.h" />
     <ClInclude Include="Application\UI\BossHpUI.h" />
+    <ClInclude Include="Application\UI\ClearTimeUI.h" />
     <ClInclude Include="Application\Weapon\IWeapon.h" />
     <ClInclude Include="Application\Weapon\Sword.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
