@@ -19,6 +19,10 @@ void StampFall::Initialize() {
 
 	// 最初の位置を取得する
 	startRisePosY_ = bossContext_.worldTransform->transform_.translate.y;
+
+#ifdef USE_IMGUI
+	ApplyDebugParam();
+#endif
 }
 
 void StampFall::Update() {

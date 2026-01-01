@@ -5,6 +5,7 @@
 // 各攻撃行動
 #include"BattleState/StampFall.h"
 #include"BattleState/ShotBall.h"
+#include"BattleState/RushAttack.h"
 #include"BattleState/Wait.h"
 
 using namespace GameEngine;
@@ -14,6 +15,7 @@ BossStateBattle::BossStateBattle(BossContext& context) : bossContext_(context) {
 	// 各攻撃行動を登録する
 	behaviorsTable_[static_cast<size_t>(BattleBehavior::StampFall)] = std::make_unique<StampFall>(bossContext_);
 	behaviorsTable_[static_cast<size_t>(BattleBehavior::ShotBall)] = std::make_unique<ShotBall>(bossContext_);
+	behaviorsTable_[static_cast<size_t>(BattleBehavior::RushAttack)] = std::make_unique<RushAttack>(bossContext_);
 	behaviorsTable_[static_cast<size_t>(BattleBehavior::Wait)] = std::make_unique<Wait>(bossContext_);
 
 	// 初期シーンを設定する
@@ -24,6 +26,7 @@ BossStateBattle::BossStateBattle(BossContext& context) : bossContext_(context) {
 	lotteryList_.resize(static_cast<size_t>(BattleBehavior::MaxCount));
 	lotteryList_ = {
 		{ BattleBehavior::StampFall,stampFallWeight_ }, // スタンプ攻撃
+		{ BattleBehavior::RushAttack,rushAttackWeight_ }, // 突進攻撃
 		{ BattleBehavior::Wait,waitWeight_ }, // 待機
 	};
 
@@ -103,4 +106,11 @@ void BossStateBattle::ApplyDebugParam() {
 	rushAttackWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "RushAttackWeight"));
 	randBallAttackWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "RandBallAttackWeight"));
 	waitWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "WaitWeight"));
+
+	// 確率を変更
+	lotteryList_ = {
+		{ BattleBehavior::StampFall,stampFallWeight_ }, // スタンプ攻撃
+		{ BattleBehavior::RushAttack,rushAttackWeight_ }, // 突進攻撃
+		{ BattleBehavior::Wait,waitWeight_ }, // 待機
+	};
 }

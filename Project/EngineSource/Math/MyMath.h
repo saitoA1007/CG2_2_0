@@ -36,6 +36,9 @@ Quaternion MakeEulerQuaternion(float pitch, float yaw, float roll);
 // クウォータニオンによる回転行列を作成
 Matrix4x4 MakeWorldMatrixFromEulerRotation(const Vector3 position, const Vector3& rotateEuler, const Vector3& scale);
 
+// ベクトルを回転させる
+Vector3 MakeDirVector(Vector3 v, const Vector3& rot);
+
 // 減算
 Vector3 Subtract(const Vector3& v1, const Vector3& v2);
 
@@ -55,6 +58,8 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
 // 最短角度補間
 float LerpShortAngle(float a, float b, float t);
+// 最短角度を求める
+float GetShortAngleY(float diffY);
 
 // ワールドスクリーン座標変換(ワールド->スクリーン変換)
 Vector3 Project(const Vector3 & worldPosition, const Vector2 & viewport, const float& viewportWidth, const float& viewportHeight, const Matrix4x4 & viewProjection);
