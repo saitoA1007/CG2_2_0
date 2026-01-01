@@ -2,9 +2,9 @@
 #include"IBossAttack.h"
 #include "Application/Enemy/BossContext.h"
 
-class RushAttack : public IBossAttack {
+class RotateAttack : public IBossAttack {
 public:
-    RushAttack(BossContext& context);
+    RotateAttack(BossContext& context);
 
     void Initialize() override;
     void Update() override;
@@ -13,12 +13,11 @@ public:
     bool IsFinished() const override { return isFinished_; }
 
 private:
-
     // 移動
     enum class Phase {
-        In,   // 移動する方向を向く
-        Move, // 移動する
-        Out,  // 余韻
+        In,   // 回転するまでの動作
+        Move, // 移動
+        Out,  // 回転が弱まる動作
     };
 
 private:
@@ -26,29 +25,23 @@ private:
 
     bool isFinished_ = false;
 
-    // 値の保存グループ名
-    const std::string groupName_ = "Boss_RushAttack";
-
     Phase phase_ = Phase::In;
+
+    // 値の保存グループ名
+    const std::string groupName_ = "Boss_RotateAttack";
 
     float timer_ = 0.0f;
 
-    // 移動する方向
-    Vector3 dir_ = {};
+    float rotSpeed_ = 0.0f;
 
 private: // 調整項目
 
-    // 移動時間
-    float InTime_ = 1.0f;
+    float inTime_ = 1.0f;
     float moveTime_ = 1.0f;
-    float OutTime_ = 1.0f;
-
-    // 回転速度
-    float rotateSpeed_ = 5.0f;
-
-    // 突進速度
-    float startRushSpeed_ = 50.0f;
-    float endRushSpeed_ = 0.0f;
+    float outTime_ = 1.0f;
+    
+    // 最大の回転速度
+    float maxRotSpeed_ = 20.0f;
 
 private:
     /// <summary>
