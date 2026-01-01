@@ -303,6 +303,7 @@
     <ClCompile Include="Application\Enemy\State\BattleState\ShotBall.cpp" />
     <ClCompile Include="Application\Enemy\State\BattleState\Wait.cpp" />
     <ClCompile Include="Application\Enemy\State\BattleState\RandMove.cpp" />
+    <ClCompile Include="Application\Enemy\State\BattleState\RushAttack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -610,6 +611,7 @@
     <ClInclude Include="Application\Enemy\State\BattleState\ShotBall.h" />
     <ClInclude Include="Application\Enemy\State\BattleState\Wait.h" />
     <ClInclude Include="Application\Enemy\State\BattleState\RandMove.h" />
+    <ClInclude Include="Application\Enemy\State\BattleState\RushAttack.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

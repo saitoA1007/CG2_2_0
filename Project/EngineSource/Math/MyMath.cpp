@@ -128,6 +128,11 @@ Matrix4x4 MakeWorldMatrixFromEulerRotation(const Vector3 position, const Vector3
 	return worldMatrix;
 }
 
+Vector3 MakeDirVector(Vector3 v, const Vector3& rot) {
+	Quaternion q = MakeEulerQuaternion(rot.x, rot.y, rot.z);
+	return RotateVector(v, q);
+}
+
 Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
 	return Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
 }
@@ -189,6 +194,16 @@ float LerpShortAngle(float a, float b, float t) {
 	}
 
 	return a + diff * t;
+}
+
+float GetShortAngleY(float diffY) {
+	while (diffY > std::numbers::pi_v<float>) {
+		diffY -= std::numbers::pi_v<float> * 2.0f;
+	}
+	while (diffY < -std::numbers::pi_v<float>) {
+		diffY += std::numbers::pi_v<float> * 2.0f;
+	}
+	return diffY;
 }
 
 Vector3 Project(const Vector3& worldPosition, const Vector2& viewport, const float& viewportWidth, const float& viewportHeight, const Matrix4x4& viewProjection) {
