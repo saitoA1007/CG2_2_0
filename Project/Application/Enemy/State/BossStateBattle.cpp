@@ -26,6 +26,7 @@ BossStateBattle::BossStateBattle(BossContext& context) : bossContext_(context) {
 	lotteryList_.resize(static_cast<size_t>(BattleBehavior::MaxCount));
 	lotteryList_ = {
 		{ BattleBehavior::StampFall,stampFallWeight_ }, // スタンプ攻撃
+		{ BattleBehavior::ShotBall,shotBallWeight_ }, // 岩攻撃
 		{ BattleBehavior::RushAttack,rushAttackWeight_ }, // 突進攻撃
 		{ BattleBehavior::Wait,waitWeight_ }, // 待機
 	};
@@ -110,6 +111,7 @@ void BossStateBattle::ApplyDebugParam() {
 	// 確率を変更
 	lotteryList_ = {
 		{ BattleBehavior::StampFall,stampFallWeight_ }, // スタンプ攻撃
+		{ BattleBehavior::ShotBall,shotBallWeight_ }, // 岩攻撃
 		{ BattleBehavior::RushAttack,rushAttackWeight_ }, // 突進攻撃
 		{ BattleBehavior::Wait,waitWeight_ }, // 待機
 	};

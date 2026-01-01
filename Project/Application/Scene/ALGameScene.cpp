@@ -106,6 +106,9 @@ void ALGameScene::Initialize(SceneContext* context) {
 	bossEnemyModel_->SetDefaultIsEnableLight(true);
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
 
+	// 敵の弾モデルを生成
+	rockBulletModel_ = context_->modelManager->GetNameByModel("Cube");
+
 	// 敵の遠距離攻撃管理クラスを初期化
 	enemyProjectileManager_ = std::make_unique<EnemyProjectileManager>();
 	enemyProjectileManager_->Initialize();
@@ -168,6 +171,11 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// ボス敵を描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
+
+	// 敵の岩の弾を描画
+	for (auto rockBullet : enemyProjectileManager_->GetProjectilesByType(ProjectileType::Rock)) {
+		ModelRenderer::Draw(rockBulletModel_, rockBullet->GetWorldTransform());
+	}
 
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingScreen);
@@ -263,6 +271,9 @@ void ALGameScene::GamePlayUpdate() {
 	// ボスの移動パーティクル
 	bossEnmeyMoveParticle_->SetEmitterPos(bossEnemy_->GetPosition());
 	bossEnmeyMoveParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+
+	// 敵の遠距離攻撃の更新処理
+	enemyProjectileManager_->Update();
 #pragma endregion
 
 	//======================================================
