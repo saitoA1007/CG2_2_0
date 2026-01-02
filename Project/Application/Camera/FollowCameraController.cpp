@@ -1,6 +1,7 @@
 #include"FollowCameraController.h"
 #include"MyMath.h"
 #include"EasingManager.h"
+#include<numbers>
 #include"FPSCounter.h"
 using namespace GameEngine;
 
@@ -15,22 +16,46 @@ void FollowCameraController::Update(GameEngine::InputCommand* inputCommand) {
 	// 追従する位置を求める
 	FollowPosition();
 
-	// カメラ操作
-	if (inputCommand->IsCommandAcitve("CameraMoveLeft")) {
-		rotateMove_.x += 0.04f;
+	if (isLockOn_) {
+		// プレイヤーからターゲットへの方向ベクトル
+		Vector3 toTarget = targetPos_ - basePos_;
+		float distance = Length(toTarget);
+
+		if (distance > 0.0f) {
+			toTarget *= -1.0f;
+			float targetRotateX = std::atan2f(toTarget.x, toTarget.z);
+
+			// 範囲に収める
+			float diffX = targetRotateX - rotateMove_.x;
+			while (diffX >= std::numbers::pi_v<float>) { diffX -= std::numbers::pi_v<float> *2.0f; }
+			while (diffX < -std::numbers::pi_v<float>) { diffX += std::numbers::pi_v<float> *2.0f; }
+
+			// 現在の角度から目標角度へ補間
+			rotateMove_.x += diffX * kLockOnRotateSpeed;
+		}
+	} else {
+		// カメラ操作
+		if (inputCommand->IsCommandAcitve("CameraMoveLeft")) {
+			rotateMove_.x += 0.04f;
+		}
+
+		if (inputCommand->IsCommandAcitve("CameraMoveRight")) {
+			rotateMove_.x -= 0.04f;
+		}
 	}
 
-	if (inputCommand->IsCommandAcitve("CameraMoveRight")) {
-		rotateMove_.x -= 0.04f;
+	// カメラのロックオンを切り替える
+	if (inputCommand->IsCommandAcitve("CameraLockOn")) {
+		isLockOn_ = !isLockOn_;
 	}
 
 	// 球面座標系で移動
-	position_.x = target.x + kDistance_ * std::sinf(rotateMove_.y) * std::sinf(rotateMove_.x);
-	position_.y = target.y + kDistance_ * std::cosf(rotateMove_.y);
-	position_.z = target.z + kDistance_ * std::sinf(rotateMove_.y) * std::cosf(rotateMove_.x);
+	position_.x = basePos_.x + kDistance_ * std::sinf(rotateMove_.y) * std::sinf(rotateMove_.x);
+	position_.y = basePos_.y + kDistance_ * std::cosf(rotateMove_.y);
+	position_.z = basePos_.z + kDistance_ * std::sinf(rotateMove_.y) * std::cosf(rotateMove_.x);
 
 	// 回転行列に変換
-	rotateMatrix_ = LookAt(position_, target, { 0.0f,1.0f,0.0f });
+	rotateMatrix_ = LookAt(position_, basePos_, { 0.0f,1.0f,0.0f });
 
 	// ワールド行列
 	Matrix4x4 worldMatrix_ = rotateMatrix_;
@@ -46,10 +71,10 @@ void FollowCameraController::Update(GameEngine::InputCommand* inputCommand) {
 
 void FollowCameraController::FollowPosition() {
 	// 追従対象とオフセットと追従対象の速度からカメラの目標座標を計算
-	TargetCoordinate_ = targetPos_ + targetVelocity_ * (kVelocityBias * FpsCounter::deltaTime);
+	TargetCoordinate_ = playerPos_ + playerVelocity_ * (kVelocityBias * FpsCounter::deltaTime);
 
 	// 座標補間によりゆったり追従
-	target = Lerp(target, TargetCoordinate_, kInterpolationRate);
+	basePos_ = Lerp(basePos_, TargetCoordinate_, kInterpolationRate);
 }
 
 Matrix4x4 FollowCameraController::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {

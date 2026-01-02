@@ -58,10 +58,15 @@ public:
 	Vector3 GetVelocity() const { return velocity_; }
 
 	/// <summary>
-	/// カメラ方向へ向けるための行列を設定
+	/// カメラ情報を取得
 	/// </summary>
-	/// <param name="vpMatrix"></param>
-	void SetRotateMatrix(const Matrix4x4& rotateMatrix) { rotateMatrix_ = rotateMatrix; }
+	/// <param name="rotateMatrix"></param>
+	/// <param name="isCameraLockOn"></param>
+	void SetCameraInfo(const Matrix4x4& rotateMatrix, const bool& isCameraLockOn,const Vector3& target) {
+		rotateMatrix_ = rotateMatrix;
+		isCameraLockOn_ = isCameraLockOn;
+		targetPos_ = target;
+	}
 
 	/// <summary>
 	/// 当たり判定を取得
@@ -99,7 +104,7 @@ private:
 	float kMoveSpeed_ = 0.2f;
 
 	// 旋回時間
-	float kTurnTime_ = 1.0f;
+	float kTurnTime_ = 0.2f;
 
 	// ジャンプの高さ
 	float kJumpHeight_ = 4.0f;
@@ -162,6 +167,8 @@ private:
 	float targetRotateY_ = 0.0f;
 	// ベクトル変換用の行列
 	Matrix4x4 rotateMatrix_;
+	bool isCameraLockOn_ = false;
+	Vector3 targetPos_ = {};
 
 	// ジャンプで使用する変数 ===========================
 

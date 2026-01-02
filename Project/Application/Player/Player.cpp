@@ -181,6 +181,24 @@ void Player::Move() {
 			targetRotateY_ = tmpRotateY;
 			turnTimer_ = 0.0f;
 		}
+	} else {
+
+		// カメラのロックオンが有効かつ操作がされていなければ
+		if (isCameraLockOn_) {
+			// プレイヤーからターゲットへの方向ベクトルを計算
+			Vector3 toTarget = targetPos_ - worldTransform_.GetWorldPosition();
+			toTarget.y = 0.0f;
+
+			if (Length(toTarget) > 0.0f) {
+				float lockOnRotateY = std::atan2f(toTarget.x, toTarget.z);
+
+				// 角度が変化していれば更新
+				if (lockOnRotateY != targetRotateY_) {
+					targetRotateY_ = lockOnRotateY;
+					turnTimer_ = 0.0f;
+				}
+			}
+		}
 	}
 
 	// 旋回処理
