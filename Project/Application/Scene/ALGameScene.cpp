@@ -238,6 +238,8 @@ void ALGameScene::InputRegisterCommand() {
 	// カメラ操作のコマンドを登録する
 	context_->inputCommand->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
 	context_->inputCommand->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
+
+	context_->inputCommand->RegisterCommand("CameraLockOn", { {InputState::KeyTrigger, DIK_G},{InputState::PadTrigger, XINPUT_GAMEPAD_Y} });
 }
 
 void ALGameScene::GamePlayUpdate() {
@@ -262,7 +264,7 @@ void ALGameScene::GamePlayUpdate() {
 	//============================================
 #pragma region PlayerUpdate
 	// プレイヤーの更新処理
-	player_->SetRotateMatrix(followCameraController_->GetRotateMatrix());
+	player_->SetCameraInfo(followCameraController_->GetRotateMatrix(), followCameraController_->GetIsLockOn(), bossEnemy_->GetPosition());
 	player_->Update();
 	// パーティクルの更新処理
 	playerMoveParticle_->SetEmitterPos(player_->GetPlayerPos());
@@ -331,6 +333,8 @@ void ALGameScene::GamePlayUpdate() {
 	followCameraController_->Update(context_->inputCommand);
 	// プレイヤーの要素をカメラに送る
 	followCameraController_->SetFollowPos(player_->GetPlayerPos(), player_->GetVelocity());
+	// カメラのターゲット目標を設定
+	followCameraController_->SetLockOnPos(bossEnemy_->GetPosition());
 
 	// カメラの更新処理
 	mainCamera_->SetCamera(followCameraController_->GetCamera());

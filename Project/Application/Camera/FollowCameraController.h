@@ -34,18 +34,25 @@ public:
 	/// </summary>
 	/// <param name="targetPos"></param>
 	/// <param name="velocity"></param>
-	void SetFollowPos(const Vector3& targetPos, const Vector3& velocity) {
-		targetPos_ = targetPos;
-		targetPos_.y = 1.0f;
-		targetVelocity_ = velocity;
+	void SetFollowPos(const Vector3& playerPos, const Vector3& velocity) {
+		playerPos_ = playerPos;
+		playerPos_.y = 1.0f;
+		playerVelocity_ = velocity;
 	}
 
+	// カメラを向けるカメラ
+	void SetLockOnPos(const Vector3& targetPos) {
+		targetPos_ = targetPos;
+	}
+
+	bool GetIsLockOn() const { return isLockOn_; }
+		
 private:
 
 	// カメラ
 	std::unique_ptr<GameEngine::Camera> camera_;
 	Vector3 position_ = { 0.0f,4.0f,-10.0f };
-	Vector3 target = {};
+	Vector3 basePos_ = {};
 
 	// 距離
 	static inline const float kDistance_ = 60.0f;
@@ -58,8 +65,8 @@ private:
 
 	// 追従対称の残像処理
 	Vector3 interTarget_ = {};
-	Vector3 targetPos_ = {};
-	Vector3 targetVelocity_ = {};
+	Vector3 playerPos_ = {};
+	Vector3 playerVelocity_ = {};
 
 	// カメラの目標座標
 	Vector3 TargetCoordinate_ = {};
@@ -68,6 +75,14 @@ private:
 	float kInterpolationRate = 0.2f;
 	// 速度掛け率
 	float kVelocityBias = -0.5f;
+
+	// カメラを向ける位置
+	Vector3 targetPos_ = {};
+
+	// ロックオン時の回転速度
+	float kLockOnRotateSpeed = 0.1f;
+
+	bool isLockOn_ = false;
 
 private:
 
