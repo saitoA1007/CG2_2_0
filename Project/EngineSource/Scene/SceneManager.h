@@ -3,6 +3,7 @@
 #include"BaseScene.h"
 #include"Camera.h"
 
+#include"AudioManager.h"
 #include"SceneTransition.h"
 
 /// <summary>

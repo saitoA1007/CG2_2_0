@@ -30,6 +30,9 @@ void SceneManager::Initialize(SceneContext* context) {
 	// アニメーションデータを読み込む
 	LoadAnimationData();
 
+	// 全ての音声ファイルを読み込む
+	GameEngine::AudioManager::GetInstance().LoadAllAudio();
+
 	// デバックカメラを生成
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->graphicsDevice->GetDevice());

@@ -3,6 +3,8 @@
 #include<cassert>
 #include <filesystem>
 
+#include"LogManager.h"
+
 #pragma comment(lib,"xaudio2.lib")
 
 #pragma comment(lib, "Mf.lib")
@@ -12,7 +14,12 @@
 
 using namespace GameEngine;
 
-AudioManager::~AudioManager() {}
+//AudioManager::~AudioManager() {}
+
+AudioManager& AudioManager::GetInstance() {
+	static AudioManager instance;
+	return instance;
+}
 
 void AudioManager::Finalize() {
 	xAudio2_.Reset();
@@ -60,7 +67,7 @@ void AudioManager::SoundPlayWave(const uint32_t& soundHandle, bool isloop) {
 }
 
 AudioManager::SoundData AudioManager::SoundLoadWave(const std::string& filename) {
-	
+
 	// ファイル入力ストリームのインスタンス
 	std::ifstream file;
 	// .wavファイルをバイナリモードで開く
@@ -248,7 +255,7 @@ void AudioManager::Play(uint32_t soundHandle, float volume, bool isloop) {
 
 	// 音声を再生
 	if (soundData_[soundHandle].type == MP3) {
-		SoundPlayMp3(soundHandle,isloop);
+		SoundPlayMp3(soundHandle, isloop);
 
 		// 音量を設定
 		auto it = activeVoices_.find(soundHandle);
@@ -257,7 +264,7 @@ void AudioManager::Play(uint32_t soundHandle, float volume, bool isloop) {
 		}
 
 	} else {
-		SoundPlayWave(soundHandle,isloop);
+		SoundPlayWave(soundHandle, isloop);
 	}
 }
 
@@ -272,6 +279,24 @@ void AudioManager::Stop(const uint32_t& soundHandle) {
 		}
 		activeVoices_.erase(it); // 管理から削除
 	}
+}
+
+void AudioManager::StopAll() {
+	// 管理している全てのボイスを停止・破棄する
+	for (auto& voicePair : activeVoices_) {
+		IXAudio2SourceVoice* pSourceVoice = voicePair.second;
+		if (pSourceVoice) {
+			// 再生停止
+			pSourceVoice->Stop(0);
+			// バッファをフラッシュ（待機中のデータを破棄）
+			pSourceVoice->FlushSourceBuffers();
+			// ボイスを削除
+			pSourceVoice->DestroyVoice();
+		}
+	}
+
+	// マップをクリアして、再生中の情報をリセット
+	activeVoices_.clear();
 }
 
 void AudioManager::SoundPlayMp3(const uint32_t& soundHandle, bool isloop) {
@@ -309,4 +334,60 @@ bool AudioManager::IsPlay(const uint32_t& soundHandle) {
 
 	// state.BuffersQueued が 0 なら再生終了
 	return (state.BuffersQueued > 0);
+}
+
+void AudioManager::RegisterAudio(const std::string& fileName) {
+
+	std::string audioName = GetFileName(fileName);
+
+	// 同名のモデルが登録されている場合は早期リターン
+	auto getName = nameToHandles_.find(audioName);
+	if (getName != nameToHandles_.end()) {
+		return;
+	}
+
+	// ロードする
+	uint32_t handle = Load(fileName);
+
+	// 登録する
+	nameToHandles_[audioName] = handle;
+}
+
+void AudioManager::LoadAllAudio() {
+	namespace fs = std::filesystem;
+	const std::string kDirectoryPath = "Resources/Sounds/";
+
+	// Soundsのフォルダが存在するか確認する
+	if (!fs::exists(kDirectoryPath)) {
+		LogManager::GetInstance().Log("Audio directory not found, skipping LoadAllAudio: " + kDirectoryPath);
+		return;
+	}
+
+	LogManager::GetInstance().Log("Start Loading All Audios from: " + kDirectoryPath);
+
+	// Soundsのフォルダにある音声ファイルとフォルダを検索
+	for (const auto& entry : fs::recursive_directory_iterator(kDirectoryPath)) {
+
+		// 音声を登録、ロードする
+		if (entry.is_regular_file()) {
+			// ファイルパスを取得する
+			std::string filePath = entry.path().string();
+			// 登録
+			RegisterAudio(filePath);
+		}
+	}
+
+	LogManager::GetInstance().Log("End Loading All Audios");
+}
+
+std::string AudioManager::GetFileName(const std::string& fullPath) {
+	return std::filesystem::path(fullPath).filename().string();
+}
+
+uint32_t AudioManager::GetHandleByName(const std::string& name) const {
+	auto getHandle = nameToHandles_.find(name);
+	if (getHandle == nameToHandles_.end()) {
+		return 0;
+	}
+	return getHandle->second;
 }
