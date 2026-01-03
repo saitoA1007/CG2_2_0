@@ -76,11 +76,19 @@ void ALGameScene::Initialize(SceneContext* context) {
 	// プレイヤーの初期化
 	//================================================================
 #pragma region Player
+
+	// 武器を初期化
+	swordModel_ = context_->modelManager->GetNameByModel("Sword");
+	// 武器
+	playerSword_ = std::make_unique<Sword>();
+	playerSword_->Initialize();
+
 	// プレイヤーモデルを生成
 	playerModel_ = context_->modelManager->GetNameByModel("Triangular");
 	playerModel_->SetDefaultIsEnableLight(true);
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();
+	player_->SetWeapon(playerSword_.get());
 	player_->Initialize(context_->inputCommand);
 
 	// パーティクルのシステムを初期化
@@ -184,6 +192,10 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// プレイヤーを描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
+	// 剣を描画	
+	if (player_->GetPlayerBehavior() == Player::Behavior::Attack) {
+		ModelRenderer::Draw(swordModel_, playerSword_->GetWorldTransform());
+	}
 
 	// ボス敵を描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
@@ -218,7 +230,7 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// 攻撃のアクセント演出を描画
 	ModelRenderer::DrawInstancing(planeModel_, attackAccentEffectParticle_->GetCurrentNumInstance(), *attackAccentEffectParticle_->GetWorldTransforms());
 
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 
 	// デバック描画
 	debugRenderer_->DrawAll(isDebugView ? context_->debugCamera_->GetVPMatrix() : mainCamera_->GetVPMatrix());
@@ -366,19 +378,35 @@ void ALGameScene::UpdateCollision() {
 
 	// プレイヤーの当たり判定を登録する
 	collisionManager_->AddCollider(player_->GetCollider());
+#ifdef USE_IMGUI
 	// デバックデータを取得する
 	debugRenderer_->AddSphere(player_->GetSphereData());
+#endif
+	if (player_->GetPlayerBehavior() == Player::Behavior::Attack) {
+		// 武器
+		auto weapon = player_->GetWeapon();
+		for (auto& collider : weapon->GetColliders()) {
+			collisionManager_->AddCollider(collider.get());
+#ifdef USE_IMGUI
+			debugRenderer_->AddSphere({ collider->GetWorldPosition(),collider->GetRadius() });
+#endif
+		}
+	}
 
 	// ボス敵の当たり判定を登録する
 	collisionManager_->AddCollider(bossEnemy_->GetCollider());
+#ifdef USE_IMGUI
 	// デバックデータを取得する
 	debugRenderer_->AddSphere(bossEnemy_->GetSphereData());
+#endif
 
 	// 壁の当たり判定を登録する
 	for (auto& wall : stageManager_->GetWalls()) {
 		collisionManager_->AddCollider(wall->GetCollider());
+#ifdef USE_IMGUI
 		// デバックデータを取得する
 		debugRenderer_->AddBox(wall->GetAABBData());
+#endif
 	}
 
 	// 衝突判定

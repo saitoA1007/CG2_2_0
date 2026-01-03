@@ -8,7 +8,8 @@
 #include"Collider.h"
 
 // 武器
-#include"Application/Weapon/IWeapon.h"
+//#include"Application/Weapon/IWeapon.h"
+#include"Application/Weapon/Sword.h"
 
 class Player : public GameEngine::GameObject {
 public:
@@ -21,6 +22,21 @@ public:
 		Dush,   // ダッシュ状態
 
 		MaxCount // 状態の数
+	};
+
+	// 攻撃用定数
+	struct ConstAttack {
+		float maxTime = 1.0f;
+		float radius = 0.0f;
+	};
+
+	// 攻撃用ワーク
+	struct WorkAttack {
+		int32_t comboIndex = 0; // 現在のコンボ段階
+		int32_t inComboPhase = 0; // 1コンボの中でどのフェーズか
+		bool isComboNext = false; // コンボが次の段階に進むフラグ
+		float maxTime_ = 0.0f; // 1コンボの最大時間
+		float timer_ = 0.0f; // 通常行動に戻るまでの時間
 	};
 
 public:
@@ -39,11 +55,31 @@ public:
 	/// <param name="inputCommand"></param>
 	void Update();
 
+public:
+
 	/// <summary>
 	/// ワールド行列を取得
 	/// </summary>
 	/// <returns></returns>
 	GameEngine::WorldTransform& GetWorldTransform() { return worldTransform_; }
+
+	/// <summary>
+	/// 当たり判定を取得
+	/// </summary>
+	/// <returns></returns>
+	GameEngine::Collider* GetCollider() { return collider_.get(); }
+
+	/// <summary>
+	/// 武器を設定
+	/// </summary>
+	/// <param name="weapon"></param>
+	void SetWeapon(Sword* weapon) { weapon_ = weapon; }
+
+	/// <summary>
+	/// 保持している武器を取得
+	/// </summary>
+	/// <returns></returns>
+	Sword* GetWeapon() { return weapon_; }
 
 	/// <summary>
 	/// プレイヤーの位置を取得
@@ -69,12 +105,6 @@ public:
 	}
 
 	/// <summary>
-	/// 当たり判定を取得
-	/// </summary>
-	/// <returns></returns>
-	GameEngine::Collider* GetCollider() { return collider_.get(); }
-
-	/// <summary>
 	/// 球のデータを取得
 	/// </summary>
 	/// <returns></returns>
@@ -98,7 +128,7 @@ public:
 	/// <returns></returns>
 	bool IsAttack() const { return isAttack_; }
 
-private:
+private: // 調整項目
 
 	// 移動速度
 	float kMoveSpeed_ = 0.2f;
@@ -121,6 +151,10 @@ private:
 
 private:
 
+	std::vector<std::string> kGroupNames_ = {
+		"Player_Combo",
+	};
+
 	// 入力処理
 	GameEngine::InputCommand* inputCommand_;
 
@@ -134,7 +168,7 @@ private:
 	bool isAlive_ = true;
 
 	// 武器を取得
-	IWeapon* weapon_ = nullptr;
+	Sword* weapon_ = nullptr;
 
 	// 球の当たり判定
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
@@ -179,6 +213,22 @@ private:
 	float dushTimer_ = 0.0f;
 	// ダッシュする方向を設定する
 	Vector3 dushDirection_ = { 0.0f,0.0f,0.0f };
+
+	// 攻撃で使用する変数 ===========================================
+
+	// コンボ回数
+	static inline const int kComboNum = 3;
+
+	// コンボ定数表
+	std::array<ConstAttack, kComboNum> kConstAttacks_;
+
+	// 攻撃ワーク
+	WorkAttack workAttack_;
+
+	// 武器の位置
+	Transform weaponTransform_ = {};
+
+	float theta_ = 0.0f;
 
 	// ダメージを受けた時の挙動に使用する変数 =============================
 

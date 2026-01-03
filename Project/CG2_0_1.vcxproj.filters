@@ -309,6 +309,7 @@
     <ClCompile Include="Application\UI\ClearTimeUI.cpp" />
     <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="Application\Stage\Wall.cpp" />
+    <ClCompile Include="Application\Graphics\PlaneProjectionShadow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -623,6 +624,7 @@
     <ClInclude Include="Application\UI\ClearTimeUI.h" />
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\Stage\Wall.h" />
+    <ClInclude Include="Application\Graphics\PlaneProjectionShadow.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

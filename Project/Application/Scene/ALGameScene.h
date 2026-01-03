@@ -19,6 +19,7 @@
 #include"Application/Enemy/Projectile/EnemyProjectileManager.h"
 #include"Application/Stage/StageManager.h"
 #include"Application/ClearTimeTracker.h"
+#include"Application/Weapon/Sword.h"
 
 
 class ALGameScene : public BaseScene {
@@ -98,6 +99,11 @@ private: // シーン機能
 	// ダメージを与えた時のパーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> attackEffectParticle_;
 	std::unique_ptr<GameEngine::ParticleBehavior> attackAccentEffectParticle_;
+
+	// 武器モデル
+	GameEngine::Model* swordModel_;
+	// 武器
+	std::unique_ptr<Sword> playerSword_;
 
 	//=======================================================
 	// 敵

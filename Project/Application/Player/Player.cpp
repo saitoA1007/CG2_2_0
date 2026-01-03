@@ -1,5 +1,6 @@
 #include"Player.h"
 #include<algorithm>
+#include<numbers>
 #include"GameParamEditor.h"
 #include"EasingManager.h"
 #include"MyMath.h"
@@ -16,6 +17,19 @@ void Player::Initialize(GameEngine::InputCommand* inputCommand) {
 
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
+
+	// 武器をプレイヤーに追従
+	weapon_->SetOwnerPosition(&worldTransform_);
+	weaponTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	weapon_->SetTransform(weaponTransform_);
+
+	// コンボの設定
+	kConstAttacks_[0].maxTime = 0.6f;
+	kConstAttacks_[0].radius = 3.0f;
+	kConstAttacks_[1].maxTime = 0.8f;
+	kConstAttacks_[1].radius = 3.0f;
+	kConstAttacks_[2].maxTime = 0.6f;
+	kConstAttacks_[2].radius = 5.0f;
 
 	// 当たり判定を設定
 	collider_ = std::make_unique<SphereCollider>();
@@ -155,11 +169,19 @@ void Player::ProcessMoveInput() {
 	}
 
 	// 攻撃操作
-	/*if (inputCommand_->IsCommandAcitve("Attack")) {
+	if (inputCommand_->IsCommandAcitve("Attack")) {
 		if (behavior_ == Behavior::Normal) {
+			workAttack_.comboIndex = 0;
+			workAttack_.timer_ = 0.0f;
 			behaviorRequest_ = Behavior::Attack;
+
+		} else if (behavior_ == Behavior::Attack) {
+			// コンボ上限に達していない時
+			if (workAttack_.comboIndex < kComboNum - 1) {
+				workAttack_.isComboNext = true;
+			}
 		}
-	}*/
+	}
 }
 
 void Player::Move() {
@@ -241,6 +263,72 @@ void Player::JumpUpdate() {
 
 void Player::AttackUpdate() {
 
+	workAttack_.timer_ += FpsCounter::deltaTime / kConstAttacks_[workAttack_.comboIndex].maxTime;
+
+	// コンボ段階によってモーション分岐
+	switch (workAttack_.comboIndex)
+	{
+		// 縦に切る
+	case 0:
+		// 回転させる
+		theta_ = Lerp(std::numbers::pi_v<float> *0.5f, 0.0f, workAttack_.timer_);
+		// 武器を移動させる
+		weaponTransform_.translate.x = 0.0f;
+		weaponTransform_.translate.z = std::cosf(theta_) * kConstAttacks_[workAttack_.comboIndex].radius;
+		weaponTransform_.translate.y = std::sinf(theta_) * kConstAttacks_[workAttack_.comboIndex].radius;
+		// 武器を回転させる
+		weaponTransform_.rotate.x = std::numbers::pi_v<float> *0.5f - theta_;
+		weaponTransform_.rotate.y = 0.0f;
+		weaponTransform_.rotate.z = 0.0f;
+		break;
+
+		// 斜め切り
+	case 1:
+		theta_ = Lerp(-std::numbers::pi_v<float> *0.6f, std::numbers::pi_v<float> *0.6f, workAttack_.timer_);
+		// 武器を移動させる
+		weaponTransform_.translate.x = std::sinf(theta_) * kConstAttacks_[workAttack_.comboIndex].radius;
+		weaponTransform_.translate.y = std::sinf(theta_) * kConstAttacks_[workAttack_.comboIndex].radius;
+		weaponTransform_.translate.z = std::cosf(theta_) * kConstAttacks_[workAttack_.comboIndex].radius;
+		// 武器を回転させる
+		weaponTransform_.rotate.x = 0.0f;
+		weaponTransform_.rotate.y = theta_;
+		weaponTransform_.rotate.z = std::numbers::pi_v<float> / 3.0f;
+		break;
+
+		// 横切り
+	case 2:
+		theta_ = Lerp(-std::numbers::pi_v<float> *0.6f, std::numbers::pi_v<float> *0.6f, workAttack_.timer_);
+		// 武器を移動させる
+		weaponTransform_.translate.x = std::sinf(theta_) * kConstAttacks_[workAttack_.comboIndex].radius;
+		weaponTransform_.translate.y = 0.5f;
+		weaponTransform_.translate.z = std::cosf(theta_) * kConstAttacks_[workAttack_.comboIndex].radius;
+		// 武器を回転させる
+		weaponTransform_.rotate.x = 0.0f;
+		weaponTransform_.rotate.y = theta_;
+		weaponTransform_.rotate.z = std::numbers::pi_v<float> *0.5f;
+		break;
+	}
+
+	// 切り替え処理
+	if (workAttack_.timer_ >= 1.0f) {
+
+		// コンボ継続の場合
+		if (workAttack_.isComboNext) {
+			// リセット
+			workAttack_.isComboNext = false;
+			workAttack_.timer_ = 0.0f;
+			workAttack_.comboIndex++;
+		} else {
+			// コンボを継続しない場合、元に戻る
+			workAttack_.comboIndex = 0;
+			workAttack_.timer_ = 0.0f;
+			behaviorRequest_ = Behavior::Normal;
+		}
+	}	
+
+	// 武器の更新処理
+	weapon_->SetTransform(weaponTransform_);
+	weapon_->Update();
 }
 
 void Player::DushUpdate() {
@@ -283,6 +371,13 @@ void Player::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem("Player", "TurnTime", kTurnTime_);
 	GameParamEditor::GetInstance()->AddItem("Player", "DushSpeed", kDushSpeed_);
 	GameParamEditor::GetInstance()->AddItem("Player", "DushMaxTime", kDushMaxTime_);
+
+	// コンボ攻撃
+	for (uint32_t i = 0; i < kConstAttacks_.size(); ++i) {
+		std::string s = std::to_string(i + 1);
+		GameParamEditor::GetInstance()->AddItem(kGroupNames_[0], s + "ComboMaxTime", kConstAttacks_[i].maxTime);
+		GameParamEditor::GetInstance()->AddItem(kGroupNames_[0], s + "ComboRadius", kConstAttacks_[i].radius);
+	}
 }
 
 void Player::ApplyDebugParam() {
@@ -293,4 +388,11 @@ void Player::ApplyDebugParam() {
 	kTurnTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "TurnTime");
 	kDushSpeed_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "DushSpeed");
 	kDushMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "DushMaxTime");
+
+	// コンボ攻撃
+	for (uint32_t i = 0; i < kConstAttacks_.size(); ++i) {
+		std::string s = std::to_string(i + 1);
+		kConstAttacks_[i].maxTime = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames_[0], s + "ComboMaxTime");
+		kConstAttacks_[i].radius = GameParamEditor::GetInstance()->GetValue<float>(kGroupNames_[0], s + "ComboRadius");
+	}
 }

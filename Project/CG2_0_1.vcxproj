@@ -183,6 +183,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateIn.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
+    <ClCompile Include="Application\Graphics\PlaneProjectionShadow.cpp" />
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
     <ClCompile Include="Application\Scene\ALGameScene.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
@@ -367,6 +368,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="Application\Enemy\State\BossStateIn.h" />
     <ClInclude Include="Application\Enemy\State\BossStateOut.h" />
     <ClInclude Include="Application\Enemy\State\IBossState.h" />
+    <ClInclude Include="Application\Graphics\PlaneProjectionShadow.h" />
     <ClInclude Include="Application\Light\SceneLightingController.h" />
     <ClInclude Include="Application\Scene\ALGameScene.h" />
     <ClInclude Include="Application\Player\Player.h" />
