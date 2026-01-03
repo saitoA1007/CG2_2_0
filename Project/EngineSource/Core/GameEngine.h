@@ -87,11 +87,6 @@ namespace GameEngine {
 		// アニメーションのリソースを管理
 		std::unique_ptr<AnimationManager> animationManager_;
 
-		/// Audio ========================================
-
-		// 音声機能
-		std::unique_ptr<AudioManager> audioManager_;
-
 		/// Core ========================================
 
 		// Windowsのアプリ機能
