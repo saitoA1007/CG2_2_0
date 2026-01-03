@@ -60,6 +60,12 @@ void ALGameScene::Initialize(SceneContext* context) {
 	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
 	terrainWorldTransform_.Initialize({ {30.0f,30.0f,30.0f},{0.0f,0.0f,0.0f},{0.0f,-0.2f,0.0f} });
 
+	// 壁を生成
+	wallModel_ = context_->modelManager->GetNameByModel("Wall");
+	wallModel_->SetDefaultIsEnableLight(true);
+	stageManager_ = std::make_unique<StageManager>();
+	stageManager_->Initialize();
+
 	// 空気を演出するためのパーティクル
 	airParticle_ = std::make_unique<ParticleBehavior>();
 	airParticle_->Initialize("AirParticle", 128);
@@ -168,6 +174,12 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// 地面を描画
 	terrainModel_->SetDefaultTextureHandle(grassGH_);
 	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
+
+	// 壁を描画
+	for (auto& wall : stageManager_->GetWalls()) {
+		ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+		ModelRenderer::Draw(wallModel_, wall->GetWorldTransform());
+	}
 
 	// プレイヤーを描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
@@ -361,6 +373,13 @@ void ALGameScene::UpdateCollision() {
 	collisionManager_->AddCollider(bossEnemy_->GetCollider());
 	// デバックデータを取得する
 	debugRenderer_->AddSphere(bossEnemy_->GetSphereData());
+
+	// 壁の当たり判定を登録する
+	for (auto& wall : stageManager_->GetWalls()) {
+		collisionManager_->AddCollider(wall->GetCollider());
+		// デバックデータを取得する
+		debugRenderer_->AddBox(wall->GetAABBData());
+	}
 
 	// 衝突判定
 	collisionManager_->CheckAllCollisions();
