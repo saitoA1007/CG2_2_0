@@ -307,6 +307,8 @@
     <ClCompile Include="Application\Enemy\State\BattleState\RotateAttack.cpp" />
     <ClCompile Include="Application\ClearTimeTracker.cpp" />
     <ClCompile Include="Application\UI\ClearTimeUI.cpp" />
+    <ClCompile Include="Application\Stage\StageManager.cpp" />
+    <ClCompile Include="Application\Stage\Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -619,6 +621,8 @@
     <ClInclude Include="Application\ClearTime.h" />
     <ClInclude Include="Application\ClearTimeTracker.h" />
     <ClInclude Include="Application\UI\ClearTimeUI.h" />
+    <ClInclude Include="Application\Stage\StageManager.h" />
+    <ClInclude Include="Application\Stage\Wall.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

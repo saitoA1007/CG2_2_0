@@ -17,6 +17,7 @@
 #include"Application/Enemy/BossEnemy.h"
 #include"Application/UI/BossHpUI.h"
 #include"Application/Enemy/Projectile/EnemyProjectileManager.h"
+#include"Application/Stage/StageManager.h"
 #include"Application/ClearTimeTracker.h"
 
 
@@ -127,6 +128,10 @@ private: // シーン機能
 	GameEngine::Model* terrainModel_;
 	uint32_t grassGH_ = 0u;
 	GameEngine::WorldTransform terrainWorldTransform_;
+
+	// 壁
+	GameEngine::Model* wallModel_;
+	std::unique_ptr<StageManager> stageManager_;
 
 	// 空気を演出するためのパーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> airParticle_;

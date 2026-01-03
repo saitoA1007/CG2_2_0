@@ -22,12 +22,7 @@ namespace GameEngine {
 
 		// 球とAABBの当たり判定
 		CollisionResult operator()(const Sphere& a, const AABB& b) const {
-			CollisionResult result = IsAABBSphereCollision(b, a);
-			// 法線の向きを反転
-			if (result.isHit) {
-				result.contactNormal = result.contactNormal * -1.0f;
-			}
-			return result;
+			return IsAABBSphereCollision(b, a);
 		}
 
 		CollisionResult operator()(const AABB& a, const Sphere& b) const {
