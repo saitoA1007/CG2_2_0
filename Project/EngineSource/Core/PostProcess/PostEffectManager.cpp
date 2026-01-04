@@ -136,8 +136,9 @@ void PostEffectManager::PostDraw(ID3D12GraphicsCommandList* commandList, const D
     D3D12_GPU_DESCRIPTOR_HANDLE currentInputSRV = drawObjectSRVHandle_;
 
     // アウトラインを描画
-    DrawOutLine(commandList, depthSRV, currentInputSRV);
-    currentInputSRV = outLineData_.srvHandle;
+    depthSRV;
+    //DrawOutLine(commandList, depthSRV, currentInputSRV);
+    //currentInputSRV = outLineData_.srvHandle;
 
     // ブルームを描画
     DrawBloom(commandList, currentInputSRV, viewport, scissorRect);
