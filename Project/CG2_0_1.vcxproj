@@ -200,6 +200,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.cpp" />
+    <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.cpp" />
     <ClCompile Include="EngineSource\3D\Extension\CustomRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Model\AnimationManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Animator.cpp" />
@@ -391,6 +392,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\2D\Sprite.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
     <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.h" />
+    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.h" />
     <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\ICustomMaterial.h" />
     <ClInclude Include="EngineSource\3D\Extension\CustomRenderer.h" />
     <ClInclude Include="EngineSource\3D\Model\AnimationManager.h" />
@@ -585,6 +587,11 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <None Include="Resources\Shaders\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Resources\Shaders\BgIceRock.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\Shaders\CS\Particle.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
