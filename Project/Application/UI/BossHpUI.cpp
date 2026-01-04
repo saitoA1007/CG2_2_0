@@ -8,9 +8,11 @@ void BossHpUI::Initialize(const uint32_t& maxHp) {
 	currentHp_ = maxHp_;
 
 	// 初期化
-	sprite_ = Sprite::Create({320.0f,32.0f},{640.0f,64.0f},{0.0f,0.0f},{1.0f,0.0f,0.0f,1.0f});
-
-	effectSprite_ = Sprite::Create({ 320.0f,32.0f }, { 640.0f,64.0f }, { 0.0f,0.0f }, { 0.5f,0.0f,0.0f,1.0f });
+	sprite_ = Sprite::Create(position_, size_, { 0.0f,0.0f }, { 1.0f,0.0f,0.0f,1.0f });
+	// 演出の用
+	effectSprite_ = Sprite::Create(position_, size_, { 0.0f,0.0f }, { 0.8f,0.8f,0.0f,1.0f });
+	// 後ろのフレーム
+	frameSprite_ = Sprite::Create(position_, size_, { 0.0f,0.0f }, { 0.0f,0.0f,0.0f,1.0f });
 }
 
 void BossHpUI::Update() {

@@ -37,12 +37,18 @@ public:
 	// 演出用の画像データを取得
 	GameEngine::Sprite* GetEffectSprite() { return effectSprite_.get(); }
 
+	// フレーム
+	GameEngine::Sprite* GetFrameSprite() { return frameSprite_.get(); }
+
 private:
 
 	std::unique_ptr<GameEngine::Sprite> sprite_;
 
 	// hpの演出用
 	std::unique_ptr<GameEngine::Sprite> effectSprite_;
+
+	// フレーム
+	std::unique_ptr<GameEngine::Sprite> frameSprite_;
 
 	float preScaleX_ = 1.0f;
 
@@ -56,6 +62,9 @@ private:
 	std::list<Point> points_;
 
 	float maxTime_ = 0.5f;
+
+	Vector2 size_ = { 640.0f,24.0f };
+	Vector2 position_ = { 320.0f,32.0f };
 
 private:
 
