@@ -36,6 +36,17 @@ void Animator::Update(const float& time) {
 	SkinClusterUpdate(*skinCluster_, *skeleton_);
 }
 
+void Animator::NormalizeUpdate(const float& time) {
+	// アニメーションの更新をおこない、骨ごとのLocal情報を更新する
+	NormalizeApplyAnimation(*skeleton_, *animationData_, time);
+
+	// 現在の骨ごとのLocal情報を基にSkeletonSpaceの情報を更新する
+	SkeletonUpdate(*skeleton_);
+
+	// SkeletonSpaceの情報を基に、SkinClusterのMatrixPaletteを更新する
+	SkinClusterUpdate(*skinCluster_, *skeleton_);
+}
+
 Vector3 Animator::CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time) {
 
 	assert(!keyframes.empty()); // キーがないものはエラーを返す
@@ -90,6 +101,22 @@ void Animator::ApplyAnimation(Skeleton& skeleton, const AnimationData& animation
 			joint.transform.translate = CalculateValue(rootNodeAnimation.translate, animationTime);
 			joint.transform.rotate = CalculateValue(rootNodeAnimation.rotate, animationTime);
 			joint.transform.scale = CalculateValue(rootNodeAnimation.scale, animationTime);
+		}
+	}
+}
+
+void Animator::NormalizeApplyAnimation(Skeleton& skeleton, const AnimationData& animation, float animationTime) {
+
+	// 秒数に戻す
+	float timeInSeconds = animationTime * animation.duration;
+
+	for (Joint& joint : skeleton.joints) {
+		// 対象のJointのAnimationがあれば、値の適応を行う。
+		if (auto it = animation.nodeAnimations.find(joint.name); it != animation.nodeAnimations.end()) {
+			const NodeAnimation& rootNodeAnimation = (*it).second;
+			joint.transform.translate = CalculateValue(rootNodeAnimation.translate, timeInSeconds);
+			joint.transform.rotate = CalculateValue(rootNodeAnimation.rotate, timeInSeconds);
+			joint.transform.scale = CalculateValue(rootNodeAnimation.scale, timeInSeconds);
 		}
 	}
 }

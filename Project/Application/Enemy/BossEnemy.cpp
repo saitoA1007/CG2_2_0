@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include"BossEnemy.h"
 
 // 敵の各状態
@@ -44,6 +45,9 @@ void BossEnemy::Initialize(EnemyProjectileManager* projectile) {
 	// コールバック関数を登録する
 	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
+	});
+	collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
+		this->OnCollisionStay(result);
 	});
 
 #ifdef _DEBUG
@@ -111,6 +115,8 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 
 	if (isHit_) { return; }
 
+	//bool isWeapon = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Weapon));
+
 	if (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Player)) {
 		Player* player = result.userData.As<Player>();
 
@@ -122,6 +128,23 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 				isAlive_ = false;
 			}
 		}
+	}
+}
+
+void BossEnemy::OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult& result) {
+
+	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall));
+
+	// 壁に当たった時、押し戻す
+	if (isWall) {
+		Vector3 n = result.contactNormal;
+		Vector3 nXZ = { n.x,0.0f,n.z };
+		if (nXZ.x != 0.0f || nXZ.z != 0.0f) { nXZ = Normalize(nXZ); }
+		float depth = std::max(result.penetrationDepth, 0.0f);
+		Vector3 correction = { nXZ.x * depth, 0.0f, nXZ.z * depth };
+
+		worldTransform_.transform_.translate.x += correction.x;
+		worldTransform_.transform_.translate.z += correction.z;
 	}
 }
 

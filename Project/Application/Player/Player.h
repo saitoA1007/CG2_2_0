@@ -280,6 +280,12 @@ private: // プレイヤーの他の関数
 	void OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result);
 
 	/// <summary>
+	/// 当たり判定
+	/// </summary>
+	/// <param name="result"></param>
+	void OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult& result);
+
+	/// <summary>
 	/// 値を登録する
 	/// </summary>
 	void RegisterBebugParam();

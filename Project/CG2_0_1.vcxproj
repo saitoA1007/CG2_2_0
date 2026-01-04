@@ -192,6 +192,8 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="Application\Stage\Wall.cpp" />
     <ClCompile Include="Application\UI\BossHpUI.cpp" />
     <ClCompile Include="Application\UI\ClearTimeUI.cpp" />
+    <ClCompile Include="Application\UI\GameOverUI.cpp" />
+    <ClCompile Include="Application\UI\PlayerHpUI.cpp" />
     <ClCompile Include="Application\Weapon\Sword.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
@@ -377,6 +379,8 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="Application\Stage\Wall.h" />
     <ClInclude Include="Application\UI\BossHpUI.h" />
     <ClInclude Include="Application\UI\ClearTimeUI.h" />
+    <ClInclude Include="Application\UI\GameOverUI.h" />
+    <ClInclude Include="Application\UI\PlayerHpUI.h" />
     <ClInclude Include="Application\Weapon\IWeapon.h" />
     <ClInclude Include="Application\Weapon\Sword.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
