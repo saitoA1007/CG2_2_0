@@ -1,4 +1,5 @@
 #include"StageManager.h"
+#include<numbers>
 
 void StageManager::Initialize() {
 
@@ -14,6 +15,7 @@ void StageManager::GenerateWalls() {
 
 		Vector3 wallSize = {};
 		Vector3 pos = {0.0f,0.0f,0.0f};
+		float rotateY = 0.0f;
 
 		if (i == 0) {
 			// 右
@@ -28,15 +30,17 @@ void StageManager::GenerateWalls() {
 			// 上
 			wallSize = { wallSize_.z,wallSize_.y,wallSize_.x };
 			pos.z = stageSize_.z * 0.5f + wallSize.z * 0.5f;
+			rotateY = std::numbers::pi_v<float> *0.5f;
 		} else {
 			// 下
 			wallSize = { wallSize_.z,wallSize_.y,wallSize_.x };
 			pos.z = (stageSize_.z * 0.5f + wallSize.z * 0.5f) * -1.0f;
+			rotateY = -std::numbers::pi_v<float> *0.5f;
 		}
 
 		// 壁を生成
 		std::unique_ptr<Wall> tmpWall = std::make_unique<Wall>();
-		tmpWall->Initialize({ wallSize ,{0.0f,0.0f,0.0f},pos });
+		tmpWall->Initialize({ wallSize ,{0.0f,rotateY,0.0f},pos });
 		// 壁を登録
 		walls_[i] = std::move(tmpWall);
 	}

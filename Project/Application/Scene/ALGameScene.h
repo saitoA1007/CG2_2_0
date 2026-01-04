@@ -44,7 +44,7 @@ public:
 	/// <summary>
 	/// デバック時、処理して良いものを更新する
 	/// </summary>
-	void DebugUpdate() override {}
+	void DebugUpdate() override;
 
 	/// <summary>
 	/// 描画処理
