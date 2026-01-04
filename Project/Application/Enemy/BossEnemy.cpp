@@ -1,11 +1,13 @@
 #define NOMINMAX
 #include"BossEnemy.h"
+#include<numbers>
 
 // 敵の各状態
 #include"State/BossStateIn.h"
 #include"State/BossStateBattle.h"
 #include"State/BossStateOut.h"
 
+#include"GameParamEditor.h"
 #include"CollisionConfig.h"
 #include"FPSCounter.h"
 #include"Application/Player/Player.h"
@@ -13,10 +15,15 @@
 #include"LogManager.h"
 using namespace GameEngine;
 
-void BossEnemy::Initialize(EnemyProjectileManager* projectile) {
+void BossEnemy::Initialize(EnemyProjectileManager* projectile, const uint32_t& texture) {
 
 	// ワールド行列を初期化
-	worldTransform_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,10.0f} });
+	worldTransform_.Initialize({ {1.5f,1.5f,1.5f},{0.0f,std::numbers::pi_v<float>,0.0f},{0.0f,2.0f,10.0f} });
+
+	// マテリアルの初期化
+	iceMaterial_ = std::make_unique<IceRockMaterial>();
+	iceMaterial_->Initialize();
+	iceMaterial_->materialData_->textureHandle = texture;
 
 	// コンテキストの設定
 	bossContext_.worldTransform = &worldTransform_;
@@ -103,9 +110,12 @@ void BossEnemy::Update(const Vector3& targetPos) {
 			alpha_ = 0.5f;
 		}
 
+		iceMaterial_->materialData_->color.w = alpha_;
+
 		if (hitTimer_ >= maxHitTime_) {
 			isHit_ = false;
 			alpha_ = 1.0f;
+			iceMaterial_->materialData_->color.w = alpha_;
 			hitTimer_ = 0.0f;
 		}
 	}
@@ -154,8 +164,34 @@ Sphere BossEnemy::GetSphereData() {
 
 void BossEnemy::RegisterBebugParam() {
 
+	GameParamEditor::GetInstance()->AddItem("Boss", "CollisionSize", collisionRadius_);
+
+	// マテリアル
+	GameParamEditor::GetInstance()->AddItem(groupName_, "IceColor", iceMaterial_->materialData_->color);
+	GameParamEditor::GetInstance()->AddItem(groupName_, "SpecularColor", specularColor);
+	GameParamEditor::GetInstance()->AddItem(groupName_, "RimColor", rimColor);
+	GameParamEditor::GetInstance()->AddItem(groupName_, "Shininess", iceMaterial_->materialData_->shininess);
+	GameParamEditor::GetInstance()->AddItem(groupName_, "RimIntensity", iceMaterial_->materialData_->rimIntensity);
+	GameParamEditor::GetInstance()->AddItem(groupName_, "RimPower", iceMaterial_->materialData_->rimPower);
 }
 
 void BossEnemy::ApplyDebugParam() {
 
+	collisionRadius_ = GameParamEditor::GetInstance()->GetValue<float>("Boss", "CollisionSize");
+	collider_->SetRadius(collisionRadius_);
+
+	// マテリアル
+	iceMaterial_->materialData_->color = GameParamEditor::GetInstance()->GetValue<Vector4>(groupName_, "IceColor");
+	specularColor = GameParamEditor::GetInstance()->GetValue<Vector4>(groupName_, "SpecularColor");
+	rimColor = GameParamEditor::GetInstance()->GetValue<Vector4>(groupName_, "RimColor");
+	iceMaterial_->materialData_->shininess = GameParamEditor::GetInstance()->GetValue<float>(groupName_, "Shininess");
+	iceMaterial_->materialData_->rimIntensity = GameParamEditor::GetInstance()->GetValue<float>(groupName_, "RimIntensity");
+	iceMaterial_->materialData_->rimPower = GameParamEditor::GetInstance()->GetValue<float>(groupName_, "RimPower");
+
+	iceMaterial_->materialData_->rimColor.x = rimColor.x;
+	iceMaterial_->materialData_->rimColor.y = rimColor.y;
+	iceMaterial_->materialData_->rimColor.z = rimColor.z;
+	iceMaterial_->materialData_->specularColor.x = specularColor.x;
+	iceMaterial_->materialData_->specularColor.y = specularColor.y;
+	iceMaterial_->materialData_->specularColor.z = specularColor.z;
 }
