@@ -61,6 +61,9 @@
 #include"SceneChangeRequest.h"
 #include"SceneManager.h"
 
+// 3D/Extension
+#include"Extension/CustomRenderer.h"
+
 namespace GameEngine {
 
 	class Engine final {

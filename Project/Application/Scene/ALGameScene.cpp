@@ -5,6 +5,7 @@
 #include"GameParamEditor.h"
 #include"FPSCounter.h"
 #include"LogManager.h"
+#include"Extension/CustomRenderer.h"
 #include<numbers>
 using namespace GameEngine;
 
@@ -56,9 +57,12 @@ void ALGameScene::Initialize(SceneContext* context) {
 	skyDomeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 地面を生成
-	terrainModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
-	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
-	terrainWorldTransform_.Initialize({ {30.0f,30.0f,30.0f},{0.0f,0.0f,0.0f},{0.0f,-0.2f,0.0f} });
+	// 氷の地面を描画するためのモデル
+	icePlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
+	// 地面を生成する
+	terrain_ = std::make_unique<Terrain>();
+	terrain_->Initialize(context_->textureManager->GetHandleByName("grass.png"),
+		context_->textureManager->GetHandleByName("ice.png"), context_->textureManager->GetHandleByName("iceNormal.png"));
 
 	// 壁を生成
 	wallModel_ = context_->modelManager->GetNameByModel("Wall");
@@ -201,6 +205,12 @@ void ALGameScene::Draw(const bool& isDebugView) {
 		ModelRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
 	}
 
+	if (isDebugView) {
+		CustomRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	} else {
+		CustomRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
+	}
+
 	//===========================================================
 	// 3D描画
 	//===========================================================
@@ -211,10 +221,12 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// 天球の描画
 	ModelRenderer::Draw(skyDomeModel_, skyDomeWorldTransform_);
 
-	// 地面を描画
-	terrainModel_->SetDefaultTextureHandle(grassGH_);
-	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
+	// 氷のテスト描画
+	CustomRenderer::PreDraw(CustomRenderMode::Ice);
+	CustomRenderer::DrawIce(icePlaneModel_, terrain_->GetWorldTransform(), sceneLightingController_->GetResource(), terrain_->GetMaterial());
 
+	// 3Dモデルの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 	// 壁を描画
 	for (auto& wall : stageManager_->GetWalls()) {
 		ModelRenderer::DrawLight(sceneLightingController_->GetResource());

@@ -20,6 +20,7 @@
 #include"Application/ClearTimeTracker.h"
 #include"Application/Weapon/Sword.h"
 #include"Application/Graphics/PlaneProjectionShadow.h"
+#include"Application/Graphics/Terrain.h"
 #include"Application/UI/BossHpUI.h"
 #include"Application/UI/PlayerHpUI.h"
 #include"Application/UI/GameOverUI.h"
@@ -139,10 +140,10 @@ private: // シーン機能
 	GameEngine::Model* skyDomeModel_;
 	GameEngine::WorldTransform skyDomeWorldTransform_;
 
+	// 氷の地面を作るためのモデル
+	GameEngine::Model* icePlaneModel_;
 	// 地面
-	GameEngine::Model* terrainModel_;
-	uint32_t grassGH_ = 0u;
-	GameEngine::WorldTransform terrainWorldTransform_;
+	std::unique_ptr<Terrain> terrain_;
 
 	// 壁
 	GameEngine::Model* wallModel_;
