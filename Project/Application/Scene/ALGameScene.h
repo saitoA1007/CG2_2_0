@@ -14,13 +14,14 @@
 #include"Application/Player/Player.h"
 #include"Application/Camera/FollowCameraController.h"
 #include"Application/Light/SceneLightingController.h"
-#include"Application/UI/BossHpUI.h"
 #include"Application/Enemy/BossEnemy.h"
 #include"Application/Enemy/Projectile/EnemyProjectileManager.h"
 #include"Application/Stage/StageManager.h"
 #include"Application/ClearTimeTracker.h"
 #include"Application/Weapon/Sword.h"
 #include"Application/Graphics/PlaneProjectionShadow.h"
+#include"Application/UI/BossHpUI.h"
+#include"Application/UI/GameOverUI.h"
 
 class ALGameScene : public BaseScene {
 public:
@@ -58,7 +59,7 @@ public:
 	/// 次のシーン遷移する場面の値を取得
 	/// </summary>
 	/// <returns></returns>
-	SceneState NextSceneState() override { return SceneState::Result; }
+	SceneState NextSceneState() override { return sceneState_; }
 
 private: // エンジンの低レイヤー機能を取得
 
@@ -72,6 +73,8 @@ private: // シーン機能
 
 	// 終了フラグ
 	bool isFinished_ = false;
+
+	SceneState sceneState_ = SceneState::Result;
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
@@ -157,6 +160,11 @@ private: // シーン機能
 
 	// ボスのHpを表示
 	std::unique_ptr<BossHpUI> bossHpUI_;
+
+	// ゲームオーバーUI
+	std::unique_ptr<GameOverUI> gameOverUI_;
+	// ゲームオーバーフラグ
+	bool isGameOver_ = false;
 
 	/// 演出
 
