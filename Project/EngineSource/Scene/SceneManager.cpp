@@ -138,6 +138,10 @@ void SceneManager::LoadModelData() {
 
 	// モデルリソースを全てロードする
 	context_->modelManager->LoadAllModel();
+
+	// モデルの接線を取得する
+	GameEngine::Model* planeModel = context_->modelManager->GetNameByModel("PlaneXZ");
+	planeModel->normalMapData_ = Model::CreateNormalMapData("planeXZ.obj", "PlaneXZ");
 }
 
 void SceneManager::LoadSpriteData() {
