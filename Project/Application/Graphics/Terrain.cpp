@@ -4,7 +4,7 @@ using namespace GameEngine;
 
 void Terrain::Initialize(const uint32_t& baseTexture, const uint32_t& iceTexture, const uint32_t& iceNormalTex) {
 	// ワールド行列の初期化
-	worldTransform_.Initialize({ { 30.0f,30.0f,30.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f } });
+	worldTransform_.Initialize({ { 27.0f,30.0f,27.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f } });
 
 	// マテリアルの初期化
 	iceMaterial_ = std::make_unique<IceMaterial>();

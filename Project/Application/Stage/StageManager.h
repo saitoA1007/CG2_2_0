@@ -22,7 +22,7 @@ private:
 	Vector3 stageSize_ = {50.0f,0.0f,50.0f};
 
 	// 壁の大きさ
-	Vector3 wallSize_ = {5.0f,2.0f,50.0f};
+	Vector3 wallSize_ = {3.0f,2.0f,50.0f};
 
 private:
 

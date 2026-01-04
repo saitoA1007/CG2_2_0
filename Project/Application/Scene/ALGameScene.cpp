@@ -225,13 +225,15 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	CustomRenderer::PreDraw(CustomRenderMode::Ice);
 	CustomRenderer::DrawIce(icePlaneModel_, terrain_->GetWorldTransform(), sceneLightingController_->GetResource(), terrain_->GetMaterial());
 
-	// 3Dモデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
+	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
+
 	// 壁を描画
 	for (auto& wall : stageManager_->GetWalls()) {
-		ModelRenderer::DrawLight(sceneLightingController_->GetResource());
-		ModelRenderer::Draw(wallModel_, wall->GetWorldTransform());
+		CustomRenderer::DrawRock(wallModel_, wall->GetWorldTransform(), sceneLightingController_->GetResource(), wall->GetMaterial());
 	}
+
+	// 3Dモデルの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
 	// プレイヤーを描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
@@ -496,4 +498,11 @@ void ALGameScene::UpdateCollision() {
 
 	// 衝突判定
 	collisionManager_->CheckAllCollisions();
+}
+
+void ALGameScene::DebugUpdate() {
+
+	for (auto& wall : stageManager_->GetWalls()) {
+		wall->Update();
+	}
 }
