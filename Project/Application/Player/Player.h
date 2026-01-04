@@ -128,6 +128,9 @@ public:
 	/// <returns></returns>
 	bool IsAttack() const { return isAttack_; }
 
+	// 体力を取得
+	int32_t GetHp() { return hp_; }
+
 private: // 調整項目
 
 	// 移動速度
@@ -160,6 +163,9 @@ private:
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
+
+	// hp
+	int32_t hp_ = 3;
 
 	// 速度
 	Vector3 velocity_ = {};

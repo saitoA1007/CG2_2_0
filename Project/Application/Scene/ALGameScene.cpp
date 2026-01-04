@@ -152,6 +152,21 @@ void ALGameScene::Initialize(SceneContext* context) {
 	// ボスのhpUIを初期化
 	bossHpUI_ = std::make_unique<BossHpUI>();
 	bossHpUI_->Initialize(bossEnemy_->GetMaxHp());
+
+	// ゲームオーバーUIを初期化
+	gameOverUI_ = std::make_unique<GameOverUI>();
+	gameOverUI_->Initialize(context_->inputCommand, context_->textureManager);
+
+	// リトライ
+	gameOverUI_->SetRetry([this]() {
+		isFinished_ = true;
+		sceneState_ = SceneState::ALGame;
+	});
+	// タイトル
+	gameOverUI_->SetTitle([this]() {
+		isFinished_ = true;
+		sceneState_ = SceneState::Title;
+	});
 #pragma endregion
 
 	// クリアまでの時間を計測する
@@ -162,8 +177,13 @@ void ALGameScene::Initialize(SceneContext* context) {
 
 void ALGameScene::Update() {
 
-	// ゲームプレイの更新処理
-	GamePlayUpdate();
+	if (isGameOver_) {
+		// ゲームオーバーの更新処理
+		gameOverUI_->Update();
+	} else {
+		// ゲームプレイの更新処理
+		GamePlayUpdate();
+	}
 }
 
 void ALGameScene::Draw(const bool& isDebugView) {
@@ -258,6 +278,14 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// ボスのHPUIを表示
 	SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
 	SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
+
+	// ゲームオーバーシーンの描画
+	if (isGameOver_) {
+		SpriteRenderer::Draw(gameOverUI_->GetBgSprite(), gameOverUI_->GetBgGH());
+		SpriteRenderer::Draw(gameOverUI_->GetLogoSprite(), gameOverUI_->GetLogoGH());
+		SpriteRenderer::Draw(gameOverUI_->GetRetrySprite(), gameOverUI_->GetRetryGH());
+		SpriteRenderer::Draw(gameOverUI_->GetTitleSprite(), gameOverUI_->GetTitleGH());
+	}
 }
 
 void ALGameScene::InputRegisterCommand() {
@@ -276,6 +304,9 @@ void ALGameScene::InputRegisterCommand() {
 	context_->inputCommand->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
 
 	context_->inputCommand->RegisterCommand("CameraLockOn", { {InputState::KeyTrigger, DIK_G},{InputState::PadTrigger, XINPUT_GAMEPAD_Y} });
+
+	// 決定ボタン
+	context_->inputCommand->RegisterCommand("Decision", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
 }
 
 void ALGameScene::GamePlayUpdate() {
@@ -285,6 +316,11 @@ void ALGameScene::GamePlayUpdate() {
 
 		// 時間の計測を終了
 		clearTimeTracker_->EndMeasureTimes();
+	}
+
+	// プレイヤーの対りょっくがなくなったらゲームオーバーに切り替え
+	if (player_->GetHp() <= 0) {
+		isGameOver_ = true;
 	}
 
 	// 当たり判定のリストを削除
