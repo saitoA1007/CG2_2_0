@@ -131,6 +131,9 @@ public:
 	// 体力を取得
 	int32_t GetHp() { return hp_; }
 
+	// 最大体力
+	int32_t GetMaxHp() { return maxHp_; }
+
 private: // 調整項目
 
 	// 移動速度
@@ -166,6 +169,9 @@ private:
 
 	// hp
 	int32_t hp_ = 3;
+
+	// 最大体力
+	int32_t maxHp_ = 3;
 
 	// 速度
 	Vector3 velocity_ = {};
