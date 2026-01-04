@@ -153,6 +153,10 @@ void ALGameScene::Initialize(SceneContext* context) {
 	bossHpUI_ = std::make_unique<BossHpUI>();
 	bossHpUI_->Initialize(bossEnemy_->GetMaxHp());
 
+	// プレイヤーのhpUIを初期化
+	playerHpUI_ = std::make_unique<PlayerHpUI>();
+	playerHpUI_->Initialize(player_->GetMaxHp(), context_->textureManager);
+
 	// ゲームオーバーUIを初期化
 	gameOverUI_ = std::make_unique<GameOverUI>();
 	gameOverUI_->Initialize(context_->inputCommand, context_->textureManager);
@@ -278,6 +282,11 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// ボスのHPUIを表示
 	SpriteRenderer::Draw(bossHpUI_->GetEffectSprite(), 0);
 	SpriteRenderer::Draw(bossHpUI_->GetSprite(), 0);
+
+	// プレイヤーのHpUIを表示
+	for (const auto& sprite : playerHpUI_->GetHpSprites()) {
+		SpriteRenderer::Draw(sprite.get(), playerHpUI_->GetHpGH());
+	}
 
 	// ゲームオーバーシーンの描画
 	if (isGameOver_) {
@@ -427,6 +436,10 @@ void ALGameScene::GamePlayUpdate() {
 	// ボスのHpUIの更新処理
 	bossHpUI_->SetCurrentHp(bossEnemy_->GetCurrentHp());
 	bossHpUI_->Update();
+
+	// プレイヤーのHpUIの更新処理
+	playerHpUI_->SetCurrentHp(player_->GetHp());
+	playerHpUI_->Update();
 #pragma endregion
 }
 

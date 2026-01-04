@@ -21,6 +21,7 @@
 #include"Application/Weapon/Sword.h"
 #include"Application/Graphics/PlaneProjectionShadow.h"
 #include"Application/UI/BossHpUI.h"
+#include"Application/UI/PlayerHpUI.h"
 #include"Application/UI/GameOverUI.h"
 
 class ALGameScene : public BaseScene {
@@ -160,6 +161,9 @@ private: // シーン機能
 
 	// ボスのHpを表示
 	std::unique_ptr<BossHpUI> bossHpUI_;
+
+	// プレイヤーのHpを表示
+	std::unique_ptr<PlayerHpUI> playerHpUI_;
 
 	// ゲームオーバーUI
 	std::unique_ptr<GameOverUI> gameOverUI_;
