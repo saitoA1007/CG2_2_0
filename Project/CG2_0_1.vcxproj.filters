@@ -310,6 +310,8 @@
     <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="Application\Stage\Wall.cpp" />
     <ClCompile Include="Application\Graphics\PlaneProjectionShadow.cpp" />
+    <ClCompile Include="Application\UI\PlayerHpUI.cpp" />
+    <ClCompile Include="Application\UI\GameOverUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -625,6 +627,8 @@
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\Stage\Wall.h" />
     <ClInclude Include="Application\Graphics\PlaneProjectionShadow.h" />
+    <ClInclude Include="Application\UI\PlayerHpUI.h" />
+    <ClInclude Include="Application\UI\GameOverUI.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

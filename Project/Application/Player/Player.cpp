@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include"Player.h"
 #include<algorithm>
 #include<numbers>
@@ -48,7 +49,9 @@ void Player::Initialize(GameEngine::InputCommand* inputCommand) {
 	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 	});
-
+	collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
+		this->OnCollisionStay(result);
+	});
 	// プレイヤーの更新状態を設定する
 	behaviorsTable_ = {
 		[this]() { NormalUpdate(); },
@@ -106,8 +109,8 @@ void Player::Update() {
 	behaviorsTable_[static_cast<size_t>(behavior_)]();
 
 	// プレイヤーを移動範囲に制限
-	worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x,-29.0f,29.0f);
-	worldTransform_.transform_.translate.z = std::clamp(worldTransform_.transform_.translate.z, -29.0f, 29.0f);
+	//worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x,-29.0f,29.0f);
+	//worldTransform_.transform_.translate.z = std::clamp(worldTransform_.transform_.translate.z, -29.0f, 29.0f);
 
 	// ダメージを受けた時のノックバック処理
 	if (knockbackSpeed_ > 0.0f) {
@@ -349,14 +352,34 @@ void Player::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult
 	// ヒットログを出す
 	Log("IsPlayerHit", "Player");
 
-	if (behavior_ != Behavior::Jump) {
-		isHit_ = true;
-	} else {
-		isAttack_ = true;
-	}
+	bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss));
 
-	knockbackSpeed_ = 30.0f;
-	hitDirection_ = Vector3(result.contactNormal.x, 0.0f, result.contactNormal.z);
+	if (isBoss) {
+		if (behavior_ != Behavior::Jump) {
+			isHit_ = true;
+		} else {
+			isAttack_ = true;
+		}
+
+		knockbackSpeed_ = 30.0f;
+		hitDirection_ = Vector3(result.contactNormal.x, 0.0f, result.contactNormal.z);
+	}
+}
+
+void Player::OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult& result) {
+	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall));
+
+	// 壁に当たった時、押し戻す
+	if (isWall) {
+		Vector3 n = result.contactNormal;
+		Vector3 nXZ = { n.x,0.0f,n.z };
+		if (nXZ.x != 0.0f || nXZ.z != 0.0f) { nXZ = Normalize(nXZ); }
+		float depth = std::max(result.penetrationDepth, 0.0f);
+		Vector3 correction = { nXZ.x * depth, 0.0f, nXZ.z * depth };
+
+		worldTransform_.transform_.translate.x += correction.x;
+		worldTransform_.transform_.translate.z += correction.z;
+	}
 }
 
 Sphere Player::GetSphereData() {

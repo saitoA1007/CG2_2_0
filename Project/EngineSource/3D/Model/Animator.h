@@ -28,6 +28,12 @@ namespace GameEngine {
 		void Update(const float& time);
 
 		/// <summary>
+		/// 更新処理(0.0f ~ 1.0f)に正規化
+		/// </summary>
+		/// <param name="time"></param>
+		void NormalizeUpdate(const float& time);
+
+		/// <summary>
 		/// 最大再生時間を取得
 		/// </summary>
 		/// <returns></returns>
@@ -44,6 +50,12 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="isLoop"></param>
 		void SetIsLoop(const bool& isLoop) { isLoop_ = isLoop; }
+
+		/// <summary>
+		/// 再生時間を設定（外部からアニメータのタイマーをリセットしたい場合に使用）
+		/// </summary>
+		/// <param name="t"></param>
+		void SetTimer(const float& t) { timer_ = t; }
 
 		/// <summary>
 		/// アニメーションデータを設定
@@ -89,6 +101,8 @@ namespace GameEngine {
 		/// <param name="animation"></param>
 		/// <param name="animationTime"></param>
 		static void ApplyAnimation(Skeleton& skeleton, const AnimationData& animation, float animationTime);
+
+		void NormalizeApplyAnimation(Skeleton& skeleton, const AnimationData& animation, float animationTime);
 
 		void SkeletonUpdate(Skeleton& skeleton);
 

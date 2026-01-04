@@ -98,6 +98,8 @@ private:
 	/// </summary>
 	void OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result);
 
+	void OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult& result);
+
 	/// <summary>
 	/// 値を登録する
 	/// </summary>
