@@ -14,13 +14,13 @@
 #include"Application/Player/Player.h"
 #include"Application/Camera/FollowCameraController.h"
 #include"Application/Light/SceneLightingController.h"
-#include"Application/Enemy/BossEnemy.h"
 #include"Application/UI/BossHpUI.h"
+#include"Application/Enemy/BossEnemy.h"
 #include"Application/Enemy/Projectile/EnemyProjectileManager.h"
 #include"Application/Stage/StageManager.h"
 #include"Application/ClearTimeTracker.h"
 #include"Application/Weapon/Sword.h"
-
+#include"Application/Graphics/PlaneProjectionShadow.h"
 
 class ALGameScene : public BaseScene {
 public:
@@ -90,6 +90,8 @@ private: // シーン機能
 	GameEngine::Model* playerModel_;
 	// プレイヤー
 	std::unique_ptr<Player> player_;
+	// プレイヤーの影
+	std::unique_ptr<PlaneProjectionShadow> playerShadow_;
 
 	// プレイやーの移動パーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> playerMoveParticle_;
@@ -113,6 +115,9 @@ private: // シーン機能
 	GameEngine::Model* bossEnemyModel_;
 	// ボス敵キャラのモデル
 	std::unique_ptr<BossEnemy> bossEnemy_;
+	// ボス敵の影
+	std::unique_ptr<PlaneProjectionShadow> bossEnemyShadow_;
+
 	// ボスの移動パーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> bossEnmeyMoveParticle_;
 

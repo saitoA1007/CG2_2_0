@@ -91,6 +91,10 @@ void ALGameScene::Initialize(SceneContext* context) {
 	player_->SetWeapon(playerSword_.get());
 	player_->Initialize(context_->inputCommand);
 
+	// プレイヤーの壁を生成
+	playerShadow_ = std::make_unique<PlaneProjectionShadow>();
+	playerShadow_->Initialize(&player_->GetWorldTransform());
+
 	// パーティクルのシステムを初期化
 	playerMoveParticle_ = std::make_unique<ParticleBehavior>();
 	playerMoveParticle_->Initialize("PlayerSmokeParticle", 48);
@@ -135,6 +139,10 @@ void ALGameScene::Initialize(SceneContext* context) {
 	// ボス敵クラスを初期化
 	bossEnemy_ = std::make_unique<BossEnemy>();
 	bossEnemy_->Initialize(enemyProjectileManager_.get());
+
+	// ボス敵の影を生成
+	bossEnemyShadow_ = std::make_unique<PlaneProjectionShadow>();
+	bossEnemyShadow_->Initialize(&bossEnemy_->GetWorldTransform());
 #pragma endregion
 
 	//==================================================
@@ -192,14 +200,18 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// プレイヤーを描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
+	// プレイヤーの影を描画
+	ModelRenderer::Draw(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
 	// 剣を描画	
 	if (player_->GetPlayerBehavior() == Player::Behavior::Attack) {
 		ModelRenderer::Draw(swordModel_, playerSword_->GetWorldTransform());
 	}
-
+	
 	// ボス敵を描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
+	// ボス敵の影を描画
+	ModelRenderer::Draw(bossEnemyModel_, bossEnemyShadow_->GetWorldTransform(), &bossEnemyShadow_->GetMaterial());
 
 	// 敵の岩の弾を描画
 	for (auto rockBullet : enemyProjectileManager_->GetProjectilesByType(ProjectileType::Rock)) {
@@ -290,6 +302,10 @@ void ALGameScene::GamePlayUpdate() {
 	// プレイヤーの更新処理
 	player_->SetCameraInfo(followCameraController_->GetRotateMatrix(), followCameraController_->GetIsLockOn(), bossEnemy_->GetPosition());
 	player_->Update();
+
+	// プレイヤーの影の更新処理
+	playerShadow_->Update();
+
 	// パーティクルの更新処理
 	playerMoveParticle_->SetEmitterPos(player_->GetPlayerPos());
 	playerMoveParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
@@ -302,6 +318,10 @@ void ALGameScene::GamePlayUpdate() {
 	// ボス敵の更新処理
 	bossEnemy_->Update(player_->GetPlayerPos());
 	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,bossEnemy_->GetAlpha() });
+
+	// ボス敵の影の更新処理
+	bossEnemyShadow_->Update();
+
 	// ボスの移動パーティクル
 	bossEnmeyMoveParticle_->SetEmitterPos(bossEnemy_->GetPosition());
 	bossEnmeyMoveParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
