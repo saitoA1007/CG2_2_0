@@ -118,6 +118,7 @@ private: // シーン機能
 
 	// ボスキャラのモデル
 	GameEngine::Model* bossEnemyModel_;
+	GameEngine::Model* bossEnemyEyeModel_;
 	// ボス敵キャラのモデル
 	std::unique_ptr<BossEnemy> bossEnemy_;
 	// ボス敵の影

@@ -4,6 +4,7 @@
 
 #include"WorldTransform.h"
 #include"Collider.h"
+#include"Extension/CustomMaterial/IceRockMaterial.h"
 
 #include"BossContext.h"
 #include"State/IBossState.h"
@@ -14,7 +15,7 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Initialize(EnemyProjectileManager* projectile);
+	void Initialize(EnemyProjectileManager* projectile, const uint32_t& texture);
 
 	/// <summary>
 	/// 更新処理
@@ -34,6 +35,12 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	GameEngine::Collider* GetCollider() { return collider_.get(); }
+
+	/// <summary>
+	/// マテリアルを取得
+	/// </summary>
+	/// <returns></returns>
+	IceRockMaterial* GetMaterial() { return iceMaterial_.get(); }
 
 	// 球のデータを取得
 	Sphere GetSphereData();
@@ -63,8 +70,13 @@ private:
 
 private:
 
+	std::string groupName_ = "Boss_Material";
+
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
+
+	// マテリアル
+	std::unique_ptr<IceRockMaterial> iceMaterial_;
 
 	// ボスの共通パラメータ
 	BossContext bossContext_;
@@ -90,6 +102,10 @@ private:
 	float alpha_ = 1.0f;
 	float hitTimer_ = 0.0f;
 	float maxHitTime_ = 1.0f;
+
+	// デバック用
+	Vector4 rimColor;
+	Vector4 specularColor;
 
 private:
 

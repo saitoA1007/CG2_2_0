@@ -124,9 +124,9 @@ void ALGameScene::Initialize(SceneContext* context) {
 #pragma region Enemy
 
 	// ボスモデルを生成
-	bossEnemyModel_ = context_->modelManager->GetNameByModel("Cube");
-	bossEnemyModel_->SetDefaultIsEnableLight(true);
-	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,1.0f });
+	bossEnemyModel_ = context_->modelManager->GetNameByModel("BossBody");
+	bossEnemyEyeModel_ = context_->modelManager->GetNameByModel("BossEye");
+	bossEnemyEyeModel_->SetDefaultColor({ 0.0f,0.0f,0.0f,1.0f });
 
 	// 敵の弾モデルを生成
 	rockBulletModel_ = context_->modelManager->GetNameByModel("Cube");
@@ -142,7 +142,7 @@ void ALGameScene::Initialize(SceneContext* context) {
 
 	// ボス敵クラスを初期化
 	bossEnemy_ = std::make_unique<BossEnemy>();
-	bossEnemy_->Initialize(enemyProjectileManager_.get());
+	bossEnemy_->Initialize(enemyProjectileManager_.get(), context_->textureManager->GetHandleByName("boss.png"));
 
 	// ボス敵の影を生成
 	bossEnemyShadow_ = std::make_unique<PlaneProjectionShadow>();
@@ -242,10 +242,13 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	if (player_->GetPlayerBehavior() == Player::Behavior::Attack) {
 		ModelRenderer::Draw(swordModel_, playerSword_->GetWorldTransform());
 	}
-	
-	// ボス敵を描画
-	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
-	ModelRenderer::Draw(bossEnemyModel_, bossEnemy_->GetWorldTransform());
+
+	// ボスの体を描画
+	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
+	CustomRenderer::DrawRock(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource(), bossEnemy_->GetMaterial());
+	// ボスの目を描画
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
+	ModelRenderer::Draw(bossEnemyEyeModel_, bossEnemy_->GetWorldTransform());
 	// ボス敵の影を描画
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemyShadow_->GetWorldTransform(), &bossEnemyShadow_->GetMaterial());
 
@@ -375,7 +378,7 @@ void ALGameScene::GamePlayUpdate() {
 #pragma region EnemyUpdate
 	// ボス敵の更新処理
 	bossEnemy_->Update(player_->GetPlayerPos());
-	bossEnemyModel_->SetDefaultColor({ 1.0f,0.0f,0.0f,bossEnemy_->GetAlpha() });
+	//bossEnemyModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,bossEnemy_->GetAlpha() });
 
 	// ボス敵の影の更新処理
 	bossEnemyShadow_->Update();
