@@ -18,9 +18,12 @@ void CustomRenderer::StaticInitialize(ID3D12Device* device,ID3D12GraphicsCommand
 
 	// 使用するマテリアルの静的初期化
 	IceMaterial::StaticInitialize(device);
+	IceRockMaterial::StaticInitialize(device);
 
 	// 氷描画のpsoデータを取得する
 	psoList_[CustomRenderMode::Ice] = psoManager->GetDrawPsoData("IceMaterial");
+	psoList_[CustomRenderMode::Rock] = psoManager->GetDrawPsoData("IceRock");
+	psoList_[CustomRenderMode::RockBoth] = psoManager->GetDrawPsoData("IceRockBoth");
 }
 
 void CustomRenderer::PreDraw(CustomRenderMode mode) {
@@ -62,6 +65,35 @@ void CustomRenderer::DrawIce(const Model* model, WorldTransform& worldTransform,
 
 		commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
 
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+		commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+		if (meshes[i]->GetTotalIndices() != 0) {
+			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
+		} else {
+			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), 1, 0, 0);
+		}
+	}
+}
+
+void CustomRenderer::DrawRock(const Model* model, WorldTransform& worldTransform, ID3D12Resource* lightGroupResource, IceRockMaterial* material) {
+	// カメラ座標に変換
+	if (model->IsLoad()) {
+		worldTransform.SetWVPMatrix(model->GetLocalMatrix(), vpMatrix_);
+	} else {
+		worldTransform.SetWVPMatrix(vpMatrix_);
+	}
+
+	// メッシュを取得
+	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
+
+	for (uint32_t i = 0; i < meshes.size(); ++i) {
+		commandList_->IASetVertexBuffers(0, 1, &meshes[i]->GetVertexBufferView());
+		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
