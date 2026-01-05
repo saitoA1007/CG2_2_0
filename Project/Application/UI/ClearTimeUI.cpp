@@ -20,20 +20,20 @@ ClearTimeUI::ClearTimeUI(GameEngine::TextureManager* textureManager) {
 	for (size_t i = 0; i < numbersSprites_.size(); ++i) {
 
 		if (i == 0) {
-			numbersSprites_[i].numSprite_ = Sprite::Create({ 640.0f - 8.0f - 64.0f, 400.0f + 32.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
+			numbersSprites_[i].numSprite_ = Sprite::Create({ basePos_.x - 8.0f - 64.0f, basePos_.y }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 1.0f,1.0f,1.0f,1.0f });
 		} else if (i == 1) {
-			numbersSprites_[i].numSprite_ = Sprite::Create({ 640.0f - 8.0f - 32.0f, 400.0f + 32.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
+			numbersSprites_[i].numSprite_ = Sprite::Create({ basePos_.x - 8.0f - 32.0f, basePos_.y }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 1.0f,1.0f,1.0f,1.0f });
 		} else if (i == 2) {
-			numbersSprites_[i].numSprite_ = Sprite::Create({ 640.0f + 8.0f + 32.0f, 400.0f + 32.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
+			numbersSprites_[i].numSprite_ = Sprite::Create({ basePos_.x + 8.0f + 32.0f, basePos_.y }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 1.0f,1.0f,1.0f,1.0f });
 		} else if (i == 3) {
-			numbersSprites_[i].numSprite_ = Sprite::Create({ 640.0f + 8.0f + 64.0f, 400.0f + 32.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
+			numbersSprites_[i].numSprite_ = Sprite::Create({ basePos_.x + 8.0f + 64.0f, basePos_.y }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 1.0f,1.0f,1.0f,1.0f });
 		}
 
 		// クリア時間の各桁の番号を取得
-		numbersSprites_[i].number = ClearTime::numbers[i];
+		numbersSprites_[i].number = numbersGH_[ClearTime::numbers[i]];
 	}
 
 	// 桁の中間
-	numMiddle_ = Sprite::Create({ 640.0f, 400.0f + 32.0f + 32.0f }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 0.0f,0.0f,0.0f,0.0f });
+	numMiddle_ = Sprite::Create({ basePos_.x, basePos_.y }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 1.0f,1.0f,1.0f,1.0f });
 	numMiddleGH_ = textureManager->GetHandleByName("dotto.png");
 }

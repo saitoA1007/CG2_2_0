@@ -68,6 +68,10 @@ private: // シーン機能
 	std::unique_ptr<GameEngine::Sprite> spaceSprite_;
 	uint32_t spaceGH_ = 0;
 
+	// タイム
+	std::unique_ptr<GameEngine::Sprite> timeSprite_;
+	uint32_t timeGH_ = 0;
+
 	// クリア時間を表示
 	std::unique_ptr<ClearTimeUI> clearTimeUI_;
 };

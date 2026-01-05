@@ -17,7 +17,7 @@ void PlayerHpUI::Initialize(const int32_t& maxHp, GameEngine::TextureManager* te
 	}
 
 	// hp画像を取得
-	hpGH_ = textureManager->GetHandleByName("PlayerHP.png");
+	hpGH_ = textureManager->GetHandleByName("hp.png");
 }
 
 void PlayerHpUI::Update() {

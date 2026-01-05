@@ -33,7 +33,7 @@ private:
 	int32_t currentHp_ = 0;
 
 	// 配置する基準の位置
-	Vector2 startPos_ = { 32.0f, 656.0f };
+	Vector2 startPos_ = { 32.0f, 640.0f };
 
 	// 画像サイズ
 	Vector2 spriteSize_ = { 64.0f, 64.0f };

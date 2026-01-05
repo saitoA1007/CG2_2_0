@@ -11,15 +11,15 @@ void GameOverUI::Initialize(GameEngine::InputCommand* inputCommand, GameEngine::
 
     // ロゴスプライト
     logoSprite_ = Sprite::Create({ 640.0f, 180.0f }, { 1024.0f, 256.0f }, { 0.5f, 0.5f });
-    logoGH_ = textureManager->GetHandleByName("gameOverText.png");
+    logoGH_ = textureManager->GetHandleByName("gameOver.png");
 
     // やりなおすスプライト
-    retrySprite_ = Sprite::Create({ 640.0f, 360.0f }, { 375.0f, 80.0f }, { 0.5f, 0.5f });
-    retryGH_ = textureManager->GetHandleByName("retryText.png");
+    retrySprite_ = Sprite::Create({ 640.0f, 400.0f }, { 375.0f, 140.0f }, { 0.5f, 0.5f });
+    retryGH_ = textureManager->GetHandleByName("retry.png");
 
     // タイトルにもどるスプライト
-    titleSprite_ = Sprite::Create({ 640.0f, 488.0f }, { 500.0f, 80.0f }, { 0.5f, 0.5f });
-    titleGH_ = textureManager->GetHandleByName("titleBackText.png");
+    titleSprite_ = Sprite::Create({ 640.0f, 540.0f }, { 375.0f, 140.0f }, { 0.5f, 0.5f });
+    titleGH_ = textureManager->GetHandleByName("title.png");
 
     // 初期選択の要素を設定
     selectNum_ = 0;

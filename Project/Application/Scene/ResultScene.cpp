@@ -28,12 +28,16 @@ void ResultScene::Initialize(SceneContext* context) {
 	skyDomeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// タイトル画像
-	titleSprite_ = Sprite::Create({ 640.0f,250.0f }, { 600.0f,128.0f }, { 0.5f,0.5f });
+	titleSprite_ = Sprite::Create({ 640.0f,200.0f }, { 600.0f,128.0f }, { 0.5f,0.5f },{0.8f,0.8f,0.0f,1.0f});
 	titleGH_ = context_->textureManager->GetHandleByName("clearText.png");
 
 	// スペースボタン
-	spaceSprite_ = Sprite::Create({ 640.0f,500.0f }, { 256.0f,64.0f }, { 0.5f,0.5f });
+	spaceSprite_ = Sprite::Create({ 640.0f,540.0f }, { 256.0f,64.0f }, { 0.5f,0.5f });
 	spaceGH_ = context_->textureManager->GetHandleByName("spaceText.png");
+
+	// タイム
+	timeSprite_ = Sprite::Create({ 640.0f,340.0f }, { 256.0f * 0.8f,128.0f*0.8f }, { 0.5f,0.5f });
+	timeGH_ = context_->textureManager->GetHandleByName("time.png");
 
 	// クリア時間UI
 	clearTimeUI_ = std::make_unique<ClearTimeUI>(context_->textureManager);
@@ -83,8 +87,12 @@ void ResultScene::Draw(const bool& isDebugView) {
 	// スペース画像
 	SpriteRenderer::Draw(spaceSprite_.get(), spaceGH_);
 
+	// タイム
+	SpriteRenderer::Draw(timeSprite_.get(), timeGH_);
+
 	// クリアUI
 	SpriteRenderer::Draw(clearTimeUI_->GetnumDottoSprite(), clearTimeUI_->GetDottoTexture());
+
 	// 時間を表示
 	for (auto& num : clearTimeUI_->GetNumberSprite()) {
 		SpriteRenderer::Draw(num.numSprite_.get(), num.number);
