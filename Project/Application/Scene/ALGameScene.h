@@ -172,6 +172,10 @@ private: // シーン機能
 	// ゲームオーバーフラグ
 	bool isGameOver_ = false;
 
+	// 操作ガイド
+	std::unique_ptr<GameEngine::Sprite> guideSprite_;
+	uint32_t guideGH_ = 0;
+
 	/// 演出
 
 	// 平面モデル
