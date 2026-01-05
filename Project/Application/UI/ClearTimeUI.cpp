@@ -20,13 +20,13 @@ ClearTimeUI::ClearTimeUI(GameEngine::TextureManager* textureManager) {
 	for (size_t i = 0; i < numbersSprites_.size(); ++i) {
 
 		if (i == 0) {
-			numbersSprites_[i].numSprite_ = Sprite::Create({ basePos_.x - 8.0f - 64.0f, basePos_.y }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 1.0f,1.0f,1.0f,1.0f });
+			numbersSprites_[i].numSprite_ = Sprite::Create({ basePos_.x - 8.0f - 64.0f - 12.0f, basePos_.y }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 1.0f,1.0f,1.0f,1.0f });
 		} else if (i == 1) {
 			numbersSprites_[i].numSprite_ = Sprite::Create({ basePos_.x - 8.0f - 32.0f, basePos_.y }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 1.0f,1.0f,1.0f,1.0f });
 		} else if (i == 2) {
 			numbersSprites_[i].numSprite_ = Sprite::Create({ basePos_.x + 8.0f + 32.0f, basePos_.y }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 1.0f,1.0f,1.0f,1.0f });
 		} else if (i == 3) {
-			numbersSprites_[i].numSprite_ = Sprite::Create({ basePos_.x + 8.0f + 64.0f, basePos_.y }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 1.0f,1.0f,1.0f,1.0f });
+			numbersSprites_[i].numSprite_ = Sprite::Create({ basePos_.x + 8.0f + 64.0f + 12.0f, basePos_.y }, { 48.0f, 64.0f }, { 0.5f, 0.5f }, { 1.0f,1.0f,1.0f,1.0f });
 		}
 
 		// クリア時間の各桁の番号を取得

@@ -32,8 +32,8 @@ void TitleScene::Initialize(SceneContext* context) {
 	titleGH_ = context_->textureManager->GetHandleByName("titleText.png");
 
 	// スペースボタン
-	spaceSprite_ = Sprite::Create({ 640.0f,500.0f }, { 256.0f,64.0f }, { 0.5f,0.5f });
-	spaceGH_ = context_->textureManager->GetHandleByName("spaceText.png");
+	spaceSprite_ = Sprite::Create({ 640.0f,500.0f }, { 256.0f * 1.2f,64.0f*1.2f }, { 0.5f,0.5f });
+	spaceGH_ = context_->textureManager->GetHandleByName("press.png");
 }
 
 void TitleScene::Update() {
