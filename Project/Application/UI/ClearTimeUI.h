@@ -35,4 +35,6 @@ private:
 	// 桁の中間
 	std::unique_ptr<GameEngine::Sprite> numMiddle_;
 	uint32_t numMiddleGH_ = 0;
+
+	Vector2 basePos_ = {640.0f,420.0f};
 };

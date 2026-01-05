@@ -17,7 +17,7 @@ public:
 	static inline int totalSeconds = 0;
 
 	// 桁
-	static inline int numbers[static_cast<size_t>(Digit::MaxCount)] = {};
+	static inline int numbers[static_cast<size_t>(Digit::MaxCount)] = {0,0,0,0};
 
 	// 各桁の番号を取得
 	static void CreateNumbers() {
