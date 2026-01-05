@@ -1,0 +1,11 @@
+{
+    "Boss_RushAttack": {
+        "EndRushSpeed": 0.0,
+        "InTime": 1.0,
+        "MoveTime": 1.0,
+        "OutTime": 1.0,
+        "RotateSpeed": 5.0,
+        "SceneName": "ALGameScene",
+        "StartRushSpeed": 50.0
+    }
+}

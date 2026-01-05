@@ -1,0 +1,11 @@
+{
+    "Boss_Controller": {
+        "RandBallAttackWeight": 1,
+        "RotateAttackMoveWeight": 20,
+        "RushAttackWeight": 30,
+        "SceneName": "ALGameScene",
+        "ShotBallWeight": 30,
+        "StampFallWeight": 20,
+        "WaitWeight": 5
+    }
+}
