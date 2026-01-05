@@ -35,6 +35,8 @@ private:
 
     // 移動する方向
     Vector3 dir_ = {};
+    
+    uint32_t rushSH_ = 0;
 
 private: // 調整項目
 

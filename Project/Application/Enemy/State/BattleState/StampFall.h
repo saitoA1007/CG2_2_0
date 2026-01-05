@@ -40,6 +40,9 @@ private:
 
     float timer_ = 0.0f;
 
+    // 着地音
+    uint32_t landSH_ = 0;
+
 private: // 調整項目
 
     // 最大の高さ

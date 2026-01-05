@@ -2,6 +2,7 @@
 #include"FPSCounter.h"
 #include"EasingManager.h"
 #include"GameParamEditor.h"
+#include"AudioManager.h"
 using namespace GameEngine;
 
 StampFall::StampFall(BossContext& context) : bossContext_(context) {
@@ -10,6 +11,8 @@ StampFall::StampFall(BossContext& context) : bossContext_(context) {
 	RegisterBebugParam();
 #endif 
 	ApplyDebugParam();
+
+	landSH_ = AudioManager::GetInstance().GetHandleByName("enemyLand.mp3");
 }
 
 void StampFall::Initialize() {
@@ -88,7 +91,16 @@ void StampFall::Update() {
 		// 落下移動
 		bossContext_.worldTransform->transform_.translate.y = Lerp(endMovePos_.y, startRisePosY_, EaseOutBounce(timer_));
 
+		// 着地音を鳴らす
+		if (bossContext_.worldTransform->transform_.translate.y <= startRisePosY_ + 1.0f) {
+			if (!AudioManager::GetInstance().IsPlay(landSH_)) {
+				AudioManager::GetInstance().Play(landSH_, 0.5f, false);
+			}
+		}
+
 		if (timer_ >= 1.0f) {
+			// 破壊音
+			//AudioManager::GetInstance().Play(landSH_, 0.5f, false);
 			bossContext_.worldTransform->transform_.translate.y = startRisePosY_;
 			isFinished_ = true;
 		}

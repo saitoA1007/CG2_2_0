@@ -3,6 +3,7 @@
 #include"MyMath.h"
 #include"GameParamEditor.h"
 #include"EasingManager.h"
+#include"AudioManager.h"
 using namespace GameEngine;
 
 RushAttack::RushAttack(BossContext& context) : bossContext_(context) {
@@ -10,6 +11,8 @@ RushAttack::RushAttack(BossContext& context) : bossContext_(context) {
 	RegisterBebugParam();
 #endif 
 	ApplyDebugParam();
+
+	rushSH_ = AudioManager::GetInstance().GetHandleByName("enemyDush.mp3");
 }
 
 void RushAttack::Initialize() {
@@ -51,6 +54,9 @@ void RushAttack::Update() {
 			timer_ = 0.0f;
 			phase_ = Phase::Move;
 			dir_ = MakeDirVector({ 0,0,1 }, { 0,bossContext_.worldTransform->transform_.rotate.y,0 });
+
+			// 突進する音
+			AudioManager::GetInstance().Play(rushSH_, 0.3f, false);
 		}
 		break;
 	}

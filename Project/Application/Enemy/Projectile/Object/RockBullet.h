@@ -39,6 +39,8 @@ private:
 
 	float timer_ = 0.0f;
 
+	uint32_t breakSH_ = 0;
+
 private: // 調整項目
 
 	// 速度
