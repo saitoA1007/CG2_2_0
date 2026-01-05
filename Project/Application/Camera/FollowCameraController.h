@@ -84,6 +84,9 @@ private:
 
 	bool isLockOn_ = false;
 
+	// 切り替え音
+	uint32_t changeSH_ = 0;
+
 private:
 
 	/// <summary>

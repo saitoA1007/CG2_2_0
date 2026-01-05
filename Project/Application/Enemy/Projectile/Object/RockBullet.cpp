@@ -4,6 +4,7 @@
 #include"RandomGenerator.h"
 #include"CollisionConfig.h"
 #include"Application/CollisionTypeID.h"
+#include"AudioManager.h"
 using namespace GameEngine;
 
 void RockBullet::Initialize(const Vector3& pos, const Vector3& dir) {
@@ -33,6 +34,8 @@ void RockBullet::Initialize(const Vector3& pos, const Vector3& dir) {
 	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 	});
+
+	breakSH_ = AudioManager::GetInstance().GetHandleByName("iceBreak.mp3");
 
 #ifdef USE_IMGUI
 	RegisterBebugParam();
@@ -64,6 +67,9 @@ void RockBullet::Update() {
 	// 地面に着いたら生存フラグを無効
 	if (worldTransform_.transform_.translate.y <= 0.0f) {
 		isAlive_ = false;
+
+		// 破壊音
+		AudioManager::GetInstance().Play(breakSH_, 0.5f, false);
 	}
 }
 
@@ -73,6 +79,8 @@ void RockBullet::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRe
 	// 接触したら、生存フラグを無効
 	if (isPlayer) {
 		isAlive_ = false;
+		// 破壊音
+		AudioManager::GetInstance().Play(breakSH_, 0.5f, false);
 	}
 }
 

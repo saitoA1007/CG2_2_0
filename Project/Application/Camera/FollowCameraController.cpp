@@ -3,12 +3,15 @@
 #include"EasingManager.h"
 #include<numbers>
 #include"FPSCounter.h"
+#include"AudioManager.h"
 using namespace GameEngine;
 
 void FollowCameraController::Initialize() {
 	// カメラの初期化
 	camera_ = std::make_unique<Camera>();
 	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},position_ }, 1280, 720);
+
+	changeSH_ = AudioManager::GetInstance().GetHandleByName("changeCamera.mp3");
 }
 
 void FollowCameraController::Update(GameEngine::InputCommand* inputCommand) {
@@ -47,6 +50,9 @@ void FollowCameraController::Update(GameEngine::InputCommand* inputCommand) {
 	// カメラのロックオンを切り替える
 	if (inputCommand->IsCommandActive("CameraLockOn")) {
 		isLockOn_ = !isLockOn_;
+
+		// 切り替え音
+		AudioManager::GetInstance().Play(changeSH_, 0.5f, false);
 	}
 
 	// 球面座標系で移動

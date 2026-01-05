@@ -208,7 +208,7 @@ void ALGameScene::Update() {
 
 	// BGMを再生
 	if (!AudioManager::GetInstance().IsPlay(gameSH_)) {
-		AudioManager::GetInstance().Play(gameSH_, 0.3f, false);
+		AudioManager::GetInstance().Play(gameSH_, 0.1f, false);
 	}
 
 	if (isGameOver_) {
