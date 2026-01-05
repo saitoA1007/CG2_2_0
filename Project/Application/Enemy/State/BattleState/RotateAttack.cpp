@@ -2,6 +2,7 @@
 #include"FPSCounter.h"
 #include"EasingManager.h"
 #include"GameParamEditor.h"
+#include"RandomGenerator.h"
 using namespace GameEngine;
 
 RotateAttack::RotateAttack(BossContext& context) : bossContext_(context) {
@@ -37,12 +38,34 @@ void RotateAttack::Update() {
 			timer_ = 0.0f;
 			phase_ = Phase::Move;
 			rotSpeed_ = maxRotSpeed_;
+
+			Vector3 toTarget = bossContext_.targetPos - bossContext_.worldTransform->transform_.translate;
+			dir_ = Normalize(toTarget);
 		}
 		break;
 
 
-	case RotateAttack::Phase::Move:
+	case RotateAttack::Phase::Move: {
 		timer_ += FpsCounter::deltaTime / moveTime_;
+
+		// 移動
+		float totalCycle = timer_ * 3;
+		float localTimer = std::fmodf(totalCycle, 1.0f);
+
+		if (localTimer <= 0.8f) {
+			isMove_ = true;
+		} else if (localTimer >= 0.9f) {
+			if (isMove_) {
+				isMove_ = false;
+
+				Vector3 toTarget = bossContext_.targetPos - bossContext_.worldTransform->transform_.translate;
+				dir_ = Normalize(toTarget);
+			}
+		}
+
+		moveSpeed_ = Lerp(20.0f, 1.0f, localTimer);
+
+		bossContext_.worldTransform->transform_.translate += dir_ * moveSpeed_ * FpsCounter::deltaTime;
 
 		// 回転
 		bossContext_.worldTransform->transform_.rotate.y += rotSpeed_ * FpsCounter::deltaTime;
@@ -52,7 +75,7 @@ void RotateAttack::Update() {
 			phase_ = Phase::Out;
 		}
 		break;
-
+	}
 
 	case RotateAttack::Phase::Out:
 		timer_ += FpsCounter::deltaTime / outTime_;
