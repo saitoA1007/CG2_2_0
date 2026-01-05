@@ -34,6 +34,12 @@ private:
 
     float rotSpeed_ = 0.0f;
 
+    float moveSpeed_ = 0.0f;
+
+    Vector3 dir_;
+
+    bool isMove_ = false;
+
 private: // 調整項目
 
     float inTime_ = 1.0f;

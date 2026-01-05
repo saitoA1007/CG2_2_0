@@ -109,8 +109,8 @@ void Player::Update() {
 	behaviorsTable_[static_cast<size_t>(behavior_)]();
 
 	// プレイヤーを移動範囲に制限
-	//worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x,-29.0f,29.0f);
-	//worldTransform_.transform_.translate.z = std::clamp(worldTransform_.transform_.translate.z, -29.0f, 29.0f);
+	worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x,-29.0f,29.0f);
+	worldTransform_.transform_.translate.z = std::clamp(worldTransform_.transform_.translate.z, -29.0f, 29.0f);
 
 	// ダメージを受けた時のノックバック処理
 	if (knockbackSpeed_ > 0.0f) {
