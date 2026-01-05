@@ -13,6 +13,7 @@ struct BossContext {
 
 	// 体力
 	uint32_t hp = 0;
+	uint32_t maxHp = 0;
 
 	// 状態の切り替えを管理
 	std::optional<BossState> bossStateRequest_ = std::nullopt;

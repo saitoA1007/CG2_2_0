@@ -75,6 +75,7 @@ void BossEnemy::Initialize(EnemyProjectileManager* projectile, const uint32_t& t
 
 	// hpを設定
 	bossContext_.hp = kMaxHp_;
+	bossContext_.maxHp = kMaxHp_;
 }
 
 void BossEnemy::Update(const Vector3& targetPos) {
