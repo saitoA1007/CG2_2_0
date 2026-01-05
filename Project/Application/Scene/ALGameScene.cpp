@@ -82,7 +82,7 @@ void ALGameScene::Initialize(SceneContext* context) {
 #pragma region Player
 
 	// 武器を初期化
-	swordModel_ = context_->modelManager->GetNameByModel("Sword");
+	swordModel_ = context_->modelManager->GetNameByModel("Hammer");
 	// 武器
 	playerSword_ = std::make_unique<Sword>();
 	playerSword_->Initialize();
@@ -160,6 +160,10 @@ void ALGameScene::Initialize(SceneContext* context) {
 	// プレイヤーのhpUIを初期化
 	playerHpUI_ = std::make_unique<PlayerHpUI>();
 	playerHpUI_->Initialize(player_->GetMaxHp(), context_->textureManager);
+
+	// 操作説明UI
+	guideSprite_ = Sprite::Create({ 928.0f,534.0f }, { 320.0f,170.0f }, { 0.0f,0.0f }, { 0.1f,0.1f,0.1f,1.0f });
+	guideGH_ = context_->textureManager->GetHandleByName("guide.png");
 
 	// ゲームオーバーUIを初期化
 	gameOverUI_ = std::make_unique<GameOverUI>();
@@ -306,6 +310,9 @@ void ALGameScene::Draw(const bool& isDebugView) {
 		SpriteRenderer::Draw(sprite.get(), playerHpUI_->GetHpGH());
 	}
 
+	// 操作説明を表示
+	SpriteRenderer::Draw(guideSprite_.get(), guideGH_);
+
 	// ゲームオーバーシーンの描画
 	if (isGameOver_) {
 		SpriteRenderer::Draw(gameOverUI_->GetBgSprite(), gameOverUI_->GetBgGH());
@@ -323,8 +330,8 @@ void ALGameScene::InputRegisterCommand() {
 	context_->inputCommand->RegisterCommand("MoveRight", { {InputState::KeyPush, DIK_D },{InputState::PadLeftStick,0,{1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_RIGHT } });
 	// ジャンプコマンドを登録する
 	context_->inputCommand->RegisterCommand("Jump", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
-	context_->inputCommand->RegisterCommand("Attack", { {InputState::KeyTrigger, DIK_K},{InputState::PadTrigger, XINPUT_GAMEPAD_B} });
-	context_->inputCommand->RegisterCommand("Dush", { {InputState::KeyTrigger, DIK_J},{InputState::PadTrigger, XINPUT_GAMEPAD_X} });
+	context_->inputCommand->RegisterCommand("Attack", { {InputState::KeyTrigger, DIK_K},{InputState::PadTrigger, XINPUT_GAMEPAD_X} });
+	context_->inputCommand->RegisterCommand("Dush", { {InputState::KeyTrigger, DIK_J},{InputState::PadTrigger, XINPUT_GAMEPAD_B} });
 
 	// カメラ操作のコマンドを登録する
 	context_->inputCommand->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
