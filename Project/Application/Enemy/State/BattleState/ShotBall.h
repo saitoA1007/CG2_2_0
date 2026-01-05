@@ -31,9 +31,19 @@ private:
 
     float timer_ = 0.0f;
 
+    float startPosY_ = 0.0f;
+
+private: // 調整項目
+
     float inTime_ = 1.0f;
     float throwTime_ = 1.0f;
     float outTime_ = 1.0f;
+
+    // 回転速度
+    float rotateSpeed_ = 5.0f;
+
+    // 最大の高さ
+    float maxHeightPosY_ = 6.0f;
 
 private:
 
