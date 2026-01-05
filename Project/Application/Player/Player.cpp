@@ -6,9 +6,10 @@
 #include"EasingManager.h"
 #include"MyMath.h"
 #include"FPSCounter.h"
-#include"CollisionConfig.h"
 #include"LogManager.h"
+#include"CollisionConfig.h"
 #include"Application/CollisionTypeID.h"
+#include"AudioManager.h"
 using namespace GameEngine;
 
 void Player::Initialize(GameEngine::InputCommand* inputCommand) {
@@ -67,6 +68,12 @@ void Player::Initialize(GameEngine::InputCommand* inputCommand) {
 		[this]() { jumpTimer_ = 0.0f; }, // ジャンプ
 		[this]() { dushTimer_ = 0.0f; }, // ダッシュ
 	};
+
+	// 音
+	dushSH_ = AudioManager::GetInstance().GetHandleByName("playerDush.mp3");
+	landSH_ = AudioManager::GetInstance().GetHandleByName("playerLand.mp3");
+	hitSH_ = AudioManager::GetInstance().GetHandleByName("playerHit.mp3");
+	swingSH_ = AudioManager::GetInstance().GetHandleByName("playerSwing.mp3");
 
 #ifdef _DEBUG
 	// 値を登録する
@@ -161,6 +168,9 @@ void Player::ProcessMoveInput() {
 		if (behavior_ == Behavior::Normal) {
 			behaviorRequest_ = Behavior::Dush;
 
+			// ダッシュ音
+			AudioManager::GetInstance().Play(dushSH_, 0.5f, false);
+
 			// ダッシュの向く方向を設定する
 			dushDirection_ = { 0.0f,0.0f,1.0f };
 			Matrix4x4 worldMatrix = worldTransform_.GetWorldMatrix();
@@ -176,12 +186,20 @@ void Player::ProcessMoveInput() {
 		if (behavior_ == Behavior::Normal) {
 			workAttack_.comboIndex = 0;
 			workAttack_.timer_ = 0.0f;
+			workAttack_.isComboNext = false;
 			behaviorRequest_ = Behavior::Attack;
+
+			// 武器を振る音
+			AudioManager::GetInstance().Play(swingSH_, 0.5f, false);
 
 		} else if (behavior_ == Behavior::Attack) {
 			// コンボ上限に達していない時
 			if (workAttack_.comboIndex < kComboNum - 1) {
-				workAttack_.isComboNext = true;
+				if (!workAttack_.isComboNext) {
+					// 武器を振る音
+					AudioManager::GetInstance().Play(swingSH_, 0.8f, false);
+					workAttack_.isComboNext = true;
+				}
 			}
 		}
 	}
@@ -274,7 +292,7 @@ void Player::AttackUpdate() {
 		// 縦に切る
 	case 0:
 		// 回転させる
-		theta_ = Lerp(std::numbers::pi_v<float> *0.5f, 0.0f, workAttack_.timer_);
+		theta_ = Lerp(std::numbers::pi_v<float> *0.5f, 0.0f, EaseIn(workAttack_.timer_));
 		// 武器を移動させる
 		weaponTransform_.translate.x = 0.0f;
 		weaponTransform_.translate.z = std::cosf(theta_) * kConstAttacks_[workAttack_.comboIndex].radius;
@@ -287,7 +305,7 @@ void Player::AttackUpdate() {
 
 		// 斜め切り
 	case 1:
-		theta_ = Lerp(-std::numbers::pi_v<float> *0.6f, std::numbers::pi_v<float> *0.6f, workAttack_.timer_);
+		theta_ = Lerp(-std::numbers::pi_v<float> *0.6f, std::numbers::pi_v<float> *0.6f, EaseIn(workAttack_.timer_));
 		// 武器を移動させる
 		weaponTransform_.translate.x = std::sinf(theta_) * kConstAttacks_[workAttack_.comboIndex].radius;
 		weaponTransform_.translate.y = std::sinf(theta_) * kConstAttacks_[workAttack_.comboIndex].radius;
@@ -300,7 +318,7 @@ void Player::AttackUpdate() {
 
 		// 横切り
 	case 2:
-		theta_ = Lerp(-std::numbers::pi_v<float> *0.6f, std::numbers::pi_v<float> *0.6f, workAttack_.timer_);
+		theta_ = Lerp(-std::numbers::pi_v<float> *0.6f, std::numbers::pi_v<float> *0.6f, EaseIn(workAttack_.timer_));
 		// 武器を移動させる
 		weaponTransform_.translate.x = std::sinf(theta_) * kConstAttacks_[workAttack_.comboIndex].radius;
 		weaponTransform_.translate.y = 0.5f;
@@ -360,6 +378,9 @@ void Player::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult
 		} else {
 			isAttack_ = true;
 		}
+
+		// ヒット音声
+		AudioManager::GetInstance().Play(hitSH_, 0.5f, false);
 
 		knockbackSpeed_ = 30.0f;
 		hitDirection_ = Vector3(result.contactNormal.x, 0.0f, result.contactNormal.z);

@@ -65,4 +65,9 @@ private: // シーン機能
 	// スペース画像
 	std::unique_ptr<GameEngine::Sprite> spaceSprite_;
 	uint32_t spaceGH_ = 0;
+
+	// タイトル音声
+	uint32_t titleSH_ = 0;
+	// 決定音
+	uint32_t decisionSH_ = 0;
 };

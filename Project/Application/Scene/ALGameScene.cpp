@@ -7,6 +7,7 @@
 #include"LogManager.h"
 #include"Extension/CustomRenderer.h"
 #include<numbers>
+#include"AudioManager.h"
 using namespace GameEngine;
 
 ALGameScene::~ALGameScene() {
@@ -175,11 +176,21 @@ void ALGameScene::Initialize(SceneContext* context) {
 	gameOverUI_->SetRetry([this]() {
 		isFinished_ = true;
 		sceneState_ = SceneState::ALGame;
+
+		// BGMを停止
+		if (AudioManager::GetInstance().IsPlay(gameSH_)) {
+			AudioManager::GetInstance().Stop(gameSH_);
+		}
 	});
 	// タイトル
 	gameOverUI_->SetTitle([this]() {
 		isFinished_ = true;
 		sceneState_ = SceneState::Title;
+
+		// BGMを停止
+		if (AudioManager::GetInstance().IsPlay(gameSH_)) {
+			AudioManager::GetInstance().Stop(gameSH_);
+		}
 	});
 #pragma endregion
 
@@ -187,9 +198,17 @@ void ALGameScene::Initialize(SceneContext* context) {
 	clearTimeTracker_ = std::make_unique<ClearTimeTracker>();
 	// 時間の計測を開始
 	clearTimeTracker_->StartMeasureTimes();
+
+	// bgmを取得
+	gameSH_ = AudioManager::GetInstance().GetHandleByName("gameBGM.mp3");
 }
 
 void ALGameScene::Update() {
+
+	// BGMを再生
+	if (!AudioManager::GetInstance().IsPlay(gameSH_)) {
+		AudioManager::GetInstance().Play(gameSH_, 0.3f, false);
+	}
 
 	if (isGameOver_) {
 		// ゲームオーバーの更新処理
@@ -353,6 +372,11 @@ void ALGameScene::GamePlayUpdate() {
 
 		// 時間の計測を終了
 		clearTimeTracker_->EndMeasureTimes();
+
+		// BGMを停止
+		if (AudioManager::GetInstance().IsPlay(gameSH_)) {
+			AudioManager::GetInstance().Stop(gameSH_);
+		}
 	}
 
 	// プレイヤーの対りょっくがなくなったらゲームオーバーに切り替え

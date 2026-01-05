@@ -1,0 +1,11 @@
+{
+    "Player_Combo": {
+        "1ComboMaxTime": 0.4000000059604645,
+        "1ComboRadius": 3.0,
+        "2ComboMaxTime": 0.800000011920929,
+        "2ComboRadius": 3.0,
+        "3ComboMaxTime": 0.6000000238418579,
+        "3ComboRadius": 5.0,
+        "SceneName": "ALGameScene"
+    }
+}

@@ -200,6 +200,15 @@ private:
 	// 攻撃フラグ
 	bool isAttack_ = false;
 
+	// ダッシュ音
+	uint32_t dushSH_ = 0;
+	// 地面に付いた音
+	uint32_t landSH_ = 0;
+	// ヒット音
+	uint32_t hitSH_ = 0;
+	// 振る音
+	uint32_t swingSH_ = 0;
+
 	// 移動で使用する変数 ============================
 
 	// 移動処理

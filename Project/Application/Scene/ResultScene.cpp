@@ -3,6 +3,7 @@
 #include"ModelRenderer.h"
 #include"GameParamEditor.h"
 #include"SpriteRenderer.h"
+#include"AudioManager.h"
 using namespace GameEngine;
 
 ResultScene::~ResultScene() {
@@ -41,12 +42,18 @@ void ResultScene::Initialize(SceneContext* context) {
 
 	// クリア時間UI
 	clearTimeUI_ = std::make_unique<ClearTimeUI>(context_->textureManager);
+
+	// 決定音を取得
+	decisionSH_ = AudioManager::GetInstance().GetHandleByName("decision.mp3");
 }
 
 void ResultScene::Update() {
 
 	if (context_->input->TriggerKey(DIK_SPACE) || context_->input->TriggerPad(XINPUT_GAMEPAD_A)) {
 		isFinished_ = true;
+
+		// 決定音
+		AudioManager::GetInstance().Play(decisionSH_, 0.5f, false);
 	}
 
 	// カメラの更新処理
