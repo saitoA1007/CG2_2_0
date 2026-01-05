@@ -40,6 +40,7 @@ void RotateAttack::Update() {
 			rotSpeed_ = maxRotSpeed_;
 
 			Vector3 toTarget = bossContext_.targetPos - bossContext_.worldTransform->transform_.translate;
+			toTarget.y = 0.0f;
 			dir_ = Normalize(toTarget);
 		}
 		break;
@@ -59,6 +60,7 @@ void RotateAttack::Update() {
 				isMove_ = false;
 
 				Vector3 toTarget = bossContext_.targetPos - bossContext_.worldTransform->transform_.translate;
+				toTarget.y = 0.0f;
 				dir_ = Normalize(toTarget);
 			}
 		}

@@ -2,7 +2,7 @@
     "Boss_RotateAttack": {
         "InTime": 1.0,
         "MaxRotateSpeed": 20.0,
-        "MoveTime": 10.0,
+        "MoveTime": 8.0,
         "OutTime": 1.0,
         "SceneName": "ALGameScene"
     }

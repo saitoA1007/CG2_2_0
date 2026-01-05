@@ -9,5 +9,6 @@ enum class CollisionTypeID : uint32_t {
 	Player,  // プレイヤー
 	Weapon,  // 武器
 	Boss,    // ボス
+	EnemyBullet, // 敵の遠距離攻撃
 	Wall,    // 壁
 };

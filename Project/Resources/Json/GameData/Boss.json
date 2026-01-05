@@ -1,6 +1,7 @@
 {
     "Boss": {
         "CollisionSize": 4.420000076293945,
+        "MaxHp": 100,
         "SceneName": "ALGameScene"
     }
 }

@@ -1,0 +1,7 @@
+{
+    "Enemy_RockBullet": {
+        "LifeTime": 30.0,
+        "SceneName": "ALGameScene",
+        "Speed": 30.0
+    }
+}

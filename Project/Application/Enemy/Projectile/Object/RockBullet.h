@@ -1,5 +1,6 @@
 #pragma once
 #include"Application/Enemy/Projectile/IProjectile.h"
+#include"Extension/CustomMaterial/IceRockMaterial.h"
 
 class RockBullet : public IProjectile {
 public:
@@ -16,6 +17,8 @@ public:
 
 	GameEngine::Collider* GetCollider() override { return collider_.get(); }
 
+	IceRockMaterial* GetMaterial() { return iceMaterial_.get(); }
+
 	ProjectileType GetType() const override { return ProjectileType::Rock; }
 
 private:
@@ -25,6 +28,9 @@ private:
 	GameEngine::WorldTransform worldTransform_;
 
 	std::unique_ptr<GameEngine::SphereCollider> collider_;
+
+	// マテリアル
+	std::unique_ptr<IceRockMaterial> iceMaterial_;
 
 	// 値の保存グループ名
 	const std::string groupName_ = "Enemy_RockBullet";
@@ -42,6 +48,13 @@ private: // 調整項目
 	float lifeTime_ = 30.0f;
 
 private:
+
+	/// <summary>
+	/// 当たり判定
+	/// </summary>
+	/// <param name="result"></param>
+	void OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result);
+
 	/// <summary>
 	/// 値を登録する
 	/// </summary>

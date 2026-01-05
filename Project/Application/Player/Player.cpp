@@ -91,7 +91,6 @@ void Player::Update() {
 	ApplyDebugParam();
 #endif
 
-	isHit_ = false;
 	isAttack_ = false;
 
 	// 状態遷移のリクエストがあった場合、切り替える処理
@@ -131,6 +130,17 @@ void Player::Update() {
 
 	// 当たり判定の位置を更新
 	collider_->SetWorldPosition(worldTransform_.transform_.translate);
+
+	// ヒット時のクールタイム
+	if (isHit_) {
+
+		hitTimer_ += FpsCounter::deltaTime / kHitCoolTime_;
+
+		if (hitTimer_ >= 1.0f) {
+			isHit_ = false;
+			hitTimer_ = 0.0f;
+		}
+	}
 }
 
 void Player::ProcessMoveInput() {
@@ -370,25 +380,59 @@ void Player::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult
 	// ヒットログを出す
 	Log("IsPlayerHit", "Player");
 
-	bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss));
-
-	if (isBoss) {
-		if (behavior_ != Behavior::Jump) {
-			isHit_ = true;
-		} else {
-			isAttack_ = true;
-		}
-
-		// ヒット音声
-		AudioManager::GetInstance().Play(hitSH_, 0.5f, false);
-
-		knockbackSpeed_ = 30.0f;
-		hitDirection_ = Vector3(result.contactNormal.x, 0.0f, result.contactNormal.z);
-	}
+	//bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss));
+	//
+	//if (isBoss) {
+	//	if (behavior_ != Behavior::Jump) {
+	//		isHit_ = true;
+	//	} else {
+	//		isAttack_ = true;
+	//	}
+	//
+	//	// ヒット音声
+	//	AudioManager::GetInstance().Play(hitSH_, 0.5f, false);
+	//
+	//	knockbackSpeed_ = 30.0f;
+	//	hitDirection_ = Vector3(result.contactNormal.x, 0.0f, result.contactNormal.z);
+	//}
 }
 
 void Player::OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult& result) {
 	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall));
+	bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Boss));
+	bool isEnemyBullet = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::EnemyBullet));
+
+	// ボスに当たった時の処理
+	if (isBoss && !isHit_) {
+		if (behavior_ != Behavior::Dush) {
+			isHit_ = true;
+			// ヒット音声
+			AudioManager::GetInstance().Play(hitSH_, 0.5f, false);
+
+			// hpを減らす
+			if (hp_ > 0) {
+				hp_ -= 1;
+			}
+
+			// ノックバック
+			knockbackSpeed_ = 30.0f;
+			hitDirection_ = Vector3(result.contactNormal.x, 0.0f, result.contactNormal.z);
+		}
+	}
+
+	// 敵の弾に当たった時
+	if (isEnemyBullet) {
+		if (behavior_ != Behavior::Dush) {
+			isHit_ = true;
+			// ヒット音声
+			AudioManager::GetInstance().Play(hitSH_, 0.5f, false);
+
+			// hpを減らす
+			if (hp_ > 0) {
+				hp_ -= 1;
+			}
+		}
+	}
 
 	// 壁に当たった時、押し戻す
 	if (isWall) {
