@@ -104,12 +104,12 @@ void BossStateBattle::RegisterBebugParam() {
 
 void BossStateBattle::ApplyDebugParam() {
 	// 値の適応
-	stampFallWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "StampFallWeight"));
-	shotBallWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "ShotBallWeight"));
-	rotateAttackMoveWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "RotateAttackMoveWeight"));
-	rushAttackWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "RushAttackWeight"));
-	randBallAttackWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "RandBallAttackWeight"));
-	waitWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<int32_t>(groupName_, "WaitWeight"));
+	stampFallWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(groupName_, "StampFallWeight"));
+	shotBallWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(groupName_, "ShotBallWeight"));
+	rotateAttackMoveWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(groupName_, "RotateAttackMoveWeight"));
+	rushAttackWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(groupName_, "RushAttackWeight"));
+	randBallAttackWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(groupName_, "RandBallAttackWeight"));
+	waitWeight_ = static_cast<int32_t>(GameParamEditor::GetInstance()->GetValue<uint32_t>(groupName_, "WaitWeight"));
 
 	// 確率を変更
 	lotteryList_ = {

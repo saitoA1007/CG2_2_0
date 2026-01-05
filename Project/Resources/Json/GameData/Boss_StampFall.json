@@ -1,0 +1,9 @@
+{
+    "Boss_StampFall": {
+        "FallTime": 1.0,
+        "MaxHeightPosY": 15.0,
+        "MoveTime": 1.0,
+        "RiseTime": 1.0,
+        "SceneName": "ALGameScene"
+    }
+}
