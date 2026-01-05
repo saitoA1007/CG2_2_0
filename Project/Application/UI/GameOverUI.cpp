@@ -1,5 +1,5 @@
 #include"GameOverUI.h"
-
+#include"AudioManager.h"
 using namespace GameEngine;
 
 void GameOverUI::Initialize(GameEngine::InputCommand* inputCommand, GameEngine::TextureManager* textureManager) {
@@ -27,6 +27,11 @@ void GameOverUI::Initialize(GameEngine::InputCommand* inputCommand, GameEngine::
     titleSprite_->color_ = { 0.2f,0.2f,0.2f,1.0f };
     retrySprite_->Update();
     titleSprite_->Update();
+
+    // 選択音
+    selectSH_ = AudioManager::GetInstance().GetHandleByName("select.mp3");
+    // 決定音を取得
+    decisionSH_ = AudioManager::GetInstance().GetHandleByName("decision.mp3");
 }
 
 void GameOverUI::Update() {
@@ -50,6 +55,11 @@ void GameOverUI::ProcessInput() {
         // 色を変更
         retrySprite_->color_ = { 1.0f,1.0f,1.0f,1.0f };
         titleSprite_->color_ = { 0.2f,0.2f,0.2f,1.0f };
+
+        // 選択音
+        if (!AudioManager::GetInstance().IsPlay(selectSH_)) {
+            AudioManager::GetInstance().Play(selectSH_, 0.5f, false);
+        }
     }
 
     if (inputCommand_->IsCommandAcitve("MoveDown")) {
@@ -58,10 +68,19 @@ void GameOverUI::ProcessInput() {
         // 色を変更
         retrySprite_->color_ = { 0.2f,0.2f,0.2f,1.0f };
         titleSprite_->color_ = { 1.0f,1.0f,1.0f,1.0f };
+
+        // 選択音
+        if (!AudioManager::GetInstance().IsPlay(selectSH_)) {
+            AudioManager::GetInstance().Play(selectSH_, 0.5f, false);
+        }
     }
 
     // 決定
     if (inputCommand_->IsCommandAcitve("Decision")) {
+
+        // 決定音
+        AudioManager::GetInstance().Play(decisionSH_, 0.5f, false);
+
         if (selectNum_ == 0) {
             // リトライ
             onRetry_();

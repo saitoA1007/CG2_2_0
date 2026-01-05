@@ -51,6 +51,11 @@ private:
 	std::unique_ptr<GameEngine::Sprite> titleSprite_;
 	uint32_t titleGH_ = 0;
 
+	// 選択音
+	uint32_t selectSH_ = 0;
+	// 決定音
+	uint32_t decisionSH_ = 0;
+
 private:
 
 	/// <summary>

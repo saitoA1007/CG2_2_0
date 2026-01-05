@@ -180,10 +180,12 @@ private: // シーン機能
 
 	// 平面モデル
 	GameEngine::Model* planeModel_;
-
 	
 	// クリアまでの時間を計測
 	std::unique_ptr<ClearTimeTracker> clearTimeTracker_;
+
+	// BGM
+	uint32_t gameSH_ = 0;
 
 private:
 

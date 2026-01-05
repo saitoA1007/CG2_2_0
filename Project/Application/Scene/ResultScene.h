@@ -74,4 +74,7 @@ private: // シーン機能
 
 	// クリア時間を表示
 	std::unique_ptr<ClearTimeUI> clearTimeUI_;
+
+	// 決定音
+	uint32_t decisionSH_ = 0;
 };

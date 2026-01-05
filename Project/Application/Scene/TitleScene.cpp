@@ -3,6 +3,7 @@
 #include"ModelRenderer.h"
 #include"GameParamEditor.h"
 #include"SpriteRenderer.h"
+#include"AudioManager.h"
 using namespace GameEngine;
 
 TitleScene::~TitleScene() {
@@ -34,12 +35,31 @@ void TitleScene::Initialize(SceneContext* context) {
 	// スペースボタン
 	spaceSprite_ = Sprite::Create({ 640.0f,500.0f }, { 256.0f * 1.2f,64.0f*1.2f }, { 0.5f,0.5f });
 	spaceGH_ = context_->textureManager->GetHandleByName("press.png");
+
+	// 音声を取得
+	titleSH_ = AudioManager::GetInstance().GetHandleByName("titleBGM.mp3");
+
+	// 決定音を取得
+	decisionSH_ = AudioManager::GetInstance().GetHandleByName("decision.mp3");
 }
 
 void TitleScene::Update() {
 
+	// BGMを再生
+	if (!AudioManager::GetInstance().IsPlay(titleSH_)) {
+		AudioManager::GetInstance().Play(titleSH_, 0.3f, false);
+	}
+
 	if (context_->input->TriggerKey(DIK_SPACE) || context_->input->TriggerPad(XINPUT_GAMEPAD_A)) {
 		isFinished_ = true;
+
+		// 決定音
+		AudioManager::GetInstance().Play(decisionSH_, 0.5f, false);
+
+		// BGMを停止
+		if (AudioManager::GetInstance().IsPlay(titleSH_)) {
+			AudioManager::GetInstance().Stop(titleSH_);
+		}
 	}
 	
 	// カメラの更新処理

@@ -1,19 +1,20 @@
 #define NOMINMAX
 #include"BossEnemy.h"
 #include<numbers>
+#include"GameParamEditor.h"
+#include"FPSCounter.h"
+#include"LogManager.h"
+#include"AudioManager.h"
 
 // 敵の各状態
 #include"State/BossStateIn.h"
 #include"State/BossStateBattle.h"
 #include"State/BossStateOut.h"
 
-#include"GameParamEditor.h"
+// 当たり判定
 #include"CollisionConfig.h"
-#include"FPSCounter.h"
-//#include"Application/Player/Player.h"
-#include"Application/Weapon/Sword.h"
 #include"Application/CollisionTypeID.h"
-#include"LogManager.h"
+#include"Application/Weapon/Sword.h"
 using namespace GameEngine;
 
 void BossEnemy::Initialize(EnemyProjectileManager* projectile, const uint32_t& texture) {
@@ -57,6 +58,9 @@ void BossEnemy::Initialize(EnemyProjectileManager* projectile, const uint32_t& t
 	collider_->SetOnCollisionCallback([this](const CollisionResult& result) {
 		this->OnCollisionStay(result);
 	});
+
+	// 音声を取得
+	hitSH_ = AudioManager::GetInstance().GetHandleByName("playerAttack.mp3");
 
 #ifdef _DEBUG
 	// 値を登録する
@@ -143,6 +147,9 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 					bossContext_.hp -= static_cast<uint32_t>(sword->GetDamage());
 				}
 			}
+
+			// ヒット音声
+			AudioManager::GetInstance().Play(hitSH_, 0.5f, false);
 		}
 	}
 }
