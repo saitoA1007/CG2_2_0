@@ -72,15 +72,30 @@ void BossStateBattle::Exit() {
 BossStateBattle::BattleBehavior BossStateBattle::SelectWeightedAttack() {
 	BattleBehavior result = BattleBehavior::Wait;
 
+	std::vector<BehaviorWeight> list;
+	list.reserve(lotteryList_.size());
+
+	// 半分になったら挙動を追加する
+	if (bossContext_.hp <= bossContext_.maxHp / 2) {
+		list = lotteryList_;
+	} else {
+		
+		for (size_t i = 0; i < lotteryList_.size(); ++i) {
+			if (lotteryList_[i].behavior != BattleBehavior::RotateAttackMove) {
+				list.push_back(lotteryList_[i]);
+			}
+		}
+	}
+
 	// 全体の重みを計算する
 	int32_t totalWeight = 0;
-	for (const auto& item : lotteryList_) {
+	for (const auto& item : list) {
 		totalWeight += item.weight;
 	}
 
 	int32_t randomValue = RandomGenerator::Get<int32_t>(0, totalWeight - 1);
 
-	for (const auto& item : lotteryList_) {
+	for (const auto& item : list) {
 		if (randomValue < item.weight) {
 			result = item.behavior;
 			break;
