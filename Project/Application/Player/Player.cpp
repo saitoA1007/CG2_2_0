@@ -18,7 +18,7 @@ void Player::Initialize(GameEngine::InputCommand* inputCommand) {
 	inputCommand_ = inputCommand;
 
 	// ワールド行列を初期化
-	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
+	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,-10.0f} });
 
 	// 武器をプレイヤーに追従
 	weapon_->SetOwnerPosition(&worldTransform_);
@@ -136,35 +136,35 @@ void Player::Update() {
 void Player::ProcessMoveInput() {
 
 	// プレイヤーの移動操作
-	if (inputCommand_->IsCommandAcitve("MoveUp")) {
+	if (inputCommand_->IsCommandActive("MoveUp")) {
 		move.z = 1.0f;
 		isMove = true;
 	}
 
-	if (inputCommand_->IsCommandAcitve("MoveDown")) {
+	if (inputCommand_->IsCommandActive("MoveDown")) {
 		move.z = -1.0f;
 		isMove = true;
 	}
 
-	if (inputCommand_->IsCommandAcitve("MoveLeft")) {
+	if (inputCommand_->IsCommandActive("MoveLeft")) {
 		move.x = -1.0f;
 		isMove = true;
 	}
 
-	if (inputCommand_->IsCommandAcitve("MoveRight")) {
+	if (inputCommand_->IsCommandActive("MoveRight")) {
 		move.x = 1.0f;
 		isMove = true;
 	}
 
 	// ジャンプ操作
-	if (inputCommand_->IsCommandAcitve("Jump")) {
+	if (inputCommand_->IsCommandActive("Jump")) {
 		if (behavior_ == Behavior::Normal) {
 			behaviorRequest_ = Behavior::Jump;
 		}
 	}
 
 	// ダッシュ操作
-	if (inputCommand_->IsCommandAcitve("Dush")) {
+	if (inputCommand_->IsCommandActive("Dush")) {
 		if (behavior_ == Behavior::Normal) {
 			behaviorRequest_ = Behavior::Dush;
 
@@ -182,7 +182,7 @@ void Player::ProcessMoveInput() {
 	}
 
 	// 攻撃操作
-	if (inputCommand_->IsCommandAcitve("Attack")) {
+	if (inputCommand_->IsCommandActive("Attack")) {
 		if (behavior_ == Behavior::Normal) {
 			workAttack_.comboIndex = 0;
 			workAttack_.timer_ = 0.0f;

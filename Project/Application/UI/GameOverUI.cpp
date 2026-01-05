@@ -49,7 +49,7 @@ void GameOverUI::Update() {
 void GameOverUI::ProcessInput() {
 
     // 選択
-    if (inputCommand_->IsCommandAcitve("MoveUp")) {
+    if (inputCommand_->IsCommandActive("MoveUp")) {
         // リトライ
         selectNum_ = 0;
         // 色を変更
@@ -62,7 +62,7 @@ void GameOverUI::ProcessInput() {
         }
     }
 
-    if (inputCommand_->IsCommandAcitve("MoveDown")) {
+    if (inputCommand_->IsCommandActive("MoveDown")) {
         // タイトル
         selectNum_ = 1;
         // 色を変更
@@ -76,7 +76,7 @@ void GameOverUI::ProcessInput() {
     }
 
     // 決定
-    if (inputCommand_->IsCommandAcitve("Decision")) {
+    if (inputCommand_->IsCommandActive("Decision")) {
 
         // 決定音
         AudioManager::GetInstance().Play(decisionSH_, 0.5f, false);
