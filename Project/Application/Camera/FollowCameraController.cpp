@@ -35,17 +35,17 @@ void FollowCameraController::Update(GameEngine::InputCommand* inputCommand) {
 		}
 	} else {
 		// カメラ操作
-		if (inputCommand->IsCommandAcitve("CameraMoveLeft")) {
+		if (inputCommand->IsCommandActive("CameraMoveLeft")) {
 			rotateMove_.x += 0.04f;
 		}
 
-		if (inputCommand->IsCommandAcitve("CameraMoveRight")) {
+		if (inputCommand->IsCommandActive("CameraMoveRight")) {
 			rotateMove_.x -= 0.04f;
 		}
 	}
 
 	// カメラのロックオンを切り替える
-	if (inputCommand->IsCommandAcitve("CameraLockOn")) {
+	if (inputCommand->IsCommandActive("CameraLockOn")) {
 		isLockOn_ = !isLockOn_;
 	}
 

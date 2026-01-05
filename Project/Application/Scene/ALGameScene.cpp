@@ -358,8 +358,8 @@ void ALGameScene::InputRegisterCommand() {
 	// カメラ操作のコマンドを登録する
 	context_->inputCommand->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
 	context_->inputCommand->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
-
-	context_->inputCommand->RegisterCommand("CameraLockOn", { {InputState::KeyTrigger, DIK_G},{InputState::PadTrigger, XINPUT_GAMEPAD_Y} });
+	// ロックオン
+	context_->inputCommand->RegisterCommand("CameraLockOn", { {InputState::KeyTrigger, DIK_L},{InputState::PadRightTriggerTrigger,0,{0.0f,0.0f},0.2f},{InputState::PadLeftTriggerTrigger,0,{0.0f,0.0f},0.2f} });
 
 	// 決定ボタン
 	context_->inputCommand->RegisterCommand("Decision", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
