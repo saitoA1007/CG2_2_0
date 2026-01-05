@@ -229,37 +229,48 @@ void Player::Move() {
 		// 角度を設定する
 		float tmpRotateY = std::atan2f(move.x, move.z);
 
-		// 角度が変化していれば更新
-		if (tmpRotateY != targetRotateY_) {
-			targetRotateY_ = tmpRotateY;
-			turnTimer_ = 0.0f;
-		}
+		Vector3 currentRot = worldTransform_.transform_.rotate;
+
+		// 最短距離の角度を取得
+		float diffY = GetShortAngleY(tmpRotateY - currentRot.y);
+
+		// 回転
+		currentRot.y += diffY * 5.0f * FpsCounter::deltaTime;
+
+		targetRotateY_ = currentRot.y;
+
 	} else {
 
 		// カメラのロックオンが有効かつ操作がされていなければ
 		if (isCameraLockOn_) {
-			// プレイヤーからターゲットへの方向ベクトルを計算
+		
+			// 目標へのベクトルを求める
 			Vector3 toTarget = targetPos_ - worldTransform_.GetWorldPosition();
 			toTarget.y = 0.0f;
+			toTarget = Normalize(toTarget);
 
-			if (Length(toTarget) > 0.0f) {
-				float lockOnRotateY = std::atan2f(toTarget.x, toTarget.z);
+			Vector3 targetRot = { 0, 0, 0 };
+			// Y軸回転を取得
+			targetRot.y = atan2f(toTarget.x, toTarget.z);
+			Vector3 currentRot = worldTransform_.transform_.rotate;
 
-				// 角度が変化していれば更新
-				if (lockOnRotateY != targetRotateY_) {
-					targetRotateY_ = lockOnRotateY;
-					turnTimer_ = 0.0f;
-				}
-			}
+			// 最短距離の角度を取得
+			float diffY = GetShortAngleY(targetRot.y - currentRot.y);
+
+			// 回転
+			currentRot.y += diffY * 5.0f * FpsCounter::deltaTime;
+
+			targetRotateY_ = currentRot.y;
 		}
 	}
 
 	// 旋回処理
-	if (turnTimer_ < 1.0f) {
-		turnTimer_ += FpsCounter::deltaTime / kTurnTime_;
-		// Y軸周りの角度
-		worldTransform_.transform_.rotate.y = LerpShortAngle(worldTransform_.transform_.rotate.y, targetRotateY_, turnTimer_);
-	}
+	worldTransform_.transform_.rotate.y = targetRotateY_;
+	//if (turnTimer_ < 1.0f) {
+	//	turnTimer_ += FpsCounter::deltaTime / kTurnTime_;
+	//	// Y軸周りの角度
+	//	worldTransform_.transform_.rotate.y = LerpShortAngle(worldTransform_.transform_.rotate.y, targetRotateY_, turnTimer_);
+	//}
 }
 
 void Player::NormalUpdate() {
