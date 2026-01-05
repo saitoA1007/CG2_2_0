@@ -50,6 +50,9 @@ private: // 調整項目
     float moveTime_ = 1.0f;
     float fallTime_ = 1.0f;
 
+    // 回転速度
+    float rotateSpeed_ = 5.0f;
+
 private:
 
     /// <summary>

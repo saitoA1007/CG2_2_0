@@ -29,12 +29,29 @@ void StampFall::Update() {
 
 	switch (phase_)
 	{
-	case StampFall::Phase::Rise:
+	case StampFall::Phase::Rise: {
 
 		timer_ += FpsCounter::deltaTime / riseTime_;
 
 		// 上に移動
-		bossContext_.worldTransform->transform_.translate.y = Lerp(startRisePosY_, maxHeightPosY_,EaseOut(timer_));
+		bossContext_.worldTransform->transform_.translate.y = Lerp(startRisePosY_, maxHeightPosY_, EaseOut(timer_));
+
+		// 目標へのベクトルを求める
+		Vector3 toTarget = bossContext_.targetPos - bossContext_.worldTransform->transform_.translate;
+		toTarget = Normalize(toTarget);
+
+		Vector3 targetRot = { 0, 0, 0 };
+		// Y軸回転を取得
+		targetRot.y = atan2f(toTarget.x, toTarget.z);
+		Vector3 currentRot = bossContext_.worldTransform->transform_.rotate;
+
+		// 最短距離の角度を取得
+		float diffY = GetShortAngleY(targetRot.y - currentRot.y);
+
+		// 回転
+		currentRot.y += diffY * rotateSpeed_ * FpsCounter::deltaTime;
+
+		bossContext_.worldTransform->transform_.rotate = currentRot;
 
 		if (timer_ >= 1.0f) {
 			timer_ = 0.0f;
@@ -47,7 +64,7 @@ void StampFall::Update() {
 			startMovePos_ = bossContext_.worldTransform->transform_.translate;
 		}
 		break;
-
+	}
 
 	case StampFall::Phase::Move:
 

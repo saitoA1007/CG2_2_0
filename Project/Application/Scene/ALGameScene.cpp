@@ -83,6 +83,8 @@ void ALGameScene::Initialize(SceneContext* context) {
 
 	// 武器を初期化
 	swordModel_ = context_->modelManager->GetNameByModel("Hammer");
+	swordModel_->SetDefaultIsEnableLight(true);
+	swordModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	// 武器
 	playerSword_ = std::make_unique<Sword>();
 	playerSword_->Initialize();
@@ -244,8 +246,9 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
 	// プレイヤーの影を描画
 	ModelRenderer::Draw(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
-	// 剣を描画	
+	// 剣を描画
 	if (player_->GetPlayerBehavior() == Player::Behavior::Attack) {
+		ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 		ModelRenderer::Draw(swordModel_, playerSword_->GetWorldTransform());
 	}
 

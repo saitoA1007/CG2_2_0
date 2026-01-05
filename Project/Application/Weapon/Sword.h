@@ -1,7 +1,7 @@
 #pragma once
 #include"IWeapon.h"
 
-class Sword : public IWeapon,GameEngine::GameObject {
+class Sword : public IWeapon, public GameEngine::GameObject {
 public:
 
 	/// <summary>
@@ -44,6 +44,9 @@ public:
 	}
 
 	std::vector<std::unique_ptr<GameEngine::SphereCollider>>& GetColliders() { return colliders_; }
+
+	// ダメージ
+	int32_t GetDamage() { return damage_; }
 
 private:
 

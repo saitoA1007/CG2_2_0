@@ -10,7 +10,8 @@
 #include"GameParamEditor.h"
 #include"CollisionConfig.h"
 #include"FPSCounter.h"
-#include"Application/Player/Player.h"
+//#include"Application/Player/Player.h"
+#include"Application/Weapon/Sword.h"
 #include"Application/CollisionTypeID.h"
 #include"LogManager.h"
 using namespace GameEngine;
@@ -125,17 +126,22 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 
 	if (isHit_) { return; }
 
-	//bool isWeapon = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Weapon));
+	bool isWeapon = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Weapon));
 
-	if (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Player)) {
-		Player* player = result.userData.As<Player>();
+	// 武器が当たった時、ダメージを食らう
+	if (isWeapon) {
+		Log("isHitBoss");
+		Sword* sword = result.userData.As<Sword>();
 
-		if (player->GetPlayerBehavior() == Player::Behavior::Jump) {
-			Log("isHitBoss");
-			bossContext_.hp -= 1;
-			isHit_ = true;
-			if (bossContext_.hp <= 0) {
-				isAlive_ = false;
+		if (sword) {
+			// ダメージを食らう
+			if (bossContext_.hp > 0) {
+				if (static_cast<int32_t>(bossContext_.hp) - sword->GetDamage() <= 0) {
+					bossContext_.hp = 0;
+					isAlive_ = false;
+				} else {
+					bossContext_.hp -= static_cast<uint32_t>(sword->GetDamage());
+				}
 			}
 		}
 	}
