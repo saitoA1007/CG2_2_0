@@ -33,7 +33,7 @@ void ResultScene::Initialize(SceneContext* context) {
 
 	// スペースボタン
 	spaceSprite_ = Sprite::Create({ 640.0f,540.0f }, { 256.0f,64.0f }, { 0.5f,0.5f });
-	spaceGH_ = context_->textureManager->GetHandleByName("spaceText.png");
+	spaceGH_ = context_->textureManager->GetHandleByName("press.png");
 
 	// タイム
 	timeSprite_ = Sprite::Create({ 640.0f,340.0f }, { 256.0f * 0.8f,128.0f*0.8f }, { 0.5f,0.5f });
