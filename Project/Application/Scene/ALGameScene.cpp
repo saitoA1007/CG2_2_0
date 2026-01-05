@@ -8,6 +8,7 @@
 #include"Extension/CustomRenderer.h"
 #include<numbers>
 #include"AudioManager.h"
+#include"Application/Enemy/Projectile/Object/RockBullet.h"
 using namespace GameEngine;
 
 ALGameScene::~ALGameScene() {
@@ -132,7 +133,7 @@ void ALGameScene::Initialize(SceneContext* context) {
 	bossEnemyEyeModel_->SetDefaultColor({ 0.0f,0.0f,0.0f,1.0f });
 
 	// 敵の弾モデルを生成
-	rockBulletModel_ = context_->modelManager->GetNameByModel("Cube");
+	rockBulletModel_ = context_->modelManager->GetNameByModel("IceFallEffect");
 
 	// 敵の遠距離攻撃管理クラスを初期化
 	enemyProjectileManager_ = std::make_unique<EnemyProjectileManager>();
@@ -281,8 +282,14 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::Draw(bossEnemyModel_, bossEnemyShadow_->GetWorldTransform(), &bossEnemyShadow_->GetMaterial());
 
 	// 敵の岩の弾を描画
-	for (auto rockBullet : enemyProjectileManager_->GetProjectilesByType(ProjectileType::Rock)) {
-		ModelRenderer::Draw(rockBulletModel_, rockBullet->GetWorldTransform());
+	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
+	for (auto bullet : enemyProjectileManager_->GetProjectilesByType(ProjectileType::Rock)) {
+
+		RockBullet* rock = dynamic_cast<RockBullet*>(bullet);
+
+		if (rock) {
+			CustomRenderer::DrawRock(rockBulletModel_, rock->GetWorldTransform(), sceneLightingController_->GetResource(), rock->GetMaterial());
+		}
 	}
 
 	// 複数モデルの描画前処理
@@ -520,6 +527,11 @@ void ALGameScene::UpdateCollision() {
 	// デバックデータを取得する
 	debugRenderer_->AddSphere(bossEnemy_->GetSphereData());
 #endif
+
+	// 敵の遠距離攻撃
+	for (auto projectile : enemyProjectileManager_->GetProjectilesByType(ProjectileType::Rock)) {
+		collisionManager_->AddCollider(projectile->GetCollider());
+	}
 
 	// 壁の当たり判定を登録する
 	for (auto& wall : stageManager_->GetWalls()) {

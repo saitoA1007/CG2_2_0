@@ -110,8 +110,6 @@ private:
 	// 攻撃を食らった時の音
 	uint32_t hitSH_ = 0;
 
-
-
 private:
 
 	/// <summary>

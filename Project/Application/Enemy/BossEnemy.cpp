@@ -29,7 +29,6 @@ void BossEnemy::Initialize(EnemyProjectileManager* projectile, const uint32_t& t
 
 	// コンテキストの設定
 	bossContext_.worldTransform = &worldTransform_;
-	bossContext_.hp = kMaxHp_;
 	bossContext_.bossStateRequest_ = std::nullopt;
 	bossContext_.projectileManager = projectile;
 
@@ -50,6 +49,11 @@ void BossEnemy::Initialize(EnemyProjectileManager* projectile, const uint32_t& t
 	collider_->SetRadius(collisionRadius_);
 	collider_->SetCollisionAttribute(kCollisionAttributeEnemy);
 	collider_->SetCollisionMask(~kCollisionAttributeEnemy);
+	// データを設定
+	UserData userData;
+	userData.typeID = static_cast<uint32_t>(CollisionTypeID::Boss);
+	//userData.object = this;
+	collider_->SetUserData(userData);
 
 	// コールバック関数を登録する
 	collider_->SetOnCollisionEnterCallback([this](const CollisionResult& result) {
@@ -68,6 +72,9 @@ void BossEnemy::Initialize(EnemyProjectileManager* projectile, const uint32_t& t
 #endif
 	// 値を適応させる
 	ApplyDebugParam();
+
+	// hpを設定
+	bossContext_.hp = kMaxHp_;
 }
 
 void BossEnemy::Update(const Vector3& targetPos) {
@@ -177,6 +184,7 @@ Sphere BossEnemy::GetSphereData() {
 
 void BossEnemy::RegisterBebugParam() {
 
+	GameParamEditor::GetInstance()->AddItem("Boss", "MaxHp", kMaxHp_);
 	GameParamEditor::GetInstance()->AddItem("Boss", "CollisionSize", collisionRadius_);
 
 	// マテリアル
@@ -190,6 +198,7 @@ void BossEnemy::RegisterBebugParam() {
 
 void BossEnemy::ApplyDebugParam() {
 
+	kMaxHp_ = GameParamEditor::GetInstance()->GetValue<uint32_t>("Boss", "MaxHp");
 	collisionRadius_ = GameParamEditor::GetInstance()->GetValue<float>("Boss", "CollisionSize");
 	collider_->SetRadius(collisionRadius_);
 

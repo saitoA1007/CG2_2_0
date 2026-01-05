@@ -120,7 +120,7 @@ public:
 	/// ヒットフラグ
 	/// </summary>
 	/// <returns></returns>
-	bool IsHit()const { return isHit_; }
+	bool IsHit()const { return false; }
 
 	/// <summary>
 	/// 攻撃フラグ
@@ -154,6 +154,9 @@ private: // 調整項目
 
 	// 当たり判定の半径
 	float kCollisionRadius_ = 1.0f;
+
+	// ヒットクールタイム
+	float kHitCoolTime_ = 1.0f;
 
 private:
 
@@ -258,6 +261,9 @@ private:
 
 	// ノックバックするスピード
 	float knockbackSpeed_ = 0.0f;
+
+	// ヒットタイム
+	float hitTimer_ = 0.0f;
 
 private: // プレイヤーの行動関数
 
