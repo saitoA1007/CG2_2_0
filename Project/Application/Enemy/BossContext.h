@@ -16,6 +16,9 @@ struct BossContext {
 	uint32_t hp = 0;
 	uint32_t maxHp = 0;
 
+	// 終了処理
+	bool isFinished_ = false;
+
 	// 状態の切り替えを管理
 	std::optional<BossState> bossStateRequest_ = std::nullopt;
 

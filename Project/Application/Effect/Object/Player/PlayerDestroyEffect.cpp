@@ -6,7 +6,7 @@ void PlayerDestroyEffect::Initialize() {
 
 	// 攻撃演出
 	destroyParticle_ = std::make_unique<ParticleBehavior>();
-	destroyParticle_->Initialize("PlayerDestroy", 16);
+	destroyParticle_->Initialize("PlayerDestroy", 32);
 }
 
 void PlayerDestroyEffect::Update(const Matrix4x4& worldMatrix, const Matrix4x4& viewMatrix) {

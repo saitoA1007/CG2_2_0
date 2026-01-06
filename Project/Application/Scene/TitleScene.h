@@ -71,6 +71,7 @@ private: // シーン機能
 	GameEngine::WorldTransform bossWorldTransform_;
 	// マテリアル
 	std::unique_ptr<IceRockMaterial> iceMaterial_;
+	std::string groupName_ = "Boss_Material";
 
 	// タイトル画像
 	std::unique_ptr<GameEngine::Sprite> titleSprite_;

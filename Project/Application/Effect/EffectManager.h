@@ -30,6 +30,9 @@ public:
 	// プレイヤーの撃破演出
 	void AddPlayerDestroyEffect(const Vector3& pos);
 
+	// 敵の撃破演出
+	void AddEnemyDestroyEffect(const Vector3& pos);
+
 public:
 
 	// 氷の破壊演出を取得

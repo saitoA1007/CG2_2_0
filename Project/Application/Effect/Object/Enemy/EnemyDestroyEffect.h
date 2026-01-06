@@ -16,6 +16,9 @@ public:
 
 	bool IsFinished() { return isFinished_; }
 
+	uint32_t GetNumInstance() { return destroyParticle_->GetCurrentNumInstance(); }
+	GameEngine::WorldTransforms* GetWorldTransforms() { return destroyParticle_->GetWorldTransforms(); }
+
 private:
 
 	bool isFinished_ = false;

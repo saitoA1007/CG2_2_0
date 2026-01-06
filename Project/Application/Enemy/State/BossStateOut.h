@@ -28,6 +28,10 @@ private:
 
 	std::string kGroupName = "BossStateOut";
 
+	float timer_ = 0.0f;
+
+	float maxTime_ = 1.0f;
+
 private:
 
 	/// <summary>

@@ -106,6 +106,8 @@ private: // シーン機能
 	// ダメージを受けた時のパーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> hitEffectParticle_;
 
+	bool isPlayerDeath_ = false;
+
 	// 武器モデル
 	GameEngine::Model* swordModel_;
 	// 武器

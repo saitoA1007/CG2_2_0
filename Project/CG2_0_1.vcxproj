@@ -168,6 +168,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application\Camera\EffectCamera.cpp" />
     <ClCompile Include="Application\Camera\FollowCameraController.cpp" />
     <ClCompile Include="Application\ClearTimeTracker.cpp" />
     <ClCompile Include="Application\Effect\EffectManager.cpp" />
@@ -356,6 +357,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application\Camera\EffectCamera.h" />
     <ClInclude Include="Application\Camera\FollowCameraController.h" />
     <ClInclude Include="Application\ClearTime.h" />
     <ClInclude Include="Application\ClearTimeTracker.h" />

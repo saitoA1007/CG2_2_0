@@ -5,7 +5,7 @@ using namespace GameEngine;
 void EnemyDestroyEffect::Initialize() {
 	// 攻撃演出
 	destroyParticle_ = std::make_unique<ParticleBehavior>();
-	destroyParticle_->Initialize("EnemyDestroy", 16);
+	destroyParticle_->Initialize("EnemyDestroy", 32);
 }
 
 void EnemyDestroyEffect::Update(const Matrix4x4& worldMatrix, const Matrix4x4& viewMatrix) {

@@ -273,7 +273,7 @@ private:
 	float hitTimer_ = 0.0f;
 
 	// 透明度
-	float alpha_ = 0.0f;
+	float alpha_ = 1.0f;
 
 private: // プレイヤーの行動関数
 

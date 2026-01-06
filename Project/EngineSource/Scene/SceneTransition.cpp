@@ -7,7 +7,7 @@ using namespace GameEngine;
 void SceneTransition::Initialize() {
 
 	// 初期化
-	sprite_ = Sprite::Create({ 0.0f,0.0f }, { 1280.0f,720.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,0.0f,0.0f });
+	sprite_ = Sprite::Create({ 0.0f,0.0f }, { 1280.0f,720.0f }, { 0.0f,0.0f }, { 1.0f,1.0f,1.0f,0.0f });
 }
 
 void SceneTransition::Update() {

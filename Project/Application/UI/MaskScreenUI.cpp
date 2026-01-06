@@ -46,6 +46,7 @@ void MaskScreenUI::Update() {
 		downMaskSprite_->position_.y = Lerp(downStartPosY_, downEndPosY_, EaseInOut(timer_));
 
 		if (timer_ >= 1.0f) {
+			timer_ = 0.0f;
 			isActive_ = false;
 			upMaskSprite_->position_.y = upEndPosY_;
 			downMaskSprite_->position_.y = downEndPosY_;

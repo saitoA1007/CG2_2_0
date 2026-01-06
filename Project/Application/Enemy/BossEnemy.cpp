@@ -85,6 +85,14 @@ void BossEnemy::Update(const Vector3& targetPos) {
 	ApplyDebugParam();
 #endif
 
+	if (bossContext_.hp <= 0) {
+		if (bossState_ != BossState::Out) {
+			bossContext_.bossStateRequest_ = BossState::Out;
+			// 撃破演出を発生
+			bossContext_.effectManager->AddEnemyDestroyEffect(worldTransform_.GetWorldPosition());
+		}
+	}
+
 	// ターゲットの位置を更新する
 	bossContext_.targetPos = targetPos;
 

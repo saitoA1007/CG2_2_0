@@ -306,6 +306,7 @@ void Player::JumpUpdate() {
 
 	// 時間がたったら通常状態へ遷移
 	if (jumpTimer_ >= 1.0f) {
+		worldTransform_.transform_.translate.y = 1.0f;
 		behaviorRequest_ = Behavior::Normal;
 	}
 }

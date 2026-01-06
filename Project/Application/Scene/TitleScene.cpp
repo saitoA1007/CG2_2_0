@@ -4,6 +4,7 @@
 #include"GameParamEditor.h"
 #include"SpriteRenderer.h"
 #include"Extension/CustomRenderer.h"
+#include"FPSCounter.h"
 #include"AudioManager.h"
 using namespace GameEngine;
 
@@ -38,14 +39,28 @@ void TitleScene::Initialize(SceneContext* context) {
 	bossEnemyEyeModel_ = context_->modelManager->GetNameByModel("BossEye");
 	bossEnemyEyeModel_->SetDefaultColor({ 0.0f,0.0f,0.0f,1.0f });
 	// 行列を初期化
-	bossWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	bossWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,8.0f} });
 	// マテリアルの初期化
 	iceMaterial_ = std::make_unique<IceRockMaterial>();
 	iceMaterial_->Initialize();
 	iceMaterial_->materialData_->textureHandle = context_->textureManager->GetHandleByName("boss.png");
 
+	// マテリアル
+	iceMaterial_->materialData_->color = GameParamEditor::GetInstance()->GetValue<Vector4>(groupName_, "IceColor");
+	Vector4 specularColor = GameParamEditor::GetInstance()->GetValue<Vector4>(groupName_, "SpecularColor");
+	Vector4 rimColor = GameParamEditor::GetInstance()->GetValue<Vector4>(groupName_, "RimColor");
+	iceMaterial_->materialData_->shininess = GameParamEditor::GetInstance()->GetValue<float>(groupName_, "Shininess");
+	iceMaterial_->materialData_->rimIntensity = GameParamEditor::GetInstance()->GetValue<float>(groupName_, "RimIntensity");
+	iceMaterial_->materialData_->rimPower = GameParamEditor::GetInstance()->GetValue<float>(groupName_, "RimPower");
+	iceMaterial_->materialData_->rimColor.x = rimColor.x;
+	iceMaterial_->materialData_->rimColor.y = rimColor.y;
+	iceMaterial_->materialData_->rimColor.z = rimColor.z;
+	iceMaterial_->materialData_->specularColor.x = specularColor.x;
+	iceMaterial_->materialData_->specularColor.y = specularColor.y;
+	iceMaterial_->materialData_->specularColor.z = specularColor.z;
+
 	// タイトル画像
-	titleSprite_ = Sprite::Create({640.0f,250.0f},{600.0f,128.0f},{0.5f,0.5f});
+	titleSprite_ = Sprite::Create({640.0f,250.0f},{600.0f,180.0f},{0.5f,0.5f});
 	titleGH_ = context_->textureManager->GetHandleByName("titleText.png");
 
 	// スペースボタン
@@ -77,6 +92,10 @@ void TitleScene::Update() {
 			AudioManager::GetInstance().Stop(titleSH_);
 		}
 	}
+
+	// 回転させる
+	bossWorldTransform_.transform_.rotate.y += 4.0f * FpsCounter::deltaTime;
+	bossWorldTransform_.UpdateTransformMatrix();
 	
 	// カメラの更新処理
 	mainCamera_->Update();
@@ -91,6 +110,12 @@ void TitleScene::Draw(const bool& isDebugView) {
 	} else {
 		// 描画に使用するカメラを設定
 		ModelRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
+	}
+
+	if (isDebugView) {
+		CustomRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	} else {
+		CustomRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
 	}
 
 	//===========================================================

@@ -9,6 +9,10 @@ void EffectManager::Initialize() {
     // プレイヤーの撃破演出を初期化
     playerDestroyEffect_ = std::make_unique<PlayerDestroyEffect>();
     playerDestroyEffect_->Initialize();
+
+    // 敵の撃破演出を初期化
+    enemyDestroyEffect_ = std::make_unique<EnemyDestroyEffect>();
+    enemyDestroyEffect_->Initialize();
 }
 
 void EffectManager::Update(const Matrix4x4& worldMatrix, const Matrix4x4& viewMatrix) {
@@ -33,6 +37,9 @@ void EffectManager::Update(const Matrix4x4& worldMatrix, const Matrix4x4& viewMa
 
     // プレイヤーの撃破演出
     playerDestroyEffect_->Update(worldMatrix, viewMatrix);
+
+    // 敵の撃破演出
+    enemyDestroyEffect_->Update(worldMatrix, viewMatrix);
 }
 
 void EffectManager::AddBreakIceParticle(const Vector3& pos) {
@@ -45,6 +52,11 @@ void EffectManager::AddPlayerAttackEffect(const Vector3& pos) {
     std::unique_ptr<PlayerAttackEffect> tmp = std::make_unique<PlayerAttackEffect>();
     tmp->Initialize(pos);
     playerAttackEffects_.push_back(std::move(tmp));
+}
+
+void EffectManager::AddEnemyDestroyEffect(const Vector3& pos) {
+    // 演出を発生
+    enemyDestroyEffect_->SetEmitPos(pos);
 }
 
 void EffectManager::AddPlayerDestroyEffect(const Vector3& pos) {

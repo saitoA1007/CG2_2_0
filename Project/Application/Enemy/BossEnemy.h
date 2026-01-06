@@ -60,6 +60,9 @@ public:
 	// 現在のhp
 	uint32_t GetCurrentHp() const { return bossContext_.hp; }
 
+	// 終了
+	bool IsFinished()const { return bossContext_.isFinished_; }
+
 private:
 
 	// 最大hp

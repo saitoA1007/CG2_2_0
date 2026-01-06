@@ -16,7 +16,7 @@ ALGameScene::~ALGameScene() {
 
 void ALGameScene::Initialize(SceneContext* context) {
 	// ゲームシーンに必要な低レイヤー機能
-#pragma region SceneSystem 
+#pragma region SceneSystem
 	// エンジン機能を取得
 	context_ = context;
 
@@ -67,7 +67,7 @@ void ALGameScene::Initialize(SceneContext* context) {
 	icePlaneModel_ = context_->modelManager->GetNameByModel("PlaneXZ");
 	// 地面を生成する
 	terrain_ = std::make_unique<Terrain>();
-	terrain_->Initialize(context_->textureManager->GetHandleByName("grass.png"),
+	terrain_->Initialize(context_->textureManager->GetHandleByName("gras.png"),
 		context_->textureManager->GetHandleByName("ice.png"), context_->textureManager->GetHandleByName("iceNormal.png"));
 
 	// 壁を生成
@@ -266,25 +266,29 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// 3Dモデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
-	// プレイヤーを描画
-	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
-	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
-	// プレイヤーの影を描画
-	ModelRenderer::Draw(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
-	// 剣を描画
-	if (player_->GetPlayerBehavior() == Player::Behavior::Attack) {
+	if (!isPlayerDeath_) {
+		// プレイヤーを描画
 		ModelRenderer::DrawLight(sceneLightingController_->GetResource());
-		ModelRenderer::Draw(swordModel_, playerSword_->GetWorldTransform());
+		ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
+		// プレイヤーの影を描画
+		ModelRenderer::Draw(playerModel_, playerShadow_->GetWorldTransform(), &playerShadow_->GetMaterial());
+		// 剣を描画
+		if (player_->GetPlayerBehavior() == Player::Behavior::Attack) {
+			ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+			ModelRenderer::Draw(swordModel_, playerSword_->GetWorldTransform());
+		}
 	}
 
-	// ボスの体を描画
-	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
-	CustomRenderer::DrawRock(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource(), bossEnemy_->GetMaterial());
-	// ボスの目を描画
-	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
-	ModelRenderer::Draw(bossEnemyEyeModel_, bossEnemy_->GetWorldTransform());
-	// ボス敵の影を描画
-	ModelRenderer::Draw(bossEnemyModel_, bossEnemyShadow_->GetWorldTransform(), &bossEnemyShadow_->GetMaterial());
+	if (bossEnemy_->GetIsAlive()) {
+		// ボスの体を描画
+		CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
+		CustomRenderer::DrawRock(bossEnemyModel_, bossEnemy_->GetWorldTransform(), sceneLightingController_->GetResource(), bossEnemy_->GetMaterial());
+		// ボスの目を描画
+		ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
+		ModelRenderer::Draw(bossEnemyEyeModel_, bossEnemy_->GetWorldTransform());
+		// ボス敵の影を描画
+		ModelRenderer::Draw(bossEnemyModel_, bossEnemyShadow_->GetWorldTransform(), &bossEnemyShadow_->GetMaterial());
+	}
 
 	// 敵の岩の弾を描画
 	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
@@ -325,6 +329,10 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// プレイヤーの撃破演出を描画
 	auto& playerDestroy = effectManager_->GetPlayerDestroyEffect();
 	ModelRenderer::DrawInstancing(planeModel_, playerDestroy->GetNumInstance(), *playerDestroy->GetWorldTransforms());
+
+	// 敵の撃破
+	auto& enemyDestroy = effectManager_->GetEnemyDestroyEffect();
+	ModelRenderer::DrawInstancing(planeModel_, enemyDestroy->GetNumInstance(), *enemyDestroy->GetWorldTransforms());
 
 	// 氷の壊れる演出
 	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
@@ -397,20 +405,36 @@ void ALGameScene::InputRegisterCommand() {
 void ALGameScene::GamePlayUpdate() {
 	// ボスの体力がなくなったらシーンを切り替える
 	if (!bossEnemy_->GetIsAlive()) {
-		isFinished_ = true;
 
-		// 時間の計測を終了
-		clearTimeTracker_->EndMeasureTimes();
+		if (bossEnemy_->IsFinished()) {
+			isFinished_ = true;
 
-		// BGMを停止
-		if (AudioManager::GetInstance().IsPlay(gameSH_)) {
-			AudioManager::GetInstance().Stop(gameSH_);
+			// 時間の計測を終了
+			clearTimeTracker_->EndMeasureTimes();
+
+			// BGMを停止
+			if (AudioManager::GetInstance().IsPlay(gameSH_)) {
+				AudioManager::GetInstance().Stop(gameSH_);
+			}
 		}
 	}
 
 	// プレイヤーの対りょっくがなくなったらゲームオーバーに切り替え
 	if (player_->GetHp() <= 0) {
-		isGameOver_ = true;
+
+		if (!isPlayerDeath_) {
+			isPlayerDeath_ = true;
+			// 死亡演出を実行
+			effectManager_->AddPlayerDestroyEffect(player_->GetPlayerPos() + Vector3(0.0f,2.0f,0.0f));
+		}
+	}
+
+	if (isPlayerDeath_) {
+		// プレイヤーの撃破演出を描画
+		auto& playerDestroy = effectManager_->GetPlayerDestroyEffect();
+		if (playerDestroy->IsFinished()) {
+			isGameOver_ = true;
+		}
 	}
 
 	// 当たり判定のリストを削除
@@ -427,7 +451,9 @@ void ALGameScene::GamePlayUpdate() {
 #pragma region PlayerUpdate
 	// プレイヤーの更新処理
 	player_->SetCameraInfo(followCameraController_->GetRotateMatrix(), followCameraController_->GetIsLockOn(), bossEnemy_->GetPosition());
-	player_->Update();
+	if (!isPlayerDeath_) {
+		player_->Update();
+	}
 
 	// モデルの透明度を設定
 	playerModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,player_->GetAlpha() });
@@ -549,11 +575,13 @@ void ALGameScene::UpdateCollision() {
 	}
 
 	// ボス敵の当たり判定を登録する
-	collisionManager_->AddCollider(bossEnemy_->GetCollider());
+	if (bossEnemy_->GetIsAlive()) {
+		collisionManager_->AddCollider(bossEnemy_->GetCollider());
 #ifdef USE_IMGUI
-	// デバックデータを取得する
-	debugRenderer_->AddSphere(bossEnemy_->GetSphereData());
+		// デバックデータを取得する
+		debugRenderer_->AddSphere(bossEnemy_->GetSphereData());
 #endif
+	}
 
 	// 敵の遠距離攻撃
 	for (auto projectile : enemyProjectileManager_->GetProjectilesByType(ProjectileType::Rock)) {

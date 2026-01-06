@@ -321,6 +321,7 @@
     <ClCompile Include="Application\Effect\Object\Player\PlayerDestroyEffect.cpp" />
     <ClCompile Include="Application\Effect\Object\Enemy\EnemyDestroyEffect.cpp" />
     <ClCompile Include="Application\UI\MaskScreenUI.cpp" />
+    <ClCompile Include="Application\Camera\EffectCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -648,6 +649,7 @@
     <ClInclude Include="Application\Effect\Object\Player\PlayerDestroyEffect.h" />
     <ClInclude Include="Application\Effect\Object\Enemy\EnemyDestroyEffect.h" />
     <ClInclude Include="Application\UI\MaskScreenUI.h" />
+    <ClInclude Include="Application\Camera\EffectCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

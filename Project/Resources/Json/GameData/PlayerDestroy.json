@@ -1,0 +1,100 @@
+{
+    "PlayerDestroy": {
+        "ColorRange": {
+            "Max": [
+                0.7696078419685364,
+                0.4074394106864929,
+                0.0,
+                1.0
+            ],
+            "Min": [
+                0.7696078419685364,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "EndAlpha": 0.20000000298023224,
+        "EndColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        ],
+        "EndSize": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "FieldAcceleration": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "IsBillBoard": true,
+        "IsEnableAlphaOverLifeTime": true,
+        "IsEnableColorOverLifeTime": false,
+        "IsEnableRotateZFromVelocity": true,
+        "IsEnableSizeOverLifeTime": false,
+        "IsEnableVelocityFromPosition": true,
+        "IsLoop": false,
+        "LifeTime": 1.0,
+        "MaxVelocity": 20.0,
+        "MinVelocity": 10.0,
+        "RotateRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "ScaleRange": {
+            "Max": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                0.5,
+                1.0,
+                1.0
+            ]
+        },
+        "SceneName": "ALGameScene",
+        "SpawnCoolTime": 1.0,
+        "SpawnMaxCount": 32,
+        "SpawnRange": {
+            "Max": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "Min": [
+                -0.5,
+                -0.5,
+                -0.5
+            ]
+        },
+        "Textures": {
+            "attackEffect.png": 26,
+            "star.png": 36
+        },
+        "VelocityRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    }
+}

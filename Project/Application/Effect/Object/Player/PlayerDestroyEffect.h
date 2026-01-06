@@ -28,5 +28,5 @@ private:
 	std::unique_ptr<GameEngine::ParticleBehavior> destroyParticle_;
 
 	float timer_ = 0.0f;
-	float maxTime_ = 2.0f;
+	float maxTime_ = 1.0f;
 };
