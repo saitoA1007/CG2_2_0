@@ -3,6 +3,7 @@
 #include"WorldTransform.h"
 #include"BossState.h"
 #include"Projectile/EnemyProjectileManager.h"
+#include"Application/Effect/EffectManager.h"
 
 struct BossContext {
 	// ワールド行列
@@ -20,4 +21,7 @@ struct BossContext {
 
 	// 遠距離攻撃を管理するクラス
 	EnemyProjectileManager* projectileManager = nullptr;
+
+	// 演出管理
+	EffectManager* effectManager = nullptr;
 };

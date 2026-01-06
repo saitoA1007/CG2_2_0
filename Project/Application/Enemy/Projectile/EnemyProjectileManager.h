@@ -2,6 +2,7 @@
 #include"IProjectile.h"
 #include<vector>
 #include<memory>
+#include"Application/Effect/EffectManager.h"
 
 // 生成パラメーター
 struct ProjectileSpwanPrams {
@@ -15,7 +16,7 @@ public:
 	EnemyProjectileManager();
 	~EnemyProjectileManager();
 
-	void Initialize();
+	void Initialize(EffectManager* effectManager);
 
 	void Update();
 
@@ -29,6 +30,8 @@ public:
 	std::vector<IProjectile*> GetProjectilesByType(ProjectileType type) const;
 
 private:
+
+	EffectManager* effectManager_ = nullptr;
 
 	// 敵の全ての遠距離攻撃のインスタンス達
 	std::vector<std::unique_ptr<IProjectile>> projectiles_;

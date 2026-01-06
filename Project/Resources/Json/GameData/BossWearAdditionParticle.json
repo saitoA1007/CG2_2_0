@@ -1,0 +1,100 @@
+{
+    "BossWearAdditionParticle": {
+        "ColorRange": {
+            "Max": [
+                0.0,
+                0.6470589637756348,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                1.0,
+                1.0
+            ]
+        },
+        "EndAlpha": 0.0,
+        "EndColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        ],
+        "EndSize": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "FieldAcceleration": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "IsBillBoard": true,
+        "IsEnableAlphaOverLifeTime": true,
+        "IsEnableColorOverLifeTime": false,
+        "IsEnableRotateZFromVelocity": false,
+        "IsEnableScaleXYZActive": false,
+        "IsEnableSizeOverLifeTime": false,
+        "IsEnableVelocityFromPosition": false,
+        "IsLoop": true,
+        "LifeTime": 3.0,
+        "MaxVelocity": 0.0,
+        "MinVelocity": 0.0,
+        "RotateRange": {
+            "Max": [
+                0.0,
+                0.0,
+                3.200000047683716
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "ScaleRange": {
+            "Max": [
+                1.5,
+                1.0,
+                1.0
+            ],
+            "Min": [
+                0.5,
+                1.0,
+                1.0
+            ]
+        },
+        "SceneName": "ALGameScene",
+        "SpawnCoolTime": 0.20000000298023224,
+        "SpawnMaxCount": 2,
+        "SpawnRange": {
+            "Max": [
+                5.0,
+                5.0,
+                5.0
+            ],
+            "Min": [
+                -5.0,
+                0.0,
+                -5.0
+            ]
+        },
+        "Textures": {
+            "white2x2.png": 0
+        },
+        "VelocityRange": {
+            "Max": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Min": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    }
+}

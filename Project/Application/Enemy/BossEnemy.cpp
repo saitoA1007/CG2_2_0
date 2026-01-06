@@ -17,7 +17,7 @@
 #include"Application/Weapon/Sword.h"
 using namespace GameEngine;
 
-void BossEnemy::Initialize(EnemyProjectileManager* projectile, const uint32_t& texture) {
+void BossEnemy::Initialize(EnemyProjectileManager* projectile, EffectManager* effectManager, const uint32_t& texture) {
 
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.5f,1.5f,1.5f},{0.0f,std::numbers::pi_v<float>,0.0f},{0.0f,2.0f,10.0f} });
@@ -31,6 +31,7 @@ void BossEnemy::Initialize(EnemyProjectileManager* projectile, const uint32_t& t
 	bossContext_.worldTransform = &worldTransform_;
 	bossContext_.bossStateRequest_ = std::nullopt;
 	bossContext_.projectileManager = projectile;
+	bossContext_.effectManager = effectManager;
 
 	// 状態の生成
 	statesTable_[static_cast<size_t>(BossState::In)] = std::make_unique<BossStateIn>(bossContext_);
@@ -155,6 +156,9 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 					bossContext_.hp -= static_cast<uint32_t>(sword->GetDamage());
 				}
 			}
+
+			// 攻撃演出を追加
+			bossContext_.effectManager->AddPlayerAttackEffect(result.contactPosition);
 
 			// ヒット音声
 			AudioManager::GetInstance().Play(hitSH_, 0.5f, false);

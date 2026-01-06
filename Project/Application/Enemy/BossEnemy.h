@@ -15,7 +15,7 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Initialize(EnemyProjectileManager* projectile, const uint32_t& texture);
+	void Initialize(EnemyProjectileManager* projectile, EffectManager* effectManager, const uint32_t& texture);
 
 	/// <summary>
 	/// 更新処理

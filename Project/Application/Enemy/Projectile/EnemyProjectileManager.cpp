@@ -10,8 +10,9 @@ EnemyProjectileManager::~EnemyProjectileManager() {
 
 }
 
-void EnemyProjectileManager::Initialize() {
+void EnemyProjectileManager::Initialize(EffectManager* effectManager) {
     projectiles_.clear();
+    effectManager_ = effectManager;
 }
 
 void EnemyProjectileManager::Update() {
@@ -45,7 +46,7 @@ std::unique_ptr<IProjectile> EnemyProjectileManager::CreateProjectile(const Proj
 
     switch (prams.type) {
     case ProjectileType::Rock: {
-        auto bullet = std::make_unique<RockBullet>();
+        auto bullet = std::make_unique<RockBullet>(effectManager_);
         bullet->Initialize(prams.pos, prams.dir);
         projectile = std::move(bullet);
         break;

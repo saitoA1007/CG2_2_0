@@ -122,6 +122,9 @@ public:
 	/// <returns></returns>
 	bool IsHit()const { return false; }
 
+	bool isHitEffect()const { return isHitEffect_; }
+	void SetIsHitEffect() { isHitEffect_ = false; }
+
 	/// <summary>
 	/// 攻撃フラグ
 	/// </summary>
@@ -133,6 +136,9 @@ public:
 
 	// 最大体力
 	int32_t GetMaxHp() { return maxHp_; }
+
+	// 透明度
+	float GetAlpha() { return alpha_; }
 
 private: // 調整項目
 
@@ -199,6 +205,7 @@ private:
 
 	// ヒットフラグ
 	bool isHit_ = false;
+	bool isHitEffect_ = false;
 
 	// 攻撃フラグ
 	bool isAttack_ = false;
@@ -264,6 +271,9 @@ private:
 
 	// ヒットタイム
 	float hitTimer_ = 0.0f;
+
+	// 透明度
+	float alpha_ = 0.0f;
 
 private: // プレイヤーの行動関数
 

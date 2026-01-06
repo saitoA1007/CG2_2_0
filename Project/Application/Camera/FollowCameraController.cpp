@@ -48,11 +48,13 @@ void FollowCameraController::Update(GameEngine::InputCommand* inputCommand) {
 	}
 
 	// カメラのロックオンを切り替える
-	if (inputCommand->IsCommandActive("CameraLockOn")) {
-		isLockOn_ = !isLockOn_;
+	if (isChangeActive_) {
+		if (inputCommand->IsCommandActive("CameraLockOn")) {
+			isLockOn_ = !isLockOn_;
 
-		// 切り替え音
-		AudioManager::GetInstance().Play(changeSH_, 0.5f, false);
+			// 切り替え音
+			AudioManager::GetInstance().Play(changeSH_, 0.5f, false);
+		}
 	}
 
 	// 球面座標系で移動

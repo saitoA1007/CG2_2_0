@@ -50,6 +50,10 @@ void ALGameScene::Initialize(SceneContext* context) {
 	sceneLightingController_ = std::make_unique<SceneLightingController>();
 	sceneLightingController_->Initialize(context_->graphicsDevice->GetDevice());
 
+	// 演出の管理クラスを初期化
+	effectManager_ = std::make_unique<EffectManager>();
+	effectManager_->Initialize();
+
 	//====================================================
 	// 地形の初期化
 	//====================================================
@@ -113,13 +117,6 @@ void ALGameScene::Initialize(SceneContext* context) {
 	// ヒットダメージ演出
 	hitEffectParticle_ = std::make_unique<ParticleBehavior>();
 	hitEffectParticle_->Initialize("HitEffect", 32);
-
-	// 攻撃演出
-	attackEffectParticle_ = std::make_unique<ParticleBehavior>();
-	attackEffectParticle_->Initialize("PlayerAttackEffect", 32);
-	// 攻撃演出のアクセント
-	attackAccentEffectParticle_ = std::make_unique<ParticleBehavior>();
-	attackAccentEffectParticle_->Initialize("PlayerAttackAccentEffect", 32);
 #pragma endregion
 
 	//========================================================
@@ -137,16 +134,20 @@ void ALGameScene::Initialize(SceneContext* context) {
 
 	// 敵の遠距離攻撃管理クラスを初期化
 	enemyProjectileManager_ = std::make_unique<EnemyProjectileManager>();
-	enemyProjectileManager_->Initialize();
+	enemyProjectileManager_->Initialize(effectManager_.get());
 
-	// ボスの移動パーティクル
-	bossEnmeyMoveParticle_ = std::make_unique<ParticleBehavior>();
-	bossEnmeyMoveParticle_->Initialize("BossSmokeParticle", 32);
-	bossEnmeyMoveParticle_->Emit({ 0.0f,0.0f,0.0f });
+	// ボスが常に纏っているパーティクル
+	bossWearParticle_ = std::make_unique<ParticleBehavior>();
+	bossWearParticle_->Initialize("BossWearParticle", 16);
+	bossWearParticle_->Emit({ 0.0f,5.0f,0.0f });
+	// 加算
+	bossWearAdditionParticle_ = std::make_unique<ParticleBehavior>();
+	bossWearAdditionParticle_->Initialize("BossWearAdditionParticle", 16);
+	bossWearAdditionParticle_->Emit({ 0.0f,5.0f,0.0f });
 
 	// ボス敵クラスを初期化
 	bossEnemy_ = std::make_unique<BossEnemy>();
-	bossEnemy_->Initialize(enemyProjectileManager_.get(), context_->textureManager->GetHandleByName("boss.png"));
+	bossEnemy_->Initialize(enemyProjectileManager_.get(), effectManager_.get(), context_->textureManager->GetHandleByName("boss.png"));
 
 	// ボス敵の影を生成
 	bossEnemyShadow_ = std::make_unique<PlaneProjectionShadow>();
@@ -168,6 +169,10 @@ void ALGameScene::Initialize(SceneContext* context) {
 	// 操作説明UI
 	guideSprite_ = Sprite::Create({ 928.0f,534.0f }, { 320.0f,170.0f }, { 0.0f,0.0f }, { 0.1f,0.1f,0.1f,1.0f });
 	guideGH_ = context_->textureManager->GetHandleByName("guide.png");
+
+	// 画面のマスク用UI
+	maskScreenSprite_ = std::make_unique<MaskScreenUI>();
+	maskScreenSprite_->Initialize(context_->inputCommand);
 
 	// ゲームオーバーUIを初期化
 	gameOverUI_ = std::make_unique<GameOverUI>();
@@ -295,26 +300,39 @@ void ALGameScene::Draw(const bool& isDebugView) {
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingScreen);
 
-	// 攻撃の演出を描画
-	ModelRenderer::DrawInstancing(planeModel_, attackEffectParticle_->GetCurrentNumInstance(), *attackEffectParticle_->GetWorldTransforms());
-
 	// 複数モデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::InstancingAdd);
 
 	// プレイヤーの移動パーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, playerMoveParticle_->GetCurrentNumInstance(), *playerMoveParticle_->GetWorldTransforms());
 
-	// ボスの移動パーティクルを描画
-	ModelRenderer::DrawInstancing(planeModel_, bossEnmeyMoveParticle_->GetCurrentNumInstance(), *bossEnmeyMoveParticle_->GetWorldTransforms());
-
 	// ヒットエフェクトの演出の描画
 	ModelRenderer::DrawInstancing(planeModel_, hitEffectParticle_->GetCurrentNumInstance(), *hitEffectParticle_->GetWorldTransforms());
+
+	// ボスの纏っているパーティクルを描画
+	ModelRenderer::DrawInstancing(planeModel_, bossWearAdditionParticle_->GetCurrentNumInstance(), *bossWearAdditionParticle_->GetWorldTransforms());
+	ModelRenderer::DrawInstancing(planeModel_, bossWearParticle_->GetCurrentNumInstance(), *bossWearParticle_->GetWorldTransforms());
 
 	// 空気を演出するためのパーティクルを描画
 	ModelRenderer::DrawInstancing(planeModel_, airParticle_->GetCurrentNumInstance(), *airParticle_->GetWorldTransforms());
 
-	// 攻撃のアクセント演出を描画
-	ModelRenderer::DrawInstancing(planeModel_, attackAccentEffectParticle_->GetCurrentNumInstance(), *attackAccentEffectParticle_->GetWorldTransforms());
+	// 攻撃演出を描画
+	for (auto& effect : effectManager_->GetPlayerAttackEffect()) {
+		ModelRenderer::DrawInstancing(planeModel_, effect->GetEffectNumInstance(), *effect->GetEffectWorldTransforms());
+		ModelRenderer::DrawInstancing(planeModel_, effect->GetAccentEffectNumInstance(), *effect->GetAccentEffectWorldTransforms());
+	}
+
+	// プレイヤーの撃破演出を描画
+	auto& playerDestroy = effectManager_->GetPlayerDestroyEffect();
+	ModelRenderer::DrawInstancing(planeModel_, playerDestroy->GetNumInstance(), *playerDestroy->GetWorldTransforms());
+
+	// 氷の壊れる演出
+	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
+	for (auto& effect : effectManager_->GetBreakIceEffect()) {
+		for (auto& ice : effect->GetParticleDatas()) {
+			CustomRenderer::DrawRock(rockBulletModel_, ice.worldTransform, sceneLightingController_->GetResource(), ice.material.get());
+		}
+	}
 
 #ifdef USE_IMGUI
 
@@ -328,6 +346,10 @@ void ALGameScene::Draw(const bool& isDebugView) {
 
 	// 画像の描画前処理
 	SpriteRenderer::PreDraw(RenderMode2D::Normal);
+
+	// 画面を隠すマスクを描画
+	SpriteRenderer::Draw(maskScreenSprite_->GetUpSprite(), 0);
+	SpriteRenderer::Draw(maskScreenSprite_->GetDownSprite(), 0);
 
 	// ボスのHPUIを表示
 	SpriteRenderer::Draw(bossHpUI_->GetFrameSprite(), 0);
@@ -407,6 +429,9 @@ void ALGameScene::GamePlayUpdate() {
 	player_->SetCameraInfo(followCameraController_->GetRotateMatrix(), followCameraController_->GetIsLockOn(), bossEnemy_->GetPosition());
 	player_->Update();
 
+	// モデルの透明度を設定
+	playerModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,player_->GetAlpha() });
+
 	// プレイヤーの影の更新処理
 	playerShadow_->Update();
 
@@ -426,9 +451,11 @@ void ALGameScene::GamePlayUpdate() {
 	// ボス敵の影の更新処理
 	bossEnemyShadow_->Update();
 
-	// ボスの移動パーティクル
-	bossEnmeyMoveParticle_->SetEmitterPos(bossEnemy_->GetPosition());
-	bossEnmeyMoveParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+	// ボスに纏っているパーティクルの更新処理
+	bossWearParticle_->SetEmitterPos(bossEnemy_->GetPosition());
+	bossWearParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+	bossWearAdditionParticle_->SetEmitterPos(bossEnemy_->GetPosition());
+	bossWearAdditionParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
 	// 敵の遠距離攻撃の更新処理
 	enemyProjectileManager_->Update();
@@ -444,19 +471,14 @@ void ALGameScene::GamePlayUpdate() {
 	//===================================================
 #pragma region HitEffectUpdate
 	// ヒットした時のエフェクト
-	if (player_->IsHit()) {
+	if (player_->isHitEffect()) {
+		player_->SetIsHitEffect();
 		hitEffectParticle_->Emit(player_->GetPlayerPos());
 	}
 	hitEffectParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 
-	// 攻撃した時のエフェクト
-	if (player_->IsAttack()) {
-		attackEffectParticle_->Emit(player_->GetPlayerPos());
-		attackAccentEffectParticle_->Emit(player_->GetPlayerPos());
-	}
-	// 攻撃演出の更新処理
-	attackEffectParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
-	attackAccentEffectParticle_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
+	// 演出の更新処理
+	effectManager_->Update(mainCamera_->GetWorldMatrix(), mainCamera_->GetViewMatrix());
 #pragma endregion
 
 	//=====================================================================
@@ -477,6 +499,8 @@ void ALGameScene::GamePlayUpdate() {
 	// カメラの更新処理
 	//==================================================================
 #pragma region CameraUpdate
+	// 切り替え可能かを取得
+	followCameraController_->SetIsChangeActive(maskScreenSprite_->IsActive());
 	// カメラコントロールの更新処理
 	followCameraController_->Update(context_->inputCommand);
 	// プレイヤーの要素をカメラに送る
@@ -499,6 +523,9 @@ void ALGameScene::GamePlayUpdate() {
 	// プレイヤーのHpUIの更新処理
 	playerHpUI_->SetCurrentHp(player_->GetHp());
 	playerHpUI_->Update();
+
+	// 画面のマスクUIの更新処理
+	maskScreenSprite_->Update();
 #pragma endregion
 }
 
