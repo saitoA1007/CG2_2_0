@@ -7,6 +7,10 @@
 #include"AudioManager.h"
 using namespace GameEngine;
 
+RockBullet::RockBullet(EffectManager* effectManager) {
+	effectManager_ = effectManager;
+}
+
 void RockBullet::Initialize(const Vector3& pos, const Vector3& dir) {
 	
 	// ワールド行列を初期化
@@ -70,6 +74,9 @@ void RockBullet::Update() {
 
 		// 破壊音
 		AudioManager::GetInstance().Play(breakSH_, 0.5f, false);
+
+		// 破壊演出を追加
+		effectManager_->AddBreakIceParticle(worldTransform_.GetWorldPosition());
 	}
 }
 
@@ -81,6 +88,9 @@ void RockBullet::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRe
 		isAlive_ = false;
 		// 破壊音
 		AudioManager::GetInstance().Play(breakSH_, 0.5f, false);
+
+		// 破壊演出を追加
+		effectManager_->AddBreakIceParticle(worldTransform_.GetWorldPosition());
 	}
 }
 

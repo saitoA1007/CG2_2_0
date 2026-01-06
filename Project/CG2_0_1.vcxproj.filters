@@ -316,6 +316,11 @@
     <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.cpp" />
     <ClCompile Include="Application\Graphics\Terrain.cpp" />
     <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.cpp" />
+    <ClCompile Include="Application\Effect\Object\BreakIceParticle.cpp" />
+    <ClCompile Include="Application\Effect\Object\Player\PlayerAttackEffect.cpp" />
+    <ClCompile Include="Application\Effect\Object\Player\PlayerDestroyEffect.cpp" />
+    <ClCompile Include="Application\Effect\Object\Enemy\EnemyDestroyEffect.cpp" />
+    <ClCompile Include="Application\UI\MaskScreenUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -638,6 +643,11 @@
     <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\ICustomMaterial.h" />
     <ClInclude Include="Application\Graphics\Terrain.h" />
     <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.h" />
+    <ClInclude Include="Application\Effect\Object\BreakIceParticle.h" />
+    <ClInclude Include="Application\Effect\Object\Player\PlayerAttackEffect.h" />
+    <ClInclude Include="Application\Effect\Object\Player\PlayerDestroyEffect.h" />
+    <ClInclude Include="Application\Effect\Object\Enemy\EnemyDestroyEffect.h" />
+    <ClInclude Include="Application\UI\MaskScreenUI.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

@@ -171,7 +171,11 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="Application\Camera\FollowCameraController.cpp" />
     <ClCompile Include="Application\ClearTimeTracker.cpp" />
     <ClCompile Include="Application\Effect\EffectManager.cpp" />
+    <ClCompile Include="Application\Effect\Object\Enemy\EnemyDestroyEffect.cpp" />
+    <ClCompile Include="Application\Effect\Object\Player\PlayerAttackEffect.cpp" />
+    <ClCompile Include="Application\Effect\Object\Player\PlayerDestroyEffect.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
+    <ClCompile Include="Application\Effect\Object\BreakIceParticle.cpp" />
     <ClCompile Include="Application\Enemy\Projectile\EnemyProjectileManager.cpp" />
     <ClCompile Include="Application\Enemy\Projectile\Object\RockBullet.cpp" />
     <ClCompile Include="Application\Enemy\State\BattleState\RandMove.cpp" />
@@ -194,6 +198,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="Application\UI\BossHpUI.cpp" />
     <ClCompile Include="Application\UI\ClearTimeUI.cpp" />
     <ClCompile Include="Application\UI\GameOverUI.cpp" />
+    <ClCompile Include="Application\UI\MaskScreenUI.cpp" />
     <ClCompile Include="Application\UI\PlayerHpUI.cpp" />
     <ClCompile Include="Application\Weapon\Sword.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
@@ -357,9 +362,13 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="Application\CollisionTypeID.h" />
     <ClInclude Include="Application\Effect\EffectManager.h" />
     <ClInclude Include="Application\Effect\IEffect.h" />
+    <ClInclude Include="Application\Effect\Object\Enemy\EnemyDestroyEffect.h" />
+    <ClInclude Include="Application\Effect\Object\Player\PlayerAttackEffect.h" />
+    <ClInclude Include="Application\Effect\Object\Player\PlayerDestroyEffect.h" />
     <ClInclude Include="Application\Enemy\BossContext.h" />
     <ClInclude Include="Application\Enemy\BossEnemy.h" />
     <ClInclude Include="Application\Enemy\BossState.h" />
+    <ClInclude Include="Application\Effect\Object\BreakIceParticle.h" />
     <ClInclude Include="Application\Enemy\Projectile\EnemyProjectileManager.h" />
     <ClInclude Include="Application\Enemy\Projectile\IProjectile.h" />
     <ClInclude Include="Application\Enemy\Projectile\Object\RockBullet.h" />
@@ -385,6 +394,7 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="Application\UI\BossHpUI.h" />
     <ClInclude Include="Application\UI\ClearTimeUI.h" />
     <ClInclude Include="Application\UI\GameOverUI.h" />
+    <ClInclude Include="Application\UI\MaskScreenUI.h" />
     <ClInclude Include="Application\UI\PlayerHpUI.h" />
     <ClInclude Include="Application\Weapon\IWeapon.h" />
     <ClInclude Include="Application\Weapon\Sword.h" />

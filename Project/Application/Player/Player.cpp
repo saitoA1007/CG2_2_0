@@ -136,7 +136,14 @@ void Player::Update() {
 
 		hitTimer_ += FpsCounter::deltaTime / kHitCoolTime_;
 
+		if (static_cast<int>(hitTimer_ * 20.0f) % 2 == 0) {
+			alpha_ = 1.0f;
+		} else {
+			alpha_ = 0.5f;
+		}
+
 		if (hitTimer_ >= 1.0f) {
+			alpha_ = 1.0f;
 			isHit_ = false;
 			hitTimer_ = 0.0f;
 		}
@@ -417,6 +424,7 @@ void Player::OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult&
 	if (isBoss && !isHit_) {
 		if (behavior_ != Behavior::Dush) {
 			isHit_ = true;
+			isHitEffect_ = true;
 			// ヒット音声
 			AudioManager::GetInstance().Play(hitSH_, 0.5f, false);
 
@@ -435,6 +443,7 @@ void Player::OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult&
 	if (isEnemyBullet) {
 		if (behavior_ != Behavior::Dush) {
 			isHit_ = true;
+			isHitEffect_ = true;
 			// ヒット音声
 			AudioManager::GetInstance().Play(hitSH_, 0.5f, false);
 

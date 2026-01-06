@@ -24,6 +24,8 @@
 #include"Application/UI/BossHpUI.h"
 #include"Application/UI/PlayerHpUI.h"
 #include"Application/UI/GameOverUI.h"
+#include"Application/UI/MaskScreenUI.h"
+#include"Application/Effect/EffectManager.h"
 
 class ALGameScene : public BaseScene {
 public:
@@ -103,9 +105,6 @@ private: // シーン機能
 
 	// ダメージを受けた時のパーティクル
 	std::unique_ptr<GameEngine::ParticleBehavior> hitEffectParticle_;
-	// ダメージを与えた時のパーティクル
-	std::unique_ptr<GameEngine::ParticleBehavior> attackEffectParticle_;
-	std::unique_ptr<GameEngine::ParticleBehavior> attackAccentEffectParticle_;
 
 	// 武器モデル
 	GameEngine::Model* swordModel_;
@@ -124,8 +123,9 @@ private: // シーン機能
 	// ボス敵の影
 	std::unique_ptr<PlaneProjectionShadow> bossEnemyShadow_;
 
-	// ボスの移動パーティクル
-	std::unique_ptr<GameEngine::ParticleBehavior> bossEnmeyMoveParticle_;
+	// ボスの纏っているパーティクル
+	std::unique_ptr<GameEngine::ParticleBehavior> bossWearParticle_;
+	std::unique_ptr<GameEngine::ParticleBehavior> bossWearAdditionParticle_;
 
 	// 岩弾のモデル
 	GameEngine::Model* rockBulletModel_;
@@ -176,6 +176,9 @@ private: // シーン機能
 	std::unique_ptr<GameEngine::Sprite> guideSprite_;
 	uint32_t guideGH_ = 0;
 
+	// 画面のマスク用UI
+	std::unique_ptr<MaskScreenUI> maskScreenSprite_;
+	
 	/// 演出
 
 	// 平面モデル
@@ -183,6 +186,9 @@ private: // シーン機能
 	
 	// クリアまでの時間を計測
 	std::unique_ptr<ClearTimeTracker> clearTimeTracker_;
+
+	// 演出の管理クラス
+	std::unique_ptr<EffectManager> effectManager_;
 
 	// BGM
 	uint32_t gameSH_ = 0;

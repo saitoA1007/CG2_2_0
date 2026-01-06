@@ -1,9 +1,12 @@
 #pragma once
 #include"Application/Enemy/Projectile/IProjectile.h"
 #include"Extension/CustomMaterial/IceRockMaterial.h"
+#include"Application/Effect/EffectManager.h"
 
 class RockBullet : public IProjectile {
 public:
+
+	RockBullet(EffectManager* effectManager);
 
 	void Initialize(const Vector3& pos, const Vector3& dir) override;
 
@@ -22,6 +25,8 @@ public:
 	ProjectileType GetType() const override { return ProjectileType::Rock; }
 
 private:
+
+	EffectManager* effectManager_ = nullptr;
 
 	bool isAlive_ = true;
 

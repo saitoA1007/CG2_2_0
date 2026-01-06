@@ -46,6 +46,9 @@ public:
 	}
 
 	bool GetIsLockOn() const { return isLockOn_; }
+
+	// ロックオン可能を取得
+	void SetIsChangeActive(const bool& isActive) { isChangeActive_ = !isActive; }
 		
 private:
 
@@ -83,6 +86,9 @@ private:
 	float kLockOnRotateSpeed = 0.1f;
 
 	bool isLockOn_ = false;
+
+	// カメラの切り替えを可能か判断
+	bool isChangeActive_ = false;
 
 	// 切り替え音
 	uint32_t changeSH_ = 0;
