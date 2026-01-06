@@ -8,6 +8,9 @@
 #include"Sprite.h"
 #include"WorldTransform.h"
 
+#include"Extension/CustomMaterial/IceRockMaterial.h"
+#include"Application/Light/SceneLightingController.h"
+
 class TitleScene : public BaseScene {
 public:
 
@@ -57,6 +60,17 @@ private: // シーン機能
 	// 天球
 	GameEngine::Model* skyDomeModel_;
 	GameEngine::WorldTransform skyDomeWorldTransform_;
+
+	// ライト
+	std::unique_ptr<SceneLightingController> sceneLightingController_;
+
+	// ボスモデル
+	GameEngine::Model* bossEnemyModel_;
+	GameEngine::Model* bossEnemyEyeModel_;
+	// 行列
+	GameEngine::WorldTransform bossWorldTransform_;
+	// マテリアル
+	std::unique_ptr<IceRockMaterial> iceMaterial_;
 
 	// タイトル画像
 	std::unique_ptr<GameEngine::Sprite> titleSprite_;
