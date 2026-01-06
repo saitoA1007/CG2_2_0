@@ -3,6 +3,7 @@
 #include"ModelRenderer.h"
 #include"GameParamEditor.h"
 #include"SpriteRenderer.h"
+#include"Extension/CustomRenderer.h"
 #include"AudioManager.h"
 using namespace GameEngine;
 
@@ -27,6 +28,21 @@ void TitleScene::Initialize(SceneContext* context) {
 	// 天球モデルを生成
 	skyDomeModel_ = context_->modelManager->GetNameByModel("SkyDome");
 	skyDomeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+
+	// ライトの生成
+	sceneLightingController_ = std::make_unique<SceneLightingController>();
+	sceneLightingController_->Initialize(context_->graphicsDevice->GetDevice());
+
+	// ボスモデルを生成
+	bossEnemyModel_ = context_->modelManager->GetNameByModel("BossBody");
+	bossEnemyEyeModel_ = context_->modelManager->GetNameByModel("BossEye");
+	bossEnemyEyeModel_->SetDefaultColor({ 0.0f,0.0f,0.0f,1.0f });
+	// 行列を初期化
+	bossWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	// マテリアルの初期化
+	iceMaterial_ = std::make_unique<IceRockMaterial>();
+	iceMaterial_->Initialize();
+	iceMaterial_->materialData_->textureHandle = context_->textureManager->GetHandleByName("boss.png");
 
 	// タイトル画像
 	titleSprite_ = Sprite::Create({640.0f,250.0f},{600.0f,128.0f},{0.5f,0.5f});
@@ -86,6 +102,13 @@ void TitleScene::Draw(const bool& isDebugView) {
 
 	// 天球の描画
 	ModelRenderer::Draw(skyDomeModel_, skyDomeWorldTransform_);
+
+	// ボスの体を描画
+	CustomRenderer::PreDraw(CustomRenderMode::RockBoth);
+	CustomRenderer::DrawRock(bossEnemyModel_, bossWorldTransform_, sceneLightingController_->GetResource(), iceMaterial_.get());
+	// ボスの目を描画
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
+	ModelRenderer::Draw(bossEnemyEyeModel_, bossWorldTransform_);
 
 	//======================================================
 	// 2D描画
