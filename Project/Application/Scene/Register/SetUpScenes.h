@@ -1,6 +1,7 @@
 #pragma once
 #include"SceneRegistry.h"
 
+// 各シーン
 #include "Application/Scene/TitleScene.h"
 #include "Application/Scene/GameScene.h"
 #include "Application/Scene/GEScene.h"

@@ -282,6 +282,7 @@
     <ClCompile Include="EngineSource\Graphics\DirectX\RtvManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\RenderTexture.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\RenderTextureManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -564,6 +565,7 @@
     <ClInclude Include="EngineSource\Graphics\DirectX\RtvManager.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\RenderTexture.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\RenderTextureManager.h" />
+    <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPass.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

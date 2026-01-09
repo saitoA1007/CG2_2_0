@@ -51,7 +51,6 @@ namespace GameEngine {
 		D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle_;
 
 		// 現在の状態
-
 		D3D12_RESOURCE_STATES currentState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	};
 
