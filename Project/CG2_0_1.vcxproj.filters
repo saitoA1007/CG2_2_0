@@ -265,7 +265,6 @@
     <ClCompile Include="EngineSource\Editor\Windows\PerformanceWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorToolBar.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\SceneMenuBar.cpp" />
-    <ClCompile Include="EngineSource\Graphics\RendererManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\DXDebugger.cpp" />
     <ClCompile Include="EngineSource\Graphics\FrameRateController.cpp" />
@@ -536,7 +535,6 @@
     <ClInclude Include="EngineSource\Scene\SceneContext.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\SceneMenuBar.h" />
     <ClInclude Include="EngineSource\Scene\SceneChangeRequest.h" />
-    <ClInclude Include="EngineSource\Graphics\RendererManager.h" />
     <ClInclude Include="EngineSource\Graphics\GraphicsDevice.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\DXDebugger.h" />
     <ClInclude Include="EngineSource\Graphics\FrameRateController.h" />

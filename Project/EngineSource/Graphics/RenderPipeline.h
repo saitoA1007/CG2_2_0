@@ -1,11 +1,11 @@
 #pragma once
 #include "GraphicsDevice.h"
-#include "RendererManager.h"
 #include "FrameRateController.h"
 #include "SrvManager.h"
 #include"RenderPass/RenderPassController.h"
 #include <Windows.h>
 #include"PostProcess/CopyPSO.h"
+#include"PostProcess/PostEffectManager.h"
 
 namespace GameEngine {
 
@@ -43,22 +43,10 @@ namespace GameEngine {
     public:
 
         /// <summary>
-        /// 描画を管理するクラスを取得
-        /// </summary>
-        /// <returns></returns>
-        RendererManager* GetRendererManager() const { return rendererManager_.get(); }
-
-        /// <summary>
         /// PostEffect用のPSOを設定
         /// </summary>
         /// <param name="copyPSO"></param>
         void SetCopyPSO(CopyPSO* copyPSO) { copyPSO_ = copyPSO; }
-
-        /// <summary>
-        /// 最終的な描画先のsrvHandleを取得
-        /// </summary>
-        /// <returns></returns>
-        CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSRVHandle() { return rendererManager_->GetSRVHandle(); }
 
     private:
         RenderPipeline(const RenderPipeline&) = delete;
@@ -66,8 +54,6 @@ namespace GameEngine {
 
         // DirectXのコア機能
         GraphicsDevice* graphicsDevice_ = nullptr;
-        // 描画管理機能
-        std::unique_ptr<RendererManager> rendererManager_;
         // Fps管理機能
         std::unique_ptr<FrameRateController> frameRateController_;
 

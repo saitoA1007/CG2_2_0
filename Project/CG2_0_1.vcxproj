@@ -269,7 +269,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     </ClCompile>
     <ClCompile Include="EngineSource\Graphics\FrameRateController.cpp" />
     <ClCompile Include="EngineSource\Graphics\GraphicsDevice.cpp" />
-    <ClCompile Include="EngineSource\Graphics\RendererManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPass.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPassController.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPipeline.cpp" />
@@ -451,7 +450,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\FrameRateController.h" />
     <ClInclude Include="EngineSource\Graphics\GraphicsDevice.h" />
-    <ClInclude Include="EngineSource\Graphics\RendererManager.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPass.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPassController.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPipeline.h" />

@@ -7,6 +7,8 @@ using namespace GameEngine;
 void RenderPipeline::Initialize(GraphicsDevice* graphicsDevice, PostEffectManager* postEffectManager, RenderPassController* renderPassController) {
     LogManager::GetInstance().Log("RenderPipeline start Initialize");
 
+    // ポストエフェクトの管理
+    postEffectManager;
 
     renderPassController_ = renderPassController;
 
@@ -17,30 +19,18 @@ void RenderPipeline::Initialize(GraphicsDevice* graphicsDevice, PostEffectManage
     frameRateController_ = std::make_unique<FrameRateController>();
     frameRateController_->InitializeFixFPS();
 
-    // レンダラーマネージャーの初期化
-    rendererManager_ = std::make_unique<RendererManager>();
-    rendererManager_->Initialize(graphicsDevice_, postEffectManager);
-
     LogManager::GetInstance().Log("RenderPipeline end Initialize\n");
 }
 
 void RenderPipeline::BeginFrame() {
-    // レンダリング開始処理
-    //rendererManager_->BeginFrame();
-
       // ヒープを設定する
-#ifdef USE_IMGUI
-    // ImGuiの方で普段は設定されている
-#else
     ID3D12DescriptorHeap* descriptorHeaps[] = { graphicsDevice_->GetSrvManager()->GetSRVHeap() };
     graphicsDevice_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
-#endif
 }
 
 void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
-    // レンダリング終了処理
-    //rendererManager_->EndFrame(imGuiManager);
 
+    /// 最終結果を描画する
     // バックバッファをレンダーターゲットに遷移
     TransitionBackBuffer(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 

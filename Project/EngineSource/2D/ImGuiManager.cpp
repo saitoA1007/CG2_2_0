@@ -72,9 +72,6 @@ void ImGuiManager::EndFrame() {
 #ifdef USE_IMGUI
 	// ImGuiの内部コマンドを生成する
 	ImGui::Render();
-	//// Imguiの描画用のDescriptorHeapの設定
-	ID3D12DescriptorHeap* descriptorHeaps[] = { srvManager_->GetSRVHeap() };
-	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 #endif
 }
 
