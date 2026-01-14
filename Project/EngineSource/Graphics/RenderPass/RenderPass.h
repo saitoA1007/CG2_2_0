@@ -28,9 +28,6 @@ namespace GameEngine {
 
         CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvHandle();
 
-        // リサイズ
-        //void Resize(uint32_t width, uint32_t height);
-
         // 名前を取得
         const std::string GetName() const { return name_; }
 
@@ -44,8 +41,6 @@ namespace GameEngine {
 
         // パスの名前
         std::string name_;
-
-        bool isEnable_ = true;
 
         bool isDepth_ = false;
     };

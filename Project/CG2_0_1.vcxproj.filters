@@ -229,7 +229,7 @@
     <ClCompile Include="Application\Scene\GEScene.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="Application\Camera\CameraController.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\SrvManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\Memory\SrvManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelRenderer.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\DXDevice.cpp" />
@@ -276,11 +276,11 @@
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPassController.cpp" />
     <ClCompile Include="EngineSource\Scene\SceneTransition.cpp" />
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\RtvManager.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\RenderTexture.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\RenderTextureManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\Memory\RtvManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\Memory\RenderTexture.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\Memory\RenderTextureManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPass.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\DsvManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\Memory\DsvManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -488,7 +488,7 @@
     <ClInclude Include="Application\Scene\GEScene.h" />
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Camera\CameraController.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\SrvManager.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\Memory\SrvManager.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelRenderer.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\DXDevice.h" />
@@ -556,11 +556,11 @@
     <ClInclude Include="EngineSource\Scene\SceneTransition.h" />
     <ClInclude Include="EngineSource\Scene\ITransitionEffect.h" />
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\RtvManager.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\RenderTexture.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\RenderTextureManager.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\Memory\RtvManager.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\Memory\RenderTexture.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\Memory\RenderTextureManager.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPass.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\DsvManager.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\Memory\DsvManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
