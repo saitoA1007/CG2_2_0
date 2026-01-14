@@ -55,9 +55,6 @@ void SceneManager::Initialize(SceneContext* context, SceneRegistry* sceneRegistr
 
 void SceneManager::Update() {
 
-	// 入力処理のコマンドシステムを更新処理
-	context_->inputCommand->Update();
-
 	// シーン遷移の更新処理
 	sceneTransition_->Update();
 
@@ -113,12 +110,12 @@ void SceneManager::DebugSceneUpdate() {
 void SceneManager::Draw() {
 	// デバック用のグリッドを描画
 #ifdef _DEBUG
-	if (isDebugView_) {
-		// モデルの単体描画前処理
-		ModelRenderer::PreDraw(RenderMode3D::Grid);
-		// グリッドを描画
-		ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
-	}
+	//if (isDebugView_) {
+	//	// モデルの単体描画前処理
+	//	ModelRenderer::PreDraw(RenderMode3D::Grid);
+	//	// グリッドを描画
+	//	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	//}
 #endif
 
 	// 現在シーンの描画処理

@@ -8,7 +8,9 @@
 #include"DXDebugger.h"
 #include"DXViewportState.h"
 
-#include "SrvManager.h"
+#include"RtvManager.h"
+#include"SrvManager.h"
+#include"DsvManager.h"
 
 namespace GameEngine {
 
@@ -24,7 +26,7 @@ namespace GameEngine {
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="srvManager"></param>
-        void Initialize(HWND hwnd, uint32_t width, uint32_t height, SrvManager* srvManager);
+        void Initialize(HWND hwnd, uint32_t width, uint32_t height);
 
         /// <summary>
         /// コマンドリストを閉じる
@@ -74,6 +76,12 @@ namespace GameEngine {
         ID3D12Resource* GetDepthStencilResource()const { return depthStencil_->GetResource(); }
         CD3DX12_GPU_DESCRIPTOR_HANDLE GetDepthStencilSRVHandle() const { return depthStencil_->GetSRVHandle(); }
 
+        RtvManager* GetRtvManager() { return rtvManager_.get(); }
+
+        SrvManager* GetSrvManager() { return srvManager_.get(); }
+
+        DsvManager* GetDsvManager() { return dsvManager_.get(); }
+
     private:
         GraphicsDevice(const GraphicsDevice&) = delete;
         GraphicsDevice& operator=(const GraphicsDevice&) = delete;
@@ -85,6 +93,15 @@ namespace GameEngine {
         std::unique_ptr<DXDepthStencil> depthStencil_;
         std::unique_ptr<DXFence> fence_;
         std::unique_ptr<DXViewportState> viewportState_;
+
+        // rtvを管理する機能
+        std::unique_ptr<RtvManager> rtvManager_;
+
+        // srvメモリを管理する機能
+        std::unique_ptr<SrvManager> srvManager_;
+
+        // dsvを管理する機能
+        std::unique_ptr<DsvManager> dsvManager_;
 
 #ifdef _DEBUG
         std::unique_ptr<DXDebugger> debugger_;

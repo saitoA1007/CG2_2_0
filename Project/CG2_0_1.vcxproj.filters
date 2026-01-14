@@ -244,12 +244,10 @@
     <ClCompile Include="EngineSource\Graphics\PSO\Core\ShaderCompiler.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Core\BlendBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RasterizerBuilder.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\Core\test.cpp" />
     <ClCompile Include="Externals\imgui\imgui_node_editor.cpp" />
     <ClCompile Include="Externals\imgui\crude_json.cpp" />
     <ClCompile Include="Externals\imgui\imgui_canvas.cpp" />
     <ClCompile Include="Externals\imgui\imgui_node_editor_api.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\Core\MaterialEditor.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
     <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp" />
     <ClCompile Include="EngineSource\Collision\CollisionManager.cpp" />
@@ -283,6 +281,7 @@
     <ClCompile Include="EngineSource\Graphics\DirectX\RenderTexture.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\RenderTextureManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPass.cpp" />
+    <ClCompile Include="EngineSource\Graphics\DirectX\DsvManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -505,14 +504,12 @@
     <ClInclude Include="EngineSource\Graphics\PSO\Core\ShaderCompiler.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\BlendBuilder.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RasterizerBuilder.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Core\test.h" />
     <ClInclude Include="Externals\imgui\imgui_node_editor.h" />
     <ClInclude Include="Externals\imgui\imgui_node_editor_internal.h" />
     <ClInclude Include="Externals\imgui\crude_json.h" />
     <ClInclude Include="Externals\imgui\imgui_extra_math.h" />
     <ClInclude Include="Externals\imgui\imgui_canvas.h" />
     <ClInclude Include="Externals\imgui\imgui_bezier_math.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Core\MaterialEditor.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\DrawPSOData.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
     <ClInclude Include="EngineSource\Editor\ParamEditorManager.h" />
@@ -554,7 +551,6 @@
     <ClInclude Include="EngineSource\3D\Model\Animator.h" />
     <ClInclude Include="EngineSource\Graphics\DescriptorCounts.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPassController.h" />
-    <ClInclude Include="EngineSource\Graphics\RenderPass\IRenderPass.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectData.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\ParameterResource.h" />
     <ClInclude Include="EngineSource\Scene\SceneRegistry.h" />
@@ -566,6 +562,7 @@
     <ClInclude Include="EngineSource\Graphics\DirectX\RenderTexture.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\RenderTextureManager.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPass.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\DsvManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

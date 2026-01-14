@@ -1,19 +1,19 @@
 #pragma once
 #include"IEditorWindow.h"
-#include"RendererManager.h"
+#include"RenderPass/RenderPassController.h"
 
 namespace GameEngine {
 
 	class SceneWindow : public IEditorWindow {
 	public:
 
-		SceneWindow(RendererManager* rendererManager);
+		SceneWindow(RenderPassController* renderPassController);
 
 		void Draw() override;
 		std::string GetName() const override { return "SceneView"; };
 
 	private:
-		GameEngine::RendererManager* rendererManager_ = nullptr;
+		GameEngine::RenderPassController* renderPassController_ = nullptr;
 		// 固定したいアスペクト比 (16:9)
 		const float kTargetAspect = 1280.0f / 720.0f;
 	};

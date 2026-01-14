@@ -3,7 +3,7 @@
 
 using namespace GameEngine;
 
-void GraphicsDevice::Initialize(HWND hwnd, uint32_t width, uint32_t height, SrvManager* srvManager) {
+void GraphicsDevice::Initialize(HWND hwnd, uint32_t width, uint32_t height) {
     // 初期化を開始するログ
     LogManager::GetInstance().Log("GraphicsDevice Class start Initialize");
 
@@ -25,7 +25,16 @@ void GraphicsDevice::Initialize(HWND hwnd, uint32_t width, uint32_t height, SrvM
     swapChain_->Initialize(hwnd, width, height, device_->GetFactory(), command_->GetQueue());
 
     // SRVを生成する
-    srvManager->Initialize(device_->GetDevice());
+    srvManager_ = std::make_unique<SrvManager>();
+    srvManager_->Initialize(device_->GetDevice());
+
+    // RTVシステムを生成
+    rtvManager_ = std::make_unique<RtvManager>();
+    rtvManager_->Initialize(device_->GetDevice());
+
+    // dsvを生成する
+    dsvManager_ = std::make_unique<DsvManager>();
+    dsvManager_->Initialize(device_->GetDevice());
 
     // RTV、DSVの生成
     renderTarget_ = std::make_unique<DXRenderTarget>();
@@ -33,7 +42,7 @@ void GraphicsDevice::Initialize(HWND hwnd, uint32_t width, uint32_t height, SrvM
 
     // 深度ステンシルの初期化
     depthStencil_ = std::make_unique<DXDepthStencil>();
-    depthStencil_->Initialize(device_->GetDevice(), renderTarget_->GetDSVHeap(), width, height, srvManager);
+    depthStencil_->Initialize(device_->GetDevice(), renderTarget_->GetDSVHeap(), width, height, srvManager_.get());
 
     // フェンスの生成
     fence_ = std::make_unique<DXFence>();

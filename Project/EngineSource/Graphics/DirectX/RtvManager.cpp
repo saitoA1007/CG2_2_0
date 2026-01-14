@@ -18,7 +18,7 @@ void RtvManager::Initialize(ID3D12Device* device) {
     rtvHeap_ = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, maxRtvCount_, false);
 
     // メモリを確保
-    resources_.resize(maxRtvCount_);
+    resources_.reserve(maxRtvCount_);
 
     // サイズを取得
     descriptorSizeRTV_ = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -36,7 +36,16 @@ uint32_t RtvManager::CreateRenderTargetResource(RtvContext context) {
     Microsoft::WRL::ComPtr<ID3D12Resource> resource;
 
     // インデックスを取得
-    uint32_t index = currentRtvIndex_++;
+    uint32_t index = 0;
+    // 空きを確認
+    if (!freeIndices_.empty()) {
+        index = freeIndices_.front();
+        freeIndices_.pop_front();
+    } else {
+        assert(index < maxRtvCount_ && "RTV index out of range");
+        // 空きがなければ新規インデックスを使用
+        index = currentRtvIndex_++;
+    }
     D3D12_CPU_DESCRIPTOR_HANDLE handle = GetCPUDescriptorHandle(rtvHeap_.Get(), descriptorSizeRTV_, index);
 
     D3D12_RESOURCE_DESC desc{};
@@ -53,6 +62,9 @@ uint32_t RtvManager::CreateRenderTargetResource(RtvContext context) {
     if (context.allowUAV) {
         desc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
     }
+
+    // クリアカラーのフォーマットを設定
+    clearValue_.Format = desc.Format;
 
     CD3DX12_HEAP_PROPERTIES heapProps{};
     heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -86,6 +98,9 @@ void RtvManager::ReleseIndex(const uint32_t& index) {
     // リソースを解放
     if (resources_[index]) {
         resources_[index].Reset();
+
+        // 解放されたインデックスを再利用リストに追加
+        freeIndices_.push_back(index);
     }
 }
 

@@ -4,8 +4,11 @@
 
 using namespace GameEngine;
 
-void RenderPipeline::Initialize(GraphicsDevice* graphicsDevice, PostEffectManager* postEffectManager) {
+void RenderPipeline::Initialize(GraphicsDevice* graphicsDevice, PostEffectManager* postEffectManager, RenderPassController* renderPassController) {
     LogManager::GetInstance().Log("RenderPipeline start Initialize");
+
+
+    renderPassController_ = renderPassController;
 
     // DirectXのコア機能を取得
     graphicsDevice_ = graphicsDevice;
@@ -23,12 +26,36 @@ void RenderPipeline::Initialize(GraphicsDevice* graphicsDevice, PostEffectManage
 
 void RenderPipeline::BeginFrame() {
     // レンダリング開始処理
-    rendererManager_->BeginFrame();
+    //rendererManager_->BeginFrame();
 }
 
 void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
     // レンダリング終了処理
-    rendererManager_->EndFrame(imGuiManager);
+    //rendererManager_->EndFrame(imGuiManager);
+
+    // バックバッファをレンダーターゲットに遷移
+    TransitionBackBuffer(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+    // バックバッファを描画先に設定
+    uint32_t backBufferIndex = graphicsDevice_->GetBackBufferIndex();
+    auto rtvHandle = graphicsDevice_->GetSwapChainRTVHandle(backBufferIndex);
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = graphicsDevice_->GetDSVHeap()->GetCPUDescriptorHandleForHeapStart();
+    graphicsDevice_->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
+
+    // ビューポート、シザーを設定
+    graphicsDevice_->GetCommandList()->RSSetViewports(1, &graphicsDevice_->GetViewport());
+    graphicsDevice_->GetCommandList()->RSSetScissorRects(1, &graphicsDevice_->GetScissorRect());
+
+#ifdef _DEBUG
+    // ImGuiを描画
+    imGuiManager->Draw();
+#else
+    // ポストプロセス結果を描画
+    copyPSO_->Draw(graphicsDevice_->GetCommandList(), renderPassController_->GetFinalOutputSRV());
+#endif
+
+    // バックバッファをPresentに遷移
+    TransitionBackBuffer(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
     // コマンドリストの内容を確定させる。すべてのコマンドを積んでからcloseにすること
     graphicsDevice_->CloseCommandList();
@@ -46,4 +73,16 @@ void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
 
     // FPS固定
     frameRateController_->UpdateFixFPS();
+}
+
+void RenderPipeline::TransitionBackBuffer(D3D12_RESOURCE_STATES stateBefore, D3D12_RESOURCE_STATES stateAfter) {
+    uint32_t backBufferIndex = graphicsDevice_->GetBackBufferIndex();
+    D3D12_RESOURCE_BARRIER barrier{};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier.Transition.pResource = graphicsDevice_->GetSwapChainResource(backBufferIndex);
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    barrier.Transition.StateBefore = stateBefore;
+    barrier.Transition.StateAfter = stateAfter;
+    graphicsDevice_->GetCommandList()->ResourceBarrier(1, &barrier);
 }

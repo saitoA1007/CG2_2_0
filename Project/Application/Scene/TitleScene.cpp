@@ -16,7 +16,15 @@ void TitleScene::Initialize(SceneContext* context) {
 	// 登録するパラメータを設定
 	GameParamEditor::GetInstance()->SetActiveScene("TitleScene");
 
+	// デフォルトで描画するパス
+	context_->renderPassController->AddPass("DefaultPass",true);
+	// 最終的な描画先を設定
+	context_->renderPassController->SetEndPass("DefaultPass");
 #pragma endregion
+
+	// グリッドの初期化
+	gridModel_ = context_->modelManager->GetNameByModel("Grid");
+	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
@@ -39,6 +47,20 @@ void TitleScene::Draw(const bool& isDebugView) {
 		// 描画に使用するカメラを設定
 		ModelRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
 	}
+
+	// 描画パスの管理を取得
+	auto pass = context_->renderPassController;
+
+	// 通常描画
+	pass->PrePass("DefaultPass");
+
+	// モデルの単体描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::Grid);
+	// グリッドを描画
+	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+
+	pass->PostPass("DefaultPass");
+
 
 	//===========================================================
 	// 3D描画

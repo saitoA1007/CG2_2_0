@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include"RtvManager.h"
 #include"SrvManager.h"
+#include"DsvManager.h"
 #include"RenderTexture.h"
 
 namespace GameEngine {
@@ -11,9 +12,9 @@ namespace GameEngine {
 		RenderTextureManager() = default;
 		~RenderTextureManager() = default;
 
-		void Initialize(RtvManager* rtvMasnager, SrvManager* srvManager, ID3D12Device* device);
+		void Initialize(RtvManager* rtvMasnager, SrvManager* srvManager,DsvManager* dsvmanager, ID3D12Device* device);
 
-		void Create(const std::string& name,RtvContext context = RtvContext(1280, 720, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, false));
+		void Create(const std::string& name,bool isDepth,RtvContext context = RtvContext(1280, 720, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, false));
 
 		RenderTexture* GetRenderTexture(const std::string& name);
 
@@ -23,7 +24,7 @@ namespace GameEngine {
 		ID3D12Device* device_ = nullptr;
 		RtvManager* rtvManager_ = nullptr;
 		SrvManager* srvManager_ = nullptr;
+		DsvManager* dsvmanager_ = nullptr;
 		std::unordered_map<std::string, std::unique_ptr<RenderTexture>> renderTextures_;
 	};
 }
-

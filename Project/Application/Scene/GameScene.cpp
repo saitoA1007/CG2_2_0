@@ -19,6 +19,10 @@ void GameScene::Initialize(SceneContext* context) {
 	// 登録するパラメータを設定
 	GameParamEditor::GetInstance()->SetActiveScene("GameScene");
 
+	// デフォルトで描画するパス
+	context->renderPassController->AddPass("DefaultPass", true);
+	// 最終的な描画先を設定
+	context_->renderPassController->SetEndPass("DefaultPass");
 #pragma endregion
 
 	// メインカメラの初期化

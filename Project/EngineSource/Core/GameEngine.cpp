@@ -35,12 +35,9 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// リソースチェックのデバック
 	D3DResourceLeakChecker leakCheck;
 
-	// srvManagerを生成
-	srvManager_ = std::make_unique<SrvManager>();
-
 	// DirectXの機能を生成
 	graphicsDevice_ = std::make_unique<GraphicsDevice>();
-	graphicsDevice_->Initialize(windowsApp_->GetHwnd(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight, srvManager_.get());
+	graphicsDevice_->Initialize(windowsApp_->GetHwnd(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 
 	// dxcCompilerの初期化
 	dxc_ = std::make_unique<DXC>();
@@ -55,22 +52,30 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	psoManager_->DefaultLoadPSO();
 	psoManager_->DeaultLoadPostEffectPSO();
 
+	// レンダーテクスチャ機能を生成
+	renderTextureManager_ = std::make_unique<RenderTextureManager>();
+	renderTextureManager_->Initialize(graphicsDevice_->GetRtvManager(), graphicsDevice_->GetSrvManager(), graphicsDevice_->GetDsvManager(), graphicsDevice_->GetDevice());
+
+	// レンダーパスの管理機能
+	renderPassController_ = std::make_unique<RenderPassController>();
+	renderPassController_->Initialize(renderTextureManager_.get(), graphicsDevice_->GetCommandList());
+
 	// ポストエフェクトの初期化
 	PostEffectManager::StaticInitialize(bloomPSO_.get(), outLinePSO_.get(), psoManager_.get());
 	// ポストエフェクトマネージャーの初期化
 	postEffectManager_ = std::make_unique<PostEffectManager>();
 	float clearColor_[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
-	postEffectManager_->Initialize(graphicsDevice_->GetDevice(), clearColor_, windowsApp_->kWindowWidth, windowsApp_->kWindowHeight, graphicsDevice_->GetRTVDescriptorSize(), srvManager_.get());
+	postEffectManager_->Initialize(graphicsDevice_->GetDevice(), clearColor_, windowsApp_->kWindowWidth, windowsApp_->kWindowHeight, graphicsDevice_->GetRTVDescriptorSize(), graphicsDevice_->GetSrvManager());
 
 	// 描画の流れを管理するクラスを初期化
 	renderPipeline_ = std::make_unique<RenderPipeline>();
-	renderPipeline_->Initialize(graphicsDevice_.get(), postEffectManager_.get());
+	renderPipeline_->Initialize(graphicsDevice_.get(), postEffectManager_.get(), renderPassController_.get());
 	renderPipeline_->SetCopyPSO(copyPSO_.get());
 
 	// ImGuiの初期化
 	imGuiManager_ = std::make_unique<ImGuiManager>();
 	imGuiManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), graphicsDevice_->GetSwapChainDesc(),
-		windowsApp_.get(), srvManager_.get());
+		windowsApp_.get(), graphicsDevice_->GetSrvManager());
 
 	// 入力処理を初期化
 	input_ = std::make_unique<Input>();
@@ -82,7 +87,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// テクスチャの初期化
 	textureManager_ = std::make_shared<TextureManager>();
-	textureManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), srvManager_.get());
+	textureManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
 	// 初期の画像をロードする
 	textureManager_->Load("Resources/Textures/white2x2.png");
 
@@ -97,11 +102,11 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	Sprite::StaticInitialize(graphicsDevice_->GetDevice(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), psoManager_.get());
 	// 3dを描画する処理の初期化
-	Model::StaticInitialize(graphicsDevice_->GetDevice(), textureManager_.get(), srvManager_.get());
-	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), srvManager_.get(), psoManager_.get());
+	Model::StaticInitialize(graphicsDevice_->GetDevice(), textureManager_.get(), graphicsDevice_->GetSrvManager());
+	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), graphicsDevice_->GetSrvManager(), psoManager_.get());
 	// ワールドトランスフォームの初期化
 	WorldTransform::StaticInitialize(graphicsDevice_->GetDevice());
-	WorldTransforms::StaticInitialize(graphicsDevice_->GetDevice(),srvManager_.get());
+	WorldTransforms::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager());
 	// マテリアルの初期化
 	Material::StaticInitialize(graphicsDevice_->GetDevice());
 	// デバック描画用
@@ -133,6 +138,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneContext.audioManager = audioManager_.get();
 	sceneContext.graphicsDevice = graphicsDevice_.get();
 	sceneContext.animationManager = animationManager_.get();
+	sceneContext.renderPassController = renderPassController_.get();
 
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();
@@ -146,7 +152,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneChangeRequest_->SetSceneNames(sceneRegistry_->GetSceneNames());
 
 	editorCore_ = std::make_unique<EditorCore>();
-	editorCore_->Initialize(textureManager_.get(), sceneChangeRequest_.get(), renderPipeline_->GetRendererManager());
+	editorCore_->Initialize(textureManager_.get(), sceneChangeRequest_.get(), renderPassController_.get());
 #endif
 }
 
@@ -197,6 +203,9 @@ void Engine::PreUpdate() {
 	// キー入力の更新処理
 	input_->Update();
 
+	// 入力コマンドの更新処理
+	inputCommand_->Update();
+
 	// ImGuiにフレームが始まる旨を伝える
 	imGuiManager_->BeginFrame();
 
@@ -244,7 +253,7 @@ void Engine::PostUpdate() {
 
 void Engine::PreDraw() {
 	// 描画前処理
-	renderPipeline_->BeginFrame();
+	//renderPipeline_->BeginFrame();
 }
 
 void Engine::PostDraw() {

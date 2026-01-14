@@ -2,14 +2,15 @@
 #include <d3d12.h>
 #include <wrl.h>
 #include<vector>
+#include <deque>
 #include"Externals/DirectXTex/d3dx12.h"
 
 namespace GameEngine {
 
 	// 設定項目
 	struct RtvContext {
-		uint32_t width;
-		uint32_t height;
+		uint32_t width = 1280;
+		uint32_t height = 720;
 		DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 		uint32_t mipLevels = 1;
 		D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
@@ -58,10 +59,13 @@ namespace GameEngine {
 		// 最大RTV数
 		uint32_t maxRtvCount_ = 128;
 
+		uint32_t descriptorSizeRTV_ = 0;
+
 		// 現在使用中のRTVインデックス
 		uint32_t currentRtvIndex_ = 0;
 
-		uint32_t descriptorSizeRTV_ = 0;
+		// 解放されたインデックスのリスト
+		std::deque<uint32_t> freeIndices_;
 
 		// リソース
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> resources_;

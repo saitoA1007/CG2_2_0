@@ -21,7 +21,7 @@ namespace GameEngine {
 	class EditorCore {
 	public:
 
-		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest,RendererManager* rendererManager);
+		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController);
 
 		void Run();
 
@@ -34,14 +34,19 @@ namespace GameEngine {
 
 	private:
 
+		// 各ウィンドウ
 		std::unique_ptr<EditorWindowManager> windowManager_;
 
+		// メニューバー
 		std::unique_ptr<EditorMenuBar> menuBar_;
 
+		// シーンの管理機能
 		std::unique_ptr<SceneMenuBar> sceneMenuBar_;
 
+		// エディターの表示管理
 		std::unique_ptr<EditorLayout> editorLayout_;
 
+		// シーンの操作などをおこなう
 		std::unique_ptr<EditorToolBar> editorToolBar_;
 
 	private:

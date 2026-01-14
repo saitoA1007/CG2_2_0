@@ -2,7 +2,6 @@
 // Core
 #include"WindowsApp.h"
 #include"TextureManager.h"
-#include"SrvManager.h"
 
 // Core/PSO
 #include"PostProcess/CopyPSO.h"
@@ -14,6 +13,8 @@
 // Graphics
 #include"GraphicsDevice.h"
 #include"RenderPipeline.h"
+#include"RenderTextureManager.h"
+#include"RenderPass/RenderPassController.h"
 
 // Common
 #include"LogManager.h"
@@ -99,9 +100,6 @@ namespace GameEngine {
 		// テクスチャの機能
 		std::shared_ptr<TextureManager> textureManager_;
 
-		// srvメモリを管理する機能
-		std::unique_ptr<SrvManager> srvManager_;
-
 		/// PSO ======================================
 
 		/// ↓ポストエフェクト用のPSO設定
@@ -127,6 +125,12 @@ namespace GameEngine {
 
 		// ポストエフェクト
 		std::unique_ptr<PostEffectManager> postEffectManager_;
+
+		// レンダーテクスチャの管理機能
+		std::unique_ptr<RenderTextureManager> renderTextureManager_;
+
+		// レンダーパスの管理機能
+		std::unique_ptr<RenderPassController> renderPassController_;
 
 		/// Input =============================
 
@@ -157,7 +161,7 @@ namespace GameEngine {
 		// シーン切り替えの通知を管理
 		std::unique_ptr<SceneChangeRequest> sceneChangeRequest_;
 
-		// 雑種
+		// フレームレートを取得
 		std::unique_ptr<FpsCounter> fpsCounter_;
 
 		// シーンの生成機能

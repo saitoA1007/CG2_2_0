@@ -3,7 +3,7 @@
 
 using namespace GameEngine;
 
-void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RendererManager* rendererManager) {
+void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController) {
 	windowManager_ = std::make_unique<EditorWindowManager>();
 	menuBar_ = std::make_unique<EditorMenuBar>();
 	editorLayout_ = std::make_unique<EditorLayout>();
@@ -11,7 +11,7 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 	sceneMenuBar_ = std::make_unique<SceneMenuBar>(sceneChangeRequest);
 
 	// ウィンドウの内容を登録する
-	windowManager_->RegisterWindow(std::make_unique<SceneWindow>(rendererManager));
+	windowManager_->RegisterWindow(std::make_unique<SceneWindow>(renderPassController));
 	windowManager_->RegisterWindow(std::make_unique<AssetWindow>());
 	windowManager_->RegisterWindow(std::make_unique<HierarchyWindow>());
 	windowManager_->RegisterWindow(std::make_unique<InspectorWindow>());

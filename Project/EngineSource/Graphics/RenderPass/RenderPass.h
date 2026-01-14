@@ -9,14 +9,13 @@ namespace GameEngine {
 
     struct RenderPassContext {
         ID3D12GraphicsCommandList* commandList = nullptr;
-        D3D12_VIEWPORT viewport{};
-        D3D12_RECT scissorRect{};
+        bool isDepth = false;
     };
 
     class RenderPass {
     public:
 
-        RenderPass(const std::string& name, RenderPass* renderPass);
+        RenderPass(const std::string& name, RenderPassContext* context, RenderTexture* renderTexture);
 
         // 描画前処理
         void PrePass();
@@ -27,6 +26,8 @@ namespace GameEngine {
         // srvIndexを取得
         uint32_t GetSrvIndex()const;
 
+        CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvHandle();
+
         // リサイズ
         //void Resize(uint32_t width, uint32_t height);
 
@@ -34,14 +35,18 @@ namespace GameEngine {
         const std::string GetName() const { return name_; }
 
     private:
-        // レンダーパス
-        RenderPass* renderPass_ = nullptr;
+
+        RenderTexture* renderTexture_ = nullptr;
+
+        ID3D12GraphicsCommandList* commandList_ = nullptr;
+        D3D12_VIEWPORT viewport_{};
+        D3D12_RECT scissorRect_{};
 
         // パスの名前
         std::string name_;
 
         bool isEnable_ = true;
-        uint32_t width_ = 0;
-        uint32_t height_ = 0;
+
+        bool isDepth_ = false;
     };
 }

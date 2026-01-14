@@ -3,6 +3,7 @@
 #include "RendererManager.h"
 #include "FrameRateController.h"
 #include "SrvManager.h"
+#include"RenderPass/RenderPassController.h"
 #include <Windows.h>
 
 namespace GameEngine {
@@ -26,7 +27,7 @@ namespace GameEngine {
         /// <param name="width">画面幅</param>
         /// <param name="height">画面高さ</param>
         /// <param name="srvManager">SRVマネージャー</param>
-        void Initialize(GraphicsDevice* graphicsDevice, PostEffectManager* postEffectManager);
+        void Initialize(GraphicsDevice* graphicsDevice, PostEffectManager* postEffectManager, RenderPassController* renderPassController);
 
         /// <summary>
         /// 描画開始処理
@@ -69,5 +70,11 @@ namespace GameEngine {
         std::unique_ptr<RendererManager> rendererManager_;
         // Fps管理機能
         std::unique_ptr<FrameRateController> frameRateController_;
+
+        RenderPassController* renderPassController_ = nullptr;
+
+    private:
+
+        void TransitionBackBuffer(D3D12_RESOURCE_STATES stateBefore, D3D12_RESOURCE_STATES stateAfter);
     };
 }
