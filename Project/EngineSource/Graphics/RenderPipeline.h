@@ -5,12 +5,12 @@
 #include "SrvManager.h"
 #include"RenderPass/RenderPassController.h"
 #include <Windows.h>
+#include"PostProcess/CopyPSO.h"
 
 namespace GameEngine {
 
     // 前方宣言
     class ImGuiManager;
-    class CopyPSO;
 
     /// <summary>
     /// レンダリングパイプライン全体を総合管理するクラス
@@ -52,7 +52,7 @@ namespace GameEngine {
         /// PostEffect用のPSOを設定
         /// </summary>
         /// <param name="copyPSO"></param>
-        void SetCopyPSO(CopyPSO* copyPSO) { rendererManager_->SetCopyPSO(copyPSO); }
+        void SetCopyPSO(CopyPSO* copyPSO) { copyPSO_ = copyPSO; }
 
         /// <summary>
         /// 最終的な描画先のsrvHandleを取得
@@ -72,6 +72,8 @@ namespace GameEngine {
         std::unique_ptr<FrameRateController> frameRateController_;
 
         RenderPassController* renderPassController_ = nullptr;
+
+        CopyPSO* copyPSO_ = nullptr;
 
     private:
 

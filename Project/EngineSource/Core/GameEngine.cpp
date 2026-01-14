@@ -253,7 +253,7 @@ void Engine::PostUpdate() {
 
 void Engine::PreDraw() {
 	// 描画前処理
-	//renderPipeline_->BeginFrame();
+	renderPipeline_->BeginFrame();
 }
 
 void Engine::PostDraw() {

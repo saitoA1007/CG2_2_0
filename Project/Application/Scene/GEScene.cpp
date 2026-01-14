@@ -93,6 +93,12 @@ void GEScene::Draw(const bool& isDebugView) {
 		ModelRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
 	}
 
+	// 描画パスの管理を取得
+	auto pass = context_->renderPassController;
+
+	// 通常描画
+	pass->PrePass("DefaultPass");
+
 	//===========================================================
 	// 3D描画
 	//===========================================================
@@ -125,6 +131,8 @@ void GEScene::Draw(const bool& isDebugView) {
 	SpriteRenderer::PreDraw(RenderMode2D::Normal);
 
 	SpriteRenderer::Draw(sprite_.get(), uvCheckerGH_);
+
+	pass->PostPass("DefaultPass");
 }
 
 void GEScene::InputRegisterCommand() {

@@ -27,6 +27,14 @@ void RenderPipeline::Initialize(GraphicsDevice* graphicsDevice, PostEffectManage
 void RenderPipeline::BeginFrame() {
     // レンダリング開始処理
     //rendererManager_->BeginFrame();
+
+      // ヒープを設定する
+#ifdef USE_IMGUI
+    // ImGuiの方で普段は設定されている
+#else
+    ID3D12DescriptorHeap* descriptorHeaps[] = { graphicsDevice_->GetSrvManager()->GetSRVHeap() };
+    graphicsDevice_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
+#endif
 }
 
 void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
@@ -46,7 +54,7 @@ void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
     graphicsDevice_->GetCommandList()->RSSetViewports(1, &graphicsDevice_->GetViewport());
     graphicsDevice_->GetCommandList()->RSSetScissorRects(1, &graphicsDevice_->GetScissorRect());
 
-#ifdef _DEBUG
+#ifdef USE_IMGUI
     // ImGuiを描画
     imGuiManager->Draw();
 #else
