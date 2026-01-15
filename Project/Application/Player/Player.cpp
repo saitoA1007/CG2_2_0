@@ -58,7 +58,7 @@ void Player::Initialize(GameEngine::InputCommand* inputCommand) {
 		[this]() { NormalUpdate(); },
 		[this]() { AttackUpdate(); },
 		[this]() { JumpUpdate(); },
-		[this]() { DushUpdate(); }
+		[this]() { DashUpdate(); }
 	};
 
 	// プレイヤーの各状態のリセット処理を設定する
@@ -66,11 +66,11 @@ void Player::Initialize(GameEngine::InputCommand* inputCommand) {
 		[this]() {}, // 通常
 		[this]() {}, // 攻撃
 		[this]() { jumpTimer_ = 0.0f; }, // ジャンプ
-		[this]() { dushTimer_ = 0.0f; }, // ダッシュ
+		[this]() { dashTimer_ = 0.0f; }, // ダッシュ
 	};
 
 	// 音
-	dushSH_ = AudioManager::GetInstance().GetHandleByName("playerDush.mp3");
+	dashSH_ = AudioManager::GetInstance().GetHandleByName("playerDush.mp3");
 	landSH_ = AudioManager::GetInstance().GetHandleByName("playerLand.mp3");
 	hitSH_ = AudioManager::GetInstance().GetHandleByName("playerHit.mp3");
 	swingSH_ = AudioManager::GetInstance().GetHandleByName("playerSwing.mp3");
@@ -183,18 +183,18 @@ void Player::ProcessMoveInput() {
 	// ダッシュ操作
 	if (inputCommand_->IsCommandActive("Dush")) {
 		if (behavior_ == Behavior::Normal) {
-			behaviorRequest_ = Behavior::Dush;
+			behaviorRequest_ = Behavior::Dash;
 
 			// ダッシュ音
-			AudioManager::GetInstance().Play(dushSH_, 0.5f, false);
+			AudioManager::GetInstance().Play(dashSH_, 0.5f, false);
 
 			// ダッシュの向く方向を設定する
-			dushDirection_ = { 0.0f,0.0f,1.0f };
+			dashDirection_ = { 0.0f,0.0f,1.0f };
 			Matrix4x4 worldMatrix = worldTransform_.GetWorldMatrix();
 			worldMatrix.m[3][0] = 0.0f;
 			worldMatrix.m[3][1] = 0.0f;
 			worldMatrix.m[3][2] = 0.0f;
-			dushDirection_ = TransformNormal(dushDirection_, worldMatrix);
+			dashDirection_ = TransformNormal(dashDirection_, worldMatrix);
 		}
 	}
 
@@ -381,16 +381,16 @@ void Player::AttackUpdate() {
 	weapon_->Update();
 }
 
-void Player::DushUpdate() {
+void Player::DashUpdate() {
 
 	// ダッシュ移動処理
-	dushTimer_ += FpsCounter::deltaTime / kDushMaxTime_;
+	dashTimer_ += FpsCounter::deltaTime / kDashMaxTime_;
 
 	// 移動
-	velocity_ = dushDirection_ * kDushSpeed_;
+	velocity_ = dashDirection_ * kDashSpeed_;
 
 	// 時間がたったら通常状態へ遷移
-	if (dushTimer_ >= kDushMaxTime_) {
+	if (dashTimer_ >= kDashMaxTime_) {
 		behaviorRequest_ = Behavior::Normal;
 	}
 }
@@ -423,7 +423,7 @@ void Player::OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult&
 
 	// ボスに当たった時の処理
 	if (isBoss && !isHit_) {
-		if (behavior_ != Behavior::Dush) {
+		if (behavior_ != Behavior::Dash) {
 			isHit_ = true;
 			isHitEffect_ = true;
 			// ヒット音声
@@ -442,7 +442,7 @@ void Player::OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult&
 
 	// 敵の弾に当たった時
 	if (isEnemyBullet) {
-		if (behavior_ != Behavior::Dush) {
+		if (behavior_ != Behavior::Dash) {
 			isHit_ = true;
 			isHitEffect_ = true;
 			// ヒット音声
@@ -478,8 +478,8 @@ void Player::RegisterDebugParam() {
 	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxTime", kJumpMaxTime_);
 	GameParamEditor::GetInstance()->AddItem("Player", "MoveSpeed", kMoveSpeed_);
 	GameParamEditor::GetInstance()->AddItem("Player", "TurnTime", kTurnTime_);
-	GameParamEditor::GetInstance()->AddItem("Player", "DushSpeed", kDushSpeed_);
-	GameParamEditor::GetInstance()->AddItem("Player", "DushMaxTime", kDushMaxTime_);
+	GameParamEditor::GetInstance()->AddItem("Player", "DushSpeed", kDashSpeed_);
+	GameParamEditor::GetInstance()->AddItem("Player", "DushMaxTime", kDashMaxTime_);
 
 	// コンボ攻撃
 	for (uint32_t i = 0; i < kConstAttacks_.size(); ++i) {
@@ -495,8 +495,8 @@ void Player::ApplyDebugParam() {
 	kJumpMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "JumpMaxTime");
 	kMoveSpeed_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "MoveSpeed");
 	kTurnTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "TurnTime");
-	kDushSpeed_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "DushSpeed");
-	kDushMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "DushMaxTime");
+	kDashSpeed_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "DushSpeed");
+	kDashMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "DushMaxTime");
 
 	// コンボ攻撃
 	for (uint32_t i = 0; i < kConstAttacks_.size(); ++i) {

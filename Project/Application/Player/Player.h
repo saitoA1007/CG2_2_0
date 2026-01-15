@@ -19,7 +19,7 @@ public:
 		Normal, // 通常状態
 		Attack, // 攻撃状態
 		Jump,   // ジャンプ状態
-		Dush,   // ダッシュ状態
+		Dash,   // ダッシュ状態
 
 		MaxCount // 状態の数
 	};
@@ -154,9 +154,9 @@ private: // 調整項目
 	float kJumpMaxTime_ = 0.65f;
 
 	// ダッシュする速さ
-	float kDushSpeed_ = 10.0f;
+	float kDashSpeed_ = 10.0f;
 	// ダッシュする時間
-	float kDushMaxTime_ = 2.0f;
+	float kDashMaxTime_ = 2.0f;
 
 	// 当たり判定の半径
 	float kCollisionRadius_ = 1.0f;
@@ -211,7 +211,7 @@ private:
 	bool isAttack_ = false;
 
 	// ダッシュ音
-	uint32_t dushSH_ = 0;
+	uint32_t dashSH_ = 0;
 	// 地面に付いた音
 	uint32_t landSH_ = 0;
 	// ヒット音
@@ -241,9 +241,9 @@ private:
 	float jumpTimer_ = 0.0f;
 
 	// ダッシュで使用する変数 ==================================
-	float dushTimer_ = 0.0f;
+	float dashTimer_ = 0.0f;
 	// ダッシュする方向を設定する
-	Vector3 dushDirection_ = { 0.0f,0.0f,0.0f };
+	Vector3 dashDirection_ = { 0.0f,0.0f,0.0f };
 
 	// 攻撃で使用する変数 ===========================================
 
@@ -306,7 +306,7 @@ private: // プレイヤーの行動関数
 	/// <summary>
 	/// ダッシュの更新処理
 	/// </summary>
-	void DushUpdate();
+	void DashUpdate();
 
 private: // プレイヤーの他の関数
 
