@@ -237,90 +237,258 @@
     <ClCompile Include="Application\Scene\GameScene.cpp">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
-    <ClCompile Include="Application\Player\Player.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\SrvManager.cpp" />
-    <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
-    <ClCompile Include="EngineSource\3D\Model\ModelRenderer.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\DXDevice.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\DXCommand.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\DXSwapChain.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\DXRenderTarget.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\DXDepthStencil.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\DXFence.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\PSOManager.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\ShaderCompiler.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\BlendBuilder.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\RasterizerBuilder.cpp" />
-    <ClCompile Include="Externals\imgui\imgui_node_editor.cpp" />
-    <ClCompile Include="Externals\imgui\crude_json.cpp" />
-    <ClCompile Include="Externals\imgui\imgui_canvas.cpp" />
-    <ClCompile Include="Externals\imgui\imgui_node_editor_api.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\MaterialEditor.cpp" />
-    <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
-    <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp" />
-    <ClCompile Include="EngineSource\Collision\CollisionManager.cpp" />
-    <ClCompile Include="EngineSource\3D\Model\DebugRenderer.cpp" />
-    <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.cpp" />
-    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorMenuBar.cpp" />
-    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorWindowManager.cpp" />
-    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorLayout.cpp" />
-    <ClCompile Include="EngineSource\Editor\Windows\SceneWIndow.cpp" />
-    <ClCompile Include="EngineSource\Editor\EditorCore.cpp" />
-    <ClCompile Include="EngineSource\Editor\Windows\ConsoleWindow.cpp" />
-    <ClCompile Include="EngineSource\Editor\Windows\AssetWindow.cpp" />
-    <ClCompile Include="EngineSource\Editor\Windows\InspectorWindow.cpp" />
-    <ClCompile Include="EngineSource\Editor\Windows\HierarchyWindow.cpp" />
-    <ClCompile Include="EngineSource\Editor\Windows\PerformanceWindow.cpp" />
-    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorToolBar.cpp" />
-    <ClCompile Include="EngineSource\Editor\EditorMenu\SceneMenuBar.cpp" />
-    <ClCompile Include="EngineSource\Graphics\RendererManager.cpp" />
-    <ClCompile Include="EngineSource\Graphics\GraphicsDevice.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\DXDebugger.cpp" />
-    <ClCompile Include="EngineSource\Graphics\FrameRateController.cpp" />
-    <ClCompile Include="EngineSource\Graphics\DirectX\DXViewportState.cpp" />
-    <ClCompile Include="EngineSource\Graphics\RenderPipeline.cpp" />
-    <ClCompile Include="Application\Light\SceneLightingController.cpp" />
-    <ClCompile Include="EngineSource\3D\Model\AnimationManager.cpp" />
-    <ClCompile Include="EngineSource\3D\Model\Animator.cpp" />
-    <ClCompile Include="Application\Scene\ALGameScene.cpp" />
-    <ClCompile Include="Application\Scene\ResultScene.cpp" />
-    <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
-    <ClCompile Include="Application\Camera\FollowCameraController.cpp" />
-    <ClCompile Include="Application\Weapon\Sword.cpp" />
-    <ClCompile Include="Application\UI\BossHpUI.cpp" />
-    <ClCompile Include="EngineSource\Scene\SceneTransition.cpp" />
-    <ClCompile Include="Application\Enemy\State\BossStateIn.cpp" />
-    <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
-    <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp" />
-    <ClCompile Include="Application\Enemy\Projectile\EnemyProjectileManager.cpp" />
-    <ClCompile Include="Application\Enemy\Projectile\Object\RockBullet.cpp" />
-    <ClCompile Include="Application\Effect\EffectManager.cpp" />
-    <ClCompile Include="Application\Enemy\State\BattleState\StampFall.cpp" />
-    <ClCompile Include="Application\Enemy\State\BattleState\ShotBall.cpp" />
-    <ClCompile Include="Application\Enemy\State\BattleState\Wait.cpp" />
-    <ClCompile Include="Application\Enemy\State\BattleState\RandMove.cpp" />
-    <ClCompile Include="Application\Enemy\State\BattleState\RushAttack.cpp" />
-    <ClCompile Include="Application\Enemy\State\BattleState\RotateAttack.cpp" />
-    <ClCompile Include="Application\ClearTimeTracker.cpp" />
-    <ClCompile Include="Application\UI\ClearTimeUI.cpp" />
-    <ClCompile Include="Application\Stage\StageManager.cpp" />
-    <ClCompile Include="Application\Stage\Wall.cpp" />
-    <ClCompile Include="Application\Graphics\PlaneProjectionShadow.cpp" />
-    <ClCompile Include="Application\UI\PlayerHpUI.cpp" />
-    <ClCompile Include="Application\UI\GameOverUI.cpp" />
-    <ClCompile Include="EngineSource\3D\Extension\CustomRenderer.cpp" />
-    <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.cpp" />
-    <ClCompile Include="Application\Graphics\Terrain.cpp" />
-    <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.cpp" />
-    <ClCompile Include="Application\Effect\Object\BreakIceParticle.cpp" />
-    <ClCompile Include="Application\Effect\Object\Player\PlayerAttackEffect.cpp" />
-    <ClCompile Include="Application\Effect\Object\Player\PlayerDestroyEffect.cpp" />
-    <ClCompile Include="Application\Effect\Object\Enemy\EnemyDestroyEffect.cpp" />
-    <ClCompile Include="Application\UI\MaskScreenUI.cpp" />
-    <ClCompile Include="Application\Camera\EffectCamera.cpp" />
+    <ClCompile Include="Application\Scene\ALGameScene.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Model\AnimationManager.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Model\Animator.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\Windows\AssetWindow.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\Core\BlendBuilder.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy\BossEnemy.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\UI\BossHpUI.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy\State\BossStateIn.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy\State\BossStateOut.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Effect\Object\BreakIceParticle.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\ClearTimeTracker.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\UI\ClearTimeUI.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Collision\CollisionManager.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\Windows\ConsoleWindow.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\imgui\crude_json.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Extension\CustomRenderer.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Model\DebugRenderer.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXCommand.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXDebugger.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXDepthStencil.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXDevice.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXFence.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXRenderTarget.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXSwapChain.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\DirectX\DXViewportState.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\EditorCore.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorLayout.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorMenuBar.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorToolBar.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\EditorMenu\EditorWindowManager.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Camera\EffectCamera.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Effect\EffectManager.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Effect\Object\Enemy\EnemyDestroyEffect.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy\Projectile\EnemyProjectileManager.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Camera\FollowCameraController.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\FrameRateController.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\UI\GameOverUI.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\GraphicsDevice.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\Windows\HierarchyWindow.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\imgui\imgui_canvas.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\imgui\imgui_node_editor.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Externals\imgui\imgui_node_editor_api.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Input\InputCommand.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\Windows\InspectorWindow.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\UI\MaskScreenUI.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\Core\MaterialEditor.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Model\ModelRenderer.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\Windows\PerformanceWindow.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Graphics\PlaneProjectionShadow.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Player\Player.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Effect\Object\Player\PlayerAttackEffect.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Effect\Object\Player\PlayerDestroyEffect.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\UI\PlayerHpUI.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\Core\PSOManager.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy\State\BattleState\RandMove.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\Core\RasterizerBuilder.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\RendererManager.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\RenderPipeline.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Scene\ResultScene.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy\Projectile\Object\RockBullet.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy\State\BattleState\RotateAttack.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy\State\BattleState\RushAttack.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\EditorMenu\SceneMenuBar.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Scene\SceneTransition.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\Windows\SceneWIndow.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Core\PSO\Core\ShaderCompiler.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Light\SceneLightingController.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy\State\BattleState\ShotBall.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\DirectX\SrvManager.cpp">
+      <Filter>EngineSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Stage\StageManager.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy\State\BattleState\StampFall.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Weapon\Sword.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Graphics\Terrain.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Enemy\State\BattleState\Wait.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Stage\Wall.cpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -536,118 +704,342 @@
     <ClInclude Include="Application\Scene\GameScene.h">
       <Filter>GameSource\Core\SceneSystem\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Input\InputCommand.h" />
-    <ClInclude Include="Application\Player\Player.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\SrvManager.h" />
-    <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
-    <ClInclude Include="EngineSource\3D\Model\ModelRenderer.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\DXDevice.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\DXCommand.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\DXSwapChain.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\DXRenderTarget.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\DXDepthStencil.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\DXFence.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\PSOManager.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\ShaderCompiler.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\BlendBuilder.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\RasterizerBuilder.h" />
-    <ClInclude Include="Externals\imgui\imgui_node_editor.h" />
-    <ClInclude Include="Externals\imgui\imgui_node_editor_internal.h" />
-    <ClInclude Include="Externals\imgui\crude_json.h" />
-    <ClInclude Include="Externals\imgui\imgui_extra_math.h" />
-    <ClInclude Include="Externals\imgui\imgui_canvas.h" />
-    <ClInclude Include="Externals\imgui\imgui_bezier_math.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\MaterialEditor.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\DrawPSOData.h" />
-    <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
-    <ClInclude Include="EngineSource\Editor\ParamEditorManager.h" />
-    <ClInclude Include="EngineSource\Collision\Collider.h" />
-    <ClInclude Include="EngineSource\Collision\CollisionConfig.h" />
-    <ClInclude Include="EngineSource\Collision\CollisionManager.h" />
-    <ClInclude Include="EngineSource\Collision\CollisionVisitor.h" />
-    <ClInclude Include="EngineSource\3D\Model\DebugRenderer.h" />
-    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.h" />
-    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleData.h" />
-    <ClInclude Include="EngineSource\Math\Range.h" />
-    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorMenuBar.h" />
-    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorWindowManager.h" />
-    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorLayout.h" />
-    <ClInclude Include="EngineSource\Editor\Windows\IEditorWindow.h" />
-    <ClInclude Include="EngineSource\Editor\Windows\SceneWIndow.h" />
-    <ClInclude Include="EngineSource\Editor\EditorCore.h" />
-    <ClInclude Include="EngineSource\Editor\Windows\ConsoleWindow.h" />
-    <ClInclude Include="EngineSource\Editor\Windows\AssetWindow.h" />
-    <ClInclude Include="EngineSource\Editor\Windows\InspectorWindow.h" />
-    <ClInclude Include="EngineSource\Editor\Windows\HierarchyWindow.h" />
-    <ClInclude Include="EngineSource\Editor\Windows\PerformanceWindow.h" />
-    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorToolBar.h" />
-    <ClInclude Include="EngineSource\Scene\SceneContext.h" />
-    <ClInclude Include="EngineSource\Editor\EditorMenu\SceneMenuBar.h" />
-    <ClInclude Include="EngineSource\Scene\SceneState.h" />
-    <ClInclude Include="EngineSource\Scene\SceneChangeRequest.h" />
-    <ClInclude Include="EngineSource\Graphics\RendererManager.h" />
-    <ClInclude Include="EngineSource\Graphics\GraphicsDevice.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\DXDebugger.h" />
-    <ClInclude Include="EngineSource\Graphics\FrameRateController.h" />
-    <ClInclude Include="EngineSource\Graphics\DirectX\DXViewportState.h" />
-    <ClInclude Include="EngineSource\Graphics\RenderPipeline.h" />
-    <ClInclude Include="EngineSource\Core\PSO\PostProcess\IPostEffect.h" />
-    <ClInclude Include="Application\Light\SceneLightingController.h" />
-    <ClInclude Include="EngineSource\Collision\CollisionResult.h" />
-    <ClInclude Include="EngineSource\Collision\ColliderData.h" />
-    <ClInclude Include="EngineSource\Collision\UserData.h" />
-    <ClInclude Include="EngineSource\3D\Model\AnimationManager.h" />
-    <ClInclude Include="EngineSource\3D\Model\Animator.h" />
-    <ClInclude Include="EngineSource\Graphics\DescriptorCounts.h" />
-    <ClInclude Include="Application\Scene\ALGameScene.h" />
-    <ClInclude Include="Application\Scene\ResultScene.h" />
-    <ClInclude Include="Application\Enemy\BossEnemy.h" />
-    <ClInclude Include="Application\Camera\FollowCameraController.h" />
-    <ClInclude Include="Application\Weapon\IWeapon.h" />
-    <ClInclude Include="Application\Weapon\Sword.h" />
-    <ClInclude Include="Application\CollisionTypeID.h" />
-    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleExtensionData.h" />
-    <ClInclude Include="Application\UI\BossHpUI.h" />
-    <ClInclude Include="EngineSource\Scene\SceneTransition.h" />
-    <ClInclude Include="Application\Enemy\BossContext.h" />
-    <ClInclude Include="Application\Enemy\BossState.h" />
-    <ClInclude Include="Application\Enemy\State\BossStateIn.h" />
-    <ClInclude Include="Application\Enemy\State\BossStateOut.h" />
-    <ClInclude Include="Application\Enemy\State\BossStateBattle.h" />
-    <ClInclude Include="Application\Enemy\State\IBossState.h" />
-    <ClInclude Include="Application\Enemy\Projectile\EnemyProjectileManager.h" />
-    <ClInclude Include="Application\Enemy\Projectile\IProjectile.h" />
-    <ClInclude Include="Application\Enemy\Projectile\Object\RockBullet.h" />
-    <ClInclude Include="Application\Effect\EffectManager.h" />
-    <ClInclude Include="Application\Effect\IEffect.h" />
-    <ClInclude Include="Application\Enemy\State\BattleState\IBossAttack.h" />
-    <ClInclude Include="Application\Enemy\State\BattleState\StampFall.h" />
-    <ClInclude Include="Application\Enemy\State\BattleState\ShotBall.h" />
-    <ClInclude Include="Application\Enemy\State\BattleState\Wait.h" />
-    <ClInclude Include="Application\Enemy\State\BattleState\RandMove.h" />
-    <ClInclude Include="Application\Enemy\State\BattleState\RushAttack.h" />
-    <ClInclude Include="Application\Enemy\State\BattleState\RotateAttack.h" />
-    <ClInclude Include="Application\ClearTime.h" />
-    <ClInclude Include="Application\ClearTimeTracker.h" />
-    <ClInclude Include="Application\UI\ClearTimeUI.h" />
-    <ClInclude Include="Application\Stage\StageManager.h" />
-    <ClInclude Include="Application\Stage\Wall.h" />
-    <ClInclude Include="Application\Graphics\PlaneProjectionShadow.h" />
-    <ClInclude Include="Application\UI\PlayerHpUI.h" />
-    <ClInclude Include="Application\UI\GameOverUI.h" />
-    <ClInclude Include="EngineSource\3D\Extension\CustomRenderer.h" />
-    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.h" />
-    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\ICustomMaterial.h" />
-    <ClInclude Include="Application\Graphics\Terrain.h" />
-    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.h" />
-    <ClInclude Include="Application\Effect\Object\BreakIceParticle.h" />
-    <ClInclude Include="Application\Effect\Object\Player\PlayerAttackEffect.h" />
-    <ClInclude Include="Application\Effect\Object\Player\PlayerDestroyEffect.h" />
-    <ClInclude Include="Application\Effect\Object\Enemy\EnemyDestroyEffect.h" />
-    <ClInclude Include="Application\UI\MaskScreenUI.h" />
-    <ClInclude Include="Application\Camera\EffectCamera.h" />
+    <ClInclude Include="Application\Scene\ALGameScene.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Model\AnimationManager.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Model\Animator.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\Windows\AssetWindow.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\Core\BlendBuilder.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\BossContext.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\BossEnemy.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\UI\BossHpUI.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\BossState.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\State\BossStateBattle.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\State\BossStateIn.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\State\BossStateOut.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Effect\Object\BreakIceParticle.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\ClearTime.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\ClearTimeTracker.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\UI\ClearTimeUI.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Collision\Collider.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Collision\ColliderData.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Collision\CollisionConfig.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Collision\CollisionManager.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Collision\CollisionResult.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Collision\CollisionVisitor.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\Windows\ConsoleWindow.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\crude_json.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\CollisionTypeID.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Extension\CustomRenderer.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Model\DebugRenderer.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\DescriptorCounts.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\Core\DrawPSOData.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXCommand.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXDebugger.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXDepthStencil.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXDevice.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXFence.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXRenderTarget.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXSwapChain.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\DirectX\DXViewportState.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\EditorCore.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorLayout.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorMenuBar.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorToolBar.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\EditorMenu\EditorWindowManager.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Camera\EffectCamera.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Effect\EffectManager.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Effect\Object\Enemy\EnemyDestroyEffect.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\Projectile\EnemyProjectileManager.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Camera\FollowCameraController.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\FrameRateController.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\UI\GameOverUI.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\GraphicsDevice.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\Windows\HierarchyWindow.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\State\IBossState.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\State\BattleState\IBossAttack.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceMaterial.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\imgui_bezier_math.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\imgui_canvas.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\imgui_extra_math.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\imgui_node_editor.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Externals\imgui\imgui_node_editor_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\IceRockMaterial.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Extension\CustomMaterial\ICustomMaterial.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\Windows\IEditorWindow.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Effect\IEffect.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Input\InputCommand.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\Core\InputLayoutBuilder.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\Windows\InspectorWindow.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\PostProcess\IPostEffect.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\Projectile\IProjectile.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Weapon\IWeapon.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\UI\MaskScreenUI.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\Core\MaterialEditor.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Model\ModelManager.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Model\ModelRenderer.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\ParamEditorManager.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleData.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleExtensionData.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\Windows\PerformanceWindow.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Graphics\PlaneProjectionShadow.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Player\Player.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Effect\Object\Player\PlayerAttackEffect.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Effect\Object\Player\PlayerDestroyEffect.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\UI\PlayerHpUI.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\Core\PSOManager.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\State\BattleState\RandMove.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Math\Range.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\Core\RasterizerBuilder.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\RendererManager.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\RenderPipeline.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Scene\ResultScene.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\Projectile\Object\RockBullet.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\State\BattleState\RotateAttack.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\State\BattleState\RushAttack.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Scene\SceneChangeRequest.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Scene\SceneContext.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\EditorMenu\SceneMenuBar.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Scene\SceneState.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Scene\SceneTransition.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\Windows\SceneWIndow.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Core\PSO\Core\ShaderCompiler.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Light\SceneLightingController.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\State\BattleState\ShotBall.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\2D\SpriteRenderer.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\DirectX\SrvManager.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Stage\StageManager.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\State\BattleState\StampFall.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Weapon\Sword.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Graphics\Terrain.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Collision\UserData.h">
+      <Filter>EngineSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Stage\Wall.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\State\BattleState\Wait.h">
+      <Filter>GameSource</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
@@ -697,10 +1089,18 @@
     <None Include="Resources\Shaders\PostEffect\FullScreen.hlsli">
       <Filter>Shaders\PostEffect</Filter>
     </None>
-    <None Include="Externals\imgui\imgui_bezier_math.inl" />
-    <None Include="Externals\imgui\imgui_extra_math.inl" />
-    <None Include="Externals\imgui\imgui_node_editor_internal.inl" />
-    <None Include="Resources\Shaders\IceMaterial.hlsli" />
+    <None Include="Resources\Shaders\IceMaterial.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Externals\imgui\imgui_bezier_math.inl">
+      <Filter>imgui</Filter>
+    </None>
+    <None Include="Externals\imgui\imgui_extra_math.inl">
+      <Filter>imgui</Filter>
+    </None>
+    <None Include="Externals\imgui\imgui_node_editor_internal.inl">
+      <Filter>imgui</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Object3d.PS.hlsl">
@@ -793,9 +1193,17 @@
     <FxCompile Include="Resources\Shaders\PostEffect\FullScreen.VS.hlsl">
       <Filter>Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shaders\SkinningObject3d.VS.hlsl" />
-    <FxCompile Include="Resources\Shaders\IceMaterial.PS.hlsl" />
-    <FxCompile Include="Resources\Shaders\IceMaterial.VS.hlsl" />
-    <FxCompile Include="Resources\Shaders\BgIceRock.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\BgIceRock.PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\IceMaterial.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\IceMaterial.PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\SkinningObject3d.VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
