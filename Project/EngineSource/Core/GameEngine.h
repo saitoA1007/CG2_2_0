@@ -168,7 +168,7 @@ namespace GameEngine {
 		// シーン切り替えの通知を管理
 		std::unique_ptr<SceneChangeRequest> sceneChangeRequest_;
 
-		// 雑種
+		// fpsの計測
 		std::unique_ptr<FpsCounter> fpsCounter_;
 
 	private:

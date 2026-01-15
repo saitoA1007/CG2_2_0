@@ -13,8 +13,8 @@ public:
 	/// <summary>
 	/// 更新処理
 	/// </summary>
-	/// <param name="inputCommand"></param>
-	/// <param name="targetPos"></param>
+	/// <param name="inputCommand">入力コマンド</param>
+	/// <param name="targetPos">目標位置</param>
 	void Update(GameEngine::InputCommand* inputCommand);
 
 	/// <summary>
@@ -40,14 +40,15 @@ public:
 		playerVelocity_ = velocity;
 	}
 
-	// カメラを向けるカメラ
+	// カメラを向ける位置を設定
 	void SetLockOnPos(const Vector3& targetPos) {
 		targetPos_ = targetPos;
 	}
 
+	// ロックオンフラグを取得
 	bool GetIsLockOn() const { return isLockOn_; }
 
-	// ロックオン可能を取得
+	// ロックオンフラグを設定
 	void SetIsChangeActive(const bool& isActive) { isChangeActive_ = !isActive; }
 		
 private:
