@@ -250,7 +250,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClCompile Include="EngineSource\Core\PSO\Core\RasterizerBuilder.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\Core\ShaderCompiler.cpp" />
-    <ClCompile Include="EngineSource\Core\PSO\Core\test.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\GaussianBlurPSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\LinePSO.cpp" />
     <ClCompile Include="EngineSource\Core\PSO\PostProcess\BloomPSO.cpp" />
@@ -471,7 +470,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="EngineSource\Core\PSO\Core\RasterizerBuilder.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\RootSignatureBuilder.h" />
     <ClInclude Include="EngineSource\Core\PSO\Core\ShaderCompiler.h" />
-    <ClInclude Include="EngineSource\Core\PSO\Core\test.h" />
     <ClInclude Include="EngineSource\Core\PSO\GaussianBlurPSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\LinePSO.h" />
     <ClInclude Include="EngineSource\Core\PSO\PostProcess\BloomPSO.h" />

@@ -17,7 +17,7 @@ namespace GameEngine {
 		// シングルトンインスタンスの取得
 		static AudioManager& GetInstance();
 
-		// コピーコンストラクタと代入演算子を無効化（シングルトン保証のため）
+		// コピーコンストラクタと代入演算子を無効化
 		AudioManager(const AudioManager&) = delete;
 		AudioManager& operator=(const AudioManager&) = delete;
 
@@ -50,7 +50,7 @@ namespace GameEngine {
 			// 波形フォーマット
 			WAVEFORMATEX wfex;
 			// バッファの先頭アドレス
-			BYTE* pBuffer;
+			std::vector<BYTE> pBuffer;
 			// バッファのサイズ
 			unsigned int bufferSize;
 			// 音声データの名前

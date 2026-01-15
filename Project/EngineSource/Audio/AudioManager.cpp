@@ -56,7 +56,7 @@ void AudioManager::SoundPlayWave(const uint32_t& soundHandle, bool isloop) {
 
 	// 再生する波形データの設定
 	XAUDIO2_BUFFER buf{};
-	buf.pAudioData = soundData.pBuffer;
+	buf.pAudioData = soundData.pBuffer.data();
 	buf.AudioBytes = soundData.bufferSize;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
 	buf.LoopCount = isloop ? XAUDIO2_LOOP_INFINITE : 0;
@@ -125,15 +125,15 @@ AudioManager::SoundData AudioManager::SoundLoadWave(const std::string& filename)
 		assert(0);
 	}
 	// Dataチャンクのデータ部（波形データ）の読み込み
-	char* pBuffer = new char[data.size];
-	file.read(pBuffer, data.size);
+	std::vector<BYTE> pBuffer(data.size);
+	file.read(reinterpret_cast<char*>(pBuffer.data()), data.size);
 	// Waveファイルを閉じる
 	file.close();
 
 	// returnする為の音声データ
 	SoundData soundData = {};
 	soundData.wfex = format.fmt;
-	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
+	soundData.pBuffer = std::move(pBuffer);
 	soundData.bufferSize = data.size;
 	soundData.name = filename;
 	soundData.type = WAV;
@@ -142,15 +142,7 @@ AudioManager::SoundData AudioManager::SoundLoadWave(const std::string& filename)
 }
 
 void AudioManager::SoundUnload() {
-
-	for (uint32_t i = 0; i < soundData_.size(); ++i) {
-		// バッファのメモリを解放
-		delete[] soundData_[i].pBuffer;
-
-		soundData_[i].pBuffer = 0;
-		soundData_[i].bufferSize = 0;
-		soundData_[i].wfex = {};
-	}
+	soundData_.clear();
 }
 
 uint32_t AudioManager::Load(const std::string& fileName) {
@@ -240,7 +232,7 @@ AudioManager::SoundData AudioManager::SoundLoadMp3(const std::wstring path) {
 	memcpy(pAudioData, bufferData.data(), bufferData.size());
 
 	soundData.wfex = *waveFormat;
-	soundData.pBuffer = pAudioData;
+	soundData.pBuffer = std::move(bufferData);
 	soundData.bufferSize = static_cast<UINT32>(bufferData.size());
 
 	// 解放処理
@@ -308,7 +300,7 @@ void AudioManager::SoundPlayMp3(const uint32_t& soundHandle, bool isloop) {
 	xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
 
 	XAUDIO2_BUFFER buffer{ 0 };
-	buffer.pAudioData = soundData.pBuffer;
+	buffer.pAudioData = soundData.pBuffer.data();
 	buffer.Flags = XAUDIO2_END_OF_STREAM;
 	buffer.AudioBytes = sizeof(BYTE) * static_cast<UINT32>(soundData.bufferSize);
 	buffer.LoopCount = isloop ? XAUDIO2_LOOP_INFINITE : 0;
