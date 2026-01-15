@@ -17,7 +17,7 @@ void Terrain::Initialize(const uint32_t& baseTexture, const uint32_t& iceTexture
 	rimColor = Vector4(iceMaterial_->materialData_->rimColor.x, iceMaterial_->materialData_->rimColor.y, iceMaterial_->materialData_->rimColor.z, 1.0f);
 	specularColor = Vector4(iceMaterial_->materialData_->specularColor.x, iceMaterial_->materialData_->specularColor.y, iceMaterial_->materialData_->specularColor.z, 1.0f);
 	// 値を登録する
-	RegisterBebugParam();
+	RegisterDebugParam();
 	ApplyDebugParam();
 #else
 	// 値を適応させる
@@ -32,7 +32,7 @@ void Terrain::Update() {
 #endif
 }
 
-void Terrain::RegisterBebugParam() {
+void Terrain::RegisterDebugParam() {
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "BaseColor", iceMaterial_->materialData_->baseColor);
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "IceColor", iceMaterial_->materialData_->color);
 	GameParamEditor::GetInstance()->AddItem("IceTerrain", "SpecularColor", specularColor);

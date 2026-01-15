@@ -96,7 +96,7 @@ void ShotBall::Finalize() {
 
 }
 
-void ShotBall::RegisterBebugParam() {
+void ShotBall::RegisterDebugParam() {
 
 }
 

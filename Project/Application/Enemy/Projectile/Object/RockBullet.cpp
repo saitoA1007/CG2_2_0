@@ -42,7 +42,7 @@ void RockBullet::Initialize(const Vector3& pos, const Vector3& dir) {
 	breakSH_ = AudioManager::GetInstance().GetHandleByName("iceBreak.mp3");
 
 #ifdef USE_IMGUI
-	RegisterBebugParam();
+	RegisterDebugParam();
 #endif 
 	ApplyDebugParam();
 
@@ -94,7 +94,7 @@ void RockBullet::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRe
 	}
 }
 
-void RockBullet::RegisterBebugParam() {
+void RockBullet::RegisterDebugParam() {
 	// 値の登録
 	GameParamEditor::GetInstance()->AddItem(groupName_, "Speed", speed_);
 	GameParamEditor::GetInstance()->AddItem(groupName_, "LifeTime", lifeTime_);

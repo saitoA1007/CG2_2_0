@@ -39,7 +39,7 @@ void Wall::Initialize(const Transform& transform) {
 
 #ifdef _DEBUG
 // 値を登録する
-	RegisterBebugParam();
+	RegisterDebugParam();
 #endif
 	// 値を適応させる
 	ApplyDebugParam();
@@ -62,7 +62,7 @@ AABB Wall::GetAABBData() {
 	return AABB{ pos - halfSize,pos + halfSize };
 }
 
-void Wall::RegisterBebugParam() {
+void Wall::RegisterDebugParam() {
 	// マテリアル
 	GameParamEditor::GetInstance()->AddItem(groupName_, "IceColor", iceMaterial_->materialData_->color);
 	GameParamEditor::GetInstance()->AddItem(groupName_, "SpecularColor", specularColor);

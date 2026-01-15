@@ -8,7 +8,7 @@ using namespace GameEngine;
 
 RushAttack::RushAttack(BossContext& context) : bossContext_(context) {
 #ifdef USE_IMGUI
-	RegisterBebugParam();
+	RegisterDebugParam();
 #endif 
 	ApplyDebugParam();
 
@@ -95,7 +95,7 @@ void RushAttack::Finalize() {
 
 }
 
-void RushAttack::RegisterBebugParam() {
+void RushAttack::RegisterDebugParam() {
 	// 値の登録
 	GameParamEditor::GetInstance()->AddItem(groupName_, "InTime", InTime_);
 	GameParamEditor::GetInstance()->AddItem(groupName_, "MoveTime", moveTime_);

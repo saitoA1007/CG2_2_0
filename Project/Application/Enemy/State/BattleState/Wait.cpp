@@ -24,7 +24,7 @@ void Wait::Finalize() {
 
 }
 
-void Wait::RegisterBebugParam() {
+void Wait::RegisterDebugParam() {
 
 }
 

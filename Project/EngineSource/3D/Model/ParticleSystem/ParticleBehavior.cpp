@@ -33,7 +33,7 @@ void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum) {
 
 #ifdef _DEBUG
     // パラメータを登録する
-    RegisterBebugParam();
+    RegisterDebugParam();
 #endif
     // 保存したデータを取得する
     ApplyDebugParam();
@@ -203,7 +203,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix, const Matrix4x4& view
     }
 }
 
-void ParticleBehavior::RegisterBebugParam() {
+void ParticleBehavior::RegisterDebugParam() {
     int index = 0;
     GameParamEditor::GetInstance()->AddItem(name_, "Textures", particleEmitter_.textures_, index++);
     GameParamEditor::GetInstance()->AddItem(name_, "SpawnMaxCount", particleEmitter_.spawnMaxCount, index++);

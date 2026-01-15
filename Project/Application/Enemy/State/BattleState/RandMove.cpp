@@ -39,7 +39,7 @@ void RandMove::Finalize() {
 
 }
 
-void RandMove::RegisterBebugParam() {
+void RandMove::RegisterDebugParam() {
 
 }
 

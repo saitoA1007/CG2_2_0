@@ -122,7 +122,7 @@ namespace GameEngine{
 		/// <summary>
 		/// デバックした値を登録
 		/// </summary>
-		void RegisterBebugParam();
+		void RegisterDebugParam();
 
 		/// <summary>
 		/// デバックした値を取得

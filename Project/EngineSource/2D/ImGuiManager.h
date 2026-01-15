@@ -13,7 +13,6 @@
 #include "Externals/imgui/imgui_node_editor.h"
 namespace ed = ax::NodeEditor;
 
-static ed::EditorContext* g_NodeContext = nullptr;
 #endif
 
 namespace GameEngine {
@@ -50,6 +49,10 @@ namespace GameEngine {
 		/// 終了処理
 		/// </summary>
 		void Finalize();
+
+#ifdef USE_IMGUI
+		static inline ed::EditorContext* g_NodeContext = nullptr;
+#endif
 
 	private:
 		ImGuiManager(const ImGuiManager&) = delete;

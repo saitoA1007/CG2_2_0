@@ -35,7 +35,7 @@ BossStateBattle::BossStateBattle(BossContext& context) : bossContext_(context) {
 	};
 
 #ifdef USE_IMGUI
-	RegisterBebugParam();
+	RegisterDebugParam();
 #endif
 	ApplyDebugParam();
 }
@@ -107,7 +107,7 @@ BossStateBattle::BattleBehavior BossStateBattle::SelectWeightedAttack() {
 	return result;
 }
 
-void BossStateBattle::RegisterBebugParam() {
+void BossStateBattle::RegisterDebugParam() {
 	// 値の登録
 	GameParamEditor::GetInstance()->AddItem(groupName_, "StampFallWeight", stampFallWeight_);
 	GameParamEditor::GetInstance()->AddItem(groupName_, "ShotBallWeight", shotBallWeight_);

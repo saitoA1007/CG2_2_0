@@ -20,7 +20,7 @@ void BossStateIn::Exit() {
 
 }
 
-void BossStateIn::RegisterBebugParam() {
+void BossStateIn::RegisterDebugParam() {
 
 }
 

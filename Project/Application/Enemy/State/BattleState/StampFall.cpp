@@ -8,7 +8,7 @@ using namespace GameEngine;
 StampFall::StampFall(BossContext& context) : bossContext_(context) {
 
 #ifdef USE_IMGUI
-	RegisterBebugParam();
+	RegisterDebugParam();
 #endif 
 	ApplyDebugParam();
 
@@ -112,7 +112,7 @@ void StampFall::Finalize() {
 
 }
 
-void StampFall::RegisterBebugParam() {
+void StampFall::RegisterDebugParam() {
 	// 値の登録
 	GameParamEditor::GetInstance()->AddItem(groupName_, "MaxHeightPosY", maxHeightPosY_);
 	GameParamEditor::GetInstance()->AddItem(groupName_, "RiseTime", riseTime_);

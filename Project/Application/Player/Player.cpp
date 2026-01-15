@@ -77,7 +77,7 @@ void Player::Initialize(GameEngine::InputCommand* inputCommand) {
 
 #ifdef _DEBUG
 	// 値を登録する
-	RegisterBebugParam();
+	RegisterDebugParam();
 	ApplyDebugParam();
 #else
 	// 値を適応させる
@@ -472,7 +472,7 @@ Sphere Player::GetSphereData() {
 	return Sphere{ collider_->GetWorldPosition(),collider_->GetRadius() };
 }
 
-void Player::RegisterBebugParam() {
+void Player::RegisterDebugParam() {
 	// 値の登録
 	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxHeight", kJumpHeight_);
 	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxTime", kJumpMaxTime_);

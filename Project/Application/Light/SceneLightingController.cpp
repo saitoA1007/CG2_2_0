@@ -17,7 +17,7 @@ void SceneLightingController::Initialize(ID3D12Device* device) {
 
 #ifdef _DEBUG
 	// 値を登録する
-	RegisterBebugParam();
+	RegisterDebugParam();
 #else
 	// 値を適応させる
 	ApplyDebugParam();
@@ -33,7 +33,7 @@ void SceneLightingController::Update() {
 	lightManager_->Update();
 }
 
-void SceneLightingController::RegisterBebugParam() {
+void SceneLightingController::RegisterDebugParam() {
 	// 登録
 	GameParamEditor::GetInstance()->AddItem("GameSceneLight", "Direction", directionalData_.direction);
 	GameParamEditor::GetInstance()->AddItem("GameSceneLight", "Intensity", directionalData_.intensity);

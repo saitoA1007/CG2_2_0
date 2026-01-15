@@ -69,7 +69,7 @@ void BossEnemy::Initialize(EnemyProjectileManager* projectile, EffectManager* ef
 
 #ifdef _DEBUG
 	// 値を登録する
-	RegisterBebugParam();	
+	RegisterDebugParam();	
 #endif
 	// 値を適応させる
 	ApplyDebugParam();
@@ -195,7 +195,7 @@ Sphere BossEnemy::GetSphereData() {
 	return Sphere{ collider_->GetWorldPosition(),collider_->GetRadius() };
 }
 
-void BossEnemy::RegisterBebugParam() {
+void BossEnemy::RegisterDebugParam() {
 
 	GameParamEditor::GetInstance()->AddItem("Boss", "MaxHp", kMaxHp_);
 	GameParamEditor::GetInstance()->AddItem("Boss", "CollisionSize", collisionRadius_);

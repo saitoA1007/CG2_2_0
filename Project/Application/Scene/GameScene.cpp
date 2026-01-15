@@ -59,7 +59,7 @@ void GameScene::Initialize(SceneContext* context) {
 	
 
 	// 値の保存の登録と適応(テスト)
-	RegisterBebugParam();
+	RegisterDebugParam();
 	ApplyDebugParam();
 }
 
@@ -130,7 +130,7 @@ void GameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_);
 }
 
-void GameScene::RegisterBebugParam() {
+void GameScene::RegisterDebugParam() {
 	GameParamEditor::GetInstance()->AddItem("Test1", "testNum", testNumber);
 	GameParamEditor::GetInstance()->AddItem("Test2", "testVec", testVector);
 }

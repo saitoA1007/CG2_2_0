@@ -7,7 +7,7 @@ using namespace GameEngine;
 
 RotateAttack::RotateAttack(BossContext& context) : bossContext_(context) {
 #ifdef USE_IMGUI
-	RegisterBebugParam();
+	RegisterDebugParam();
 #endif 
 	ApplyDebugParam();
 }
@@ -100,7 +100,7 @@ void RotateAttack::Finalize() {
 
 }
 
-void RotateAttack::RegisterBebugParam() {
+void RotateAttack::RegisterDebugParam() {
 	// 値の登録
 	GameParamEditor::GetInstance()->AddItem(groupName_, "InTime", inTime_);
 	GameParamEditor::GetInstance()->AddItem(groupName_, "MoveTime", moveTime_);
