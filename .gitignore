@@ -325,7 +325,12 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-DirectXGame/DirectXGame.exe
+Project/Resources/Json/DebugData/windowLayout.json
+
+# Windows executable files
+*.exe
+
+# Project-specific config / runtime files
 Project/imgui.ini
 Project/node_editor.json
 Project/node_editor_docked.json
