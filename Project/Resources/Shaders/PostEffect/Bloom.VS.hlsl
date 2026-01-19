@@ -1,4 +1,4 @@
-#include"PostProcessGrayScale.hlsli"
+#include"FullScreen.hlsli"
 
 struct VertexShaderInput
 {

@@ -281,7 +281,7 @@ void Engine::CreatePSO() {
 
 	// CopyPSOの初期化
 	copyPSO_ = std::make_unique<CopyPSO>();
-	copyPSO_->Initialize(graphicsDevice_->GetDevice(), L"Resources/Shaders/PostEffect/Copy.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc_.get());
+	copyPSO_->Initialize(graphicsDevice_->GetDevice(), L"Resources/Shaders/PostEffect/FullScreen.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc_.get());
 
 	/// PostProcessのPSOを初期化
 

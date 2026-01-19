@@ -1,4 +1,4 @@
-#include"PostProcessGrayScale.hlsli"
+#include"FullScreen.hlsli"
 
 Texture2D<float32_t4> gTexture : register(t0);
 Texture2D<float32_t4> gTexBloomResult : register(t3);

@@ -368,6 +368,23 @@ void PSOManager::DefaultLoadPSO() {
 }
 
 void PSOManager::DeaultLoadPostEffectPSO() {
+    // 画像のコピーを描画
+    //CreatePSOData copy;
+    //copy.rootSigName = "DefaultPostEffect";
+    //copy.vsPath = L"Resources/Shaders/PostEffect/FullScreen.VS.hlsl";
+    //copy.psPath = L"Resources/Shaders/PostEffect/Copy.PS.hlsl";
+    //copy.drawMode = DrawModel::FillFront;
+    //copy.blendMode = BlendMode::kBlendModeNone;
+    //copy.isDepthEnable = false;
+    //RootSignatureBuilder copyRootSigBuilder;
+    //copyRootSigBuilder.Initialize(device_);
+    //copyRootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount) + static_cast<uint32_t>(SrvHeapTypeCount::SystemMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    //copyRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    //copyRootSigBuilder.CreateRootSignature();
+    InputLayoutBuilder inputLayoutBuilder;
+    inputLayoutBuilder.CreateNone();
+    //RegisterPSO("Copy", copy, &copyRootSigBuilder, &inputLayoutBuilder);
+
     // ヴィネットを作成
     CreatePSOData defaultPostEffect;
     defaultPostEffect.rootSigName = "DefaultPostEffect";
@@ -383,8 +400,6 @@ void PSOManager::DeaultLoadPostEffectPSO() {
     rootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.CreateRootSignature();
-    InputLayoutBuilder inputLayoutBuilder;
-    inputLayoutBuilder.CreateNone();
     RegisterPSO("Vignetting", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // スキャンラインを作成
