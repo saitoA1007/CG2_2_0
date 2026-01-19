@@ -29,6 +29,8 @@ namespace GameEngine {
 			CD3DX12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
 			// 名前
 			std::string fileName;
+			// ハンドル
+			uint32_t index;
 		};
 
 	public:
@@ -68,7 +70,6 @@ namespace GameEngine {
 
 
 		D3D12_GPU_DESCRIPTOR_HANDLE& GetTextureSrvHandlesGPU(const uint32_t& textureHandle);
-
 
 		/// <summary>
 		/// 全てのテクスチャデータを読み込む

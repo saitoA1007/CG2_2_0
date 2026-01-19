@@ -98,7 +98,6 @@ std::unique_ptr<Model> Model::CreateGridPlane(const Vector2& size) {
 [[nodiscard]]
 std::unique_ptr<Model> Model::CreateModel(const std::string& objFilename, const std::string& filename) {
 
-	LogManager::GetInstance().Log("//==============================");
 	LogManager::GetInstance().Log("Start create model");
 
 	// インスタンスを生成
@@ -130,8 +129,8 @@ std::unique_ptr<Model> Model::CreateModel(const std::string& objFilename, const 
 
 		// テクスチャ情報があればを取得
 		if (!modelData.materials[index].textureFilePath.empty()) {
-
-			uint32_t textureHandle = textureManager_->Load(modelData.materials[index].textureFilePath);
+			std::string texPath = std::filesystem::path(modelData.materials[index].textureFilePath).filename().string();
+			uint32_t textureHandle = textureManager_->GetHandleByName(texPath);
 			tmpMaterial->SetTextureHandle(textureHandle);
 			tmpMaterial->SetDefaultTexture(textureHandle);
 		}
@@ -158,7 +157,6 @@ std::unique_ptr<Model> Model::CreateModel(const std::string& objFilename, const 
 	}
 
 	LogManager::GetInstance().Log("End create model");
-	LogManager::GetInstance().Log("//==============================\n");
 
 	return model;
 }

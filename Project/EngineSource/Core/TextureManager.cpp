@@ -210,7 +210,7 @@ void TextureManager::LoadAllTexture() {
 		// 現在のファイル/ディレクトリの絶対パスを取得
 		fs::path currentPath = fs::absolute(entry.path());
 
-		// 読み込んだパスが除外対象か確認すうｒ
+		// 読み込んだパスが除外対象か確認する
 		if (currentPath.string().find(excludePathStr) == 0) {
 			continue;
 		}

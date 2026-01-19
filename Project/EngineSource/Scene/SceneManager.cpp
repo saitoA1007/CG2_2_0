@@ -15,11 +15,11 @@ void SceneManager::Initialize(SceneContext* context, SceneRegistry* sceneRegistr
 	// エンジン機能を取得する
 	context_ = context;
 
-	// モデルを読み込む
-	LoadModelData();
-
 	// 画像を読み込む
 	LoadSpriteData();
+
+	// モデルを読み込む
+	LoadModelData();
 
 	// アニメーションデータを読み込む
 	LoadAnimationData();
