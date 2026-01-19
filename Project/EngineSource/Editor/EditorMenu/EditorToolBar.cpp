@@ -6,9 +6,9 @@ using namespace GameEngine;
 EditorToolBar::EditorToolBar(GameEngine::TextureManager* textureManager) {
 
 	// デバックで使用する画像を登録する
-	textureManager->RegisterTexture("Resources/Textures/DebugImages/debugPlay.png");
-	textureManager->RegisterTexture("Resources/Textures/DebugImages/debugPause.png");
-	textureManager->RegisterTexture("Resources/Textures/DebugImages/debugStop.png");
+	textureManager->RegisterTexture("EngineSource/Resources/Textures/debugPlay.png");
+	textureManager->RegisterTexture("EngineSource/Resources/Textures/debugPause.png");
+	textureManager->RegisterTexture("EngineSource/Resources/Textures/debugStop.png");
 
 	// 画像のsrvHandleを取得する
 	playImagesrvHandle_ = textureManager->GetTextureSrvHandlesGPU(textureManager->GetHandleByName("debugPlay.png"));
