@@ -14,56 +14,45 @@ void TextureManager::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList*
 }
 
 void TextureManager::Finalize() {
-
-	for (auto& tex : textures_) {
+	// 解放処理
+	for (auto& [s, tex] : textureDatas_) {
 		tex.textureResource.Reset();
 		tex.intermediateResources_.Reset();
 	}
-	textures_.clear();
+	textureDatas_.clear();
 }
 
 void TextureManager::RegisterTexture(const std::string& fileName) {
-
+	// 画像のファイル名を取得
 	std::string textureName = GetFileName(fileName);
 
-	// 同名のモデルが登録されている場合は早期リターン
-	auto getName = nameToHandles_.find(textureName);
-	if (getName != nameToHandles_.end()) {
+	// 登録している場合は早期リターン
+	auto tex = textureDatas_.find(textureName);
+	if (tex != textureDatas_.end()) {
 		return;
 	}
 
-	// ロードする
-	uint32_t handle = Load(fileName);
-
 	// 登録する
-	nameToHandles_[textureName] = handle;
+	Load(textureName, fileName);
 }
 
 uint32_t TextureManager::GetHandleByName(const std::string& name) const {
-	auto getHandle = nameToHandles_.find(name);
-	if (getHandle == nameToHandles_.end()) {
+	auto tex = textureDatas_.find(name);
+	// 登録されていなければ0を返す
+	if (tex == textureDatas_.end()) {
 		return 0;
 	}
-	return getHandle->second;
+	return tex->second.srvIndex;
 }
 
-uint32_t TextureManager::Load(const std::string& fileName) {
+void TextureManager::Load(const std::string& registerName,const std::string& fileName) {
 
 	// テクスチャーの読み込みを開始するログ
 	LogManager::GetInstance().Log("Start LoadTexture : " + fileName);
 
-	// もし同じテクスチャを読み込んだのであれば、すでに格納されている配列番号を返す。
-	for (int i = 0; i < textures_.size(); ++i) {
-		if (textures_.at(i).fileName == GetFileName(fileName)) {
-			// 終了したこと、同じテクスチャを読み込んでいることを伝える
-			LogManager::GetInstance().Log("End LoadTexture : " + fileName + ". This texture data already loaded");
-			return i;
-		}
-	}
-
 	Texture texture;
 	// テクスチャ名を記録
-	texture.fileName = GetFileName(fileName);
+	texture.fileName = fileName;
 
 	// テクスチャを読み込む
 	texture.mipImage = LoadTexture(fileName);
@@ -71,15 +60,15 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 		LogManager::GetInstance().Log("Failed to load texture: " + fileName);
 		assert(false);
 	}
-	metadata_ = &texture.mipImage.GetMetadata();
+	const DirectX::TexMetadata* metadata = &texture.mipImage.GetMetadata();
 	// テクスチャリソースを作成
-	texture.textureResource = CreateTextureResource(device_, *metadata_);
+	texture.textureResource = CreateTextureResource(*metadata);
 	if (!texture.textureResource) {
 		LogManager::GetInstance().Log("Failed to create textureResource for: " + fileName);
 		assert(false);
 	}
 	// テクスチャデータをアップロード
-	texture.intermediateResources_ = UploadTextureData(texture.textureResource.Get(), texture.mipImage, device_, commandList_);
+	texture.intermediateResources_ = UploadTextureData(texture.textureResource.Get(), texture.mipImage);
 	if (!texture.intermediateResources_) {
 		LogManager::GetInstance().Log("Failed to upload texture data for: " + fileName);
 		assert(false);
@@ -87,37 +76,35 @@ uint32_t TextureManager::Load(const std::string& fileName) {
 
 	// srvインデックスを取得
 	uint32_t index = srvManager_->AllocateSrvIndex(SrvHeapType::Texture);
+	texture.srvIndex = index;
 
 	// metaDataを基にSRVの設定
-	srvDesc_.Format = metadata_->format;
-	srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;// 2Dテクスチャ
-	srvDesc_.Texture2D.MipLevels = UINT(metadata_->mipLevels);
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = metadata->format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;// 2Dテクスチャ
+	srvDesc.Texture2D.MipLevels = UINT(metadata->mipLevels);
 
 	// SRVを作成するDescriptorHeapの場所を決める。
 	texture.textureSrvHandleCPU = srvManager_->GetCPUHandle(index);
 	texture.textureSrvHandleGPU = srvManager_->GetGPUHandle(index);
 	LogManager::GetInstance().Log(std::format("CPU Handle: {}, GPU Handle: {}", texture.textureSrvHandleCPU.ptr, texture.textureSrvHandleGPU.ptr));
 	// SRVを作成
-	device_->CreateShaderResourceView(texture.textureResource.Get(), &srvDesc_, texture.textureSrvHandleCPU);
+	device_->CreateShaderResourceView(texture.textureResource.Get(), &srvDesc, texture.textureSrvHandleCPU);
 
-	// 登録
-	textures_.push_back(std::move(texture));
+	// 登録する
+	textureDatas_[registerName] = std::move(texture);
 
 	// テクスチャーの読み込みを完了するログ
 	LogManager::GetInstance().Log("End LoadTexture : " + fileName + "\n");
-
-	// 読み込んだ画像が格納されている配列番号を返す
-	return static_cast<uint32_t>(textures_.size() - 1);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE& TextureManager::GetTextureSrvHandlesGPU(const uint32_t& textureHandle) {
-	return textures_.at(textureHandle).textureSrvHandleGPU;
+D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetTextureSrvHandlesGPU(const uint32_t& textureHandle) {
+	return srvManager_->GetGPUHandle(textureHandle);
 }
 
 [[nodiscard]]
-DirectX::ScratchImage TextureManager::LoadTexture(const std::string& filePath)
-{
+DirectX::ScratchImage TextureManager::LoadTexture(const std::string& filePath) {
 	// テクスチャファイルを読み込んでプログラムを扱えるようにする
 	DirectX::ScratchImage image{};
 	std::wstring filePathW = ConvertString(filePath);
@@ -134,8 +121,7 @@ DirectX::ScratchImage TextureManager::LoadTexture(const std::string& filePath)
 }
 
 [[nodiscard]]
-Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
-{
+Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(const DirectX::TexMetadata& metadata) {
 	// metadataを基にResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = UINT(metadata.width); // Textureの幅
@@ -152,7 +138,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(ID3
 
 	// Resourceの生成
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
-	HRESULT hr = device->CreateCommittedResource(
+	HRESULT hr = device_->CreateCommittedResource(
 		&heapProperties, // Heapの設定
 		D3D12_HEAP_FLAG_NONE, // Heapの特殊な設定。特になし。
 		&resourceDesc, // Resourceの設定。
@@ -164,14 +150,12 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(ID3
 }
 
 [[nodiscard]]
-Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12Device* device,
-	ID3D12GraphicsCommandList* commandList)
-{
+Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages) {
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-	DirectX::PrepareUpload(device, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
+	DirectX::PrepareUpload(device_, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresources.size()));
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = CreateBufferResource(device, intermediateSize);
-	UpdateSubresources(commandList, texture, intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = CreateBufferResource(device_, intermediateSize);
+	UpdateSubresources(commandList_, texture, intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
 	// Textureへ転送後は利用出来るよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -180,7 +164,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(ID3D12R
 	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-	commandList->ResourceBarrier(1, &barrier);
+	commandList_->ResourceBarrier(1, &barrier);
 	return intermediateResource;
 }
 
@@ -190,11 +174,6 @@ std::string TextureManager::GetFileName(const std::string& fullPath) {
 
 void TextureManager::LoadAllTexture() {
 	namespace fs = std::filesystem;
-	const std::string kDirectoryPath = "Resources/Textures/";
-
-	// デバックで使用する画像は読み込みの対象に含めない
-	const fs::path excludePath = fs::absolute("Resources/Textures/DebugImages");
-	const std::string excludePathStr = excludePath.string();
 
 	// Texturesのフォルダが存在するか確認する
 	if (!fs::exists(kDirectoryPath)) {
@@ -209,11 +188,6 @@ void TextureManager::LoadAllTexture() {
 
 		// 現在のファイル/ディレクトリの絶対パスを取得
 		fs::path currentPath = fs::absolute(entry.path());
-
-		// 読み込んだパスが除外対象か確認する
-		if (currentPath.string().find(excludePathStr) == 0) {
-			continue;
-		}
 
 		// 画像を登録、ロードする
 		if (entry.is_regular_file()) {

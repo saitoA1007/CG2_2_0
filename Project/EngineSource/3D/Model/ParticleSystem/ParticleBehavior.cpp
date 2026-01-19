@@ -137,6 +137,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         }
 
         worldTransforms_->transformDatas_[currentNumInstance_].color = particles_[i].color;
+        worldTransforms_->transformDatas_[currentNumInstance_].textureHandle = textureHandle_;
         currentNumInstance_++;
     }
 

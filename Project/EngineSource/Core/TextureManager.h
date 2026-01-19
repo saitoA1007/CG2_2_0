@@ -1,15 +1,14 @@
 #pragma once
 #include <d3d12.h>
-#include<iostream>
-#include<vector>
+#include <iostream>
+#include <vector>
 #include <unordered_map>
 #include <wrl.h>
-#include"Externals/DirectXTex/DirectXTex.h"
-#include"Externals/DirectXTex/d3dx12.h"
+#include <format>
+#include "Externals/DirectXTex/DirectXTex.h"
+#include "Externals/DirectXTex/d3dx12.h"
 
-#include<format>
-
-#include"SrvManager.h"
+#include "SrvManager.h"
 
 namespace GameEngine {
 
@@ -29,8 +28,8 @@ namespace GameEngine {
 			CD3DX12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
 			// 名前
 			std::string fileName;
-			// ハンドル
-			uint32_t index;
+			// インデックス
+			uint32_t srvIndex;
 		};
 
 	public:
@@ -38,43 +37,41 @@ namespace GameEngine {
 		~TextureManager() = default;
 
 		/// <summary>
-		/// 初期化
+		/// 初期化処理
 		/// </summary>
-		/// <param name="dxCommon"></param>
-		void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList,SrvManager* srvManager);
+		/// <param name="device">デバイス</param>
+		/// <param name="commandList">コマンドリスト</param>
+		/// <param name="srvManager">srvの管理クラス</param>
+		void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, SrvManager* srvManager);
 
-		// 解放処理
+		/// <summary>
+		/// 解放処理
+		/// </summary>
 		void Finalize();
 
 		/// <summary>
 		/// 登録する関数
 		/// </summary>
-		/// <param name="registerName"></param>
-		/// <param name="fileName"></param>
+		/// <param name="registerName">登録名</param>
+		/// <param name="fileName">読み込む画像のファイルパス</param>
 		void RegisterTexture(const std::string& fileName);
 
-		/// <summary>
-		/// 名前からハンドルを取得
-		/// </summary>
-		/// <param name="name"></param>
-		/// <returns></returns>
-		uint32_t GetHandleByName(const std::string& name) const;
-
-		/// <summary>
-		/// テクスチャを読み込んで転送する処理
-		/// </summary>
-		/// <param name="fileName">ファイル名</param>
-		/// <param name="logStream">ログファイル</param>
-		/// <returns></returns>
-		uint32_t Load(const std::string& fileName);
-
-
-		D3D12_GPU_DESCRIPTOR_HANDLE& GetTextureSrvHandlesGPU(const uint32_t& textureHandle);
+	public:
 
 		/// <summary>
 		/// 全てのテクスチャデータを読み込む
 		/// </summary>
 		void LoadAllTexture();
+
+		/// <summary>
+		/// 名前からハンドルを取得
+		/// </summary>
+		/// <param name="name">登録名</param>
+		/// <returns>ハンドル</returns>
+		uint32_t GetHandleByName(const std::string& name) const;
+
+		// GPUハンドルを取得する
+		D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandlesGPU(const uint32_t& textureHandle);
 
 	private:
 		TextureManager(const TextureManager&) = delete;
@@ -82,34 +79,53 @@ namespace GameEngine {
 
 		ID3D12Device* device_ = nullptr;
 		ID3D12GraphicsCommandList* commandList_ = nullptr;
-
-		// テクスチャデータを管理する変数
-		std::vector<Texture> textures_;
-
-		const DirectX::TexMetadata* metadata_{};
-
-		// metaDataを基にSRVの設定の変数
-		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc_{};
-
-		// テクスチャパス
-		std::string texturePath_;
-
 		SrvManager* srvManager_ = nullptr;
 
-		// テクスチャのハンドルを保存する
-		std::unordered_map<std::string, uint32_t> nameToHandles_;
+		// 読み取り先のパス名
+		static inline const std::string kDirectoryPath = "Resources/Textures/";
+
+		// テクスチャ情報
+		std::unordered_map<std::string, Texture> textureDatas_;
 
 	private:
 
+		/// <summary>
+		/// 画像を読み込んで登録する処理
+		/// </summary>
+		/// <param name="registerName">登録名</param>
+		/// <param name="fileName">読み込むファイルパス</param>
+		void Load(const std::string& registerName, const std::string& fileName);
+
+		/// <summary>
+		/// ファイルから画像を読み込んでミップマップを生成する
+		/// </summary>
+		/// <param name="filePath">ファイルパス</param>
+		/// <returns>読み込んだ画像データ</returns>
 		[[nodiscard]]
 		DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
+		/// <summary>
+		/// メタデータにより、DirectX12のテクスチャリソースを作成する
+		/// </summary>
+		/// <param name="metadata">画像メタデータ</param>
+		/// <returns>作成されたリソース</returns>
 		[[nodiscard]]
-		Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
+		Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
 
-		[[nodiscard]] Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12Device* device,
-			ID3D12GraphicsCommandList* commandList);
+		/// <summary>
+		/// テクスチャデータをCPUメモリからGPUメモリに転送する
+		/// </summary>
+		/// <param name="texture">転送先のリソース</param>
+		/// <param name="mipImages">転送元の画像データ</param>
+		/// <returns>中間リソース</returns>
+		[[nodiscard]]
+		Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 
+		/// <summary>
+		/// フルパスからファイル名を取得
+		/// </summary>
+		/// <param name="fullPath"></param>
+		/// <returns></returns>
 		std::string GetFileName(const std::string& fullPath);
 	};
 }

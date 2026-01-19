@@ -113,6 +113,12 @@ void GameScene::Draw(const bool& isDebugView) {
 		ModelRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
 	}
 
+	// 描画パスの管理を取得
+	auto pass = context_->renderPassController;
+
+	// 通常描画
+	pass->PrePass("DefaultPass");
+
 	//===========================================================
 	// 3D描画
 	//===========================================================
@@ -130,6 +136,8 @@ void GameScene::Draw(const bool& isDebugView) {
 
 	// アニメーションしているモデルを描画
 	ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_);
+
+	pass->PostPass("DefaultPass");
 }
 
 void GameScene::RegisterBebugParam() {
