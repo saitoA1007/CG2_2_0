@@ -171,9 +171,6 @@
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectManager.cpp">
       <Filter>EngineSource\Core\PostProcess</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\PSO\GaussianBlurPSO.cpp">
-      <Filter>EngineSource\Core\PSO</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\3D\Model\Mesh.cpp">
       <Filter>EngineSource\3D</Filter>
     </ClCompile>
@@ -382,7 +379,7 @@
     <ClInclude Include="EngineSource\3D\Model\WorldTransform.h">
       <Filter>EngineSource\3D</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\BlendMode.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\BlendMode.h">
       <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\WorldTransforms.h">
@@ -417,9 +414,6 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectManager.h">
       <Filter>EngineSource\Core\PostProcess</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\GaussianBlurPSO.h">
-      <Filter>EngineSource\Core\PSO</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Model\Mesh.h">
       <Filter>EngineSource\3D</Filter>
@@ -574,9 +568,6 @@
     <None Include="Resources\Shaders\PostEffect\GaussianBlur.hlsli">
       <Filter>Shaders\PostEffect</Filter>
     </None>
-    <None Include="Resources\Shaders\PostEffect\CopyImage.hlsli">
-      <Filter>Shaders\PostEffect</Filter>
-    </None>
     <None Include="Resources\Shaders\Grid.hlsli">
       <Filter>Shaders</Filter>
     </None>
@@ -588,9 +579,6 @@
     </None>
     <None Include="Resources\Shaders\CS\ParticleCS.hlsli">
       <Filter>Shaders\CS</Filter>
-    </None>
-    <None Include="Resources\Shaders\PostEffect\PostProcessGrayScale.hlsli">
-      <Filter>Shaders\PostEffect</Filter>
     </None>
     <None Include="Resources\Shaders\PostEffect\FullScreen.hlsli">
       <Filter>Shaders\PostEffect</Filter>
@@ -633,9 +621,6 @@
     <FxCompile Include="Resources\Shaders\PostEffect\HighLumMask.PS.hlsl">
       <Filter>Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\Copy.VS.hlsl">
-      <Filter>Shaders\PostEffect</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect\Copy.PS.hlsl">
       <Filter>Shaders\PostEffect</Filter>
     </FxCompile>
@@ -644,12 +629,6 @@
     </FxCompile>
     <FxCompile Include="Resources\Shaders\Grid.PS.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\GaussianBlur.VS.hlsl">
-      <Filter>Shaders\PostEffect</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffect\GaussianBlur.PS.hlsl">
-      <Filter>Shaders\PostEffect</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\Sprite.VS.hlsl">
       <Filter>Shaders</Filter>

@@ -1,4 +1,4 @@
-#include"PostProcessGrayScale.hlsli"
+#include"FullScreen.hlsli"
 #include"GaussianBlur.hlsli"
 
 Texture2D<float32_t4> gTexture : register(t0);
