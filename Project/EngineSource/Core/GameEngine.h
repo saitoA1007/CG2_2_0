@@ -30,7 +30,6 @@
 #include"Model.h"
 #include"WorldTransform.h"
 #include"WorldTransforms.h"
-#include"AxisIndicator.h"
 #include"ModelRenderer.h"
 #include"DebugRenderer.h"
 #include"AnimationManager.h"

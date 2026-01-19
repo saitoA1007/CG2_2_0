@@ -89,7 +89,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	textureManager_ = std::make_shared<TextureManager>();
 	textureManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
 	// 初期の画像をロードする
-	textureManager_->Load("Resources/Textures/white2x2.png");
+	textureManager_->RegisterTexture("EngineSource/Resources/Textures/white2x2.png");
 
 	// 入力処理のコマンドシステムを生成
 	inputCommand_ = std::make_unique<InputCommand>(input_.get());
@@ -111,9 +111,6 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	Material::StaticInitialize(graphicsDevice_->GetDevice());
 	// デバック描画用
 	DebugRenderer::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), psoManager_.get());
-
-	// 軸方向表示の初期化
-	AxisIndicator::StaticInitialize(graphicsDevice_->GetCommandList());
 
 	// fpsを計測する
 	fpsCounter_ = std::make_unique<FpsCounter>();
