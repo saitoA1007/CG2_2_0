@@ -130,6 +130,9 @@ void SceneManager::LoadModelData() {
 	// グリッドモデルをロードと登録
 	context_->modelManager->RegisterMode("Grid", Model::CreateGridPlane({ 200.0f,200.0f }));
 
+	// 球モデル
+	context_->modelManager->RegisterMode("Sphere", Model::CreateSphere(16));
+
 	// モデルリソースを全てロードする
 	context_->modelManager->LoadAllModel();
 }

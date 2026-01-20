@@ -1,4 +1,5 @@
 #pragma once
+#include<string>
 #include"LightManager.h"
 #include"DirectionalLight.h"
 
@@ -36,6 +37,11 @@ private:
 	// スポットライト
 	//GameEngine::SpotLight::SpotLightData spotLightData_;
 
+private: // デバック用
+
+	std::string directinalName_ = "DirectionalLight";
+	std::string pointName_ = "";
+	std::string spotName_ = "";
 private:
 
 	/// <summary>

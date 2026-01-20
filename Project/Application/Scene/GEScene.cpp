@@ -29,6 +29,10 @@ void GEScene::Initialize(SceneContext* context) {
 
 #pragma endregion
 
+	// グリッドの初期化
+	gridModel_ = context_->modelManager->GetNameByModel("Grid");
+	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
@@ -121,6 +125,11 @@ void GEScene::Draw(const bool& isDebugView) {
 	if (isDebugView) {
 		debugRenderer_->DrawAll(context_->debugCamera_->GetVPMatrix());
 	} 
+
+	// モデルの単体描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::Grid);
+	// グリッドを描画
+	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
 #endif
 
 	//========================================================================

@@ -22,16 +22,27 @@ void TitleScene::Initialize(SceneContext* context) {
 	context_->renderPassController->SetEndPass("DefaultPass");
 #pragma endregion
 
-	// グリッドの初期化
-	gridModel_ = context_->modelManager->GetNameByModel("Grid");
-	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
-
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
+
+	// ライトの初期化
+	sceneLightingController_ = std::make_unique<SceneLightingController>();
+	sceneLightingController_->Initialize(context_->graphicsDevice->GetDevice());
+
+	// 画像を取得
+	monsterGH_ = context_->textureManager->GetHandleByName("monsterBall.png");
+	// 球の初期化
+	sphereModel_ = context_->modelManager->GetNameByModel("Sphere");
+	sphereModel_->SetDefaultIsEnableLight(true);
+	sphereModel_->SetDefaultTextureHandle(monsterGH_);
+	sphereWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 }
 
 void TitleScene::Update() {
+
+	// ライトの更新処理
+	sceneLightingController_->Update();
 
 	// カメラの更新処理
 	mainCamera_->Update();
@@ -51,21 +62,24 @@ void TitleScene::Draw(const bool& isDebugView) {
 	// 描画パスの管理を取得
 	auto pass = context_->renderPassController;
 
-	// 通常描画
+	// 描画パス
 	pass->PrePass("DefaultPass");
-
-	// モデルの単体描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::Grid);
-	// グリッドを描画
-	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
-
-	pass->PostPass("DefaultPass");
 
 	//===========================================================
 	// 3D描画
 	//===========================================================
 
-	// 3Dモデルの描画前処理
-	//ModelRenderer::PreDraw(RenderMode::DefaultModel);
+	// 描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
+	// 球の描画
+	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+	ModelRenderer::Draw(sphereModel_, sphereWorldTransform_);
+
+	pass->PostPass("DefaultPass");
+}
+
+void TitleScene::DebugUpdate() {
+	// ライトの更新処理
+	sceneLightingController_->Update();
 }

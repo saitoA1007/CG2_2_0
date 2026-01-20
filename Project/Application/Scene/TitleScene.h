@@ -8,6 +8,7 @@
 #include"WorldTransform.h"
 
 #include"Application/Scene/Transition/Fade.h"
+#include"Application/Light/SceneLightingController.h"
 
 class TitleScene : public BaseScene {
 public:
@@ -28,7 +29,7 @@ public:
 	/// <summary>
 	/// デバック時、処理して良いものを更新する
 	/// </summary>
-	void DebugUpdate() override{}
+	void DebugUpdate() override;
 
 	/// <summary>
 	/// 描画処理
@@ -61,7 +62,11 @@ private: // シーン機能
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
 
-	// グリッドを描画するためのモデル
-	GameEngine::Model* gridModel_;
-	GameEngine::WorldTransform gridWorldTransform_;
+	// ライトの管理
+	std::unique_ptr<SceneLightingController> sceneLightingController_;
+
+	// 球のモデル
+	GameEngine::Model* sphereModel_;
+	GameEngine::WorldTransform sphereWorldTransform_;
+	uint32_t monsterGH_ = 0;
 };

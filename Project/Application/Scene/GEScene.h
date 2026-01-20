@@ -70,6 +70,10 @@ private: // シーン機能
 	// 終了フラグ
 	bool isFinished_ = false;
 
+	// グリッドを描画するためのモデル
+	GameEngine::Model* gridModel_;
+	GameEngine::WorldTransform gridWorldTransform_;
+
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
 

@@ -35,17 +35,17 @@ void SceneLightingController::Update() {
 
 void SceneLightingController::RegisterBebugParam() {
 	// 登録
-	GameParamEditor::GetInstance()->AddItem("GameSceneLight", "Direction", directionalData_.direction);
-	GameParamEditor::GetInstance()->AddItem("GameSceneLight", "Intensity", directionalData_.intensity);
-	GameParamEditor::GetInstance()->AddItem("GameSceneLight", "Color", directionalData_.color);
+	GameParamEditor::GetInstance()->AddItem(directinalName_, "Direction", directionalData_.direction);
+	GameParamEditor::GetInstance()->AddItem(directinalName_, "Intensity", directionalData_.intensity);
+	GameParamEditor::GetInstance()->AddItem(directinalName_, "Color", directionalData_.color);
 }
 
 void SceneLightingController::ApplyDebugParam(){
 	// 適応
-	Vector3 tmpDireciton = GameParamEditor::GetInstance()->GetValue<Vector3>("GameSceneLight", "Direction");
+	Vector3 tmpDireciton = GameParamEditor::GetInstance()->GetValue<Vector3>(directinalName_, "Direction");
 	directionalData_.direction = Normalize(tmpDireciton);
-	directionalData_.intensity = GameParamEditor::GetInstance()->GetValue<float>("GameSceneLight", "Intensity");
-	directionalData_.color = GameParamEditor::GetInstance()->GetValue<Vector4>("GameSceneLight", "Color");
+	directionalData_.intensity = GameParamEditor::GetInstance()->GetValue<float>(directinalName_, "Intensity");
+	directionalData_.color = GameParamEditor::GetInstance()->GetValue<Vector4>(directinalName_, "Color");
 
 	// ライトマネージャーに適応
 	lightManager_->SetDirectionalData(directionalData_);
