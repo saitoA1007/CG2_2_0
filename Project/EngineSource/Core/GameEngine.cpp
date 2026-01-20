@@ -88,8 +88,6 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// テクスチャの初期化
 	textureManager_ = std::make_shared<TextureManager>();
 	textureManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
-	// 初期の画像をロードする
-	textureManager_->RegisterTexture("EngineSource/Resources/Textures/white2x2.png");
 
 	// 入力処理のコマンドシステムを生成
 	inputCommand_ = std::make_unique<InputCommand>(input_.get());

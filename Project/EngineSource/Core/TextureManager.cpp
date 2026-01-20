@@ -11,6 +11,11 @@ void TextureManager::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList*
 	device_ = device;
 	commandList_ = commandList;
 	srvManager_ = srvManager;
+
+#ifdef USE_IMGUI
+	// 最初にwhiteの画像を読み込む
+	RegisterTexture("EngineSource/Resources/Textures/white2x2.png");
+#endif
 }
 
 void TextureManager::Finalize() {
