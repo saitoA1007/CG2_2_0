@@ -25,6 +25,9 @@ struct PointLight
     float32_t decay; // 減衰率
 };
 
+// 点光源の数
+static const int POINTLIGHT_NUM = 3;
+
 struct SpotLight
 {
     float32_t4 color; // ライトの色
@@ -37,6 +40,9 @@ struct SpotLight
     float32_t cosFalloffStart; // 
     int32_t active; // 有効化
 };
+
+// スポットライトの数
+static const int SPOTLIGHT_NUM = 3;
 
 struct Skinned
 {

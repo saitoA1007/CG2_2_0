@@ -1,109 +1,97 @@
 #pragma once
 #include <d3d12.h>
 #include <wrl.h>
-#include<memory>
-#include"DirectionalLight.h"
-#include"PointLight.h"
-#include"SpotLight.h"
+#include <memory>
+#include <array>
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "SpotLight.h"
 
 namespace GameEngine {
 
-    class LightManager {
-    public:
-        // 定数バッファ
-        struct LightGroupData {
-            DirectionalLight::DirectionalLightData directionalLightData_;
-            PointLight::PointLightData pointLightData_;
-            SpotLight::SpotLightData spotLightData_;
-        };
+	class LightManager {
+	public:
+		// 点光源の数
+		static const int kPointLightNum = 3;
+		// スポットライトの数
+		static const int kSpotLightNum = 3;
 
-    public:
-        LightManager() = default;
-        ~LightManager();
+		// 定数バッファ
+		struct LightGroupData {
+			DirectionalLight::DirectionalLightData directionalLightData_;
+			PointLight::PointLightData pointLightData_[kPointLightNum];
+			SpotLight::SpotLightData spotLightData_[kSpotLightNum];
+		};
 
-        /// <summary>
-        /// 初期化
-        /// </summary>
-        /// <param name="device"></param>
-        void Initialize(ID3D12Device* device,const bool& isDirectionalActive,const bool& isPointActive,const bool& isSpotActive);
+	public:
+		LightManager() = default;
+		~LightManager();
 
-        /// <summary>
-        /// 更新処理
-        /// </summary>
-        void Update();
+		/// <summary>
+		/// 初期化
+		/// </summary>
+		/// <param name="device"></param>
+		void Initialize(ID3D12Device* device, const bool& isDirectionalActive, const int& activePointNum, const int& activeSpotNum);
 
-    public:
+		/// <summary>
+		/// 更新処理
+		/// </summary>
+		void Update();
 
-        /// <summary>
-        /// リソース
-        /// </summary>
-        /// <returns></returns>
-        ID3D12Resource* GetResource()const {return lightGroupResource_.Get();}
+	public:
 
-        /// <summary>
-        /// 平行光源のデータ設定
-        /// </summary>
-        /// <param name="directionalData"></param>
-        void SetDirectionalData(const DirectionalLight::DirectionalLightData& directionalData);
+		/// <summary>
+		/// リソース
+		/// </summary>
+		/// <returns></returns>
+		ID3D12Resource* GetResource()const { return lightGroupResource_.Get(); }
 
-        /// <summary>
-        /// 平行光源の方向
-        /// </summary>
-        /// <param name="lightdir"></param>
-        void SetDirectionalDirction(const Vector3& lightdir);
+		/// <summary>
+		/// 平行光源のデータ設定
+		/// </summary>
+		/// <param name="directionalData"></param>
+		void SetDirectionalData(const DirectionalLight::DirectionalLightData& directionalData);
 
-        /// <summary>
-        /// 平行光源の有効化
-        /// </summary>
-        /// <param name="active"></param>
-        void SetDirectionalLightActive(const bool& active);
+		/// <summary>
+		/// 平行光源の有効化
+		/// </summary>
+		/// <param name="active"></param>
+		void SetDirectionalLightActive(const bool& active);
 
-        /// <summary>
-        /// 点光源のデータ設定
-        /// </summary>
-        /// <param name="pointData"></param>
-        void SetPointData(const PointLight::PointLightData& pointData);
+		/// <summary>
+		/// 点光源のデータ設定
+		/// </summary>
+		/// <param name="pointData"></param>
+		void SetPointData(const PointLight::PointLightData& pointData, const int& index);
 
-        /// <summary>
-        /// 点光源の位置
-        /// </summary>
-        /// <param name="position"></param>
-        void SetPointLightPosition(const Vector3& position);
+		/// <summary>
+		/// 点光源の有効化
+		/// </summary>
+		/// <param name="active"></param>
+		void SetPointLightActive(const bool& active, const int& index);
 
-        /// <summary>
-        /// 点光源の有効化
-        /// </summary>
-        /// <param name="active"></param>
-        void SetPointLightActive(const bool& active);
+		/// <summary>
+		/// スポットライトのデータ設定
+		/// </summary>
+		/// <param name="spotData"></param>
+		void SetSpotData(const SpotLight::SpotLightData& spotData, const int& index);
 
-        /// <summary>
-        /// スポットライトのデータ設定
-        /// </summary>
-        /// <param name="spotData"></param>
-        void SetSpotData(const SpotLight::SpotLightData& spotData);
+		/// <summary>
+		/// スポットライトの有効化
+		/// </summary>
+		/// <param name="active"></param>
+		void SetSpotLightActive(const bool& active, const int& index);
 
-        /// <summary>
-        /// スポットライトの位置
-        /// </summary>
-        /// <param name="position"></param>
-        void SetSpotLightPosition(const Vector3& position);
+		std::unique_ptr<DirectionalLight> directionalLight_;
+		std::array<std::unique_ptr<PointLight>, kPointLightNum> pointLights_;
+		std::array<std::unique_ptr<SpotLight>, kSpotLightNum> spotLights_;
 
-        /// <summary>
-        /// スポットライトの有効化
-        /// </summary>
-        /// <param name="active"></param>
-        void SetSpotLightActive(const bool& active);
+	private:
+		// リソース
+		Microsoft::WRL::ComPtr<ID3D12Resource> lightGroupResource_;
 
-        std::unique_ptr<DirectionalLight> directionalLight_;
-        std::unique_ptr<PointLight> pointLight_;
-        std::unique_ptr<SpotLight> spotLight_;
-
-    private:
-        // リソース
-        Microsoft::WRL::ComPtr<ID3D12Resource> lightGroupResource_;
-
-        // 平行光源のデータを作る
-        LightGroupData* lightGroupData_ = nullptr;
-    };
+		// 平行光源のデータを作る
+		LightGroupData* lightGroupData_ = nullptr;
+	};
 
 }
