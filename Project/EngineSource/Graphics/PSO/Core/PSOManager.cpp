@@ -62,7 +62,7 @@ void PSOManager::RegisterPSO(const std::string& name, const CreatePSOData& psoDa
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
     if (psoData.isDepthEnable) {
         depthStencilDesc.DepthEnable = true;
-        depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+        depthStencilDesc.DepthWriteMask = psoData.depthMask;
         depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
     } else {
         depthStencilDesc.DepthEnable = false;
@@ -365,6 +365,26 @@ void PSOManager::DefaultLoadPSO() {
     RegisterPSO("Animation", animation, &animationRootSigBuilder, &animationInputLayoutBuilder);
 
     LogManager::GetInstance().Log("Default PSOs loaded");
+
+    // skyboxのpso設定
+    CreatePSOData skybox;
+    skybox.rootSigName = "Skybox";
+    skybox.vsPath = L"Resources/Shaders/Skybox.VS.hlsl";
+    skybox.psPath = L"Resources/Shaders/Skybox.PS.hlsl";
+    skybox.drawMode = DrawModel::FillFront;
+    skybox.blendMode = BlendMode::kBlendModeNormal;
+    skybox.isDepthEnable = true;
+    skybox.depthMask = D3D12_DEPTH_WRITE_MASK::D3D12_DEPTH_WRITE_MASK_ZERO;
+    RootSignatureBuilder skyRoot;
+    skyRoot.Initialize(device_);
+    skyRoot.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
+    skyRoot.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
+    skyRoot.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    skyRoot.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    skyRoot.CreateRootSignature();
+    InputLayoutBuilder skyInput;
+    skyInput.CreateDefaultObjElement();
+    RegisterPSO("Skybox", skybox, &skyRoot, &skyInput);
 }
 
 void PSOManager::DeaultLoadPostEffectPSO() {

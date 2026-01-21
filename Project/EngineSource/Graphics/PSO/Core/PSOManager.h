@@ -42,6 +42,7 @@ namespace GameEngine {
 			DrawModel drawMode = DrawModel::FillFront; // 描画モード
 			BlendMode blendMode = BlendMode::kBlendModeNormal; // ブレンドモード
 			bool isDepthEnable = true; // 深度の使用
+			D3D12_DEPTH_WRITE_MASK depthMask = D3D12_DEPTH_WRITE_MASK::D3D12_DEPTH_WRITE_MASK_ALL; // 深度の書き込み
 			D3D12_PRIMITIVE_TOPOLOGY_TYPE primitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 描画タイプ
 		};
 

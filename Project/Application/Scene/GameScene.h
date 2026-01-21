@@ -78,6 +78,11 @@ private: // シーン機能
 	uint32_t grassGH_ = 0u;
 	GameEngine::WorldTransform terrainWorldTransform_;
 
+	// スカイボックス
+	GameEngine::Model* skyboxModel_;
+	GameEngine::WorldTransform skyboxWorldTransform_;
+	uint32_t skyboxGH_ = 0u;
+
 	// 平面モデル
 	GameEngine::Model* planeModel_;
 	uint32_t uvCheckerGH_ = 0u;

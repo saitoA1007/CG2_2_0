@@ -42,7 +42,14 @@ void GameScene::Initialize(SceneContext* context) {
 	terrainModel_ = context_->modelManager->GetNameByModel("Terrain");
 	terrainModel_->SetDefaultIsEnableLight(true);
 	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
+	terrainModel_->SetDefaultTextureHandle(grassGH_);
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
+
+	// スカイボックスの生成
+	skyboxModel_ = context_->modelManager->GetNameByModel("Skybox");
+	skyboxWorldTransform_.Initialize({ {100.0f,100.0f,100.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	skyboxGH_ = context_->textureManager->GetHandleByName("rostock_laage_airport_4k.dds");
+	skyboxModel_->SetDefaultTextureHandle(skyboxGH_);
 
 	// 平面モデルを生成
 	planeModel_ = context_->modelManager->GetNameByModel("Plane");
@@ -123,12 +130,16 @@ void GameScene::Draw(const bool& isDebugView) {
 	// 3D描画
 	//===========================================================
 
+	// スカイボックスの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::Skybox);
+
+	ModelRenderer::DrawSkybox(skyboxModel_, skyboxWorldTransform_);
+
 	// 3Dモデルの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
 	// 地面を描画
 	ModelRenderer::DrawLight(lightManager_->GetResource());
-	terrainModel_->SetDefaultTextureHandle(grassGH_);
 	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
 
 	// アニメーションの描画前処理
