@@ -10,7 +10,7 @@ LightManager::~LightManager() {
 	}
 }
 
-void LightManager::Initialize(ID3D12Device* device, const bool& isDirectionalActive, const int& activePointNum, const int& activeSpotNum) {
+void LightManager::Initialize(ID3D12Device* device, const bool& isDirectionalActive, const int& activePointNum, const int& activeSpotNum, const int& activeAreaNum) {
 	// 平行光源
 	directionalLight_ = std::make_unique<DirectionalLight>();
 	directionalLight_->Initialize({ 1,1,1,1 }, { 0,-1,0 }, 1.0f);
@@ -38,6 +38,17 @@ void LightManager::Initialize(ID3D12Device* device, const bool& isDirectionalAct
 		}
 	}
 
+	// 面光源の生成
+	for (int i = 0; i < kAreaLightNum; ++i) {
+		areaLights_[i] = std::make_unique<AreaLight>();
+		areaLights_[i]->Initialize({ 1,1,1,1 }, { 0,0,-1 }, 1.0f);
+		if (i < activeAreaNum) {
+			areaLights_[i]->SetLightActive(true);
+		} else {
+			areaLights_[i]->SetLightActive(false);
+		}
+	}
+
 	// 平行光源のリソースを作る。
 	lightGroupResource_ = CreateBufferResource(device, sizeof(LightGroupData));
 	// 書き込むためのアドレスを取得
@@ -60,6 +71,10 @@ void LightManager::Update() {
 	// スポットライト
 	for (int i = 0; i < kSpotLightNum; ++i) {
 		lightGroupData_->spotLightData_[i] = spotLights_[i]->GetSpotLightData();
+	}
+	// 面光源
+	for (int i = 0; i < kAreaLightNum; ++i) {
+		lightGroupData_->areaLightData_[i] = areaLights_[i]->GetPointLightData();
 	}
 }
 
@@ -85,4 +100,12 @@ void LightManager::SetSpotData(const SpotLight::SpotLightData& spotData, const i
 
 void LightManager::SetSpotLightActive(const bool& active, const int& index) {
 	spotLights_[index]->SetLightActive(active);
+}
+
+void LightManager::SetAreaData(const AreaLight::AreaLightData& areaData, const int& index) {
+	areaLights_[index]->SetPointLightData(areaData);
+}
+
+void LightManager::SetAreaLightActive(const bool& active, const int& index) {
+	areaLights_[index]->SetLightActive(active);
 }

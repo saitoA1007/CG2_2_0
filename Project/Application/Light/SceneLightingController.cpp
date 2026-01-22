@@ -32,15 +32,31 @@ void SceneLightingController::Initialize(ID3D12Device* device) {
 		spotLightDatas_[i].cosFalloffStart = 1.0f;
 		spotLightDatas_[i].decay = 1.0f;
 	}
+
+	// 面光源
+	for (int i = 0; i < areaLightDatas_.size(); ++i) {
+		areaLightDatas_[i].color = {1.0f,1.0f,1.0f,1.0f};
+		areaLightDatas_[i].position = {0.0f,0.0f,-1.0f};
+		areaLightDatas_[i].intensity = 1.0f;
+		areaLightDatas_[i].right = { 1.0f,0.0f,0.0f };
+		areaLightDatas_[i].width = 5.0f;
+		areaLightDatas_[i].up = { 0.0f,1.0f,0.0f };
+		areaLightDatas_[i].height = 5.0f;
+		areaLightDatas_[i].distance = 10.0f;
+		areaLightDatas_[i].decay = 0.5f;
+		areaLightDatas_[i].active = true;
+	}
 	
 	// ライトの設定
 	lightManager_ = std::make_unique<LightManager>();
-	lightManager_->Initialize(device, true, 1, 0);
+	lightManager_->Initialize(device, true, 2, 2,2);
 	lightManager_->SetDirectionalData(directionalData_);
 	lightManager_->SetPointData(pointLightDatas_[0], 0);
 	lightManager_->SetPointData(pointLightDatas_[1], 1);
 	lightManager_->SetSpotData(spotLightDatas_[0], 0);
 	lightManager_->SetSpotData(spotLightDatas_[1], 1);
+	lightManager_->SetAreaData(areaLightDatas_[0], 0);
+	lightManager_->SetAreaData(areaLightDatas_[1], 1);
 
 #ifdef _DEBUG
 	// 値を登録する
@@ -88,6 +104,20 @@ void SceneLightingController::RegisterBebugParam() {
 		GameParamEditor::GetInstance()->AddItem(name, "CosFalloffStart", spotLightDatas_[i].cosFalloffStart);
 		GameParamEditor::GetInstance()->AddItem(name, "Decay", spotLightDatas_[i].decay);
 	}
+
+	// 面光源の設定
+	for (int i = 0; i < areaLightDatas_.size(); ++i) {
+		std::string name = areaName_ + std::to_string(i);
+		GameParamEditor::GetInstance()->AddItem(name, "Color", areaLightDatas_[i].color);
+		GameParamEditor::GetInstance()->AddItem(name, "Position", areaLightDatas_[i].position);
+		GameParamEditor::GetInstance()->AddItem(name, "Intensity", areaLightDatas_[i].intensity);
+		GameParamEditor::GetInstance()->AddItem(name, "Right", areaLightDatas_[i].right);
+		GameParamEditor::GetInstance()->AddItem(name, "Width", areaLightDatas_[i].width);
+		GameParamEditor::GetInstance()->AddItem(name, "Up", areaLightDatas_[i].up);
+		GameParamEditor::GetInstance()->AddItem(name, "Height", areaLightDatas_[i].height);
+		GameParamEditor::GetInstance()->AddItem(name, "Distance", areaLightDatas_[i].distance);
+		GameParamEditor::GetInstance()->AddItem(name, "Decay", areaLightDatas_[i].decay);
+	}
 }
 
 void SceneLightingController::ApplyDebugParam(){
@@ -120,10 +150,25 @@ void SceneLightingController::ApplyDebugParam(){
 		spotLightDatas_[i].decay = GameParamEditor::GetInstance()->GetValue<float>(name, "Decay");
 	}
 
+	for (int i = 0; i < areaLightDatas_.size(); ++i) {
+		std::string name = areaName_ + std::to_string(i);
+		areaLightDatas_[i].color =  GameParamEditor::GetInstance()->GetValue<Vector4>(name, "Color");
+		areaLightDatas_[i].position = GameParamEditor::GetInstance()->GetValue<Vector3>(name, "Position");
+		areaLightDatas_[i].intensity = GameParamEditor::GetInstance()->GetValue<float>(name, "Intensity");
+		areaLightDatas_[i].right = GameParamEditor::GetInstance()->GetValue<Vector3>(name, "Right");
+		areaLightDatas_[i].width = GameParamEditor::GetInstance()->GetValue<float>(name, "Width");
+		areaLightDatas_[i].up = GameParamEditor::GetInstance()->GetValue<Vector3>(name, "Up");
+		areaLightDatas_[i].height = GameParamEditor::GetInstance()->GetValue<float>(name, "Height");
+		areaLightDatas_[i].distance = GameParamEditor::GetInstance()->GetValue<float>(name, "Distance");
+		areaLightDatas_[i].decay = GameParamEditor::GetInstance()->GetValue<float>(name, "Decay");
+	}
+
 	// ライトマネージャーに適応
 	lightManager_->SetDirectionalData(directionalData_);
 	lightManager_->SetPointData(pointLightDatas_[0], 0);
 	lightManager_->SetPointData(pointLightDatas_[1], 1);
 	lightManager_->SetSpotData(spotLightDatas_[0], 0);
 	lightManager_->SetSpotData(spotLightDatas_[1], 1);
+	lightManager_->SetAreaData(areaLightDatas_[0], 0);
+	lightManager_->SetAreaData(areaLightDatas_[1], 1);
 }

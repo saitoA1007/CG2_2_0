@@ -65,8 +65,21 @@ private: // シーン機能
 	// ライトの管理
 	std::unique_ptr<SceneLightingController> sceneLightingController_;
 
+	// 地面モデル
+	GameEngine::Model* terrainModel_;
+	uint32_t grassGH_ = 0u;
+	GameEngine::WorldTransform terrainWorldTransform_;
+
 	// 球のモデル
 	GameEngine::Model* sphereModel_;
 	GameEngine::WorldTransform sphereWorldTransform_;
 	uint32_t monsterGH_ = 0;
+
+	// objのplaneモデル
+	GameEngine::Model* objPlaneModel_;
+	GameEngine::WorldTransform objPlaneWorldTransform_;
+
+	// gltfのplaneモデル
+	GameEngine::Model* gltfPlaneModel_;
+	GameEngine::WorldTransform gltfPlaneWorldTransform_;
 };

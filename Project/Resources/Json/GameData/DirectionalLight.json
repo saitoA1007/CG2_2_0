@@ -1,0 +1,17 @@
+{
+    "DirectionalLight": {
+        "Color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+        ],
+        "Direction": [
+            1.9500000476837158,
+            -0.38999998569488525,
+            0.0
+        ],
+        "Intensity": 0.7900000214576721,
+        "SceneName": "TitleScene"
+    }
+}

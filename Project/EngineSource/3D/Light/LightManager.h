@@ -6,6 +6,7 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
+#include"AreaLight.h"
 
 namespace GameEngine {
 
@@ -15,12 +16,15 @@ namespace GameEngine {
 		static const int kPointLightNum = 3;
 		// スポットライトの数
 		static const int kSpotLightNum = 3;
+		// 面光源の数
+		static const int kAreaLightNum = 3;
 
 		// 定数バッファ
 		struct LightGroupData {
 			DirectionalLight::DirectionalLightData directionalLightData_;
 			PointLight::PointLightData pointLightData_[kPointLightNum];
 			SpotLight::SpotLightData spotLightData_[kSpotLightNum];
+			AreaLight::AreaLightData areaLightData_[kAreaLightNum];
 		};
 
 	public:
@@ -31,7 +35,7 @@ namespace GameEngine {
 		/// 初期化
 		/// </summary>
 		/// <param name="device"></param>
-		void Initialize(ID3D12Device* device, const bool& isDirectionalActive, const int& activePointNum, const int& activeSpotNum);
+		void Initialize(ID3D12Device* device, const bool& isDirectionalActive, const int& activePointNum, const int& activeSpotNum, const int& activeAreaNum);
 
 		/// <summary>
 		/// 更新処理
@@ -82,10 +86,24 @@ namespace GameEngine {
 		/// <param name="active"></param>
 		void SetSpotLightActive(const bool& active, const int& index);
 
+		/// <summary>
+		/// 面光源のデータ設定
+		/// </summary>
+		/// <param name="spotData"></param>
+		/// <param name="index"></param>
+		void SetAreaData(const AreaLight::AreaLightData& areaData, const int& index);
+
+		/// <summary>
+		/// 面光源の有効化
+		/// </summary>
+		/// <param name="active"></param>
+		/// <param name="index"></param>
+		void SetAreaLightActive(const bool& active, const int& index);
+
 		std::unique_ptr<DirectionalLight> directionalLight_;
 		std::array<std::unique_ptr<PointLight>, kPointLightNum> pointLights_;
 		std::array<std::unique_ptr<SpotLight>, kSpotLightNum> spotLights_;
-
+		std::array<std::unique_ptr<AreaLight>, kAreaLightNum> areaLights_;
 	private:
 		// リソース
 		Microsoft::WRL::ComPtr<ID3D12Resource> lightGroupResource_;

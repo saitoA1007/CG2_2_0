@@ -275,6 +275,7 @@
     <ClCompile Include="EngineSource\Graphics\DirectX\Memory\RenderTextureManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPass.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\Memory\DsvManager.cpp" />
+    <ClCompile Include="EngineSource\3D\Light\AreaLight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -549,6 +550,7 @@
     <ClInclude Include="EngineSource\Graphics\DirectX\Memory\RenderTextureManager.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPass.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\Memory\DsvManager.h" />
+    <ClInclude Include="EngineSource\3D\Light\AreaLight.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

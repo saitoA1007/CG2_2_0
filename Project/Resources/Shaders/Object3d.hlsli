@@ -44,6 +44,23 @@ struct SpotLight
 // スポットライトの数
 static const int SPOTLIGHT_NUM = 3;
 
+struct AreaLight
+{
+    float32_t4 color; // ライトの色
+    float32_t3 position; // ライトの中心位置
+    float32_t intensity; // 輝度
+    float32_t3 right; // ライトの右方向ベクトル
+    float32_t width; // ライトの幅
+    float32_t3 up; // ライトの上方向ベクトル
+    float32_t height; // ライトの高さ
+    float32_t distance; // ライトの届く最大距離
+    float32_t decay; // 減衰率
+    int32_t active; // 有効化
+};
+
+// 面光源の数
+static const int AREALIGHT_NUM = 3;
+
 struct Skinned
 {
     float32_t4 position;

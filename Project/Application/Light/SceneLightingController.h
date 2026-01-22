@@ -37,12 +37,15 @@ private:
 	std::array<GameEngine::PointLight::PointLightData,2> pointLightDatas_;
 	// スポットライト
 	std::array<GameEngine::SpotLight::SpotLightData, 2> spotLightDatas_;
+	// 面光源
+	std::array<GameEngine::AreaLight::AreaLightData, 2> areaLightDatas_;
 
 private: // デバック用
 
 	std::string directinalName_ = "DirectionalLight";
 	std::string pointName_ = "PointLight";
 	std::string spotName_ = "SpotLight";
+	std::string areaName_ = "AreaLight";
 private:
 
 	/// <summary>

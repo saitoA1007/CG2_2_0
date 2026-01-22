@@ -19,6 +19,7 @@ cbuffer LightGroup : register(b1)
     DirectionalLight gDirectionalLight;
     PointLight gPointLight[POINTLIGHT_NUM];
     SpotLight gSpotLight[SPOTLIGHT_NUM];
+    AreaLight gAreaLight[AREALIGHT_NUM];
 };
 
 struct Camera
@@ -127,6 +128,73 @@ PixelShaderOutput main(VertexShaderOutput input)
             
                 // diffuse+specular
                 tmpColor += diffuseSpotLight + specularSpotLight;
+            }
+        }
+        
+        // 面光源
+        for (int i = 0; i < AREALIGHT_NUM; ++i)
+        {
+            if (gAreaLight[i].active)
+            {
+                // 距離と減衰
+                float32_t distance = length(gAreaLight[i].position - input.worldPosition);
+                float32_t factor = pow(saturate(-distance / gAreaLight[i].distance + 1.0), gAreaLight[i].decay);
+                // 面の法線
+                float32_t3 lightNormal = normalize(cross(gAreaLight[i].right, gAreaLight[i].up));
+                // ライトからピクセルへの方向ベクトル
+                float32_t3 directionToPixel = normalize(input.worldPosition - gAreaLight[i].position);
+
+                float32_t areaLightAngleCos = dot(lightNormal, directionToPixel);
+                float32_t falloffFactor = saturate(areaLightAngleCos);
+
+                // Direction
+                float32_t3 areaLightDirection = -directionToPixel;
+        
+                // Half Lambert
+                float NdotL = dot(normalize(input.normal), areaLightDirection);
+                float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+        
+                // Diffuse
+                float32_t3 diffuseAreaLight = gMaterial.color.rgb * textureColor.rgb * gAreaLight[i].color.rgb * cos * gAreaLight[i].intensity * factor * falloffFactor;
+        
+                // 反射ベクトルを求める
+                float32_t3 r = reflect(-toEye, normalize(input.normal));
+
+                // 反射ベクトルとライト平面の交点を求める
+                float32_t3 L = input.worldPosition - gAreaLight[i].position;
+                float32_t t = dot(-L, lightNormal) / dot(r, lightNormal);
+        
+                // 交点が前方にある場合のみ計算
+                float32_t3 closestPointOnLight = gAreaLight[i].position;
+                if (t > 0.0f)
+                {
+                    float32_t3 intersectPoint = input.worldPosition + r * t;
+
+                    // 交点をライトのローカル空間に投影
+                    float32_t3 localPoint = intersectPoint - gAreaLight[i].position;
+                    float32_t u = dot(localPoint, normalize(gAreaLight[i].right));
+                    float32_t v = dot(localPoint, normalize(gAreaLight[i].up));
+
+                    // 矩形サイズでクランプ
+                    u = clamp(u, -gAreaLight[i].width * 0.5f, gAreaLight[i].width * 0.5f);
+                    v = clamp(v, -gAreaLight[i].height * 0.5f, gAreaLight[i].height * 0.5f);
+
+                    // クランプした座標をワールド座標に戻す
+                    closestPointOnLight = gAreaLight[i].position + (normalize(gAreaLight[i].right) * u) + (normalize(gAreaLight[i].up) * v);
+                }
+
+                // 計算した点に向かうベクトル
+                float32_t3 toClosestPoint = normalize(closestPointOnLight - input.worldPosition);
+
+                // Specular
+                float32_t3 halfVectorArea = normalize(toClosestPoint + toEye);
+                float NDotHArea = dot(normalize(input.normal), halfVectorArea);
+                float specularPowArea = pow(saturate(NDotHArea), gMaterial.shininess);
+        
+                // Specular合成   
+                float32_t3 specularAreaLight = gAreaLight[i].color.rgb * gAreaLight[i].intensity * specularPowArea * gMaterial.specularColor * factor * falloffFactor;
+        
+                tmpColor += diffuseAreaLight + specularAreaLight;
             }
         }
         

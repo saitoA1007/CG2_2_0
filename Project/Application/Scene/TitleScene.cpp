@@ -30,6 +30,13 @@ void TitleScene::Initialize(SceneContext* context) {
 	sceneLightingController_ = std::make_unique<SceneLightingController>();
 	sceneLightingController_->Initialize(context_->graphicsDevice->GetDevice());
 
+	// 地面モデルを生成
+	terrainModel_ = context_->modelManager->GetNameByModel("Terrain");
+	terrainModel_->SetDefaultIsEnableLight(true);
+	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
+	terrainModel_->SetDefaultTextureHandle(grassGH_);
+	terrainWorldTransform_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,-1.6f,0.0f},{0.0f,-2.0f,0.0f} });
+
 	// 画像を取得
 	monsterGH_ = context_->textureManager->GetHandleByName("monsterBall.png");
 	// 球の初期化
@@ -37,6 +44,16 @@ void TitleScene::Initialize(SceneContext* context) {
 	sphereModel_->SetDefaultIsEnableLight(true);
 	sphereModel_->SetDefaultTextureHandle(monsterGH_);
 	sphereWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
+
+	// objのplaneモデル
+	objPlaneModel_ = context_->modelManager->GetNameByModel("ObjPlane");
+	objPlaneModel_->SetDefaultIsEnableLight(true);
+	objPlaneWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-3.0f,0.0f,0.0f} });
+
+	// gltfのplaneモデル
+	gltfPlaneModel_ = context_->modelManager->GetNameByModel("GltfPlane");
+	gltfPlaneModel_->SetDefaultIsEnableLight(true);
+	gltfPlaneWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{3.0f,0.0f,0.0f} });
 }
 
 void TitleScene::Update() {
@@ -72,9 +89,21 @@ void TitleScene::Draw(const bool& isDebugView) {
 	// 描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
 
+	// 地面を描画
+	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
+
 	// 球の描画
 	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
 	ModelRenderer::Draw(sphereModel_, sphereWorldTransform_);
+
+	// objのplaneモデルを描画
+	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+	ModelRenderer::Draw(objPlaneModel_, objPlaneWorldTransform_);
+
+	// gltfのplaneモデルを描画
+	ModelRenderer::DrawLight(sceneLightingController_->GetResource());
+	ModelRenderer::Draw(gltfPlaneModel_, gltfPlaneWorldTransform_);
 
 	pass->PostPass("DefaultPass");
 }
