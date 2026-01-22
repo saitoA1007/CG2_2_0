@@ -8,10 +8,12 @@ struct Material
     float32_t3 specularColor;
     float shininess;
     uint32_t textureHandle;
+    float metallic;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 
-Texture2D<float32_t4> gTexture[] : register(t0);
+Texture2D<float32_t4> gTexture[] : register(t0,space0);
+TextureCube<float32_t4> gCubeTexture[] : register(t1,space1);
 SamplerState gSampler : register(s0);
 
 cbuffer LightGroup : register(b1)
@@ -19,6 +21,8 @@ cbuffer LightGroup : register(b1)
     DirectionalLight gDirectionalLight;
     PointLight gPointLight;
     SpotLight gSpotLight;
+    uint32_t environmentTexture;
+    int32_t isActiveEnvironment;
 };
 
 struct Camera
@@ -122,7 +126,15 @@ PixelShaderOutput main(VertexShaderOutput input)
             tmpColor += diffuseSpotLight + specularSpotLight;
         }
         
-        // 最終的な色を適応
+        // 環境マップを適応
+        if (isActiveEnvironment)
+        {
+            float32_t3 cameraToPosition = normalize(input.worldPosition - gCamera.worldPosition);
+            float32_t3 reflectedVector = reflect(cameraToPosition, normalize(input.normal));
+            float32_t4 environmentColor = gCubeTexture[environmentTexture].Sample(gSampler, reflectedVector);
+            tmpColor += environmentColor.rgb * gMaterial.metallic;
+        }
+            
         output.color.rgb = tmpColor;
        
         // アルファ値を適応

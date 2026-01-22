@@ -15,6 +15,9 @@ namespace GameEngine {
             DirectionalLight::DirectionalLightData directionalLightData_;
             PointLight::PointLightData pointLightData_;
             SpotLight::SpotLightData spotLightData_;
+            uint32_t environmentTexture = 0;
+            int32_t isActiveEnvironment = false;
+            float padding[2];
         };
 
     public:
@@ -93,6 +96,15 @@ namespace GameEngine {
         /// </summary>
         /// <param name="active"></param>
         void SetSpotLightActive(const bool& active);
+
+        /// <summary>
+        /// 環境マップを設定
+        /// </summary>
+        /// <param name="index"></param>
+        void SetEnvironmentTexture(const uint32_t& index) {
+            lightGroupData_->environmentTexture = index;
+            lightGroupData_->isActiveEnvironment = true;
+        }
 
         std::unique_ptr<DirectionalLight> directionalLight_;
         std::unique_ptr<PointLight> pointLight_;

@@ -50,6 +50,7 @@ void GameScene::Initialize(SceneContext* context) {
 	skyboxWorldTransform_.Initialize({ {100.0f,100.0f,100.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 	skyboxGH_ = context_->textureManager->GetHandleByName("rostock_laage_airport_4k.dds");
 	skyboxModel_->SetDefaultTextureHandle(skyboxGH_);
+	lightManager_->SetEnvironmentTexture(skyboxGH_);
 
 	// 平面モデルを生成
 	planeModel_ = context_->modelManager->GetNameByModel("Plane");
