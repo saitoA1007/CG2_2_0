@@ -330,6 +330,14 @@ void Model::SetDefaultShiness(const float& shininess, const std::string& materia
 	material->SetShiness(shininess);
 }
 
+void Model::SetDefaultMetallic(const float& metallic, const std::string& materialName) {
+	auto it = materialName == "default" ? materials_.begin() : materials_.find(materialName);
+
+	assert(it != materials_.end() && "Material not found");
+	Material* material = it->second.get();
+	material->SetMetallic(metallic);
+}
+
 void  Model::SetDefaultIsEnableLight(const bool& isEnableLight, const std::string& materialName) {
 
 	auto it = materialName == "default" ? materials_.begin() : materials_.find(materialName);

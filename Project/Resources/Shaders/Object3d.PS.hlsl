@@ -8,6 +8,7 @@ struct Material
     float32_t3 specularColor;
     float shininess;
     uint32_t textureHandle;
+    float metallic;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 
@@ -206,7 +207,7 @@ PixelShaderOutput main(VertexShaderOutput input)
             float32_t3 cameraToPosition = normalize(input.worldPosition - gCamera.worldPosition);
             float32_t3 reflectedVector = reflect(cameraToPosition, normalize(input.normal));
             float32_t4 environmentColor = gCubeTexture[gEnvironmentData.textureIndex].Sample(gSampler, reflectedVector);
-            tmpColor += environmentColor.rgb * 0.01f;
+            tmpColor += environmentColor.rgb * gMaterial.metallic;
         }
         
         // 最終的な色を適応

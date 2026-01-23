@@ -119,6 +119,13 @@ namespace GameEngine {
 		void SetDefaultShiness(const float& shininess, const std::string& materialName = "default");
 
 		/// <summary>
+		/// 環境光の移りを設定
+		/// </summary>
+		/// <param name="shininess"></param>
+		/// <param name="materialName"></param>
+		void SetDefaultMetallic(const float& metallic, const std::string& materialName = "default");
+
+		/// <summary>
 		/// デフォオルトの光源の有無を設定
 		/// </summary>
 		/// <param name="isEnableLight"></param>

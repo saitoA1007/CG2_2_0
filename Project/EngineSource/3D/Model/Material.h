@@ -19,7 +19,8 @@ namespace GameEngine {
 			Vector3 specularColor;
 			float shininess;
 			uint32_t textureHandle;
-			float padding2[3];
+			float metallic;
+			float padding2[2];
 		};
 
 	public:
@@ -69,6 +70,12 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="shininess"></param>
 		void SetShiness(const float& shininess) { materialData_->shininess = shininess; }
+
+		/// <summary>
+		/// 環境光の移りを設定
+		/// </summary>
+		/// <param name="metallic"></param>
+		void SetMetallic(const float& metallic) { materialData_->metallic = metallic; }
 
 		/// <summary>
 		/// ライトを適応させるかを設定
