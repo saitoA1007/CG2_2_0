@@ -27,6 +27,14 @@ public:
 	/// <returns></returns>
 	ID3D12Resource* GetResource() const {return lightManager_->GetResource();}
 
+	/// <summary>
+	/// 環境マップを設定
+	/// </summary>
+	/// <param name="index"></param>
+	void SetEnvironment(const uint32_t& index) {
+		lightManager_->SetEnvironmentTexture(index);
+	}
+
 private:
 
 	// ライト

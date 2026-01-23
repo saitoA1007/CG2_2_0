@@ -19,12 +19,20 @@ namespace GameEngine {
 		// 面光源の数
 		static const int kAreaLightNum = 3;
 
+		// 環境マップデータ
+		struct EnvironmentData {
+			uint32_t textureIndex = 0;
+			int32_t isActive = false;
+			float padding[2];
+		};
+
 		// 定数バッファ
 		struct LightGroupData {
 			DirectionalLight::DirectionalLightData directionalLightData_;
 			PointLight::PointLightData pointLightData_[kPointLightNum];
 			SpotLight::SpotLightData spotLightData_[kSpotLightNum];
 			AreaLight::AreaLightData areaLightData_[kAreaLightNum];
+			EnvironmentData environmentData;
 		};
 
 	public:
@@ -99,6 +107,15 @@ namespace GameEngine {
 		/// <param name="active"></param>
 		/// <param name="index"></param>
 		void SetAreaLightActive(const bool& active, const int& index);
+
+		/// <summary>
+		/// 環境マップを設定
+		/// </summary>
+		/// <param name="index"></param>
+		void SetEnvironmentTexture(const uint32_t& index) {
+			lightGroupData_->environmentData.textureIndex = index;
+			lightGroupData_->environmentData.isActive = true;
+		}
 
 		std::unique_ptr<DirectionalLight> directionalLight_;
 		std::array<std::unique_ptr<PointLight>, kPointLightNum> pointLights_;

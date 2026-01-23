@@ -65,6 +65,11 @@ private: // シーン機能
 	// ライトの管理
 	std::unique_ptr<SceneLightingController> sceneLightingController_;
 
+	// スカイボックス
+	GameEngine::Model* skyboxModel_;
+	GameEngine::WorldTransform skyboxWorldTransform_;
+	uint32_t skyboxGH_ = 0u;
+
 	// 地面モデル
 	GameEngine::Model* terrainModel_;
 	uint32_t grassGH_ = 0u;

@@ -30,6 +30,14 @@ void TitleScene::Initialize(SceneContext* context) {
 	sceneLightingController_ = std::make_unique<SceneLightingController>();
 	sceneLightingController_->Initialize(context_->graphicsDevice->GetDevice());
 
+	// スカイボックスの生成
+	skyboxModel_ = context_->modelManager->GetNameByModel("Skybox");
+	skyboxWorldTransform_.Initialize({ {100.0f,100.0f,100.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	skyboxGH_ = context_->textureManager->GetHandleByName("rostock_laage_airport_4k.dds");
+	skyboxModel_->SetDefaultTextureHandle(skyboxGH_);
+	// 環境マップを設定
+	sceneLightingController_->SetEnvironment(skyboxGH_);
+
 	// 地面モデルを生成
 	terrainModel_ = context_->modelManager->GetNameByModel("Terrain");
 	terrainModel_->SetDefaultIsEnableLight(true);
@@ -85,6 +93,11 @@ void TitleScene::Draw(const bool& isDebugView) {
 	//===========================================================
 	// 3D描画
 	//===========================================================
+
+	// スカイボックスの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::Skybox);
+
+	ModelRenderer::DrawSkybox(skyboxModel_, skyboxWorldTransform_);
 
 	// 描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);

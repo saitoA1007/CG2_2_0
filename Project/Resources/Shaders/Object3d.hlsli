@@ -61,6 +61,13 @@ struct AreaLight
 // 面光源の数
 static const int AREALIGHT_NUM = 3;
 
+// 環境マップ
+struct EnvironmentData
+{
+    uint32_t textureIndex;
+    int32_t isActive;
+};
+
 struct Skinned
 {
     float32_t4 position;

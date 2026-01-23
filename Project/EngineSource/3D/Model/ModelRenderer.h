@@ -22,6 +22,7 @@ namespace GameEngine {
 		InstancingAdd,
 		Grid,  // グリッド描画用
 		AnimationModel, // アニメーション描画用
+		Skybox, // スカイボックスの描画用
 	};
 
 	class ModelRenderer {
@@ -96,6 +97,14 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="directionalLightResource"></param>
 		static void DrawLight(ID3D12Resource* lightGroupResource);
+
+		/// <summary>
+		/// スカイボックスの描画
+		/// </summary>
+		/// <param name="model"></param>
+		/// <param name="worldTransform"></param>
+		/// <param name="material"></param>
+		static void DrawSkybox(const Model* model, WorldTransform& worldTransform, const Material* material = nullptr);
 
 	private:
 

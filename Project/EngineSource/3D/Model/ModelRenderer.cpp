@@ -25,6 +25,8 @@ void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, Tex
 	psoList_[RenderMode3D::Grid] = psoManager->GetDrawPsoData("Grid");
 	// アニメーション描画用のデータを取得する
 	psoList_[RenderMode3D::AnimationModel] = psoManager->GetDrawPsoData("Animation");
+	// スカイボックス描画用のデータを取得
+	psoList_[RenderMode3D::Skybox] = psoManager->GetDrawPsoData("Skybox");
 }
 
 void ModelRenderer::PreDraw(RenderMode3D mode) {
@@ -207,7 +209,43 @@ void ModelRenderer::DrawGrid(const Model* model, WorldTransform& worldTransform,
 	commandList_->DrawIndexedInstanced(meshes[0]->GetTotalIndices(), 1, 0, 0, 0);
 }
 
+void ModelRenderer::DrawSkybox(const Model* model, WorldTransform& worldTransform, const Material* material) {
+	// カメラ座標に変換
+	if (model->IsLoad()) {
+		worldTransform.SetWVPMatrix(model->GetLocalMatrix(), vpMatrix_);
+	} else {
+		worldTransform.SetWVPMatrix(vpMatrix_);
+	}
+
+	// メッシュを取得
+	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
+
+	for (uint32_t i = 0; i < meshes.size(); ++i) {
+		commandList_->IASetVertexBuffers(0, 1, &meshes[i]->GetVertexBufferView());
+		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		// マテリアルが設定されていなければデフォルトのマテリアルを使う
+		if (material == nullptr) {
+			// マテリアルを設定
+			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
+		} else {
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+		}
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+
+		if (meshes[i]->GetTotalIndices() != 0) {
+			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
+		} else {
+			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), 1, 0, 0);
+		}
+	}
+}
+
 void ModelRenderer::DrawLight(ID3D12Resource* lightGroupResource) {
 	commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(5, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 }

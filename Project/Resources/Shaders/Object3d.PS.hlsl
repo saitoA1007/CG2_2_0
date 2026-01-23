@@ -11,7 +11,8 @@ struct Material
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 
-Texture2D<float32_t4> gTexture[] : register(t0);
+Texture2D<float32_t4> gTexture[] : register(t0, space0);
+TextureCube<float32_t4> gCubeTexture[] : register(t1, space1);
 SamplerState gSampler : register(s0);
 
 cbuffer LightGroup : register(b1)
@@ -20,6 +21,7 @@ cbuffer LightGroup : register(b1)
     PointLight gPointLight[POINTLIGHT_NUM];
     SpotLight gSpotLight[SPOTLIGHT_NUM];
     AreaLight gAreaLight[AREALIGHT_NUM];
+    EnvironmentData gEnvironmentData;
 };
 
 struct Camera
@@ -196,6 +198,15 @@ PixelShaderOutput main(VertexShaderOutput input)
         
                 tmpColor += diffuseAreaLight + specularAreaLight;
             }
+        }
+        
+        // 環境マップを適応
+        if (gEnvironmentData.isActive)
+        {
+            float32_t3 cameraToPosition = normalize(input.worldPosition - gCamera.worldPosition);
+            float32_t3 reflectedVector = reflect(cameraToPosition, normalize(input.normal));
+            float32_t4 environmentColor = gCubeTexture[gEnvironmentData.textureIndex].Sample(gSampler, reflectedVector);
+            tmpColor += environmentColor.rgb * 0.01f;
         }
         
         // 最終的な色を適応

@@ -265,6 +265,7 @@ void PSOManager::DefaultLoadPSO() {
     rootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilder.AddSRVDescriptorTable(1, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 1, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.CreateRootSignature();
     InputLayoutBuilder inputLayoutBuilder;
@@ -358,11 +359,31 @@ void PSOManager::DefaultLoadPSO() {
     animationRootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_VERTEX);
     animationRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
     animationRootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
+    animationRootSigBuilder.AddSRVDescriptorTable(1, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 1, D3D12_SHADER_VISIBILITY_PIXEL);
     animationRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     animationRootSigBuilder.CreateRootSignature();
     InputLayoutBuilder animationInputLayoutBuilder;
     animationInputLayoutBuilder.CreateDefaultAnimationElement();
     RegisterPSO("Animation", animation, &animationRootSigBuilder, &animationInputLayoutBuilder);
+
+    // skyboxのpso設定
+    CreatePSOData skybox;
+    skybox.rootSigName = "Skybox";
+    skybox.vsPath = L"Resources/Shaders/Skybox.VS.hlsl";
+    skybox.psPath = L"Resources/Shaders/Skybox.PS.hlsl";
+    skybox.drawMode = DrawModel::FillFront;
+    skybox.blendMode = BlendMode::kBlendModeNormal;
+    skybox.isDepthEnable = true;
+    RootSignatureBuilder skyRoot;
+    skyRoot.Initialize(device_);
+    skyRoot.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
+    skyRoot.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
+    skyRoot.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    skyRoot.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    skyRoot.CreateRootSignature();
+    InputLayoutBuilder skyInput;
+    skyInput.CreateDefaultObjElement();
+    RegisterPSO("Skybox", skybox, &skyRoot, &skyInput);
 
     LogManager::GetInstance().Log("Default PSOs loaded");
 }
