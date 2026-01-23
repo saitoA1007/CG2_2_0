@@ -1,6 +1,7 @@
 {
     "Terrain": {
         "Metalic": 0.009999999776482582,
-        "SceneName": "TitleScene"
+        "SceneName": "TitleScene",
+        "Shininess": 250.0
     }
 }

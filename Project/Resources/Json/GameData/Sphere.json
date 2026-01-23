@@ -1,6 +1,7 @@
 {
     "Sphere": {
         "Metalic": 0.07999999821186066,
-        "SceneName": "TitleScene"
+        "SceneName": "TitleScene",
+        "Shininess": 500.0
     }
 }

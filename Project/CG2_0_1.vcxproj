@@ -170,7 +170,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
   <ItemGroup>
     <ClCompile Include="Application\Camera\CameraController.cpp" />
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
-    <ClCompile Include="Application\Scene\GEScene.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
@@ -314,7 +313,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     </ClCompile>
     <ClCompile Include="Application\ColorEditor.cpp" />
     <ClCompile Include="EngineSource\Scene\SceneManager.cpp" />
-    <ClCompile Include="Application\Scene\GameScene.cpp" />
     <ClCompile Include="Application\Scene\TitleScene.cpp" />
     <ClCompile Include="EngineSource\Editor\GameParamEditor.cpp" />
     <ClCompile Include="main.cpp">
@@ -325,7 +323,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
   <ItemGroup>
     <ClInclude Include="Application\Camera\CameraController.h" />
     <ClInclude Include="Application\Light\SceneLightingController.h" />
-    <ClInclude Include="Application\Scene\GEScene.h" />
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
@@ -487,7 +484,6 @@ copy "$(ProjectDir)Externals\DXC\dxil.dll"       "$(TargetDir)dxil.dll" /Y</Comm
     <ClInclude Include="Application\ColorEditor.h" />
     <ClInclude Include="EngineSource\Scene\SceneManager.h" />
     <ClInclude Include="EngineSource\Scene\BaseScene.h" />
-    <ClInclude Include="Application\Scene\GameScene.h" />
     <ClInclude Include="Application\Scene\TitleScene.h" />
     <ClInclude Include="EngineSource\Editor\GameParamEditor.h" />
   </ItemGroup>

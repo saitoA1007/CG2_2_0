@@ -46,7 +46,7 @@ public:
 	/// 次のシーン遷移する場面の名前を取得
 	/// </summary>
 	/// <returns></returns>
-	std::string NextSceneName() override { return "Game"; }
+	std::string NextSceneName() override { return "Title"; }
 
 	/// <summary>
 	/// 遷移する演出
