@@ -69,7 +69,7 @@ namespace GameEngine {
 		/// 輝度を設定
 		/// </summary>
 		/// <param name="shininess"></param>
-		void SetShiness(const float& shininess) { materialData_->shininess = shininess; }
+		void SetShiness(const float& shininess) {materialData_->shininess = shininess;}
 
 		/// <summary>
 		/// 環境光の移りを設定

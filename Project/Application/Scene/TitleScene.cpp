@@ -43,6 +43,8 @@ void TitleScene::Initialize(SceneContext* context) {
 	terrainModel_->SetDefaultIsEnableLight(true);
 	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
 	terrainModel_->SetDefaultTextureHandle(grassGH_);
+	terrainModel_->SetDefaultMetallic(terrainMetalic_);
+	terrainModel_->SetDefaultShiness(terrainShininess_);
 	terrainWorldTransform_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,-1.6f,0.0f},{0.0f,-2.0f,0.0f} });
 
 	// 画像を取得
@@ -51,6 +53,8 @@ void TitleScene::Initialize(SceneContext* context) {
 	sphereModel_ = context_->modelManager->GetNameByModel("Sphere");
 	sphereModel_->SetDefaultIsEnableLight(true);
 	sphereModel_->SetDefaultTextureHandle(monsterGH_);
+	sphereModel_->SetDefaultMetallic(sphereMetalic_);
+	sphereModel_->SetDefaultShiness(sphereShininess_);
 	sphereWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// objのplaneモデル
@@ -62,9 +66,12 @@ void TitleScene::Initialize(SceneContext* context) {
 	gltfPlaneModel_ = context_->modelManager->GetNameByModel("GltfPlane");
 	gltfPlaneModel_->SetDefaultIsEnableLight(true);
 	gltfPlaneWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{3.0f,0.0f,0.0f} });
+
+	RegisterDebugParam();
 }
 
 void TitleScene::Update() {
+	ApplyDebugParam();
 
 	// ライトの更新処理
 	sceneLightingController_->Update();
@@ -122,6 +129,28 @@ void TitleScene::Draw(const bool& isDebugView) {
 }
 
 void TitleScene::DebugUpdate() {
+	ApplyDebugParam();
+
 	// ライトの更新処理
 	sceneLightingController_->Update();
+}
+
+void TitleScene::RegisterDebugParam() {
+	GameParamEditor::GetInstance()->AddItem("Sphere", "Metalic", sphereMetalic_);
+	GameParamEditor::GetInstance()->AddItem("Sphere", "Shininess", sphereShininess_);
+
+	GameParamEditor::GetInstance()->AddItem("Terrain", "Metalic", terrainMetalic_);
+	GameParamEditor::GetInstance()->AddItem("Terrain", "Shininess", terrainShininess_);
+}
+
+void TitleScene::ApplyDebugParam() {
+	sphereMetalic_ = GameParamEditor::GetInstance()->GetValue<float>("Sphere", "Metalic");
+	sphereShininess_ = GameParamEditor::GetInstance()->GetValue<float>("Sphere", "Shininess");
+	sphereModel_->SetDefaultMetallic(sphereMetalic_);
+	sphereModel_->SetDefaultShiness(sphereShininess_);
+
+	terrainMetalic_ = GameParamEditor::GetInstance()->GetValue<float>("Terrain", "Metalic");
+	terrainShininess_ = GameParamEditor::GetInstance()->GetValue<float>("Terrain", "Shininess");
+	terrainModel_->SetDefaultMetallic(terrainMetalic_);
+	terrainModel_->SetDefaultShiness(terrainShininess_);
 }

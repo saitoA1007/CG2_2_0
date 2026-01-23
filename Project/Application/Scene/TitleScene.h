@@ -74,11 +74,15 @@ private: // シーン機能
 	GameEngine::Model* terrainModel_;
 	uint32_t grassGH_ = 0u;
 	GameEngine::WorldTransform terrainWorldTransform_;
+	float terrainMetalic_ = 0.01f;
+	float terrainShininess_ = 250.0f;
 
 	// 球のモデル
 	GameEngine::Model* sphereModel_;
 	GameEngine::WorldTransform sphereWorldTransform_;
 	uint32_t monsterGH_ = 0;
+	float sphereMetalic_ = 0.01f;
+	float sphereShininess_ = 500.0f;
 
 	// objのplaneモデル
 	GameEngine::Model* objPlaneModel_;
@@ -87,4 +91,16 @@ private: // シーン機能
 	// gltfのplaneモデル
 	GameEngine::Model* gltfPlaneModel_;
 	GameEngine::WorldTransform gltfPlaneWorldTransform_;
+
+private:
+
+	/// <summary>
+	/// デバックした値を登録
+	/// </summary>
+	void RegisterDebugParam();
+
+	/// <summary>
+	/// デバックした値を取得
+	/// </summary>
+	void ApplyDebugParam();
 };
