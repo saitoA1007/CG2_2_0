@@ -64,6 +64,9 @@ private: // シーン機能
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
 
+	// 太陽の位置を描画するカメラ
+	std::unique_ptr<GameEngine::Camera> directionLightCamera_;
+
 	// ライト
 	std::unique_ptr<GameEngine::LightManager> lightManager_;
 	// 平行光源
@@ -99,6 +102,9 @@ private: // シーン機能
 	std::map<std::string, AnimationData> walkAnimationData_;
 	// アニメーションを再生するクラス
 	std::unique_ptr<GameEngine::Animator> walkAnimator_;
+
+	// デバック用
+	CD3DX12_GPU_DESCRIPTOR_HANDLE handle_;
 
 private:
 

@@ -4,6 +4,7 @@
 
 #include"GameParamEditor.h"
 #include"FPSCounter.h"
+#include"LogManager.h"
 
 using namespace GameEngine;
 
@@ -19,6 +20,10 @@ void GameScene::Initialize(SceneContext* context) {
 	// 登録するパラメータを設定
 	GameParamEditor::GetInstance()->SetActiveScene("GameScene");
 
+	// 影を描画するパス
+	context->renderPassController->AddPass("ShadowPass", true);
+	handle_ = context->renderPassController->GetSrvHandle("ShadowPass");
+
 	// デフォルトで描画するパス
 	context->renderPassController->AddPass("DefaultPass", true);
 	// 最終的な描画先を設定
@@ -27,7 +32,11 @@ void GameScene::Initialize(SceneContext* context) {
 
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
-	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
+	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
+
+	// 太陽によるカメラの位置を設定
+	directionLightCamera_ = std::make_unique<Camera>();
+	directionLightCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.6f,0.0f,0.0f},{0.0f,22.0f,-32.0f} }, 1280, 720);
 
 	// 平行光源ライト
 	lightManager_ = std::make_unique<LightManager>();
@@ -89,6 +98,8 @@ void GameScene::Update() {
 	// カメラの更新処理
 	mainCamera_->Update();
 
+	directionLightCamera_->Update();
+
 #ifdef _DEBUG
 
 	// 光源をデバック
@@ -96,6 +107,9 @@ void GameScene::Update() {
 	// カメラのデバック
 	ImGui::DragFloat3("CameraTranslate", &mainCamera_->transform_.translate.x, 0.01f);
 	ImGui::DragFloat3("CameraRotate", &mainCamera_->transform_.translate.x, 0.01f);
+
+	ImGui::DragFloat3("DCameraTranslate", &directionLightCamera_->transform_.translate.x, 0.01f);
+	ImGui::DragFloat3("DCameraRotate", &directionLightCamera_->transform_.rotate.x, 0.01f);
 
 	// 平行光源
 	if (ImGui::TreeNodeEx("Light", ImGuiTreeNodeFlags_Framed)) {
@@ -107,10 +121,56 @@ void GameScene::Update() {
 		ImGui::TreePop();
 	}
 	ImGui::End();
+
+	// シャドウマップ用の描画データをデバック
+	ImGui::Begin("ShadowScene");
+	ImVec2 sceneWindowSize = ImGui::GetContentRegionAvail();
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = handle_;
+	ImVec2 imageSize = sceneWindowSize;
+	float windowAspect = sceneWindowSize.x / sceneWindowSize.y;
+	float target = 1280.0f / 720.0f;
+	if (windowAspect > target) {
+		// ウィンドウが横長すぎる場合、高さに合わせる
+		imageSize.x = sceneWindowSize.y * target;
+		imageSize.y = sceneWindowSize.y;
+	} else {
+		// ウィンドウが縦長すぎる場合、幅に合わせる
+		imageSize.x = sceneWindowSize.x;
+		imageSize.y = sceneWindowSize.x / target;
+	}
+	float offsetX = (sceneWindowSize.x - imageSize.x) * 0.5f;
+	ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+	ImGui::SetCursorScreenPos(ImVec2(cursorPos.x + offsetX, cursorPos.y));
+	ImGui::Image((ImTextureID)srvHandle.ptr, imageSize);
+	ImGui::End();
 #endif
 }
 
 void GameScene::Draw(const bool& isDebugView) {
+
+	// 描画パスの管理を取得
+	auto pass = context_->renderPassController;
+
+	// 影を描画するためのパス
+	pass->PrePass("ShadowPass");
+
+	// 太陽の位置のカメラ設定を
+	ModelRenderer::SetCamera(directionLightCamera_->GetVPMatrix(), directionLightCamera_->GetCameraResource());
+
+	// 3Dモデルの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
+
+	// 地面を描画
+	ModelRenderer::DrawLight(lightManager_->GetResource());
+	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
+
+	// アニメーションの描画前処理
+	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
+
+	// アニメーションしているモデルを描画
+	ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_);
+
+	pass->PostPass("ShadowPass");
 
 	// 描画に使用するカメラを設定
 	if (isDebugView) {
@@ -120,9 +180,6 @@ void GameScene::Draw(const bool& isDebugView) {
 		// 描画に使用するカメラを設定
 		ModelRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
 	}
-
-	// 描画パスの管理を取得
-	auto pass = context_->renderPassController;
 
 	// 通常描画
 	pass->PrePass("DefaultPass");

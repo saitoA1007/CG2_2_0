@@ -15,13 +15,15 @@ namespace GameEngine {
 		Camera() = default;
 		~Camera();
 
+		static void StaticInitialize(ID3D12Device* device);
+
 		/// <summary>
 		/// 初期化
 		/// </summary>
 		/// <param name="transform">Scale,Rotate,Translate : 各型Vector3</param>
 		/// <param name="kClientWidth">画面横幅</param>
 		/// <param name="kClientHeight">画面縦幅</param>
-		void Initialize(const Transform& transform, int kClientWidth, int kClientHeight, ID3D12Device* device = nullptr);
+		void Initialize(const Transform& transform, int kClientWidth, int kClientHeight);
 
 		/// <summary>
 		/// カメラの更新処理
@@ -119,5 +121,7 @@ namespace GameEngine {
 		// カメラのリソース
 		Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
 		CameraForGPU* cameraForGPU_ = nullptr;
+
+		static ID3D12Device* device_;
 	};
 }

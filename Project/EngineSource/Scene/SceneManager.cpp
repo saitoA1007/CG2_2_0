@@ -1,7 +1,7 @@
 #include"SceneManager.h"
 
 #include"ImguiManager.h"
-#include"ModelRenderer.h"
+//#include"ModelRenderer.h"
 
 using namespace GameEngine;
 
@@ -122,7 +122,7 @@ void SceneManager::Draw() {
 	currentScene_->Draw(isDebugView_);
 
 	// シーン遷移演出を描画
-	sceneTransition_->Draw();
+	//sceneTransition_->Draw();
 }
 
 void SceneManager::LoadModelData() {

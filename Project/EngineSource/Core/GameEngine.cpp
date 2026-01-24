@@ -109,6 +109,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	Material::StaticInitialize(graphicsDevice_->GetDevice());
 	// デバック描画用
 	DebugRenderer::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), psoManager_.get());
+	Camera::StaticInitialize(graphicsDevice_->GetDevice());
 
 	// fpsを計測する
 	fpsCounter_ = std::make_unique<FpsCounter>();

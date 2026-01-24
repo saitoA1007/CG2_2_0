@@ -28,7 +28,7 @@ void TitleScene::Initialize(SceneContext* context) {
 
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
-	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720, context_->graphicsDevice->GetDevice());
+	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
 }
 
 void TitleScene::Update() {

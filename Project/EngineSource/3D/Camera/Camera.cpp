@@ -4,6 +4,8 @@
 
 using namespace GameEngine;
 
+ID3D12Device* Camera::device_ = nullptr;
+
 Camera::~Camera() {
 	if (cameraForGPU_) {
 		cameraResource_->Unmap(0, nullptr);
@@ -11,7 +13,11 @@ Camera::~Camera() {
 	}
 }
 
-void Camera::Initialize(const Transform& transform, int kClientWidth, int kClientHeight, ID3D12Device* device) {
+void Camera::StaticInitialize(ID3D12Device* device) {
+	device_ = device;
+}
+
+void Camera::Initialize(const Transform& transform, int kClientWidth, int kClientHeight) {
 	// Matrixの初期化
 	transform_ = transform;
 	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -19,9 +25,9 @@ void Camera::Initialize(const Transform& transform, int kClientWidth, int kClien
 	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, static_cast<float>(kClientWidth) / static_cast<float>(kClientHeight), 0.1f, 200.0f);
 	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 
-	if (device) {
+	if (device_) {
 		// カメラリソースを作成
-		cameraResource_ = CreateBufferResource(device, sizeof(CameraForGPU));
+		cameraResource_ = CreateBufferResource(device_, sizeof(CameraForGPU));
 		// データを書き込む
 		// 書き込むためのアドレスを取得
 		cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPU_));

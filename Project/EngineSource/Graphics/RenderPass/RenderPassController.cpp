@@ -67,6 +67,12 @@ void RenderPassController::SetEndPass(const std::string& name) {
 	resultSrvHandle_ = render->second->GetSrvHandle();
 }
 
-CD3DX12_GPU_DESCRIPTOR_HANDLE RenderPassController::GetFinalOutputSRV() {
-	return resultSrvHandle_;
+CD3DX12_GPU_DESCRIPTOR_HANDLE RenderPassController::GetSrvHandle(const std::string& name) {
+	// 登録されていなければエラー
+	auto render = renderPassList_.find(name);
+	if (render == renderPassList_.end()) {
+		assert(false && "Not found RenderPass");
+	}
+
+	return render->second->GetSrvHandle();
 }

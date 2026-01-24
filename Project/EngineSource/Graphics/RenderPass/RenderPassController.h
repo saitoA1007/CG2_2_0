@@ -27,7 +27,11 @@ namespace GameEngine {
 		void SetEndPass(const std::string& name);
 
 		// 最終敵な描画先
-		CD3DX12_GPU_DESCRIPTOR_HANDLE GetFinalOutputSRV();
+		CD3DX12_GPU_DESCRIPTOR_HANDLE GetFinalOutputSRV() { return resultSrvHandle_; }
+
+		CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvHandle(const std::string& name);
+
+		//uint32_t SrvIndex(const std::string& name);
 
 	private:
 		RenderPassController(const RenderPassController&) = delete;
