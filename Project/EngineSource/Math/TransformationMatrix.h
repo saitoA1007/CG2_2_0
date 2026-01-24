@@ -22,4 +22,5 @@ static_assert(sizeof(ParticleForGPU) == 160);
 struct alignas(16) CameraForGPU {
 	Vector3 worldPosition;
 	float pad;
+	Matrix4x4 vpMatrix;
 };

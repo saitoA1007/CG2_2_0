@@ -28,6 +28,7 @@ cbuffer LightGroup : register(b1)
 struct Camera
 {
     float32_t3 worldPosition;
+    float32_t4x4 vpMatrix;
 };
 ConstantBuffer<Camera> gCamera : register(b2);
 
