@@ -57,7 +57,7 @@ void TitleScene::Draw(const bool& isDebugView) {
 	// モデルの単体描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::Grid);
 	// グリッドを描画
-	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_, context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_);
 
 	pass->PostPass("DefaultPass");
 

@@ -82,7 +82,7 @@ namespace GameEngine {
 		/// <summary>
 		/// グリッドを描画
 		/// </summary>
-		static void DrawGrid(const Model* model, WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* cameraResource);
+		static void DrawGrid(const Model* model, WorldTransform& worldTransform);
 
 		/// <summary>
 		/// アニメーションのあるモデルを描画

@@ -48,9 +48,7 @@ void ModelRenderer::SetCamera(const Matrix4x4& vpMatrix, ID3D12Resource* cameraR
 void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const Material* material) {
 	// カメラ座標に変換
 	if (model->IsLoad()) {
-		worldTransform.SetWVPMatrix(model->GetLocalMatrix(), vpMatrix_);
-	} else {
-		worldTransform.SetWVPMatrix(vpMatrix_);
+		worldTransform.SetWVPMatrix(model->GetLocalMatrix());
 	}
 
 	// メッシュを取得
@@ -71,6 +69,7 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
@@ -83,9 +82,7 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, ID3D12Resource* lightGroupResource, const Material* material) {
 	// カメラ座標に変換
 	if (model->IsLoad()) {
-		worldTransform.SetWVPMatrix(model->GetLocalMatrix(), vpMatrix_);
-	} else {
-		worldTransform.SetWVPMatrix(vpMatrix_);
+		worldTransform.SetWVPMatrix(model->GetLocalMatrix());
 	}
 
 	// メッシュを取得
@@ -106,8 +103,8 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, ID3
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
-		commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGPUVirtualAddress());
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
 		} else {
@@ -123,9 +120,9 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 
 	// カメラ座標に変換
 	if (model->IsLoad()) {
-		worldTransforms.SetWVPMatrix(numInstance, model->GetLocalMatrix(), vpMatrix_);
+		worldTransforms.SetWVPMatrix(numInstance, model->GetLocalMatrix());
 	} else {
-		worldTransforms.SetWVPMatrix(numInstance, vpMatrix_);
+		worldTransforms.SetWVPMatrix(numInstance);
 	}
 
 	// メッシュを取得
@@ -146,6 +143,7 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 		}
 		commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), numInstance, 0, 0, 0);
@@ -156,9 +154,7 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 }
 
 void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, const Material* material) {
-	// カメラ座標に変換
-	worldTransform.SetWVPMatrix(vpMatrix_);
-
+	
 	// メッシュを取得
 	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
 
@@ -185,6 +181,7 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 
 		commandList_->SetGraphicsRootDescriptorTable(3, model->skinClusterBron_->paletteSrvHandle.second);
+		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
@@ -194,9 +191,7 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 	}
 }
 
-void ModelRenderer::DrawGrid(const Model* model, WorldTransform& worldTransform, const Matrix4x4& VPMatrix, ID3D12Resource* cameraResource) {
-
-	worldTransform.SetWVPMatrix(VPMatrix);
+void ModelRenderer::DrawGrid(const Model* model, WorldTransform& worldTransform) {
 
 	// メッシュを取得
 	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
@@ -205,16 +200,14 @@ void ModelRenderer::DrawGrid(const Model* model, WorldTransform& worldTransform,
 	commandList_->IASetIndexBuffer(&meshes[0]->GetIndexBufferView());
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, cameraResource->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, cameraResource_->GetGPUVirtualAddress());
 	commandList_->DrawIndexedInstanced(meshes[0]->GetTotalIndices(), 1, 0, 0, 0);
 }
 
 void ModelRenderer::DrawSkybox(const Model* model, WorldTransform& worldTransform, const Material* material) {
 	// カメラ座標に変換
 	if (model->IsLoad()) {
-		worldTransform.SetWVPMatrix(model->GetLocalMatrix(), vpMatrix_);
-	} else {
-		worldTransform.SetWVPMatrix(vpMatrix_);
+		worldTransform.SetWVPMatrix(model->GetLocalMatrix());
 	}
 
 	// メッシュを取得
@@ -235,6 +228,7 @@ void ModelRenderer::DrawSkybox(const Model* model, WorldTransform& worldTransfor
 		}
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
@@ -245,7 +239,6 @@ void ModelRenderer::DrawSkybox(const Model* model, WorldTransform& worldTransfor
 }
 
 void ModelRenderer::DrawLight(ID3D12Resource* lightGroupResource) {
-	commandList_->SetGraphicsRootConstantBufferView(3, lightGroupResource->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(5, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 }

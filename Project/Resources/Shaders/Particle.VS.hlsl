@@ -2,13 +2,19 @@
 
 struct ParticleForGPU
 {
-    float32_t4x4 WVP;
     float32_t4x4 World;
     float32_t4 color;
     uint32_t textureHandle;
     float32_t3 padding;
 };
 StructuredBuffer<ParticleForGPU> gParticle : register(t0);
+
+struct Camera
+{
+    float32_t3 worldPosition;
+    float32_t4x4 vpMatrix;
+};
+ConstantBuffer<Camera> gCamera : register(b0);
 
 struct VertexShaderInput
 {
@@ -20,7 +26,8 @@ struct VertexShaderInput
 VertexShaderOutput main(VertexShaderInput input, uint32_t instanceId : SV_InstanceID)
 {
     VertexShaderOutput output;
-    output.position = mul(input.position, gParticle[instanceId].WVP);
+    float32_t4 worldPos = mul(input.position, gParticle[instanceId].World);
+    output.position = mul(worldPos, gCamera.vpMatrix);
     output.texcoord = input.texcoord;
     output.color = gParticle[instanceId].color;
     output.textureHandle = gParticle[instanceId].textureHandle;

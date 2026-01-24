@@ -48,7 +48,6 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& 
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
 	// 単位行列を書き込んでおく
 	for (uint32_t index = 0; index < numInstance_; ++index) {
-		instancingData_[index].WVP = MakeIdentity4x4();
 		instancingData_[index].World = MakeIdentity4x4();
 		instancingData_[index].color = { 1.0f,1.0f,1.0f,1.0f };
 		instancingData_[index].textureHandle = 0;
@@ -77,22 +76,20 @@ void WorldTransforms::UpdateTransformMatrix(const uint32_t& numInstance) {
 	}
 }
 
-void WorldTransforms::SetWVPMatrix(const uint32_t& numInstance,const Matrix4x4& VPMatrix) {
+void WorldTransforms::SetWVPMatrix(const uint32_t& numInstance) {
 	// 数によって更新を変える
 	for (uint32_t i = 0; i < numInstance; ++i) {
-		instancingData_[i].WVP = Multiply(transformDatas_[i].worldMatrix, VPMatrix);
 		instancingData_[i].World = transformDatas_[i].worldMatrix;
 		instancingData_[i].color = transformDatas_[i].color;
 		instancingData_[i].textureHandle = transformDatas_[i].textureHandle;
 	}
 }
 
-void WorldTransforms::SetWVPMatrix(const uint32_t& numInstance, const Matrix4x4& localMatrix, const Matrix4x4& VPMatrix) {
+void WorldTransforms::SetWVPMatrix(const uint32_t& numInstance, const Matrix4x4& localMatrix) {
 
 	// 数によって更新を変える
 	for (uint32_t i = 0; i < numInstance; ++i) {
-		instancingData_[i].WVP = Multiply(localMatrix, Multiply(transformDatas_[i].worldMatrix, VPMatrix));
-		instancingData_[i].World = transformDatas_[i].worldMatrix;
+		instancingData_[i].World = Multiply(localMatrix, transformDatas_[i].worldMatrix);
 		instancingData_[i].color = transformDatas_[i].color;
 		instancingData_[i].textureHandle = transformDatas_[i].textureHandle;
 	}

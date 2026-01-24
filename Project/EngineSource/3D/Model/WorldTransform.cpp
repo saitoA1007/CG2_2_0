@@ -29,7 +29,6 @@ void WorldTransform::Initialize(const Transform& transform) {
 	// 書き込むためのアドレスを取得
 	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	// 単位行列を書き込んでおく
-	transformationMatrixData_->WVP = MakeIdentity4x4();
 	transformationMatrixData_->World = MakeIdentity4x4();
 	transformationMatrixData_->worldInverseTranspose = MakeIdentity4x4();
 }
@@ -44,15 +43,8 @@ void WorldTransform::UpdateTransformMatrix() {
 	transformationMatrixData_->worldInverseTranspose = InverseTranspose(worldMatrix_);
 }
 
-void WorldTransform::SetWVPMatrix(const Matrix4x4& localMatrix,const Matrix4x4& VPMatrix) {
-	transformationMatrixData_->WVP = Multiply(localMatrix ,Multiply(worldMatrix_, VPMatrix));
+void WorldTransform::SetWVPMatrix(const Matrix4x4& localMatrix) {
 	transformationMatrixData_->World = Multiply(localMatrix,worldMatrix_);
-	transformationMatrixData_->worldInverseTranspose = InverseTranspose(worldMatrix_);
-}
-
-void WorldTransform::SetWVPMatrix(const Matrix4x4& VPMatrix) {
-	transformationMatrixData_->WVP = Multiply(worldMatrix_, VPMatrix);
-	transformationMatrixData_->World = worldMatrix_;
 	transformationMatrixData_->worldInverseTranspose = InverseTranspose(worldMatrix_);
 }
 

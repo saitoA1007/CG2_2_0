@@ -263,7 +263,7 @@ void PSOManager::DefaultLoadPSO() {
     rootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
     rootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
-    rootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL);
     rootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddSRVDescriptorTable(1, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 1, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
@@ -301,6 +301,7 @@ void PSOManager::DefaultLoadPSO() {
     instancingRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
     instancingRootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_VERTEX);
     instancingRootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount),0, D3D12_SHADER_VISIBILITY_PIXEL);
+    instancingRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
     instancingRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     instancingRootSigBuilder.CreateRootSignature();
     RegisterPSO("Instancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
@@ -320,7 +321,7 @@ void PSOManager::DefaultLoadPSO() {
     RootSignatureBuilder gridRootSigBuilder;
     gridRootSigBuilder.Initialize(device_);
     gridRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
-    gridRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
+    gridRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL);
     gridRootSigBuilder.CreateRootSignature();
     InputLayoutBuilder gridInputLayoutBuilder;
     gridInputLayoutBuilder.CreateGridElement();
@@ -357,7 +358,7 @@ void PSOManager::DefaultLoadPSO() {
     animationRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
     animationRootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
     animationRootSigBuilder.AddSRVDescriptorTable(0, 1,0, D3D12_SHADER_VISIBILITY_VERTEX);
-    animationRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
+    animationRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL);
     animationRootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
     animationRootSigBuilder.AddSRVDescriptorTable(1, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 1, D3D12_SHADER_VISIBILITY_PIXEL);
     animationRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
@@ -382,6 +383,7 @@ void PSOManager::DefaultLoadPSO() {
     skyRoot.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
     skyRoot.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
     skyRoot.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    skyRoot.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_VERTEX);
     skyRoot.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     skyRoot.CreateRootSignature();
     InputLayoutBuilder skyInput;

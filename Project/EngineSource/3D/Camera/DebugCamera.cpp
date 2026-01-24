@@ -25,6 +25,7 @@ void DebugCamera::Initialize(const Vector3& translate,int width, int height, ID3
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPU_));
 	// 単位行列を書き込んでおく
 	cameraForGPU_->worldPosition = translate_;
+	cameraForGPU_->vpMatrix = MakeIdentity4x4();
 
 	// 球面座標系で移動
 	translate_.x = targetPos_.x + distance_ * std::sinf(mouseMove_.y) * std::sinf(mouseMove_.x);
@@ -98,6 +99,7 @@ void DebugCamera::Update(Input* input) {
 	cameraForGPU_->worldPosition = GetWorldPosition();
 	// カメラの変更した内容を適用する処理
 	viewMatrix_ = InverseMatrix(worldMatrix_);
+	cameraForGPU_->vpMatrix = GetVPMatrix();
 
 	// 初期位置にリセットする
 	if (input->PushKey(DIK_G) && input->PushKey(DIK_LCONTROL)) {

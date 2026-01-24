@@ -5,19 +5,16 @@
 #include<cstdint>
 
 struct alignas(16) TransformationMatrix {
-	Matrix4x4 WVP;
 	Matrix4x4 World;
 	Matrix4x4 worldInverseTranspose;
 };
 
 struct alignas(16) ParticleForGPU {
-	Matrix4x4 WVP;
 	Matrix4x4 World;
 	Vector4 color;
 	uint32_t textureHandle;
 	float padding[3];
 };
-static_assert(sizeof(ParticleForGPU) == 160);
 
 struct alignas(16) CameraForGPU {
 	Vector3 worldPosition;

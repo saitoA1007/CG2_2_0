@@ -2,11 +2,17 @@
 
 struct TransformationMatrix
 {
-    float32_t4x4 WVP;
     float32_t4x4 World;
     float32_t4x4 WorldInverseTranspose;
 };
 ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b0);
+
+struct Camera
+{
+    float32_t3 worldPosition;
+    float32_t4x4 vpMatrix;
+};
+ConstantBuffer<Camera> gCamera : register(b1);
 
 struct VertexShaderInput
 {
@@ -52,7 +58,8 @@ VertexShaderOutput main(VertexShaderInput input)
     // Skinning計算をおこなって、Skinning後の頂点情報を取得する
     Skinned skinned = Skinning(input);
     // Skinning結果を元に変換
-    output.position = mul(skinned.position, gTransformationMatrix.WVP);
+    float32_t4 worldPos = mul(skinned.position, gTransformationMatrix.World);
+    output.position = mul(worldPos, gCamera.vpMatrix);
     output.worldPosition = mul(skinned.position, gTransformationMatrix.World).xyz;
     output.texcoord = input.texcoord;
     output.normal = normalize(mul(skinned.normal, (float32_t3x3)gTransformationMatrix.WorldInverseTranspose));

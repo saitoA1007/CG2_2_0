@@ -16,7 +16,14 @@ Texture2D<float32_t4> gTexture[] : register(t0,space0);
 TextureCube<float32_t4> gCubeTexture[] : register(t1,space1);
 SamplerState gSampler : register(s0);
 
-cbuffer LightGroup : register(b1)
+struct Camera
+{
+    float32_t3 worldPosition;
+    float32_t4x4 vpMatrix;
+};
+ConstantBuffer<Camera> gCamera : register(b1);
+
+cbuffer LightGroup : register(b2)
 {
     DirectionalLight gDirectionalLight;
     PointLight gPointLight;
@@ -24,13 +31,6 @@ cbuffer LightGroup : register(b1)
     uint32_t environmentTexture;
     int32_t isActiveEnvironment;
 };
-
-struct Camera
-{
-    float32_t3 worldPosition;
-    float32_t4x4 vpMatrix;
-};
-ConstantBuffer<Camera> gCamera : register(b2);
 
 struct PixelShaderOutput
 {

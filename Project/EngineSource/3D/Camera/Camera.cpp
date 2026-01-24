@@ -33,6 +33,7 @@ void Camera::Initialize(const Transform& transform, int kClientWidth, int kClien
 		cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPU_));
 		// 単位行列を書き込んでおく
 		cameraForGPU_->worldPosition = GetWorldPosition();
+		cameraForGPU_->vpMatrix = MakeIdentity4x4();
 	}
 }
 
@@ -43,6 +44,7 @@ void Camera::Update() {
 
 	if (cameraForGPU_) {
 		cameraForGPU_->worldPosition = GetWorldPosition();
+		cameraForGPU_->vpMatrix = VPMatrix_;
 	}	
 }
 
@@ -52,6 +54,7 @@ void Camera::UpdateFromWorldMatrix() {
 
 	if (cameraForGPU_) {
 		cameraForGPU_->worldPosition = GetWorldPosition();
+		cameraForGPU_->vpMatrix = VPMatrix_;
 	}
 }
 
@@ -85,5 +88,6 @@ void Camera::SetCamera(const Camera& camera) {
 
 	if (cameraForGPU_) {
 		cameraForGPU_->worldPosition = camera.GetWorldPosition();
+		cameraForGPU_->vpMatrix = VPMatrix_;
 	}
 }
