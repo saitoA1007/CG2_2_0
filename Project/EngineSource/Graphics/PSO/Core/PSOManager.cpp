@@ -99,6 +99,76 @@ void PSOManager::RegisterPSO(const std::string& name, const CreatePSOData& psoDa
     LogManager::GetInstance().Log("PSO registerd name : " + name);
 }
 
+void PSOManager::RegisterShadowMapPSO(const std::string& name, const CreatePSOData& psoData, RootSignatureBuilder* rootSignature, InputLayoutBuilder* inputLayout) {
+    // 既に登録されていたら飛ばす
+    if (psoList_.find(name) != psoList_.end()) {
+        return;
+    }
+
+    // シェーダーをコンパイル
+    LogManager::GetInstance().Log("Compiling vertex shader");
+    Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = shaderCompiler_.CompileShader(ShaderCompiler::Type::VS, psoData.vsPath);
+
+    if (!vsBlob) {
+        LogManager::GetInstance().Log("Shader compilation failed for: " + name);
+        return;
+    }
+
+    // ルートシグネチャが登録されていなければ生成する
+    if (rootSignatureList_.find(psoData.rootSigName) == rootSignatureList_.end()) {
+        RootSignatureData rootSignatureData;
+        rootSignatureData.rootSignature = rootSignature->GetRootSignature();
+        rootSignatureData.parameterTypes = rootSignature->GetParameterTypes();
+        // RootSignatureを保存
+        rootSignatureList_[psoData.rootSigName] = rootSignatureData;
+    }
+
+    // DepthStencilStateの設定
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+    depthStencilDesc.DepthEnable = true;
+    depthStencilDesc.DepthWriteMask = psoData.depthMask;
+    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+    // かリングを設定
+    D3D12_RASTERIZER_DESC rast{};
+    rast.FillMode = D3D12_FILL_MODE_SOLID;
+    rast.CullMode = D3D12_CULL_MODE_BACK;
+    // シャドウアクネ対策
+    rast.DepthBias = 1000;
+    rast.SlopeScaledDepthBias = 1.0f;
+    rast.DepthBiasClamp = 0.0f;
+
+    // PSO設定
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
+    psoDesc.pRootSignature = rootSignatureList_[psoData.rootSigName].rootSignature.Get();
+    psoDesc.InputLayout = inputLayout->GetInputLayoutDesc();
+    psoDesc.RasterizerState = rast;
+    psoDesc.BlendState = blendBuilder_.GetBlendDesc(psoData.blendMode);
+    psoDesc.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
+    psoDesc.PS = { nullptr,0 };
+    psoDesc.DepthStencilState = depthStencilDesc;
+    psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    psoDesc.NumRenderTargets = 0;
+    psoDesc.RTVFormats[0] = DXGI_FORMAT_UNKNOWN;
+    psoDesc.PrimitiveTopologyType = psoData.primitiveType;
+    psoDesc.SampleDesc.Count = 1;
+    psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+    // PSOの生成
+    PSOData pso;
+    // リンクするルートシグネチャを保存
+    pso.rootSigName = psoData.rootSigName;
+
+    // 実際に生成
+    HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso.graphicsPipelineState));
+    assert(SUCCEEDED(hr));
+
+    // PSOを保存
+    psoList_[name] = pso;
+
+    LogManager::GetInstance().Log("PSO registerd name : " + name);
+}
+
 void PSOManager::LoadFromJson(const std::string& fileName) {
 
 	// 読み込みJSONファイルのフルパスを合成する
@@ -368,8 +438,6 @@ void PSOManager::DefaultLoadPSO() {
     animationInputLayoutBuilder.CreateDefaultAnimationElement();
     RegisterPSO("Animation", animation, &animationRootSigBuilder, &animationInputLayoutBuilder);
 
-    LogManager::GetInstance().Log("Default PSOs loaded");
-
     // skyboxのpso設定
     CreatePSOData skybox;
     skybox.rootSigName = "Skybox";
@@ -390,6 +458,20 @@ void PSOManager::DefaultLoadPSO() {
     InputLayoutBuilder skyInput;
     skyInput.CreateDefaultObjElement();
     RegisterPSO("Skybox", skybox, &skyRoot, &skyInput);
+
+    // ShadowMap用のPSO設定
+    CreatePSOData shadowMap;
+    shadowMap.rootSigName = "ShadowMap";
+    shadowMap.vsPath = L"Resources/Shaders/ShadowMap.VS.hlsl";
+    shadowMap.blendMode = BlendMode::kBlendModeNormal;
+    RootSignatureBuilder shadowMapRootSigBuilder;
+    shadowMapRootSigBuilder.Initialize(device_);
+    shadowMapRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
+    shadowMapRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_VERTEX);
+    shadowMapRootSigBuilder.CreateRootSignature();
+    RegisterShadowMapPSO("ShadowMap", shadowMap, &shadowMapRootSigBuilder, &inputLayoutBuilder);
+
+    LogManager::GetInstance().Log("Default PSOs loaded");
 }
 
 void PSOManager::DeaultLoadPostEffectPSO() {

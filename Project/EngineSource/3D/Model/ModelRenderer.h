@@ -23,6 +23,7 @@ namespace GameEngine {
 		Grid,  // グリッド描画用
 		AnimationModel, // アニメーション描画用
 		Skybox, // スカイボックスの描画用
+		ShadowMap, // シャドウマップ用
 	};
 
 	class ModelRenderer {
@@ -105,6 +106,13 @@ namespace GameEngine {
 		/// <param name="worldTransform"></param>
 		/// <param name="material"></param>
 		static void DrawSkybox(const Model* model, WorldTransform& worldTransform, const Material* material = nullptr);
+
+		/// <summary>
+		/// シャドウマップ用の描画処理
+		/// </summary>
+		/// <param name="model"></param>
+		/// <param name="worldTransform"></param>
+		static void DrawShadowMap(const Model* model, WorldTransform& worldTransform);
 
 	private:
 

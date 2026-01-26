@@ -21,14 +21,16 @@ void GameScene::Initialize(SceneContext* context) {
 	GameParamEditor::GetInstance()->SetActiveScene("GameScene");
 
 	// 影を描画するパス
-	context->renderPassController->AddPass("ShadowPass");
-	handle_ = context->renderPassController->GetSrvHandle("ShadowPass");
+	context->renderPassController->AddPass("ShadowPass",RenderTextureMode::DsvOnly);
+	//handle_ = context->renderPassController->GetSrvHandle("ShadowPass");
 
 	// デフォルトで描画するパス
 	context->renderPassController->AddPass("DefaultPass");
 	// 最終的な描画先を設定
 	context_->renderPassController->SetEndPass("DefaultPass");
 #pragma endregion
+
+	InputRegisterCommand();
 
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
@@ -52,7 +54,7 @@ void GameScene::Initialize(SceneContext* context) {
 	terrainModel_->SetDefaultIsEnableLight(true);
 	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
 	terrainModel_->SetDefaultTextureHandle(grassGH_);
-	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,0.0f,0.0f} });
+	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,-1.0f,0.0f} });
 
 	// スカイボックスの生成
 	skyboxModel_ = context_->modelManager->GetNameByModel("Skybox");
@@ -60,6 +62,13 @@ void GameScene::Initialize(SceneContext* context) {
 	skyboxGH_ = context_->textureManager->GetHandleByName("rostock_laage_airport_4k.dds");
 	skyboxModel_->SetDefaultTextureHandle(skyboxGH_);
 	lightManager_->SetEnvironmentTexture(skyboxGH_);
+
+	// プレイヤーモデルを生成
+	playerModel_ = context_->modelManager->GetNameByModel("Cube");
+	playerModel_->SetDefaultIsEnableLight(true);
+	// プレイヤークラスを初期化
+	player_ = std::make_unique<Player>();
+	player_->Initialize();
 
 	// 平面モデルを生成
 	planeModel_ = context_->modelManager->GetNameByModel("Plane");
@@ -85,6 +94,9 @@ void GameScene::Initialize(SceneContext* context) {
 void GameScene::Update() {
 
 	ApplyDebugParam();
+
+	// プレイヤーの更新処理
+	player_->Update(context_->inputCommand);
 
 	// 地面の更新処理
 	terrainWorldTransform_.UpdateTransformMatrix();
@@ -123,26 +135,26 @@ void GameScene::Update() {
 	ImGui::End();
 
 	// シャドウマップ用の描画データをデバック
-	ImGui::Begin("ShadowScene");
-	ImVec2 sceneWindowSize = ImGui::GetContentRegionAvail();
-	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = handle_;
-	ImVec2 imageSize = sceneWindowSize;
-	float windowAspect = sceneWindowSize.x / sceneWindowSize.y;
-	float target = 1280.0f / 720.0f;
-	if (windowAspect > target) {
-		// ウィンドウが横長すぎる場合、高さに合わせる
-		imageSize.x = sceneWindowSize.y * target;
-		imageSize.y = sceneWindowSize.y;
-	} else {
-		// ウィンドウが縦長すぎる場合、幅に合わせる
-		imageSize.x = sceneWindowSize.x;
-		imageSize.y = sceneWindowSize.x / target;
-	}
-	float offsetX = (sceneWindowSize.x - imageSize.x) * 0.5f;
-	ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-	ImGui::SetCursorScreenPos(ImVec2(cursorPos.x + offsetX, cursorPos.y));
-	ImGui::Image((ImTextureID)srvHandle.ptr, imageSize);
-	ImGui::End();
+	//ImGui::Begin("ShadowScene");
+	//ImVec2 sceneWindowSize = ImGui::GetContentRegionAvail();
+	//D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = handle_;
+	//ImVec2 imageSize = sceneWindowSize;
+	//float windowAspect = sceneWindowSize.x / sceneWindowSize.y;
+	//float target = 1280.0f / 720.0f;
+	//if (windowAspect > target) {
+	//	// ウィンドウが横長すぎる場合、高さに合わせる
+	//	imageSize.x = sceneWindowSize.y * target;
+	//	imageSize.y = sceneWindowSize.y;
+	//} else {
+	//	// ウィンドウが縦長すぎる場合、幅に合わせる
+	//	imageSize.x = sceneWindowSize.x;
+	//	imageSize.y = sceneWindowSize.x / target;
+	//}
+	//float offsetX = (sceneWindowSize.x - imageSize.x) * 0.5f;
+	//ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+	//ImGui::SetCursorScreenPos(ImVec2(cursorPos.x + offsetX, cursorPos.y));
+	//ImGui::Image((ImTextureID)srvHandle.ptr, imageSize);
+	//ImGui::End();
 #endif
 }
 
@@ -151,24 +163,20 @@ void GameScene::Draw(const bool& isDebugView) {
 	// 描画パスの管理を取得
 	auto pass = context_->renderPassController;
 
-	// 影を描画するためのパス
-	pass->PrePass("ShadowPass");
-
 	// 太陽の位置のカメラ設定を
 	ModelRenderer::SetCamera(directionLightCamera_->GetVPMatrix(), directionLightCamera_->GetCameraResource());
 
-	// 3Dモデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
+	// 影を描画するためのパス
+	pass->PrePass("ShadowPass");
+
+	// shadowMapの描画
+	ModelRenderer::PreDraw(RenderMode3D::ShadowMap);
 
 	// 地面を描画
-	ModelRenderer::DrawLight(lightManager_->GetResource());
-	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
+	ModelRenderer::DrawShadowMap(terrainModel_, terrainWorldTransform_);
 
-	// アニメーションの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
-
-	// アニメーションしているモデルを描画
-	ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_);
+	// プレイヤーを描画
+	ModelRenderer::DrawShadowMap(playerModel_, player_->GetWorldTransform());
 
 	pass->PostPass("ShadowPass");
 
@@ -200,6 +208,10 @@ void GameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::DrawLight(lightManager_->GetResource());
 	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
 
+	// プレイヤーを描画
+	ModelRenderer::DrawLight(lightManager_->GetResource());
+	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
+
 	// アニメーションの描画前処理
 	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 
@@ -208,6 +220,21 @@ void GameScene::Draw(const bool& isDebugView) {
 
 	pass->PostPass("DefaultPass");
 }
+
+void GameScene::InputRegisterCommand() {
+	// 移動の入力コマンドを登録する
+	context_->inputCommand->RegisterCommand("MoveUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
+	context_->inputCommand->RegisterCommand("MoveDown", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });
+	context_->inputCommand->RegisterCommand("MoveLeft", { {InputState::KeyPush, DIK_A },{InputState::PadLeftStick,0,{-1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_LEFT } });
+	context_->inputCommand->RegisterCommand("MoveRight", { {InputState::KeyPush, DIK_D },{InputState::PadLeftStick,0,{1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_RIGHT } });
+	// ジャンプコマンドを登録する
+	context_->inputCommand->RegisterCommand("Jump", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
+
+	// カメラ操作のコマンドを登録する
+	context_->inputCommand->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
+	context_->inputCommand->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
+}
+
 
 void GameScene::RegisterBebugParam() {
 	GameParamEditor::GetInstance()->AddItem("Test1", "testNum", testNumber);

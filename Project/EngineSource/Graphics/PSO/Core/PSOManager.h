@@ -79,6 +79,15 @@ namespace GameEngine {
 		/// <param name="inputLayout"></param>
 		void RegisterPSO(const std::string& name, const CreatePSOData& psoData,RootSignatureBuilder* rootSignature, InputLayoutBuilder* inputLayout);
 
+		/// <summary>
+		/// シャドウマップ専用のPSO(後で一つにまとめる)
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="psoData"></param>
+		/// <param name="rootSignature"></param>
+		/// <param name="inputLayout"></param>
+		void RegisterShadowMapPSO(const std::string& name, const CreatePSOData& psoData, RootSignatureBuilder* rootSignature, InputLayoutBuilder* inputLayout);
+
 		void LoadFromJson(const std::string& filePath);
 
 		/// <summary>

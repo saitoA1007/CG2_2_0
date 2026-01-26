@@ -27,6 +27,8 @@ void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, Tex
 	psoList_[RenderMode3D::AnimationModel] = psoManager->GetDrawPsoData("Animation");
 	// スカイボックス描画用のデータを取得
 	psoList_[RenderMode3D::Skybox] = psoManager->GetDrawPsoData("Skybox");
+	// シャドウマップ用
+	psoList_[RenderMode3D::ShadowMap] = psoManager->GetDrawPsoData("ShadowMap");
 }
 
 void ModelRenderer::PreDraw(RenderMode3D mode) {
@@ -229,6 +231,31 @@ void ModelRenderer::DrawSkybox(const Model* model, WorldTransform& worldTransfor
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
+
+		if (meshes[i]->GetTotalIndices() != 0) {
+			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
+		} else {
+			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), 1, 0, 0);
+		}
+	}
+}
+
+void ModelRenderer::DrawShadowMap(const Model* model, WorldTransform& worldTransform) {
+	// カメラ座標に変換
+	if (model->IsLoad()) {
+		worldTransform.SetWVPMatrix(model->GetLocalMatrix());
+	}
+
+	// メッシュを取得
+	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
+
+	for (uint32_t i = 0; i < meshes.size(); ++i) {
+		commandList_->IASetVertexBuffers(0, 1, &meshes[i]->GetVertexBufferView());
+		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, cameraResource_->GetGPUVirtualAddress());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
