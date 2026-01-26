@@ -1,4 +1,5 @@
 #include"Object3d.hlsli"
+#include"LightElement.hlsli"
 
 struct Material
 {
@@ -37,6 +38,13 @@ struct PixelShaderOutput
     float32_t4 color : SV_TARGET0;
 };
 
+// ライトの処理
+float32_t3 CalculateShading(float32_t3 lightDirection, float32_t3 lightColor, float32_t3 normal, float32_t3 viewDirection, float32_t3 materialColor, Material matData);
+float32_t3 CalculateDirectionalLight(DirectionalLight light,float32_t3 normal,float32_t3 viewDirection,float32_t3 materialColor,Material matData);
+float32_t3 CalculatePointLight(PointLight light,float32_t3 worldPosition,float32_t3 normal,float32_t3 viewDirection,float32_t3 materialColor,Material matData);
+float32_t3 CalculateSpotLight(SpotLight light, float32_t3 worldPosition, float32_t3 normal, float32_t3 viewDirection, float32_t3 materialColor, Material matData);
+float32_t3 CalculateEnvironmentMap(float32_t3 worldPosition, float32_t3 normal, float32_t3 cameraPosition);
+
 PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
@@ -51,92 +59,39 @@ PixelShaderOutput main(VertexShaderOutput input)
     if (gMaterial.enableLighting)
     { // Lightingする場合
         
-        float32_t3 tmpColor = { 0.0f, 0.0f, 0.0f };
-        // cameraDirection
+        // 最終的な色
+        float32_t3 finalColor = float32_t3(0.0f, 0.0f, 0.0f);
+        
+        // ライト計算のための共通データを準備
+        float32_t3 normal = normalize(input.normal);
         float32_t3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
+        float32_t3 baseColor = gMaterial.color.rgb * textureColor.rgb;
         
         if (gDirectionalLight.active)
         {
-            // half lambert
-            float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
-            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-            // 拡散反射
-            float32_t3 diffuseDirectionalLight = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
-              
-            // cameraDirection
-            float32_t3 halfVector = normalize(-gDirectionalLight.direction + toEye);
-            float NDotH = dot(normalize(input.normal), halfVector);
-            float specularPow = pow(saturate(NDotH), gMaterial.shininess); // 反射強度
-            // 鏡面反射
-            float32_t3 specularDirectionalLight = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * gMaterial.specularColor;
-        
-            // diffuse+specular
-            tmpColor += diffuseDirectionalLight + specularDirectionalLight;
+            finalColor += CalculateDirectionalLight(gDirectionalLight, normal, toEye, baseColor, gMaterial);
         }
         
         if (gPointLight.active)
         {
-            
-            float32_t distance = length(gPointLight.position - input.worldPosition); // pointLightへの距離
-            float32_t factor = pow(saturate(-distance / gPointLight.radius + 1.0), gPointLight.decay); // 指数によるコントロール
-            
-            // direcition
-            float32_t3 pointLightDirection = normalize(input.worldPosition - gPointLight.position);
-            // half lambert
-            float NdotL = dot(normalize(input.normal), -pointLightDirection);
-            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-            // diffuse
-            float32_t3 diffusePointLight = gMaterial.color.rgb * textureColor.rgb * gPointLight.color.rgb * cos * gPointLight.intensity * factor;
-           
-            // cameraDirection
-            float32_t3 halfVector = normalize(-pointLightDirection + toEye);
-            float NDotH = dot(normalize(input.normal), halfVector);
-            float specularPow = pow(saturate(NDotH), gMaterial.shininess); // reflectintency
-            // specular
-            float32_t3 specularPointLight = gPointLight.color.rgb * gPointLight.intensity * specularPow * gMaterial.specularColor * factor;
-            
-            // diffuse+specular
-            tmpColor += diffusePointLight + specularPointLight;
+            finalColor += CalculatePointLight(gPointLight, input.worldPosition, normal, toEye, baseColor, gMaterial);  
         }         
         
         if (gSpotLight.active)
         {
-            // 入射光を求める
-            float32_t3 spotLightDirectionOnSurface = normalize(input.worldPosition - gSpotLight.position);
-            // 角度に応じた減衰
-            float32_t cosAngle = dot(spotLightDirectionOnSurface, gSpotLight.direction);
-            float32_t falloffFactor = saturate((cosAngle - gSpotLight.cosAngle) / (gSpotLight.cosFalloffStart - gSpotLight.cosAngle));
-            // 距離減衰
-            float distanceToLight = length(gSpotLight.position - input.worldPosition);
-            float attenuationFactor = pow(1.0f / distanceToLight, gSpotLight.decay) * saturate(1.0f - distanceToLight / gSpotLight.distance);
-            
-            // half lambert
-            float NdotL = dot(normalize(input.normal), -gSpotLight.direction);
-            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-            // diffuse
-            float32_t3 diffuseSpotLight = gMaterial.color.rgb * textureColor.rgb * gSpotLight.color.rgb * cos * gSpotLight.intensity * attenuationFactor * falloffFactor;
-           
-            // cameraDirection
-            float32_t3 halfVector = normalize(-gSpotLight.direction + toEye);
-            float NDotH = dot(normalize(input.normal), halfVector);
-            float specularPow = pow(saturate(NDotH), gMaterial.shininess); // 反射強度
-            // specular
-            float32_t3 specularSpotLight = gSpotLight.color.rgb * gSpotLight.intensity * specularPow * gMaterial.specularColor * attenuationFactor * falloffFactor;
-            
-            // diffuse+specular
-            tmpColor += diffuseSpotLight + specularSpotLight;
+            finalColor += CalculateSpotLight(gSpotLight, input.worldPosition, normal, toEye, baseColor, gMaterial);
         }
         
         // 環境マップを適応
         if (isActiveEnvironment)
         {
-            float32_t3 cameraToPosition = normalize(input.worldPosition - gCamera.worldPosition);
-            float32_t3 reflectedVector = reflect(cameraToPosition, normalize(input.normal));
+            float32_t3 reflectedVector = CalculateEnvironmentMap(input.worldPosition, normal, gCamera.worldPosition);
             float32_t4 environmentColor = gCubeTexture[environmentTexture].Sample(gSampler, reflectedVector);
-            tmpColor += environmentColor.rgb * gMaterial.metallic;
+            finalColor += environmentColor.rgb * gMaterial.metallic;
         }
-            
-        output.color.rgb = tmpColor;
+        
+        // 最終的な色を設定
+        output.color.rgb = finalColor;
        
         // アルファ値を適応
         output.color.a = gMaterial.color.a * textureColor.a;
@@ -152,4 +107,96 @@ PixelShaderOutput main(VertexShaderOutput input)
     }
     
     return output;
+}
+
+// Blinn-Phong + Half-Lambertの計算
+float32_t3 CalculateShading(
+    float32_t3 lightDirection, // ライトへの方向ベクトル
+    float32_t3 lightColor,     // ライトの色 * 強度
+    float32_t3 normal,         // 法線
+    float32_t3 viewDirection,  // カメラへの方向
+    float32_t3 materialColor,  // マテリアル色 * テクスチャ色
+    Material matData)          // マテリアル構造体
+{
+    // Diffuse(Half-Lambert)
+    float NdotL = dot(normal, lightDirection);
+    float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+    float32_t3 diffuse = materialColor * lightColor * cos;
+
+    // Specular(Blinn-Phong)
+    float32_t3 halfVector = normalize(lightDirection + viewDirection);
+    float NDotH = dot(normal, halfVector);
+    float specularPow = pow(saturate(NDotH), matData.shininess);
+    float32_t3 specular = lightColor * specularPow * matData.specularColor;
+
+    return diffuse + specular;
+}
+
+// DirectionalLightの計算
+float32_t3 CalculateDirectionalLight(
+    DirectionalLight light,
+    float32_t3 normal,
+    float32_t3 viewDirection,
+    float32_t3 materialColor,
+    Material matData)
+{
+    // 平行光源なので、ライトへの方向は -direction
+    float32_t3 lightDir = normalize(-light.direction);
+    float32_t3 lightColorIntensity = light.color.rgb * light.intensity;
+
+    return CalculateShading(lightDir, lightColorIntensity, normal, viewDirection, materialColor, matData);
+}
+
+// PointLightの計算
+float32_t3 CalculatePointLight(
+    PointLight light,
+    float32_t3 worldPosition,
+    float32_t3 normal,
+    float32_t3 viewDirection,
+    float32_t3 materialColor,
+    Material matData)
+{
+    // ポイントライトへの方向ベクトルと距離
+    float32_t3 directionToLight = light.position - worldPosition;
+    float32_t distance = length(directionToLight);
+    float32_t3 lightDir = normalize(directionToLight);
+    // 距離減衰
+    float32_t factor = pow(saturate(-distance / light.radius + 1.0), light.decay);
+    float32_t3 lightColorIntensity = light.color.rgb * light.intensity * factor;
+
+    return CalculateShading(lightDir, lightColorIntensity, normal, viewDirection, materialColor, matData);
+}
+
+// SpotLightの計算
+float32_t3 CalculateSpotLight(
+    SpotLight light,
+    float32_t3 worldPosition,
+    float32_t3 normal,
+    float32_t3 viewDirection,
+    float32_t3 materialColor,
+    Material matData)
+{
+    // スポットライト光源位置への方向
+    float32_t3 directionToLight = light.position - worldPosition;
+    float32_t distance = length(directionToLight);
+    float32_t3 lightDirOnSurface = normalize(directionToLight);
+    // 角度減衰
+    float32_t cosAngle = dot(-lightDirOnSurface, normalize(light.direction));
+    float32_t falloffFactor = saturate((cosAngle - light.cosAngle) / (light.cosFalloffStart - light.cosAngle));
+    // 距離減衰
+    float attenuationFactor = pow(1.0f / distance, light.decay) * saturate(1.0f - distance / light.distance);
+    // 最終的な強さ
+    float32_t3 lightColorIntensity = light.color.rgb * light.intensity * attenuationFactor * falloffFactor;
+
+    float32_t3 shadingDir = normalize(-light.direction);
+    
+    return CalculateShading(shadingDir, lightColorIntensity, normal, viewDirection, materialColor, matData);
+}
+
+// 環境マップの計算
+float32_t3 CalculateEnvironmentMap(float32_t3 worldPosition, float32_t3 normal, float32_t3 cameraPosition)
+{
+    float32_t3 cameraToPosition = normalize(worldPosition - cameraPosition);
+    float32_t3 reflectedVector = reflect(cameraToPosition, normal);
+    return reflectedVector;
 }

@@ -587,6 +587,7 @@
     <None Include="Externals\imgui\imgui_extra_math.inl" />
     <None Include="Externals\imgui\imgui_node_editor_internal.inl" />
     <None Include="Resources\Shaders\Skybox.hlsli" />
+    <None Include="Resources\Shaders\LightElement.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Object3d.PS.hlsl">
@@ -664,5 +665,7 @@
     <FxCompile Include="Resources\Shaders\SkinningObject3d.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Skybox.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Skybox.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\ShadowMap.VS.hlsl" />
+    <FxCompile Include="Resources\Shaders\ShadowMap.PS.hlsl" />
   </ItemGroup>
 </Project>
