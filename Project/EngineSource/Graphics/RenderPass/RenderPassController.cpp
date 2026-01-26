@@ -10,7 +10,7 @@ void RenderPassController::Initialize(RenderTextureManager* renderTextureManager
 	renderTextureManager_ = renderTextureManager;
 }
 
-void RenderPassController::AddPass(const std::string& name, bool isDepth) {
+void RenderPassController::AddPass(const std::string& name, RenderTextureMode mode) {
 	// すでに登録されている場合、早期リターン
 	auto getName = renderPassList_.find(name);
 	if (getName != renderPassList_.end()) {
@@ -18,16 +18,11 @@ void RenderPassController::AddPass(const std::string& name, bool isDepth) {
 	}
 
 	// renderTextureを作成
-	renderTextureManager_->Create(name, isDepth);
+	renderTextureManager_->Create(name, mode);
 	RenderTexture* renderTex = renderTextureManager_->GetRenderTexture(name);
 
-	// 生成リソースを作成
-	RenderPassContext context;
-	context.commandList = commandList_;
-	context.isDepth = isDepth;
-
 	// レンダーパスを作成
-	std::unique_ptr<RenderPass> tmp = std::make_unique<RenderPass>(name, &context, renderTex);
+	std::unique_ptr<RenderPass> tmp = std::make_unique<RenderPass>(name, commandList_, renderTex);
 
 	// 登録
 	renderPassList_[name] = std::move(tmp);

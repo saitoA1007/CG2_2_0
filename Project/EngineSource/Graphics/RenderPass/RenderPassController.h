@@ -17,7 +17,7 @@ namespace GameEngine {
 		void Initialize(RenderTextureManager* renderTextureManager, ID3D12GraphicsCommandList* commandList);
 
 		// パスを作成する
-		void AddPass(const std::string& name,bool isDepth = false);
+		void AddPass(const std::string& name, RenderTextureMode mode = RenderTextureMode::RtvAndDsv);
 
 		// 描画前に呼び出す(参照する時に切り替えられていなければassertで引っ掛ける)
 		void PrePass(const std::string& name);

@@ -4,6 +4,13 @@
 
 namespace GameEngine {
 
+	// 描画タイプ
+	enum class RenderTextureMode {
+		RtvOnly,    // RTVのみ
+		DsvOnly,    // Dsvのみ
+		RtvAndDsv   // RTVとDSV
+	};
+
 	// レンダーターゲットを作成する土台
 	struct RenderTextureContext {
 		uint32_t rtvIndex = 0;
@@ -12,7 +19,7 @@ namespace GameEngine {
 		uint32_t width = 0;
 		uint32_t height = 0;
 
-		bool isDepth = false;
+		RenderTextureMode mode = RenderTextureMode::RtvAndDsv;
 		uint32_t dsvHaveSrvIndex = 0;
 
 		ID3D12Resource* resource = nullptr;
@@ -51,6 +58,8 @@ namespace GameEngine {
 
 		uint32_t GetHeight() const { return height_; }
 
+		RenderTextureMode GetMode() const { return mode_; }
+
 	private:
 
 		// インデックス
@@ -77,10 +86,11 @@ namespace GameEngine {
 		// srvハンドル
 		CD3DX12_GPU_DESCRIPTOR_HANDLE srvGpuHandle_;
 
-		// 現在の状態
-		D3D12_RESOURCE_STATES currentState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+		// 現在の描画状態
+		bool isTarget_ = false;
 
-		bool isDepth_ = false;
+		// 通常描画
+		RenderTextureMode mode_ = RenderTextureMode::RtvAndDsv;
 	};
 
 }

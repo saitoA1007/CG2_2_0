@@ -21,11 +21,11 @@ void GameScene::Initialize(SceneContext* context) {
 	GameParamEditor::GetInstance()->SetActiveScene("GameScene");
 
 	// 影を描画するパス
-	context->renderPassController->AddPass("ShadowPass", true);
+	context->renderPassController->AddPass("ShadowPass");
 	handle_ = context->renderPassController->GetSrvHandle("ShadowPass");
 
 	// デフォルトで描画するパス
-	context->renderPassController->AddPass("DefaultPass", true);
+	context->renderPassController->AddPass("DefaultPass");
 	// 最終的な描画先を設定
 	context_->renderPassController->SetEndPass("DefaultPass");
 #pragma endregion

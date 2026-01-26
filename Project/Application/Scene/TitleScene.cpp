@@ -17,7 +17,7 @@ void TitleScene::Initialize(SceneContext* context) {
 	GameParamEditor::GetInstance()->SetActiveScene("TitleScene");
 
 	// デフォルトで描画するパス
-	context_->renderPassController->AddPass("DefaultPass",true);
+	context_->renderPassController->AddPass("DefaultPass");
 	// 最終的な描画先を設定
 	context_->renderPassController->SetEndPass("DefaultPass");
 #pragma endregion

@@ -23,7 +23,7 @@ void GEScene::Initialize(SceneContext* context) {
 	GameParamEditor::GetInstance()->SetActiveScene("GEScene");
 
 	// デフォルトで描画するパス
-	context->renderPassController->AddPass("DefaultPass", true);
+	context->renderPassController->AddPass("DefaultPass");
 	// 最終的な描画先を設定
 	context_->renderPassController->SetEndPass("DefaultPass");
 

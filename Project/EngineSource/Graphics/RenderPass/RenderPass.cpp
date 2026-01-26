@@ -2,11 +2,11 @@
 
 using namespace GameEngine;
 
-RenderPass::RenderPass(const std::string& name, RenderPassContext* context, RenderTexture* renderTexture) {
+RenderPass::RenderPass(const std::string& name, ID3D12GraphicsCommandList* commandList, RenderTexture* renderTexture) {
 	name_ = name;
 	renderTexture_ = renderTexture;
 
-	commandList_ = context->commandList;
+	commandList_ = commandList;
 
 	// 画面サイズを取得
 	uint32_t width = renderTexture_->GetWidth();
@@ -23,25 +23,47 @@ RenderPass::RenderPass(const std::string& name, RenderPassContext* context, Rend
 	scissorRect_.top = 0;
 	scissorRect_.bottom = static_cast<LONG>(viewport_.Height);
 
-	isDepth_ = context->isDepth;
+	// モードを取得する
+	mode_ = renderTexture_->GetMode();
 }
 
 void RenderPass::PrePass() {
 	// 書き込み状態に遷移
 	renderTexture_->TransitionToRenderTarget(commandList_);
 
-	// 描画先に設定
-	if (isDepth_) {
-		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, &renderTexture_->GetDsvHandle());
-		// 指定した深度で画面全体をクリアする
-		commandList_->ClearDepthStencilView(renderTexture_->GetDsvHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-	} else {
+	switch (mode_)
+	{
+	case GameEngine::RenderTextureMode::RtvOnly: {
+		// RTVのみセットする
 		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, nullptr);
+
+		// 指定した色で画面全体をクリアする
+		float clearColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor, 0, nullptr);
+		break;
 	}
 
-	float clearColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
-	// 指定した色で画面全体をクリアする
-	commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor, 0, nullptr);
+	case GameEngine::RenderTextureMode::DsvOnly: {
+		// DSVのみセットする
+		commandList_->OMSetRenderTargets(0, nullptr, false, &renderTexture_->GetDsvHandle());
+
+		// 深度クリア
+		commandList_->ClearDepthStencilView(renderTexture_->GetDsvHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		break;
+	}
+
+	case GameEngine::RenderTextureMode::RtvAndDsv: {
+		// RTVとDSVをセットする
+		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, &renderTexture_->GetDsvHandle());
+
+		float clearColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+		// 指定した色で画面全体をクリアする
+		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor, 0, nullptr);
+		// 指定した深度で画面全体をクリアする
+		commandList_->ClearDepthStencilView(renderTexture_->GetDsvHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		break;
+	}
+	}
 
 	// Viewportを設定
 	commandList_->RSSetViewports(1, &viewport_);

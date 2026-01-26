@@ -666,6 +666,5 @@
     <FxCompile Include="Resources\Shaders\Skybox.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Skybox.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\ShadowMap.VS.hlsl" />
-    <FxCompile Include="Resources\Shaders\ShadowMap.PS.hlsl" />
   </ItemGroup>
 </Project>

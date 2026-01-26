@@ -266,6 +266,7 @@ void PSOManager::DefaultLoadPSO() {
     rootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL);
     rootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddSRVDescriptorTable(1, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 1, D3D12_SHADER_VISIBILITY_PIXEL);
+    //rootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_VERTEX);
     rootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.CreateRootSignature();
     InputLayoutBuilder inputLayoutBuilder;

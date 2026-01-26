@@ -7,15 +7,10 @@
 
 namespace GameEngine {
 
-    struct RenderPassContext {
-        ID3D12GraphicsCommandList* commandList = nullptr;
-        bool isDepth = false;
-    };
-
     class RenderPass {
     public:
 
-        RenderPass(const std::string& name, RenderPassContext* context, RenderTexture* renderTexture);
+        RenderPass(const std::string& name, ID3D12GraphicsCommandList* commandList, RenderTexture* renderTexture);
 
         // 描画前処理
         void PrePass();
@@ -42,6 +37,7 @@ namespace GameEngine {
         // パスの名前
         std::string name_;
 
-        bool isDepth_ = false;
+        // レンダーモード
+        RenderTextureMode mode_;
     };
 }
