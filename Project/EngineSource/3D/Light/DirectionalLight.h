@@ -1,6 +1,7 @@
 #pragma once
 #include"EngineSource/Math/Vector4.h"
 #include"EngineSource/Math/Vector3.h"
+#include"Matrix4x4.h"
 #include<cstdint>
 
 namespace GameEngine {
@@ -12,7 +13,9 @@ namespace GameEngine {
 			Vector3 direction; // ライトの向き
 			float intensity; // 輝度
 			int32_t active; // ライトの使用
-			float padding[3];
+			uint32_t isDepthTexture;
+			float padding[2];
+			Matrix4x4 vpMatrix;
 		};
 
 	public:
@@ -66,6 +69,8 @@ namespace GameEngine {
 		/// <param name="active"></param>
 		void SetActive(const bool& active) { directionalLightData_.active = active; }
 
+		void SetDepthTexture(const uint32_t& index) { directionalLightData_.isDepthTexture = index; }
+
 		/// <summary>
 		/// ライトデータを適応
 		/// </summary>
@@ -74,7 +79,8 @@ namespace GameEngine {
 
 		DirectionalLightData& GetDirectionalLightData() { return directionalLightData_;}
 
-	private:
+		// 行列を作成する
+		void CreateDirectionalShadowMatrix(const Vector3& targetCenter,float shadowRange);
 
 		// 平行光源のデータを作る
 		DirectionalLightData directionalLightData_;

@@ -17,7 +17,7 @@ namespace GameEngine {
 		void Initialize(RenderTextureManager* renderTextureManager, ID3D12GraphicsCommandList* commandList);
 
 		// パスを作成する
-		void AddPass(const std::string& name, RenderTextureMode mode = RenderTextureMode::RtvAndDsv);
+		void AddPass(const std::string& name, RenderTextureMode mode = RenderTextureMode::RtvAndDsv,uint32_t wid = 1280,uint32_t hei = 720);
 
 		// 描画前に呼び出す(参照する時に切り替えられていなければassertで引っ掛ける)
 		void PrePass(const std::string& name);
@@ -31,7 +31,7 @@ namespace GameEngine {
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvHandle(const std::string& name);
 
-		//uint32_t SrvIndex(const std::string& name);
+		uint32_t GetSrvIndex(const std::string& name);
 
 	private:
 		RenderPassController(const RenderPassController&) = delete;

@@ -10,7 +10,7 @@ void RenderPassController::Initialize(RenderTextureManager* renderTextureManager
 	renderTextureManager_ = renderTextureManager;
 }
 
-void RenderPassController::AddPass(const std::string& name, RenderTextureMode mode) {
+void RenderPassController::AddPass(const std::string& name, RenderTextureMode mode, uint32_t wid, uint32_t hei) {
 	// すでに登録されている場合、早期リターン
 	auto getName = renderPassList_.find(name);
 	if (getName != renderPassList_.end()) {
@@ -18,7 +18,10 @@ void RenderPassController::AddPass(const std::string& name, RenderTextureMode mo
 	}
 
 	// renderTextureを作成
-	renderTextureManager_->Create(name, mode);
+	RtvContext contex;
+	contex.width = wid;
+	contex.height = hei;
+	renderTextureManager_->Create(name, mode,contex);
 	RenderTexture* renderTex = renderTextureManager_->GetRenderTexture(name);
 
 	// レンダーパスを作成
@@ -70,4 +73,14 @@ CD3DX12_GPU_DESCRIPTOR_HANDLE RenderPassController::GetSrvHandle(const std::stri
 	}
 
 	return render->second->GetSrvHandle();
+}
+
+uint32_t RenderPassController::GetSrvIndex(const std::string& name) {
+	// 登録されていなければエラー
+	auto render = renderPassList_.find(name);
+	if (render == renderPassList_.end()) {
+		assert(false && "Not found RenderPass");
+	}
+
+	return render->second->GetSrvIndex();
 }

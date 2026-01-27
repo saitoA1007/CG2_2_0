@@ -53,7 +53,7 @@ namespace GameEngine {
 		/// <param name="filter">バイナリフィルタ</param>
 		/// <param name="texAddress">範囲外の振る舞い</param>
 		/// <param name="visibility">使用するシェーダー</param>
-		void AddSampler(uint32_t shaderRegister, D3D12_FILTER filter, D3D12_TEXTURE_ADDRESS_MODE texAddress, D3D12_SHADER_VISIBILITY visibility);
+		void AddSampler(uint32_t shaderRegister, D3D12_FILTER filter, D3D12_TEXTURE_ADDRESS_MODE texAddress, D3D12_SHADER_VISIBILITY visibility, D3D12_COMPARISON_FUNC func = D3D12_COMPARISON_FUNC_NEVER);
 
 		void CreateRootSignature();
 

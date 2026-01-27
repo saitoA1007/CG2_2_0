@@ -21,8 +21,7 @@ void GameScene::Initialize(SceneContext* context) {
 	GameParamEditor::GetInstance()->SetActiveScene("GameScene");
 
 	// 影を描画するパス
-	context->renderPassController->AddPass("ShadowPass",RenderTextureMode::DsvOnly);
-	//handle_ = context->renderPassController->GetSrvHandle("ShadowPass");
+	context->renderPassController->AddPass("ShadowPass",RenderTextureMode::DsvOnly,2048,2048);
 
 	// デフォルトで描画するパス
 	context->renderPassController->AddPass("DefaultPass");
@@ -45,13 +44,19 @@ void GameScene::Initialize(SceneContext* context) {
 	lightManager_->Initialize(context_->graphicsDevice->GetDevice(), true, false, false);
 	directionalData_.active = true;
 	directionalData_.color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalData_.direction = { 0.0,0.0f,1.0f };
+	directionalData_.direction = { 0.0,-1.0f,0.0f };
 	directionalData_.intensity = 1.0f;
+	directionalData_.isDepthTexture = context->renderPassController->GetSrvIndex("ShadowPass");
 	lightManager_->SetDirectionalData(directionalData_);
+	lightManager_->Setshadow({ 0.0f,0.0f,0.0f }, 60.0f);
+
+	// 平行光源の位置のカメラ行列を取得する
+	directionLightCamera_->SetVPMatrix(lightManager_->directionalLight_->directionalLightData_.vpMatrix);
 
 	// 地面モデルを生成
 	terrainModel_ = context_->modelManager->GetNameByModel("Terrain");
 	terrainModel_->SetDefaultIsEnableLight(true);
+	terrainModel_->SetDefaultIsEnableShadow(true);
 	grassGH_ = context_->textureManager->GetHandleByName("grass.png");
 	terrainModel_->SetDefaultTextureHandle(grassGH_);
 	terrainWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,-1.6f,0.0f},{0.0f,-1.0f,0.0f} });
@@ -66,6 +71,7 @@ void GameScene::Initialize(SceneContext* context) {
 	// プレイヤーモデルを生成
 	playerModel_ = context_->modelManager->GetNameByModel("Cube");
 	playerModel_->SetDefaultIsEnableLight(true);
+	playerModel_->SetDefaultIsEnableShadow(true);
 	// プレイヤークラスを初期化
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
@@ -101,6 +107,10 @@ void GameScene::Update() {
 	// 地面の更新処理
 	terrainWorldTransform_.UpdateTransformMatrix();
 
+	// カメラの位置を更新
+	lightManager_->Setshadow(player_->GetPlayerPos(), 60.0f);
+	directionLightCamera_->SetVPMatrix(lightManager_->directionalLight_->directionalLightData_.vpMatrix);
+
 	// ライトの更新
 	lightManager_->Update();
 
@@ -110,7 +120,7 @@ void GameScene::Update() {
 	// カメラの更新処理
 	mainCamera_->Update();
 
-	directionLightCamera_->Update();
+	//directionLightCamera_->Update();
 
 #ifdef _DEBUG
 
@@ -120,8 +130,8 @@ void GameScene::Update() {
 	ImGui::DragFloat3("CameraTranslate", &mainCamera_->transform_.translate.x, 0.01f);
 	ImGui::DragFloat3("CameraRotate", &mainCamera_->transform_.translate.x, 0.01f);
 
-	ImGui::DragFloat3("DCameraTranslate", &directionLightCamera_->transform_.translate.x, 0.01f);
-	ImGui::DragFloat3("DCameraRotate", &directionLightCamera_->transform_.rotate.x, 0.01f);
+	//ImGui::DragFloat3("DCameraTranslate", &directionLightCamera_->transform_.translate.x, 0.01f);
+	//ImGui::DragFloat3("DCameraRotate", &directionLightCamera_->transform_.rotate.x, 0.01f);
 
 	// 平行光源
 	if (ImGui::TreeNodeEx("Light", ImGuiTreeNodeFlags_Framed)) {
@@ -133,28 +143,6 @@ void GameScene::Update() {
 		ImGui::TreePop();
 	}
 	ImGui::End();
-
-	// シャドウマップ用の描画データをデバック
-	//ImGui::Begin("ShadowScene");
-	//ImVec2 sceneWindowSize = ImGui::GetContentRegionAvail();
-	//D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = handle_;
-	//ImVec2 imageSize = sceneWindowSize;
-	//float windowAspect = sceneWindowSize.x / sceneWindowSize.y;
-	//float target = 1280.0f / 720.0f;
-	//if (windowAspect > target) {
-	//	// ウィンドウが横長すぎる場合、高さに合わせる
-	//	imageSize.x = sceneWindowSize.y * target;
-	//	imageSize.y = sceneWindowSize.y;
-	//} else {
-	//	// ウィンドウが縦長すぎる場合、幅に合わせる
-	//	imageSize.x = sceneWindowSize.x;
-	//	imageSize.y = sceneWindowSize.x / target;
-	//}
-	//float offsetX = (sceneWindowSize.x - imageSize.x) * 0.5f;
-	//ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-	//ImGui::SetCursorScreenPos(ImVec2(cursorPos.x + offsetX, cursorPos.y));
-	//ImGui::Image((ImTextureID)srvHandle.ptr, imageSize);
-	//ImGui::End();
 #endif
 }
 
@@ -213,10 +201,10 @@ void GameScene::Draw(const bool& isDebugView) {
 	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
 
 	// アニメーションの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
+	//ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 
 	// アニメーションしているモデルを描画
-	ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_);
+	//ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_);
 
 	pass->PostPass("DefaultPass");
 }

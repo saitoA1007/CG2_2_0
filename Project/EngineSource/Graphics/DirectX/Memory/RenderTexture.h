@@ -48,7 +48,7 @@ namespace GameEngine {
 
 		D3D12_CPU_DESCRIPTOR_HANDLE& GetDsvHandle() { return dsvHandle_; }
 
-		uint32_t GetSrvIndex() const { return srvIndex_; }
+		uint32_t GetSrvIndex() { return srvIndex_; }
 
 		uint32_t GetRtvIndex() const { return rtvIndex_; }
 

@@ -125,6 +125,13 @@ namespace GameEngine {
 		void SetDefaultIsEnableLight(const bool& isEnableLight, const std::string& materialName = "default");
 
 		/// <summary>
+		/// 影の適応の有無を設定
+		/// </summary>
+		/// <param name="isEnableLight"></param>
+		/// <param name="materialName"></param>
+		void SetDefaultIsEnableShadow(const bool& isEnableShadow, const std::string& materialName = "default");
+
+		/// <summary>
 		/// デフォルトのuvMatrixを設定
 		/// </summary>
 		/// <param name="uvMatrix"></param>

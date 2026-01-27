@@ -75,7 +75,7 @@ namespace GameEngine {
 		/// ビュープロジェクション行列を設定
 		/// </summary>
 		/// <param name="VPMatrix"></param>
-		void SetVPMatrix(Matrix4x4 VPMatrix) { VPMatrix_ = VPMatrix; }
+		void SetVPMatrix(Matrix4x4 VPMatrix) { cameraForGPU_->vpMatrix = VPMatrix; }
 
 		/// <summary>
 		/// ビュープロジェクション行列を取得

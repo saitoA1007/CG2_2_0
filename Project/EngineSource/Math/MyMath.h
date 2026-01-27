@@ -117,3 +117,12 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 /// <param name="cameraMatrix"></param>
 /// <returns></returns>
 Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix);
+
+/// <summary>
+/// カメラをターゲットの方向に向かせる
+/// </summary>
+/// <param name="eye">カメラの位置</param>
+/// <param name="center">ターゲットの位置</param>
+/// <param name="up">向き</param>
+/// <returns></returns>
+Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up);

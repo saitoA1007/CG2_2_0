@@ -14,9 +14,6 @@ struct Camera
 };
 ConstantBuffer<Camera> gCamera : register(b1);
 
-// shadowMapで使用するライト方向
-//ConstantBuffer<Camera> gLightCamera : register(b2);
-
 struct VertexShaderInput
 {
     float32_t4 position : POSITION0;
@@ -31,10 +28,6 @@ VertexShaderOutput main(VertexShaderInput input)
     output.position = mul(worldPos, gCamera.vpMatrix);
     output.texcoord = input.texcoord;
     output.normal = normalize(mul(input.normal, (float32_t3x3) gTransformationMatrix.WorldInverseTranspose));
-    output.worldPosition = mul(input.position, gTransformationMatrix.World).xyz;
-    
-    //float4 worldPos = float4(output.worldPosition, 1.0f);
-    //output.shadowCoord = mul(worldPos, gLightCamera.vpMatrix);
-    
+    output.worldPosition = mul(input.position, gTransformationMatrix.World).xyz;  
     return output;
 }

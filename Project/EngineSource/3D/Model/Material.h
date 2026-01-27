@@ -20,7 +20,8 @@ namespace GameEngine {
 			float shininess;
 			uint32_t textureHandle;
 			float metallic;
-			float padding2[2];
+			int32_t isActiveShadow;
+			float padding2;
 		};
 
 	public:
@@ -76,6 +77,12 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="isEnableLighting"></param>
 		void SetEnableLighting(bool isEnableLighting) { materialData_->enableLighting = isEnableLighting; }
+
+		/// <summary>
+		/// 影の適応
+		/// </summary>
+		/// <param name="isEnableLighting"></param>
+		void SetEnableShadow(bool isEnableShadow) { materialData_->isActiveShadow = isEnableShadow; }
 
 		/// <summary>
 		/// UV行列を設定

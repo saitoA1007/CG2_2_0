@@ -49,6 +49,8 @@ namespace GameEngine {
         /// <param name="directionalData"></param>
         void SetDirectionalData(const DirectionalLight::DirectionalLightData& directionalData);
 
+        void Setshadow(const Vector3& targetCenter, float shadowRange);
+
         /// <summary>
         /// 平行光源の方向
         /// </summary>

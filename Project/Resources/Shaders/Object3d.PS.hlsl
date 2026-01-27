@@ -10,12 +10,15 @@ struct Material
     float shininess;
     uint32_t textureHandle;
     float metallic;
+    int32_t isActiveShadow;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 
 Texture2D<float32_t4> gTexture[] : register(t0,space0);
 TextureCube<float32_t4> gCubeTexture[] : register(t1,space1);
+Texture2D<float> gShadowMap[] : register(t2,space2);
 SamplerState gSampler : register(s0);
+SamplerComparisonState gShadowSampler : register(s1);
 
 struct Camera
 {
@@ -44,6 +47,8 @@ float32_t3 CalculateDirectionalLight(DirectionalLight light,float32_t3 normal,fl
 float32_t3 CalculatePointLight(PointLight light,float32_t3 worldPosition,float32_t3 normal,float32_t3 viewDirection,float32_t3 materialColor,Material matData);
 float32_t3 CalculateSpotLight(SpotLight light, float32_t3 worldPosition, float32_t3 normal, float32_t3 viewDirection, float32_t3 materialColor, Material matData);
 float32_t3 CalculateEnvironmentMap(float32_t3 worldPosition, float32_t3 normal, float32_t3 cameraPosition);
+// 影を計算する
+float32_t CalculateShadow(float32_t4 shadowCoord);
 
 PixelShaderOutput main(VertexShaderOutput input)
 {
@@ -69,7 +74,22 @@ PixelShaderOutput main(VertexShaderOutput input)
         
         if (gDirectionalLight.active)
         {
-            finalColor += CalculateDirectionalLight(gDirectionalLight, normal, toEye, baseColor, gMaterial);
+            // デフォルトは影なし
+            float32_t shadowFactor = 1.0f;
+            float finalShadow = 1.0f;
+            
+            if (gMaterial.isActiveShadow)
+            {
+                float4 world = float4(input.worldPosition, 1.0f);
+                float4 shadowCoord = mul(world, gDirectionalLight.vpMatrix);
+                // 影の計算を実行
+                shadowFactor = CalculateShadow(shadowCoord);
+                
+                float shadowAtten = 1.0f - 0.8f; // 影部分の明るさ
+                finalShadow = shadowFactor + shadowAtten * (1.0f - shadowFactor);
+            }
+            
+            finalColor += CalculateDirectionalLight(gDirectionalLight, normal, toEye, baseColor, gMaterial) * finalShadow;
         }
         
         if (gPointLight.active)
@@ -199,4 +219,28 @@ float32_t3 CalculateEnvironmentMap(float32_t3 worldPosition, float32_t3 normal, 
     float32_t3 cameraToPosition = normalize(worldPosition - cameraPosition);
     float32_t3 reflectedVector = reflect(cameraToPosition, normal);
     return reflectedVector;
+}
+
+float32_t CalculateShadow(float32_t4 shadowCoord)
+{
+    // 透視投影除算
+    float32_t3 projectCoord = shadowCoord.xyz / shadowCoord.w;
+
+    // uv座標に変換
+    projectCoord.x = projectCoord.x * 0.5f + 0.5f;
+    projectCoord.y = -projectCoord.y * 0.5f + 0.5f;
+
+    // テクスチャ範囲外かチェック
+    if (projectCoord.x < 0.0f || projectCoord.x > 1.0f ||
+        projectCoord.y < 0.0f || projectCoord.y > 1.0f ||
+        projectCoord.z < 0.0f || projectCoord.z > 1.0f)
+    {
+        return 1.0f;
+    }
+
+    float32_t bias = 0.001f;
+    float currentDepth = projectCoord.z - bias;
+    
+    // Shadow Mapサンプリング (比較サンプラーを使用)
+    return gShadowMap[gDirectionalLight.isDepthTexture].SampleCmpLevelZero(gShadowSampler, projectCoord.xy, currentDepth);
 }

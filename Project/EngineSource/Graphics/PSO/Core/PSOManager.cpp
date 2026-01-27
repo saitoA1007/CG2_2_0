@@ -336,8 +336,9 @@ void PSOManager::DefaultLoadPSO() {
     rootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL);
     rootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddSRVDescriptorTable(1, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 1, D3D12_SHADER_VISIBILITY_PIXEL);
-    //rootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_VERTEX);
+    rootSigBuilder.AddSRVDescriptorTable(2, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount) + static_cast<uint32_t>(SrvHeapTypeCount::SystemMaxCount),2, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSigBuilder.AddSampler(1, D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_COMPARISON_FUNC_LESS_EQUAL);
     rootSigBuilder.CreateRootSignature();
     InputLayoutBuilder inputLayoutBuilder;
     inputLayoutBuilder.CreateDefaultObjElement();
@@ -432,7 +433,9 @@ void PSOManager::DefaultLoadPSO() {
     animationRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL);
     animationRootSigBuilder.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
     animationRootSigBuilder.AddSRVDescriptorTable(1, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 1, D3D12_SHADER_VISIBILITY_PIXEL);
+    animationRootSigBuilder.AddSRVDescriptorTable(2, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount) + static_cast<uint32_t>(SrvHeapTypeCount::SystemMaxCount), 2, D3D12_SHADER_VISIBILITY_PIXEL);
     animationRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    animationRootSigBuilder.AddSampler(1, D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_COMPARISON_FUNC_LESS_EQUAL);
     animationRootSigBuilder.CreateRootSignature();
     InputLayoutBuilder animationInputLayoutBuilder;
     animationInputLayoutBuilder.CreateDefaultAnimationElement();

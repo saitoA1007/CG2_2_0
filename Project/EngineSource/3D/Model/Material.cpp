@@ -37,6 +37,8 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 	materialData_->textureHandle = 0;
 	// 環境光
 	materialData_->metallic = 0.01f;
+	// 影の適応
+	materialData_->isActiveShadow = false;
 }
 
 void Material::SetUVTransform(Transform uvTransform) {

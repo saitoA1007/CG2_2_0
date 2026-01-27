@@ -268,4 +268,5 @@ void ModelRenderer::DrawShadowMap(const Model* model, WorldTransform& worldTrans
 void ModelRenderer::DrawLight(ID3D12Resource* lightGroupResource) {
 	commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(5, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+	commandList_->SetGraphicsRootDescriptorTable(6, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 }

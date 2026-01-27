@@ -339,6 +339,14 @@ void  Model::SetDefaultIsEnableLight(const bool& isEnableLight, const std::strin
 	material->SetEnableLighting(isEnableLight);
 }
 
+void Model::SetDefaultIsEnableShadow(const bool& isEnableShadow, const std::string& materialName) {
+	auto it = materialName == "default" ? materials_.begin() : materials_.find(materialName);
+
+	assert(it != materials_.end() && "Material not found");
+	Material* material = it->second.get();
+	material->SetEnableShadow(isEnableShadow);
+}
+
 void  Model::SetDefaultUVMatrix(const Matrix4x4& uvMatrix, const std::string& materialName) {
 	
 	auto it = materialName == "default" ? materials_.begin() : materials_.find(materialName);

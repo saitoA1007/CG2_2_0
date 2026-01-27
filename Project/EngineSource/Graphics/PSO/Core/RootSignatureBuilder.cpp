@@ -37,14 +37,15 @@ void RootSignatureBuilder::AddSRVDescriptorTable(uint32_t shaderRegister, uint32
 	rootParameters_.push_back(param);
 }
 
-void RootSignatureBuilder::AddSampler(uint32_t shaderRegister, D3D12_FILTER filter, D3D12_TEXTURE_ADDRESS_MODE texAddress, D3D12_SHADER_VISIBILITY visibility) {
+void RootSignatureBuilder::AddSampler(uint32_t shaderRegister, D3D12_FILTER filter, D3D12_TEXTURE_ADDRESS_MODE texAddress, D3D12_SHADER_VISIBILITY visibility, D3D12_COMPARISON_FUNC func) {
     D3D12_STATIC_SAMPLER_DESC samplerDesc{};
     samplerDesc.Filter = filter; // バイリニアフィルタ
     samplerDesc.AddressU = texAddress;
     samplerDesc.AddressV = texAddress;
     samplerDesc.AddressW = texAddress;
-    samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER; // 比較しない
+    samplerDesc.ComparisonFunc = func;
     samplerDesc.MaxLOD = D3D12_FLOAT32_MAX;
+    samplerDesc.BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE;
     samplerDesc.ShaderRegister = shaderRegister; // レジスタ番号
     samplerDesc.ShaderVisibility = visibility; // シェーダーモード
     staticSamplers_.push_back(samplerDesc);

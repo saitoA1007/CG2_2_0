@@ -51,6 +51,10 @@ void LightManager::SetDirectionalData(const DirectionalLight::DirectionalLightDa
     directionalLight_->SetDirectionalLightData(directionalData);
 }
 
+void LightManager::Setshadow(const Vector3& targetCenter, float shadowRange) {
+    directionalLight_->CreateDirectionalShadowMatrix(targetCenter, shadowRange);
+}
+
 void  LightManager::SetDirectionalDirction(const Vector3& lightdir) {
     directionalLight_->SetLightDir(lightdir);
 }

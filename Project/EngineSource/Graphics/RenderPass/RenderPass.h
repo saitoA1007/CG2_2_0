@@ -19,7 +19,7 @@ namespace GameEngine {
         void PostPass();
 
         // srvIndexを取得
-        uint32_t GetSrvIndex()const;
+        uint32_t GetSrvIndex() { return renderTexture_->GetSrvIndex(); }
 
         CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvHandle();
 
