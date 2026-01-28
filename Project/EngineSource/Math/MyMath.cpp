@@ -435,28 +435,15 @@ Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& translate, co
 
 Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {
 
-//	Vector3 f = Normalize(center - eye); // 前方向ベクトル
-//	Vector3 s = Normalize(Cross(up, f)); // 右方向ベクトル
-//	Vector3 u = Cross(f, s); // 上方向ベクトル
-//
-//	Matrix4x4 result = { {
-//		{ s.x,  s.y, s.z, 0 },
-//		{ u.x,  u.y, u.z, 0 },
-//		{ f.x,  f.y, f.z, 0 },
-//		{ 0.0f, 0.0f, 0.0f, 1}
-//	} };
-//	return result;
-
 	// カメラの方向ベクトル
 	Vector3 z = Normalize(center - eye); // 前方向ベクトル
 	Vector3 x = Normalize(Cross(up, z)); // 右方向ベクトル
 	Vector3 y = Cross(z, x);             // 上方向ベクトル
-	
-	// 平行移動成分を計算
+
 	float tx = Dot(x, eye);
 	float ty = Dot(y, eye);
 	float tz = Dot(z, eye);
-	
+
 	Matrix4x4 result = { {
 		{ x.x,  x.y,  x.z,  0.0f },
 		{ y.x,  y.y,  y.z,  0.0f },

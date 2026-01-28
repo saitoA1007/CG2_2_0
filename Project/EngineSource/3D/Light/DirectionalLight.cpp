@@ -17,36 +17,60 @@ void DirectionalLight::SetLightDir(const Vector3& lightdir) {
 }
 
 void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter,float shadowRange) {
+
+    //=================================================
+    // 
+    // 
+    // 回転からライトのベクトルを求める方式に変更する
+    // 
+    // 
+    //=================================================
+
     // ライトの方向を正規化
     Vector3 lightDir = Normalize(directionalLightData_.direction);
    
-    // 基本となる View行列 の作成
-    // まずはスナップなしで、ターゲット中心にライトを配置
-    // ターゲットより十分手前から奥までカバーするため、距離をとる
+    // View行列の作成
     float distance = shadowRange * 2.0f;
     Vector3 lightPos = targetCenter + (lightDir * distance);
    
-    // Upベクトルの対策
-    Vector3 up = Vector3(0, 1, 0);
-    if (std::abs(lightDir.y) > 0.999f) {
-        // ライトがほぼ真上・真下を向いているときは、UpをX軸などにする
-        up = Vector3(0, 0, 1);
+    Vector3 candidateUps[] = {
+        Vector3(0, 1, 0),   // Y-up（デフォルト）
+        Vector3(0, 0, 1),   // Z-forward
+        Vector3(1, 0, 0)    // X-right
+    };
+
+    Vector3 worldUp;
+    float minDot = 1.0f;
+
+    // ライト方向と最も垂直に近い軸を選択
+    for (int i = 0; i < 3; ++i) {
+        float dotProduct = std::abs(Dot(lightDir, candidateUps[i]));
+        if (dotProduct < minDot) {
+            minDot = dotProduct;
+            worldUp = candidateUps[i];
+        }
     }
+
+    // 右ベクトルを計算
+    Vector3 right = Normalize(Cross(worldUp, lightDir));
+    // ライトと右ベクトル直交ベクトルを求める
+    Vector3 up = Normalize(Cross(lightDir, right));
    
-    Matrix4x4 viewMatrix = LookAt(lightPos, targetCenter, up);
-   
+    Matrix4x4 worldMatrix = LookAt(lightPos, targetCenter, up);
+
     // Projection行列の作成
     float r = shadowRange;
     float l = -shadowRange;
     float t = shadowRange;
     float b = -shadowRange;
-    float nearPlane = 0.1f;             // 0より少し大きく
-    float farPlane = distance * 2.5f;   // 十分な奥行きを確保
+    float nearPlane = 0.1f;
+    float farPlane = distance * 2.5f;
     Matrix4x4 projMatrix = MakeOrthographicMatrix(l, t, r, b, nearPlane, farPlane);
    
     // シャドウマップのチラつきを補正
-    // 基準点(0,0,0)がシャドウマップ上のどこに落ちるか計算する
-    Matrix4x4 vpMatrix = viewMatrix * projMatrix;
+    Matrix4x4 vpMatrix = worldMatrix * projMatrix;
+
+    directionalLightData_.vpMatrix = vpMatrix;
    
     // ワールド原点をシャドウマップ空間へ変換
     Vector3 shadowOrigin = { 0.0f, 0.0f, 0.0f};
@@ -65,5 +89,5 @@ void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter
     projMatrix.m[3][0] -= offsetX;
     projMatrix.m[3][1] -= offsetY;
    
-    directionalLightData_.vpMatrix = viewMatrix * projMatrix;
+    //directionalLightData_.vpMatrix = worldMatrix * projMatrix;
 }

@@ -75,7 +75,6 @@ PixelShaderOutput main(VertexShaderOutput input)
         if (gDirectionalLight.active)
         {
             // デフォルトは影なし
-            float32_t shadowFactor = 1.0f;
             float finalShadow = 1.0f;
             
             if (gMaterial.isActiveShadow)
@@ -83,7 +82,7 @@ PixelShaderOutput main(VertexShaderOutput input)
                 float4 world = float4(input.worldPosition, 1.0f);
                 float4 shadowCoord = mul(world, gDirectionalLight.vpMatrix);
                 // 影の計算を実行
-                shadowFactor = CalculateShadow(shadowCoord);
+                float32_t shadowFactor = CalculateShadow(shadowCoord);
                 
                 float shadowAtten = 1.0f - 0.8f; // 影部分の明るさ
                 finalShadow = shadowFactor + shadowAtten * (1.0f - shadowFactor);
@@ -241,6 +240,6 @@ float32_t CalculateShadow(float32_t4 shadowCoord)
     float32_t bias = 0.001f;
     float currentDepth = projectCoord.z - bias;
     
-    // Shadow Mapサンプリング (比較サンプラーを使用)
+    // ShadowMapサンプリング
     return gShadowMap[gDirectionalLight.isDepthTexture].SampleCmpLevelZero(gShadowSampler, projectCoord.xy, currentDepth);
 }

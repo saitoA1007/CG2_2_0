@@ -6,6 +6,7 @@ struct DirectionalLight
     float32_t intensity; // 輝度
     int32_t active;
     uint32_t isDepthTexture; // 深度値を持ったテクスチャ
+    float32_t2 padding;
     float32_t4x4 vpMatrix;
 };
 

@@ -107,10 +107,6 @@ void GameScene::Update() {
 	// 地面の更新処理
 	terrainWorldTransform_.UpdateTransformMatrix();
 
-	// カメラの位置を更新
-	lightManager_->Setshadow(player_->GetPlayerPos(), 60.0f);
-	directionLightCamera_->SetVPMatrix(lightManager_->directionalLight_->directionalLightData_.vpMatrix);
-
 	// ライトの更新
 	lightManager_->Update();
 
@@ -128,7 +124,7 @@ void GameScene::Update() {
 	ImGui::Begin("DebugWindow");
 	// カメラのデバック
 	ImGui::DragFloat3("CameraTranslate", &mainCamera_->transform_.translate.x, 0.01f);
-	ImGui::DragFloat3("CameraRotate", &mainCamera_->transform_.translate.x, 0.01f);
+	ImGui::DragFloat3("CameraRotate", &mainCamera_->transform_.rotate.x, 0.01f);
 
 	//ImGui::DragFloat3("DCameraTranslate", &directionLightCamera_->transform_.translate.x, 0.01f);
 	//ImGui::DragFloat3("DCameraRotate", &directionLightCamera_->transform_.rotate.x, 0.01f);
@@ -144,6 +140,10 @@ void GameScene::Update() {
 	}
 	ImGui::End();
 #endif
+
+	// カメラの位置を更新
+	lightManager_->Setshadow(player_->GetPlayerPos(), 60.0f);
+	directionLightCamera_->SetVPMatrix(lightManager_->directionalLight_->directionalLightData_.vpMatrix);
 }
 
 void GameScene::Draw(const bool& isDebugView) {
