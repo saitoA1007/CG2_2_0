@@ -102,6 +102,8 @@ void ALGameScene::Initialize(SceneContext* context) {
 	player_ = std::make_unique<Player>();
 	player_->SetWeapon(playerSword_.get());
 	player_->Initialize(context_->inputCommand);
+	// カメラを設定
+	player_->SetCamera(followCameraController_.get());
 
 	// プレイヤーの壁を生成
 	playerShadow_ = std::make_unique<PlaneProjectionShadow>();

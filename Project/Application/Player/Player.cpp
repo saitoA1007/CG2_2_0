@@ -389,9 +389,26 @@ void Player::DashUpdate() {
 	// 移動
 	velocity_ = dashDirection_ * kDashSpeed_;
 
+	// 視野を広げる
+	if (dashTimer_ <= 0.1f) {
+		float localT = dashTimer_/ 0.1f;
+		float fovY = Lerp(0.45f, 0.6f, EaseIn(localT));
+		followCamera_->SetFovY(fovY);
+	}
+
+	// 視野を元に戻す
+	if (dashTimer_ >= 0.8f) {
+		float localT = (dashTimer_ - 0.8f) / 0.2f;
+		float fovY = Lerp(0.6f, 0.45f,EaseOut(localT));
+		followCamera_->SetFovY(fovY);
+	}
+
 	// 時間がたったら通常状態へ遷移
 	if (dashTimer_ >= kDashMaxTime_) {
 		behaviorRequest_ = Behavior::Normal;
+
+		// 視野を変更
+		followCamera_->SetFovY(0.45f);
 	}
 }
 

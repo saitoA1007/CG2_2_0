@@ -8,8 +8,8 @@
 #include"Collider.h"
 
 // 武器
-//#include"Application/Weapon/IWeapon.h"
 #include"Application/Weapon/Sword.h"
+#include"Application/Camera/FollowCameraController.h"
 
 class Player : public GameEngine::GameObject {
 public:
@@ -140,6 +140,11 @@ public:
 	// 透明度
 	float GetAlpha() { return alpha_; }
 
+	// カメラを設定
+	void SetCamera(FollowCameraController* followCamera) {
+		followCamera_ = followCamera;
+	}
+
 private: // 調整項目
 
 	// 移動速度
@@ -175,6 +180,9 @@ private:
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
+
+	// 追従カメラ
+	FollowCameraController* followCamera_ = nullptr;
 
 	// hp
 	int32_t hp_ = 3;

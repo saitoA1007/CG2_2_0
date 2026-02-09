@@ -51,6 +51,11 @@ public:
 	// ロックオンフラグを設定
 	void SetIsChangeActive(const bool& isActive) { isChangeActive_ = !isActive; }
 		
+	// カメラのFovYを設定
+	void SetFovY(const float& fovY) {
+		camera_->SetProjectionMatrix(fovY, 1280,720, 0.1f, 200.0f);
+	}
+
 private:
 
 	// カメラ
