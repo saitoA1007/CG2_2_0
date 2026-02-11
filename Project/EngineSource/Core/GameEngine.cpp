@@ -191,6 +191,18 @@ void Engine::Update() {
 			if (!isStop_) {
 				sceneManager_->Update();
 			}
+
+			if (input_->TriggerKey(DIK_H)) {
+				isPost_ = !isPost_;
+
+				if (isPost_) {
+					postEffectManager_->SetDrawMode(PostEffectManager::DrawMode::RadialBlur);
+					postEffectManager_->radialBlurResource_.GetData()->blurWidth = -0.02f;
+				} else {
+					postEffectManager_->SetDrawMode(PostEffectManager::DrawMode::Default);
+				}
+			}
+
 		} else {
 			sceneManager_->DebugSceneUpdate();
 		}

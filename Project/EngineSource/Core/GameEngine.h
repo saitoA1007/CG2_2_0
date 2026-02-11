@@ -164,6 +164,8 @@ namespace GameEngine {
 
 		bool isStop_ = false;
 
+		bool isPost_ = false;
+
 	private:
 
 		/// <summary>
