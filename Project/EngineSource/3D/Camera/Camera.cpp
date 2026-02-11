@@ -49,6 +49,16 @@ void Camera::UpdateFromWorldMatrix() {
 	}
 }
 
+void Camera::SetNew(const Matrix4x4& world) {
+	worldMatrix_ = world;
+	viewMatrix_ = InverseMatrix(worldMatrix_);
+	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
+
+	if (cameraForGPU_) {
+		cameraForGPU_->worldPosition = GetWorldPosition();
+	}
+}
+
 Matrix4x4 Camera::MakeWVPMatrix(Matrix4x4 worldMatrix) {
 	WVPMatrix_ = Multiply(worldMatrix, Multiply(viewMatrix_, projectionMatrix_));
 	return WVPMatrix_;

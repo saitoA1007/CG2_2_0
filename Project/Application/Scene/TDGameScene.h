@@ -108,6 +108,8 @@ private: // エンジンの低レイヤー機能を取得
 	// 当たり判定の管理
 	std::unique_ptr<GameEngine::CollisionManager> collisionManager_;
 
+	bool isDebug_ = false;
+
 private:
 	//==================================================
 	// シーン機能

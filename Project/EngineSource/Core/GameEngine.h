@@ -162,6 +162,8 @@ namespace GameEngine {
 		// 雑種
 		std::unique_ptr<FpsCounter> fpsCounter_;
 
+		bool isStop_ = false;
+
 	private:
 
 		/// <summary>

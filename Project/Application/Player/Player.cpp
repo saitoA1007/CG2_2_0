@@ -81,6 +81,9 @@ void Player::Update(GameEngine::InputCommand* inputCommand, const Camera& camera
     // カメラ基準ベクトル更新
     UpdateCameraBasis(&camera);
 
+	// 撮影用にhpを100に固定化
+	currentHP_ = 100;
+
     // ダメージ無敵タイマー更新
     if (isInvincible_) {
         damageInvincibleTimer_ -= FpsCounter::deltaTime;

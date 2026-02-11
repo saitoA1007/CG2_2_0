@@ -846,6 +846,13 @@ void TDGameScene::Update() {
 		}
 	}
 
+
+	// メインカメラをデバック表示へ
+	if (isDebug_) {
+		// メインカメラを設定
+		mainCamera_->SetNew(context_->debugCamera_->GetWorldMatrix());
+	}
+
 	// 時間を取得する
 	if (bossEnemy_->Isnow()) {
 		clearUI_->StartTime();
@@ -988,6 +995,11 @@ void TDGameScene::Update() {
 		cameraController_->Update(context_->inputCommand, context_->input);
 	}
 	mainCamera_->SetCamera(cameraController_->GetCamera());
+	// メインカメラをデバック表示へ
+	if (isDebug_) {
+		// メインカメラを設定
+		mainCamera_->SetNew(context_->debugCamera_->GetWorldMatrix());
+	}
 
     //============================
     // Pad Vibration 制御
@@ -1229,6 +1241,8 @@ void TDGameScene::Update() {
 }
 
 void TDGameScene::Draw(const bool &isDebugView) {
+
+	isDebug_ = isDebugView;
 
 	// 描画に使用するカメラを設定
 	if (isDebugView) {
@@ -1510,11 +1524,11 @@ void TDGameScene::DrawUI() {
     }
 
 	// プレイヤーHP
-    if (!bossIntroPlaying_ && !isBossDestroyFade_) {
-        for (const auto &sprite : playerHpUI_->GetHpSprites()) {
-            SpriteRenderer::Draw(sprite.get(), playerHpUI_->GetHpIconGH());
-        }
-    }
+   //if (!bossIntroPlaying_ && !isBossDestroyFade_) {
+   //    for (const auto &sprite : playerHpUI_->GetHpSprites()) {
+   //        SpriteRenderer::Draw(sprite.get(), playerHpUI_->GetHpIconGH());
+   //    }
+   //}
 
 	// ボスのHPUIは演出が終わったあとにのみ描画
     if (bossIntroFinished_ && !isBossDestroyFade_) {
@@ -1525,9 +1539,9 @@ void TDGameScene::DrawUI() {
     }
 
     // 操作ガイド
-    if (!bossIntroPlaying_ && playGuideSprite_ && !isBossDestroyFade_) {
-        SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_);
-    }
+   // if (!bossIntroPlaying_ && playGuideSprite_ && !isBossDestroyFade_) {
+   //     SpriteRenderer::Draw(playGuideSprite_.get(), playGuideGH_);
+   // }
 
     // GameOverUI
     if (gameOverUI_->IsActive()) {

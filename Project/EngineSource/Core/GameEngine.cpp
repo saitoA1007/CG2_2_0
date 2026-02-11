@@ -183,7 +183,14 @@ void Engine::Update() {
 
 		// シーンの更新処理
 		if (isActiveUpdate_ && !isPause_) {
-			sceneManager_->Update();
+			sceneManager_->DebugUpdate();
+
+			if (input_->TriggerKey(DIK_G)) {
+				isStop_ = !isStop_;
+			}
+			if (!isStop_) {
+				sceneManager_->Update();
+			}
 		} else {
 			sceneManager_->DebugSceneUpdate();
 		}

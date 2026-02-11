@@ -34,6 +34,8 @@ namespace GameEngine {
 		/// <param name="worldMatrix"></param>
 		void UpdateFromWorldMatrix();
 
+		void SetNew(const Matrix4x4& world);
+
 	public:
 
 		/// <summary>
