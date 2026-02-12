@@ -1,11 +1,11 @@
 {
     "Boss-Controller": {
-        "CrossMoveWeight": 10,
+        "CrossMoveWeight": 0,
         "IceFallWeight": 40,
-        "RotateMoveWeight": 10,
+        "RotateMoveWeight": 0,
         "RushAttackWeight": 30,
         "SceneName": "TDGameScene",
-        "WaitWeight": 5,
-        "WindAttackWeight": 30
+        "WaitWeight": 0,
+        "WindAttackWeight": 0
     }
 }

@@ -190,6 +190,9 @@ void Engine::Update() {
 			}
 			if (!isStop_) {
 				sceneManager_->Update();
+			} else {
+				inputCommand_->Update();
+				sceneManager_->DebugSceneUpdate();
 			}
 
 			if (input_->TriggerKey(DIK_H)) {
@@ -198,10 +201,40 @@ void Engine::Update() {
 				if (isPost_) {
 					postEffectManager_->SetDrawMode(PostEffectManager::DrawMode::RadialBlur);
 					postEffectManager_->radialBlurResource_.GetData()->blurWidth = -0.02f;
+				
+
 				} else {
 					postEffectManager_->SetDrawMode(PostEffectManager::DrawMode::Default);
 				}
 			}
+
+			if (input_->TriggerKey(DIK_Q)) {
+				postEffectManager_->radialBlurResource_.GetData()->blurWidth -= 0.005f;
+			}
+
+			if (input_->TriggerKey(DIK_E)) {
+				postEffectManager_->radialBlurResource_.GetData()->blurWidth += 0.005f;
+			}
+
+			if (input_->TriggerKey(DIK_I)) {
+				postEffectManager_->radialBlurResource_.GetData()->centerPos.y += 0.1f;
+			}
+
+			if (input_->TriggerKey(DIK_K)) {
+				postEffectManager_->radialBlurResource_.GetData()->centerPos.y -= 0.1f;
+			}
+
+			if (input_->TriggerKey(DIK_J)) {
+				postEffectManager_->radialBlurResource_.GetData()->centerPos.x -= 0.1f;
+			}
+
+			if (input_->TriggerKey(DIK_L)) {
+				postEffectManager_->radialBlurResource_.GetData()->centerPos.x += 0.1f;
+			}
+
+			//ImGui::Begin("tes");
+			//ImGui::DragFloat2("center", &postEffectManager_->radialBlurResource_.GetData()->centerPos.x, 1.0f);
+			//ImGui::End();
 
 		} else {
 			sceneManager_->DebugSceneUpdate();

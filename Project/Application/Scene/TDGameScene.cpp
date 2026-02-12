@@ -1614,6 +1614,9 @@ void TDGameScene::DrawUI() {
 	context_->inputCommand->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
 	context_->inputCommand->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
 
+	context_->inputCommand->RegisterCommand("Dup", { { InputState::KeyPush, DIK_UP } });
+	context_->inputCommand->RegisterCommand("Ddown", { { InputState::KeyPush, DIK_DOWN } });
+
 	// Startゲーム開始（EnterキーまたはAボタン）
     context_->inputCommand->RegisterCommand("Start", { {InputState::KeyTrigger, DIK_RETURN}, {InputState::PadTrigger, XINPUT_GAMEPAD_A},{InputState::KeyTrigger, DIK_SPACE}, {InputState::MouseTrigger, 0} });
 	// メニュー移動
@@ -1701,6 +1704,9 @@ void TDGameScene::UpdateCollision() {
 }
 
 void TDGameScene::DebugUpdate() {
+
+	player_->DebugUpdate(context_->inputCommand);
+
 #ifdef _DEBUG
 
 	// ステージ作成のデバック用
@@ -1727,6 +1733,7 @@ void TDGameScene::DebugUpdate() {
 	debugRenderer_->SetEnabled(isDrawCollision_);
 	ImGui::End();
 #endif
+
 }
 
 void TDGameScene::UpdateStartAnimation() {

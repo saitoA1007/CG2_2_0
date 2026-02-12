@@ -668,6 +668,19 @@ void Player::Bounce(const Vector3 &bounceDirection, float bounceStrength, bool i
 	}
 }
 
+void Player::DebugUpdate(GameEngine::InputCommand* inputCommand) {
+	if (inputCommand->IsCommandActive("MoveUp")) { worldTransform_.transform_.translate.z -= 4.0f * FpsCounter::deltaTime; }
+	if (inputCommand->IsCommandActive("MoveDown")) { worldTransform_.transform_.translate.z += 4.0f * FpsCounter::deltaTime; }
+	if (inputCommand->IsCommandActive("MoveLeft")) { worldTransform_.transform_.translate.x -= 4.0f * FpsCounter::deltaTime; }
+	if (inputCommand->IsCommandActive("MoveRight")) { worldTransform_.transform_.translate.x += 4.0f * FpsCounter::deltaTime; }
+
+	if (inputCommand->IsCommandActive("Dup")) { worldTransform_.transform_.translate.y += 4.0f * FpsCounter::deltaTime; }
+	if (inputCommand->IsCommandActive("Ddown")) { worldTransform_.transform_.translate.y -= 4.0f * FpsCounter::deltaTime; }
+
+
+	worldTransform_.UpdateTransformMatrix();
+}
+
 void Player::OnCollision(const CollisionResult &result) {
 	if (!result.isHit) return;
 

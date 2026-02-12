@@ -120,6 +120,8 @@ public:
 
 	// 回復演出
 	bool IsHearted() const { return isHearted_; }
+
+	void DebugUpdate(GameEngine::InputCommand* inputCommand);
 	
 private:
 	//==================================================
